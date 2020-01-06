@@ -104,3 +104,4 @@ ENV/
 
 # DB
 db.sqlite3
+migrations/
