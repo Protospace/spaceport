@@ -8,23 +8,28 @@ if (process.env.NODE_ENV !== 'production') {
 	apiUrl = 'https://api.' + window.location.hostname;
 }
 
-export const requester = (route, method, data) => {
-	var options;
+export const requester = (route, method, token, data) => {
+	let options = {headers: {}};
+
+	if (token) {
+		options.headers.Authorization = 'Token ' + token;
+	}
 
 	if (method == 'GET') {
-		options = {};
-	} else if (method == 'POST') {
+		// pass
+	} else if (['POST', 'PUT', 'PATCH'].includes(method)) {
 		const formData = new FormData();
 		Object.keys(data).forEach(key =>
 			formData.append(key, data[key])
 		);
 
 		options = {
-			method: 'POST',
+			...options,
+			method: method,
 			body: formData,
 		};
 	} else {
-		return 'Method not supported';
+		throw new Error('Method not supported');
 	}
 
 	const customError = (data) => {
@@ -44,11 +49,13 @@ export const requester = (route, method, data) => {
 		const code = error.data.status;
 		if (code == 413) {
 			throw customError({non_field_errors: ['File too big']});
-		} else if (code == 400) {
+		} else if (code >= 400 && code < 500) {
 			return error.data.json()
 			.then(result => {
 				throw customError(result);
 			});
+		} else if (code >= 500 && code < 600) {
+			throw customError({non_field_errors: ['Server Error']});
 		} else {
 			throw customError({non_field_errors: ['Network Error']});
 		}

@@ -104,4 +104,6 @@ ENV/
 
 # DB
 db.sqlite3
+old_portal.sqlite3
+old_models.py
 migrations/

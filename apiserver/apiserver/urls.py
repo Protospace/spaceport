@@ -7,11 +7,15 @@ from .api import views
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
+router.register(r'members', views.MemberViewSet, basename='member')
+#router.register(r'me', views.FullMemberView, basename='fullmember')
+#router.register(r'registration', views.RegistrationViewSet, basename='register')
 
 urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     url(r'^rest-auth/', include('rest_auth.urls')),
-    url(r'^rest-auth/registration/', include('rest_auth.registration.urls'))
+    url(r'^registration/', views.RegistrationViewSet.as_view(), name='rest_name_register'),
+    url(r'^me/', views.MyUserView.as_view(), name='fullmember'),
 ]
