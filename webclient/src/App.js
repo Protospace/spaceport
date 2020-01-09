@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './light.css';
 import Logo from './logo.svg';
-import { Container, Divider, Form, Grid, Header, Icon, Menu, Message, Segment } from 'semantic-ui-react';
+import { Container, Divider, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { requester } from './utils.js';
 
 function LoginForm(props) {
@@ -236,11 +236,57 @@ function DetailsForm(props) {
 }
 
 function MemberInfo(props) {
-	const member = props.user.member;
+	const user = props.user;
+	const member = user.member;
 
 	return (
 		<div>
-			<Header size='large'>{member.first_name} {member.last_name}</Header>
+			<Header size='large'>
+				<Icon.Group size='small'>
+					<Icon name='circle' color='green' />
+				</Icon.Group>
+				<Header.Content>{member.first_name} {member.last_name}</Header.Content>
+			</Header>
+
+			<p>Preferred Name: {member.preferred_name || '???'}</p>
+			<p>Email: {user.email}</p>
+
+			<Grid stackable>
+				<Grid.Column width={6}>
+					<Image src='https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png' size='small' />
+				</Grid.Column>
+
+				<Grid.Column width={10}>
+					<Table unstackable basic='very'>
+						<Table.Body>
+							<Table.Row>
+								<Table.Cell>Expiry:</Table.Cell>
+								<Table.Cell>2099-01-01</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>Status:</Table.Cell>
+								<Table.Cell>Current</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>Application:</Table.Cell>
+								<Table.Cell>{member.application_date || '???'}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>Start:</Table.Cell>
+								<Table.Cell>{member.current_start_date || '???'}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>Vetted:</Table.Cell>
+								<Table.Cell>{member.vetted_date || 'Not vetted'}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>Monthly</Table.Cell>
+								<Table.Cell>${member.monthly_fees || '???'}</Table.Cell>
+							</Table.Row>
+						</Table.Body>
+					</Table>
+				</Grid.Column>
+			</Grid>
 		</div>
 	);
 }
