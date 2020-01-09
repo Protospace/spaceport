@@ -198,7 +198,7 @@ function DetailsForm(props) {
 
 	return (
 		<Form onSubmit={handleSubmit}>
-			<Header size='medium'>Enter New Member Details</Header>
+			<Header size='medium'>Enter Member Details</Header>
 			<Form.Input
 				label='Preferred Name'
 				name='preferred_name'

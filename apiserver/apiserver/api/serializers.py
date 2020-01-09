@@ -5,23 +5,18 @@ from rest_auth.registration.serializers import RegisterSerializer
 
 from . import models, old_models
 
-GRAB_FIELDS = [
-    'preferred_name',
-    'phone',
-    'current_start_date',
-    'application_date',
-    'vetted_date',
-    'monthly_fees',
-    'emergency_contact_name',
-    'emergency_contact_phone',
-]
-
 #custom_error = lambda x: ValidationError(dict(non_field_errors=x))
 
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Transaction
+        fields = '__all__'
+
 class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'member']
+        fields = ['id', 'username', 'email', 'member', 'transactions']
         depth = 1
 
 
@@ -45,8 +40,6 @@ class RegistrationSerializer(RegisterSerializer):
 
     def custom_signup(self, request, user):
         data = request.data
-        old_member_id = None
-        old_member_fields = dict(preferred_name=data['first_name'])
 
         if data['existing_member'] == 'true':
             old_members = old_models.Members.objects.using('old_portal')
@@ -56,15 +49,26 @@ class RegistrationSerializer(RegisterSerializer):
                 user.delete()
                 raise ValidationError(dict(email='Unable to find in old database.'))
 
-            old_member_id = old_member.id
+            member = models.Member.objects.get(id=old_member.id)
 
-            for f in GRAB_FIELDS:
-                old_member_fields[f] = old_member.__dict__.get(f, None)
+            if member.user:
+                raise ValidationError(dict(email='Old member already claimed.'))
 
-        models.Member.objects.create(
-            user=user,
-            first_name=data['first_name'],
-            last_name=data['last_name'],
-            old_member_id=old_member_id,
-            **old_member_fields
-        )
+            member.user = user
+            member.first_name = data['first_name']
+            member.last_name = data['last_name']
+            member.preferred_name = data['first_name']
+            member.save()
+
+            transactions = models.Transaction.objects.filter(member_id=member.id)
+            for t in transactions:
+                t.user = user
+                t.save()
+
+        else:
+            models.Member.objects.create(
+                user=user,
+                first_name=data['first_name'],
+                last_name=data['last_name'],
+                preferred_name=data['first_name'],
+            )
