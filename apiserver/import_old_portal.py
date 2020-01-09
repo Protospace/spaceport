@@ -30,6 +30,15 @@ TRANSACTION_FIELDS = [
     'info_source',
 ]
 
+CARD_FIELDS = [
+    'id',
+    'member_id',
+    'card_number',
+    'notes',
+    'last_seen_at',
+    'active_status',
+]
+
 print('Deleting all members...')
 models.Member.objects.all().delete()
 
@@ -63,6 +72,24 @@ for t in old_transactions:
     models.Transaction.objects.create(**new_transaction)
     print('Imported #{} - {} {}'.format(
         t.id, t.member_id, t.category
+    ))
+
+
+print('Deleting all cards...')
+models.Card.objects.all().delete()
+
+print('Importing old cards...')
+old_cards = old_models.AccessKeys.objects.using('old_portal').all()
+
+for c in old_cards:
+    new_card = {}
+
+    for f in CARD_FIELDS:
+        new_card[f] = c.__dict__.get(f, None)
+
+    models.Card.objects.create(**new_card)
+    print('Imported #{} - {} {}'.format(
+        c.id, c.card_number, c.notes
     ))
 
 

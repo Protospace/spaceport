@@ -239,7 +239,8 @@ function MemberInfo(props) {
 	const user = props.user;
 	const member = user.member;
 
-	const lastTrans = user.transactions.slice(-3);
+	const lastTrans = user.transactions && user.transactions.slice(-3).reverse();
+	const lastCard = user.cards && user.cards.sort((a, b) => a.last_seen_at > b.last_seen_at)[0];
 
 	return (
 		<div>
@@ -282,8 +283,12 @@ function MemberInfo(props) {
 						<Table.Cell>{member.vetted_date || 'Not vetted'}</Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Cell>Monthly</Table.Cell>
+						<Table.Cell>Monthly:</Table.Cell>
 						<Table.Cell>${member.monthly_fees || '???'}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Card Number:</Table.Cell>
+						<Table.Cell>{lastCard && lastCard.card_number || 'None'}</Table.Cell>
 					</Table.Row>
 				</Table.Body>
 			</Table>
@@ -365,7 +370,9 @@ function App() {
 					<Menu.Item
 						content='Logout'
 						onClick={logout}
+						icon='cancel'
 					/>
+					<Menu.Item fitted content='' />
 				</Menu.Menu>}
 			</Container>
 			</Menu>

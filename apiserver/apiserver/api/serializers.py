@@ -7,16 +7,10 @@ from . import models, old_models
 
 #custom_error = lambda x: ValidationError(dict(non_field_errors=x))
 
-class TransactionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Transaction
-        fields = '__all__'
-
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'member', 'transactions']
+        fields = ['id', 'username', 'email', 'member', 'transactions', 'cards']
         depth = 1
 
 
@@ -31,6 +25,12 @@ class AdminMemberSerializer(serializers.ModelSerializer):
         model = models.Member
         fields = '__all__'
         read_only_fields = ['id', 'user']
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Transaction
+        fields = '__all__'
 
 
 class RegistrationSerializer(RegisterSerializer):
@@ -64,6 +64,11 @@ class RegistrationSerializer(RegisterSerializer):
             for t in transactions:
                 t.user = user
                 t.save()
+
+            cards = models.Card.objects.filter(member_id=member.id)
+            for c in cards:
+                c.user = user
+                c.save()
 
         else:
             models.Member.objects.create(
