@@ -6,7 +6,7 @@ from django.utils.timezone import now
 from . import old_models
 
 class Member(models.Model):
-    user = models.OneToOneField(User, blank=True, null=True, on_delete=models.PROTECT)
+    user = models.OneToOneField(User, blank=True, null=True, on_delete=models.SET_NULL)
     first_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=32)
 
@@ -21,8 +21,8 @@ class Member(models.Model):
     emergency_contact_phone = models.CharField(max_length=32, blank=True)
 
 class Transaction(models.Model):
-    user = models.ForeignKey(User, related_name='transactions', blank=True, null=True, on_delete=models.PROTECT)
-    recorder = models.ForeignKey(User, related_name='+', blank=True, null=True, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, related_name='transactions', blank=True, null=True, on_delete=models.SET_NULL)
+    recorder = models.ForeignKey(User, related_name='+', blank=True, null=True, on_delete=models.SET_NULL)
 
     member_id = models.IntegerField(blank=True, null=True)
     date = models.DateField(default=date.today)
@@ -36,10 +36,32 @@ class Transaction(models.Model):
     info_source = models.TextField(blank=True, null=True)
 
 class Card(models.Model):
-    user = models.ForeignKey(User, related_name='cards', blank=True, null=True, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, related_name='cards', blank=True, null=True, on_delete=models.SET_NULL)
 
     member_id = models.IntegerField(blank=True, null=True)
     card_number = models.CharField(max_length=16, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     last_seen_at = models.DateField(default=date.today, blank=True, null=True)
     active_status = models.CharField(max_length=32, blank=True, null=True)
+
+class Course(models.Model):
+    name = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    is_old = models.BooleanField(default=False)
+
+class Session(models.Model):
+    instructor = models.ForeignKey(User, related_name='teaching', blank=True, null=True, on_delete=models.SET_NULL)
+    course = models.ForeignKey(Course, blank=True, null=True, on_delete=models.SET_NULL)
+
+    old_instructor = models.TextField(blank=True, null=True)
+    datetime = models.DateTimeField(blank=True, null=True)
+    cost = models.DecimalField(max_digits=5, decimal_places=2)
+
+class Training(models.Model):
+    user = models.ForeignKey(User, related_name='training', blank=True, null=True, on_delete=models.SET_NULL)
+    session = models.ForeignKey(Session, blank=True, null=True, on_delete=models.SET_NULL)
+
+    member_id = models.IntegerField(blank=True, null=True)
+    attendance_status = models.TextField(blank=True, null=True)
+    sign_up_date = models.DateField(default=date.today, blank=True, null=True)
+    paid_date = models.DateField(default=date.today, blank=True, null=True)

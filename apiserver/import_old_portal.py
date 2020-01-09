@@ -39,57 +39,134 @@ CARD_FIELDS = [
     'active_status',
 ]
 
+COURSE_FIELDS = [
+    'id',
+    'name',
+    'description',
+    # True -> is_old
+]
+
+SESSION_FIELDS = [
+    'id',
+    # course_id -> course
+    # instructor -> old_instructor
+    'datetime',
+    'cost',
+]
+
+TRAINING_FIELDS = [
+    'id',
+    # class_session_id -> session
+    'member_id',
+    'attendance_status',
+    'sign_up_date',
+    'paid_date',
+]
+
 print('Deleting all members...')
 models.Member.objects.all().delete()
-
 print('Importing old members...')
-old_members = old_models.Members.objects.using('old_portal').all()
+old = old_models.Members.objects.using('old_portal').all()
 
-for m in old_members:
-    new_member = {}
+for o in old:
+    new = {}
 
     for f in MEMBER_FIELDS:
-        new_member[f] = m.__dict__.get(f, None)
+        new[f] = o.__dict__.get(f, None)
 
-    models.Member.objects.create(**new_member)
-    print('Imported #{} - {} {}'.format(
-        m.id, m.first_name, m.last_name
+    models.Member.objects.create(**new)
+    print('Imported member #{} - {} {}'.format(
+        o.id, o.first_name, o.last_name
     ))
 
 
 print('Deleting all transactions...')
 models.Transaction.objects.all().delete()
-
 print('Importing old transactions...')
-old_transactions = old_models.Transactions.objects.using('old_portal').all()
+old = old_models.Transactions.objects.using('old_portal').all()
 
-for t in old_transactions:
-    new_transaction = {}
+for o in old:
+    new = {}
 
     for f in TRANSACTION_FIELDS:
-        new_transaction[f] = t.__dict__.get(f, None)
+        new[f] = o.__dict__.get(f, None)
 
-    models.Transaction.objects.create(**new_transaction)
-    print('Imported #{} - {} {}'.format(
-        t.id, t.member_id, t.category
+    models.Transaction.objects.create(**new)
+    print('Imported transaction #{} - {} {}'.format(
+        o.id, o.member_id, o.category
     ))
 
 
 print('Deleting all cards...')
 models.Card.objects.all().delete()
-
 print('Importing old cards...')
-old_cards = old_models.AccessKeys.objects.using('old_portal').all()
+old = old_models.AccessKeys.objects.using('old_portal').all()
 
-for c in old_cards:
-    new_card = {}
+for o in old:
+    new = {}
 
     for f in CARD_FIELDS:
-        new_card[f] = c.__dict__.get(f, None)
+        new[f] = o.__dict__.get(f, None)
 
-    models.Card.objects.create(**new_card)
-    print('Imported #{} - {} {}'.format(
-        c.id, c.card_number, c.notes
+    models.Card.objects.create(**new)
+    print('Imported card #{} - {} {}'.format(
+        o.id, o.card_number, o.notes
+    ))
+
+
+print('Deleting all courses...')
+models.Course.objects.all().delete()
+print('Importing old courses...')
+old = old_models.Courses.objects.using('old_portal').all()
+
+for o in old:
+    new = {}
+
+    for f in COURSE_FIELDS:
+        new[f] = o.__dict__.get(f, None)
+    new['name'] = new['name'].split('<',1)[0]
+    new['is_old'] = True
+
+    models.Course.objects.create(**new)
+    print('Imported course #{} - {}'.format(
+        o.id, new['name']
+    ))
+
+
+print('Deleting all sessions...')
+models.Session.objects.all().delete()
+print('Importing old session...')
+old = old_models.ClassSessions.objects.using('old_portal').all()
+
+for o in old:
+    new = {}
+
+    for f in SESSION_FIELDS:
+        new[f] = o.__dict__.get(f, None)
+    new['course'] = models.Course.objects.get(id=o.course_id)
+    new['old_instructor'] = o.instructor
+
+    models.Session.objects.create(**new)
+    print('Imported session #{} - {} {}'.format(
+        o.id, o.instructor, new['course']
+    ))
+
+
+print('Deleting all training...')
+models.Training.objects.all().delete()
+print('Importing old training...')
+old = old_models.ClassRegistrants.objects.using('old_portal').all()
+
+for o in old:
+    new = {}
+
+    for f in TRAINING_FIELDS:
+        new[f] = o.__dict__.get(f, None)
+    new['session'] = models.Session.objects.get(id=o.class_session_id)
+
+    models.Training.objects.create(**new)
+    print('Imported training #{} - {} {}'.format(
+        o.id, new['session'], o.member_id
     ))
 
 

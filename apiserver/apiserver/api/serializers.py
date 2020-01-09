@@ -7,10 +7,18 @@ from . import models, old_models
 
 #custom_error = lambda x: ValidationError(dict(non_field_errors=x))
 
+class UserTrainingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Training
+        exclude = ['user']
+        depth = 2
+
 class UserSerializer(serializers.ModelSerializer):
+    training = UserTrainingSerializer(many=True)
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'member', 'transactions', 'cards']
+        fields = ['id', 'username', 'email', 'member', 'transactions', 'cards', 'training']
         depth = 1
 
 
@@ -47,7 +55,7 @@ class RegistrationSerializer(RegisterSerializer):
                 old_member = old_members.get(email=data['email'])
             except old_models.Members.DoesNotExist:
                 user.delete()
-                raise ValidationError(dict(email='Unable to find in old database.'))
+                raise ValidationError(dict(email='Unable to find email in old database.'))
 
             member = models.Member.objects.get(id=old_member.id)
 
@@ -69,6 +77,11 @@ class RegistrationSerializer(RegisterSerializer):
             for c in cards:
                 c.user = user
                 c.save()
+
+            training = models.Training.objects.filter(member_id=member.id)
+            for t in training:
+                t.user = user
+                t.save()
 
         else:
             models.Member.objects.create(
