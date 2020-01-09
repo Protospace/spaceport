@@ -25,7 +25,7 @@ class Transaction(models.Model):
     recorder = models.ForeignKey(User, related_name='+', blank=True, null=True, on_delete=models.PROTECT)
 
     member_id = models.IntegerField(blank=True, null=True)
-    date = models.DateTimeField(default=now)
+    date = models.DateField(default=date.today)
     amount = models.DecimalField(max_digits=7, decimal_places=2)
     reference_number = models.CharField(max_length=32, blank=True, null=True)
     memo = models.TextField(blank=True, null=True)

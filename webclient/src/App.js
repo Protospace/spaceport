@@ -239,54 +239,71 @@ function MemberInfo(props) {
 	const user = props.user;
 	const member = user.member;
 
+	const lastTrans = user.transactions.slice(-3);
+
 	return (
 		<div>
-			<Header size='large'>
-				<Icon.Group size='small'>
-					<Icon name='circle' color='green' />
-				</Icon.Group>
-				<Header.Content>{member.first_name} {member.last_name}</Header.Content>
-			</Header>
-
-			<p>Preferred Name: {member.preferred_name || '???'}</p>
-			<p>Email: {user.email}</p>
-
 			<Grid stackable>
 				<Grid.Column width={6}>
 					<Image src='https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png' size='small' />
 				</Grid.Column>
 
 				<Grid.Column width={10}>
-					<Table unstackable basic='very'>
-						<Table.Body>
-							<Table.Row>
-								<Table.Cell>Expiry:</Table.Cell>
-								<Table.Cell>2099-01-01</Table.Cell>
-							</Table.Row>
-							<Table.Row>
-								<Table.Cell>Status:</Table.Cell>
-								<Table.Cell>Current</Table.Cell>
-							</Table.Row>
-							<Table.Row>
-								<Table.Cell>Application:</Table.Cell>
-								<Table.Cell>{member.application_date || '???'}</Table.Cell>
-							</Table.Row>
-							<Table.Row>
-								<Table.Cell>Start:</Table.Cell>
-								<Table.Cell>{member.current_start_date || '???'}</Table.Cell>
-							</Table.Row>
-							<Table.Row>
-								<Table.Cell>Vetted:</Table.Cell>
-								<Table.Cell>{member.vetted_date || 'Not vetted'}</Table.Cell>
-							</Table.Row>
-							<Table.Row>
-								<Table.Cell>Monthly</Table.Cell>
-								<Table.Cell>${member.monthly_fees || '???'}</Table.Cell>
-							</Table.Row>
-						</Table.Body>
-					</Table>
+					<Header size='large'>
+						<Icon.Group size='small'>
+							<Icon name='circle' color='green' />
+						</Icon.Group>
+						<Header.Content>{member.first_name} {member.last_name}</Header.Content>
+					</Header>
+
+					<p>Preferred Name: {member.preferred_name || '???'}</p>
+					<p>Email: {user.email}</p>
+					<p>Status: Current</p>
 				</Grid.Column>
 			</Grid>
+
+			<Header size='medium'>Details</Header>
+			<Table unstackable basic='very'>
+				<Table.Body>
+					<Table.Row>
+						<Table.Cell>Expiry:</Table.Cell>
+						<Table.Cell>2099-01-01</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Application:</Table.Cell>
+						<Table.Cell>{member.application_date || '???'}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Start:</Table.Cell>
+						<Table.Cell>{member.current_start_date || '???'}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Vetted:</Table.Cell>
+						<Table.Cell>{member.vetted_date || 'Not vetted'}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Monthly</Table.Cell>
+						<Table.Cell>${member.monthly_fees || '???'}</Table.Cell>
+					</Table.Row>
+				</Table.Body>
+			</Table>
+
+			<Header size='medium'>Latest Transactions</Header>
+			<Table unstackable basic='very'>
+				<Table.Body>
+					{lastTrans.length ?
+						lastTrans.map((x, i) =>
+							<Table.Row key={i}>
+								<Table.Cell>{x.date}</Table.Cell>
+								<Table.Cell>{x.account_type}</Table.Cell>
+								<Table.Cell>${x.amount}</Table.Cell>
+							</Table.Row>
+						)
+					:
+						<p>None</p>
+					}
+				</Table.Body>
+			</Table>
 		</div>
 	);
 }
@@ -322,7 +339,7 @@ function App() {
 		setUserCache(false);
 	}
 
-	const menuName = user.member && user.member.preferred_name || 'Me';
+	const menuName = user && user.member && user.member.preferred_name || 'Me';
 
 	return (
 		<div>
