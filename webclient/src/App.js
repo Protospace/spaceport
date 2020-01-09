@@ -368,7 +368,7 @@ function Transactions(props) {
 
 	return (
 		<Container>
-			<Header size='large'>Protospace Transactions</Header>
+			<Header size='large'>Transactions</Header>
 
 			<Table basic='very'>
 				<Table.Header>
@@ -454,7 +454,69 @@ function TransactionDetail(props) {
 		:
 			<NotFound />
 	);
-}
+};
+
+function Cards(props) {
+	const { user } = props;
+
+	const cardStatus = (c) => c.active_status === 'card_active' ? 'Yes' : 'No';
+	const card = user.cards[0];
+
+	return (
+		<Container>
+			<Header size='large'>Member Cards</Header>
+
+			{user.cards.length ?
+				user.cards.length > 1 ?
+					<Table basic='very'>
+						<Table.Header>
+							<Table.Row>
+								<Table.HeaderCell>Number</Table.HeaderCell>
+								<Table.HeaderCell>Notes</Table.HeaderCell>
+								<Table.HeaderCell>Last Seen</Table.HeaderCell>
+								<Table.HeaderCell>Active</Table.HeaderCell>
+							</Table.Row>
+						</Table.Header>
+
+						<Table.Body>
+							{user.cards.map((x, i) =>
+								<Table.Row key={i}>
+									<Table.Cell>{x.card_number}</Table.Cell>
+									<Table.Cell>{x.notes}</Table.Cell>
+									<Table.Cell>{x.last_seen_at}</Table.Cell>
+									<Table.Cell>{cardStatus(x)}</Table.Cell>
+								</Table.Row>
+							)}
+						</Table.Body>
+					</Table>
+				:
+					<Table unstackable basic='very'>
+						<Table.Body>
+							<Table.Row>
+								<Table.Cell>Number:</Table.Cell>
+								<Table.Cell>{card.card_number}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>Notes:</Table.Cell>
+								<Table.Cell>{card.notes}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>Last Seen:</Table.Cell>
+								<Table.Cell>{card.last_seen_at}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>Active:</Table.Cell>
+								<Table.Cell>{cardStatus(card)}</Table.Cell>
+							</Table.Row>
+						</Table.Body>
+					</Table>
+			:
+				<p>No cards yet! Ask a director for one after you are vetted.</p>
+			}
+
+		</Container>
+	);
+};
 
 function PleaseLogin() {
 	return (
@@ -538,6 +600,8 @@ function App() {
 							/>
 							<Dropdown.Item
 								content='Cards'
+								as={Link}
+								to='/cards'
 							/>
 						</Dropdown.Menu>
 					</Dropdown>
@@ -568,24 +632,30 @@ function App() {
 				<Home token={token} setTokenCache={setTokenCache} user={user} setUserCache={setUserCache} />
 			</Route>
 
-			{user ?
-				<Switch>
-					<Route path='/transactions/:id'>
-						<TransactionDetail user={user} />
-					</Route>
-					<Route path='/transactions'>
-						<Transactions user={user} />
-					</Route>
+			<div className='topPadding'>
+				{user ?
+					<Switch>
+						<Route path='/transactions/:id'>
+							<TransactionDetail user={user} />
+						</Route>
+						<Route path='/transactions'>
+							<Transactions user={user} />
+						</Route>
 
+						<Route path='/cards'>
+							<Cards user={user} />
+						</Route>
+
+						<Route path='/:page'>
+							<NotFound />
+						</Route>
+					</Switch>
+				:
 					<Route path='/:page'>
-						<NotFound />
+						<PleaseLogin />
 					</Route>
-				</Switch>
-			:
-				<Route path='/:page'>
-					<PleaseLogin />
-				</Route>
-			}
+				}
+			</div>
 
 		</Router>
 	)

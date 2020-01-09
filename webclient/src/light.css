@@ -25,3 +25,7 @@ body {
 #ps-menu .dropdown.icon {
 	display: none;
 }
+
+.topPadding {
+	padding-top: 1rem;
+}
