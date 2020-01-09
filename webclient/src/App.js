@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import './light.css';
 import Logo from './logo.svg';
-import { Container, Divider, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { requester } from './utils.js';
 
 function LoginForm(props) {
@@ -53,7 +54,7 @@ function LoginForm(props) {
 			</Form.Button>
 		</Form>
 	);
-}
+};
 
 function SignupForm(props) {
 	const [input, setInput] = useState({});
@@ -160,7 +161,7 @@ function SignupForm(props) {
 			</Form.Button>
 		</Form>
 	);
-}
+};
 
 function DetailsForm(props) {
 	const member = props.user.member;
@@ -233,7 +234,7 @@ function DetailsForm(props) {
 			</Form.Button>
 		</Form>
 	);
-}
+};
 
 function MemberInfo(props) {
 	const user = props.user;
@@ -311,7 +312,59 @@ function MemberInfo(props) {
 			</Table>
 		</div>
 	);
-}
+};
+
+function Home(props) {
+	const token = props.token;
+	const setTokenCache = props.setTokenCache;
+	const user = props.user;
+	const setUserCache = props.setUserCache;
+
+	return (
+		<Container>
+			<Grid stackable padded columns={2}>
+				<Grid.Column>
+					{user ?
+						user.member.set_details ?
+							<MemberInfo user={user} />
+						:
+							<DetailsForm token={token} user={user} setUserCache={setUserCache} />
+					:
+						<div>
+							<LoginForm setTokenCache={setTokenCache} />
+
+							<Divider section horizontal>Or</Divider>
+
+							<SignupForm setTokenCache={setTokenCache} />
+						</div>
+					}
+				</Grid.Column>
+				<Grid.Column>
+					<Segment>
+						<Header size='medium'>Portal</Header>
+						<p>Welcome to the Protospace member portal! Here you can view member info, join classes, and manage your membership.</p>
+
+						<Header size='medium'>Quick Links</Header>
+						<p><a href='http://protospace.ca/' target='_blank' rel='noopener noreferrer'>Main Website</a></p>
+						<p><a href='http://wiki.protospace.ca/Welcome_to_Protospace' target='_blank' rel='noopener noreferrer'>Protospace Wiki</a></p>
+						<p><a href='https://groups.google.com/forum/#!forum/protospace-discuss' target='_blank' rel='noopener noreferrer'>Discussion Google Group</a></p>
+						<p><a href='https://drive.google.com/open?id=0By-vvp6fxFekfmU1cmdxaVRlaldiYXVyTE9rRnNVNjhkc3FjdkFIbjBwQkZ3MVVQX2Ezc3M' target='_blank' rel='noopener noreferrer'>Google Drive</a></p>
+
+						<Header size='medium'>Protospace Stats</Header>
+						<p>Next member meeting: Jan 01, 2099</p>
+						<p>Next monthly clean: Jan 01, 2099</p>
+						<p>Current member count: 200</p>
+						<p>Due members: 20</p>
+						<p>Expired members: 100</p>
+						<p>Bay 108 temperature: 21 C</p>
+						<p>Bay 110 temperature: 22 C</p>
+
+					</Segment>
+				</Grid.Column>
+			</Grid>
+		</Container>
+	);
+};
 
 function App() {
 	const [token, setToken] = useState(localStorage.getItem('token', ''));
@@ -344,10 +397,11 @@ function App() {
 		setUserCache(false);
 	}
 
-	const menuName = user && user.member && user.member.preferred_name || 'Me';
+	let menuName = user && user.member && user.member.preferred_name || 'Profile';
+	menuName = menuName.length > 7 ? 'Profile' : menuName;
 
 	return (
-		<div>
+		<Router>
 			<Container>
 				<div className='header'>
 					<img src={Logo} className='logo' />
@@ -355,72 +409,52 @@ function App() {
 			</Container>
 
 			<Menu>
-			<Container>
-				<Menu.Item
-					content='Home'
-				/>
-				<Menu.Item
-					content={menuName}
-				/>
-				<Menu.Item
-					content='Space'
-				/>
-
-				{user && <Menu.Menu position='right'>
+				<Container>
 					<Menu.Item
-						content='Logout'
-						onClick={logout}
-						icon='cancel'
+						content='Home'
+						as={Link}
+						to='/'
 					/>
-					<Menu.Item fitted content='' />
-				</Menu.Menu>}
-			</Container>
+
+					<Dropdown item text={menuName} id='ps-menu'>
+						<Dropdown.Menu>
+							<Dropdown.Item
+								content='Transactions'
+							/>
+							<Dropdown.Item
+								content='Cards'
+							/>
+						</Dropdown.Menu>
+					</Dropdown>
+
+					<Dropdown item text='Space' id='ps-menu'>
+						<Dropdown.Menu>
+							<Dropdown.Item
+								content='Members'
+							/>
+							<Dropdown.Item
+								content='Courses'
+							/>
+						</Dropdown.Menu>
+					</Dropdown>
+
+					{user && <Menu.Menu position='right'>
+						<Menu.Item
+							content='Logout'
+							onClick={logout}
+							icon='cancel'
+						/>
+						<Menu.Item fitted content='' />
+					</Menu.Menu>}
+				</Container>
 			</Menu>
 
-			<Container>
-				<Grid stackable padded columns={2}>
-					<Grid.Column>
-						{user ?
-							user.member.set_details ?
-								<MemberInfo user={user} />
-							:
-								<DetailsForm token={token} user={user} setUserCache={setUserCache} />
-						:
-							<div>
-								<LoginForm setTokenCache={setTokenCache} />
+			<Route exact path='/'>
+				<Home token={token} setTokenCache={setTokenCache} user={user} setUserCache={setUserCache} />
+			</Route>
 
-								<Divider section horizontal>Or</Divider>
-
-								<SignupForm setTokenCache={setTokenCache} />
-							</div>
-						}
-					</Grid.Column>
-					<Grid.Column>
-						<Segment>
-							<Header size='medium'>Portal</Header>
-							<p>Welcome to the Protospace member portal! Here you can view member info, join classes, and manage your membership.</p>
-
-							<Header size='medium'>Quick Links</Header>
-							<p><a href='http://protospace.ca/' target='_blank' rel='noopener noreferrer'>Main Website</a></p>
-							<p><a href='http://wiki.protospace.ca/Welcome_to_Protospace' target='_blank' rel='noopener noreferrer'>Protospace Wiki</a></p>
-							<p><a href='https://groups.google.com/forum/#!forum/protospace-discuss' target='_blank' rel='noopener noreferrer'>Discussion Google Group</a></p>
-							<p><a href='https://drive.google.com/open?id=0By-vvp6fxFekfmU1cmdxaVRlaldiYXVyTE9rRnNVNjhkc3FjdkFIbjBwQkZ3MVVQX2Ezc3M' target='_blank' rel='noopener noreferrer'>Google Drive</a></p>
-
-							<Header size='medium'>Protospace Stats</Header>
-							<p>Next member meeting: Jan 01, 2099</p>
-							<p>Next monthly clean: Jan 01, 2099</p>
-							<p>Current member count: 200</p>
-							<p>Due members: 20</p>
-							<p>Expired members: 100</p>
-							<p>Bay 108 temperature: 21 C</p>
-							<p>Bay 110 temperature: 22 C</p>
-
-						</Segment>
-					</Grid.Column>
-				</Grid>
-			</Container>
-		</div>
-	);
-}
+		</Router>
+	)
+};
 
 export default App;
