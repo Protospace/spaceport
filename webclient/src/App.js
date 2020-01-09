@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
 import Logo from './logo.svg';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
@@ -240,8 +240,8 @@ function MemberInfo(props) {
 	const user = props.user;
 	const member = user.member;
 
-	const lastTrans = user.transactions && user.transactions.slice(-3).reverse();
-	const lastCard = user.cards && user.cards.sort((a, b) => a.last_seen_at > b.last_seen_at)[0];
+	const lastTrans = user.transactions && user.transactions.slice(-3).slice().reverse();
+	const lastCard = user.cards && user.cards.sort((a, b) => a.last_seen_at < b.last_seen_at)[0];
 
 	return (
 		<div>
@@ -315,10 +315,7 @@ function MemberInfo(props) {
 };
 
 function Home(props) {
-	const token = props.token;
-	const setTokenCache = props.setTokenCache;
-	const user = props.user;
-	const setUserCache = props.setUserCache;
+	const { token, setTokenCache, user, setUserCache } = props;
 
 	return (
 		<Container>
@@ -366,16 +363,117 @@ function Home(props) {
 	);
 };
 
+function Transactions(props) {
+	const { user } = props;
+
+	return (
+		<Container>
+			<Header size='large'>Protospace Transactions</Header>
+
+			<Table basic='very'>
+				<Table.Header>
+					<Table.Row>
+						<Table.HeaderCell>Date</Table.HeaderCell>
+						<Table.HeaderCell>ID</Table.HeaderCell>
+						<Table.HeaderCell>Amount</Table.HeaderCell>
+						<Table.HeaderCell>Account</Table.HeaderCell>
+						<Table.HeaderCell>Memo</Table.HeaderCell>
+					</Table.Row>
+				</Table.Header>
+
+				<Table.Body>
+					{user.transactions.length ?
+						user.transactions.slice().reverse().map((x, i) =>
+							<Table.Row key={i}>
+								<Table.Cell>{x.date}</Table.Cell>
+								<Table.Cell><Link to={'/transactions/'+x.id}>{x.id}</Link></Table.Cell>
+								<Table.Cell>${x.amount}</Table.Cell>
+								<Table.Cell>{x.account_type}</Table.Cell>
+								<Table.Cell>{x.memo}</Table.Cell>
+							</Table.Row>
+						)
+					:
+						<p>None</p>
+					}
+				</Table.Body>
+			</Table>
+
+		</Container>
+	);
+}
+
+function TransactionDetail(props) {
+	const { user } = props;
+	const { id } = useParams();
+
+	const t = user.transactions.find(x => x.id == id);
+
+	return (
+		<Container>
+			<Header size='large'>Transaction Receipt</Header>
+
+			<Table unstackable basic='very'>
+				<Table.Body>
+					<Table.Row>
+						<Table.Cell>Date:</Table.Cell>
+						<Table.Cell>{t.date}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>ID:</Table.Cell>
+						<Table.Cell>{t.id}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Amount:</Table.Cell>
+						<Table.Cell>${t.amount}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Category:</Table.Cell>
+						<Table.Cell>{t.category}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Account:</Table.Cell>
+						<Table.Cell>{t.account}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Info Source:</Table.Cell>
+						<Table.Cell>{t.info_source}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Reference:</Table.Cell>
+						<Table.Cell>{t.reference_number}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Memo:</Table.Cell>
+						<Table.Cell>{t.memo}</Table.Cell>
+					</Table.Row>
+				</Table.Body>
+			</Table>
+
+		</Container>
+	);
+}
+
+function PleaseLogin() {
+	return (
+		<Container text>
+			<Message warning>
+				<Message.Header style={{ padding: 0 }}>You must login before you can do that!</Message.Header>
+				<p>Visit our <Link to='/'>login page</Link>, then try again.</p>
+			</Message>
+		</Container>
+	);
+};
+
 function App() {
 	const [token, setToken] = useState(localStorage.getItem('token', ''));
 	const [user, setUser] = useState(JSON.parse(localStorage.getItem('user', 'false')));
 
-	const setTokenCache = (x) => {
+	function setTokenCache(x) {
 		setToken(x);
 		localStorage.setItem('token', x);
 	}
 
-	const setUserCache = (x) => {
+	function setUserCache(x) {
 		setUser(x);
 		localStorage.setItem('user', JSON.stringify(x));
 	}
@@ -392,7 +490,8 @@ function App() {
 		});
 	}, [token]);
 
-	const logout = () => {
+	function logout() {
+		window.location = '/';
 		setTokenCache('');
 		setUserCache(false);
 	}
@@ -420,6 +519,8 @@ function App() {
 						<Dropdown.Menu>
 							<Dropdown.Item
 								content='Transactions'
+								as={Link}
+								to='/transactions'
 							/>
 							<Dropdown.Item
 								content='Cards'
@@ -452,6 +553,22 @@ function App() {
 			<Route exact path='/'>
 				<Home token={token} setTokenCache={setTokenCache} user={user} setUserCache={setUserCache} />
 			</Route>
+
+			{user ?
+				<Switch>
+					<Route path='/transactions/:id'>
+						<TransactionDetail user={user} />
+					</Route>
+					<Route path='/transactions'>
+						<Transactions user={user} />
+					</Route>
+
+				</Switch>
+			:
+				<Route path='/:page'>
+					<PleaseLogin />
+				</Route>
+			}
 
 		</Router>
 	)
