@@ -409,47 +409,50 @@ function TransactionDetail(props) {
 	const t = user.transactions.find(x => x.id == id);
 
 	return (
-		<Container>
-			<Header size='large'>Transaction Receipt</Header>
+		t ?
+			<Container>
+				<Header size='large'>Transaction Receipt</Header>
 
-			<Table unstackable basic='very'>
-				<Table.Body>
-					<Table.Row>
-						<Table.Cell>Date:</Table.Cell>
-						<Table.Cell>{t.date}</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Cell>ID:</Table.Cell>
-						<Table.Cell>{t.id}</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Cell>Amount:</Table.Cell>
-						<Table.Cell>${t.amount}</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Cell>Category:</Table.Cell>
-						<Table.Cell>{t.category}</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Cell>Account:</Table.Cell>
-						<Table.Cell>{t.account}</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Cell>Info Source:</Table.Cell>
-						<Table.Cell>{t.info_source}</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Cell>Reference:</Table.Cell>
-						<Table.Cell>{t.reference_number}</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Cell>Memo:</Table.Cell>
-						<Table.Cell>{t.memo}</Table.Cell>
-					</Table.Row>
-				</Table.Body>
-			</Table>
+				<Table unstackable basic='very'>
+					<Table.Body>
+						<Table.Row>
+							<Table.Cell>Date:</Table.Cell>
+							<Table.Cell>{t.date}</Table.Cell>
+						</Table.Row>
+						<Table.Row>
+							<Table.Cell>ID:</Table.Cell>
+							<Table.Cell>{t.id}</Table.Cell>
+						</Table.Row>
+						<Table.Row>
+							<Table.Cell>Amount:</Table.Cell>
+							<Table.Cell>${t.amount}</Table.Cell>
+						</Table.Row>
+						<Table.Row>
+							<Table.Cell>Category:</Table.Cell>
+							<Table.Cell>{t.category}</Table.Cell>
+						</Table.Row>
+						<Table.Row>
+							<Table.Cell>Account:</Table.Cell>
+							<Table.Cell>{t.account}</Table.Cell>
+						</Table.Row>
+						<Table.Row>
+							<Table.Cell>Info Source:</Table.Cell>
+							<Table.Cell>{t.info_source}</Table.Cell>
+						</Table.Row>
+						<Table.Row>
+							<Table.Cell>Reference:</Table.Cell>
+							<Table.Cell>{t.reference_number}</Table.Cell>
+						</Table.Row>
+						<Table.Row>
+							<Table.Cell>Memo:</Table.Cell>
+							<Table.Cell>{t.memo}</Table.Cell>
+						</Table.Row>
+					</Table.Body>
+				</Table>
 
-		</Container>
+			</Container>
+		:
+			<NotFound />
 	);
 }
 
@@ -459,6 +462,17 @@ function PleaseLogin() {
 			<Message warning>
 				<Message.Header style={{ padding: 0 }}>You must login before you can do that!</Message.Header>
 				<p>Visit our <Link to='/'>login page</Link>, then try again.</p>
+			</Message>
+		</Container>
+	);
+};
+
+function NotFound() {
+	return (
+		<Container text>
+			<Message warning>
+				<Message.Header style={{ padding: 0 }}>The page you requested can't be found!</Message.Header>
+				<p>Visit our <Link to='/'>home page</Link> if you are lost.</p>
 			</Message>
 		</Container>
 	);
@@ -563,6 +577,9 @@ function App() {
 						<Transactions user={user} />
 					</Route>
 
+					<Route path='/:page'>
+						<NotFound />
+					</Route>
 				</Switch>
 			:
 				<Route path='/:page'>
