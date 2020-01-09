@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './light.css';
 import Logo from './logo.svg';
-import { Container, Divider, Form, Grid, Header, Icon, Menu, Message } from 'semantic-ui-react';
+import { Container, Divider, Form, Grid, Header, Icon, Menu, Message, Segment } from 'semantic-ui-react';
 import { requester } from './utils.js';
 
 function LoginForm(props) {
@@ -198,7 +198,7 @@ function DetailsForm(props) {
 
 	return (
 		<Form onSubmit={handleSubmit}>
-			<Header size='medium'>Enter Details</Header>
+			<Header size='medium'>Enter New Member Details</Header>
 			<Form.Input
 				label='Preferred Name'
 				name='preferred_name'
@@ -235,6 +235,16 @@ function DetailsForm(props) {
 	);
 }
 
+function MemberInfo(props) {
+	const member = props.user.member;
+
+	return (
+		<div>
+			<Header size='large'>{member.first_name} {member.last_name}</Header>
+		</div>
+	);
+}
+
 function App() {
 	const [token, setToken] = useState(localStorage.getItem('token', ''));
 	const [user, setUser] = useState(JSON.parse(localStorage.getItem('user', 'false')));
@@ -266,6 +276,8 @@ function App() {
 		setUserCache(false);
 	}
 
+	const menuName = user.member && user.member.preferred_name || 'Me';
+
 	return (
 		<div>
 			<Container>
@@ -280,10 +292,10 @@ function App() {
 					content='Home'
 				/>
 				<Menu.Item
-					content='About'
+					content={menuName}
 				/>
 				<Menu.Item
-					content='Contact'
+					content='Space'
 				/>
 
 				{user && <Menu.Menu position='right'>
@@ -300,7 +312,7 @@ function App() {
 					<Grid.Column>
 						{user ?
 							user.member.set_details ?
-								<p>yay welcome {user.member.first_name}</p>
+								<MemberInfo user={user} />
 							:
 								<DetailsForm token={token} user={user} setUserCache={setUserCache} />
 						:
@@ -314,7 +326,26 @@ function App() {
 						}
 					</Grid.Column>
 					<Grid.Column>
-						<p>two</p>
+						<Segment>
+							<Header size='medium'>Portal</Header>
+							<p>Welcome to the Protospace member portal! Here you can view member info, join classes, and manage your membership.</p>
+
+							<Header size='medium'>Quick Links</Header>
+							<p><a href='http://protospace.ca/' target='_blank' rel='noopener noreferrer'>Main Website</a></p>
+							<p><a href='http://wiki.protospace.ca/Welcome_to_Protospace' target='_blank' rel='noopener noreferrer'>Protospace Wiki</a></p>
+							<p><a href='https://groups.google.com/forum/#!forum/protospace-discuss' target='_blank' rel='noopener noreferrer'>Discussion Google Group</a></p>
+							<p><a href='https://drive.google.com/open?id=0By-vvp6fxFekfmU1cmdxaVRlaldiYXVyTE9rRnNVNjhkc3FjdkFIbjBwQkZ3MVVQX2Ezc3M' target='_blank' rel='noopener noreferrer'>Google Drive</a></p>
+
+							<Header size='medium'>Protospace Stats</Header>
+							<p>Next member meeting: Jan 01, 2099</p>
+							<p>Next monthly clean: Jan 01, 2099</p>
+							<p>Current member count: 200</p>
+							<p>Due members: 20</p>
+							<p>Expired members: 100</p>
+							<p>Bay 108 temperature: 21 C</p>
+							<p>Bay 110 temperature: 22 C</p>
+
+						</Segment>
 					</Grid.Column>
 				</Grid>
 			</Container>
