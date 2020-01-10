@@ -51,7 +51,7 @@ class Course(models.Model):
 
 class Session(models.Model):
     instructor = models.ForeignKey(User, related_name='teaching', blank=True, null=True, on_delete=models.SET_NULL)
-    course = models.ForeignKey(Course, blank=True, null=True, on_delete=models.SET_NULL)
+    course = models.ForeignKey(Course, related_name='sessions', blank=True, null=True, on_delete=models.SET_NULL)
 
     old_instructor = models.TextField(blank=True, null=True)
     datetime = models.DateTimeField(blank=True, null=True)
@@ -59,7 +59,7 @@ class Session(models.Model):
 
 class Training(models.Model):
     user = models.ForeignKey(User, related_name='training', blank=True, null=True, on_delete=models.SET_NULL)
-    session = models.ForeignKey(Session, blank=True, null=True, on_delete=models.SET_NULL)
+    session = models.ForeignKey(Session, related_name='students', blank=True, null=True, on_delete=models.SET_NULL)
 
     member_id = models.IntegerField(blank=True, null=True)
     attendance_status = models.TextField(blank=True, null=True)

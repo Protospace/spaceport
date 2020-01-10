@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User, Group
+from django.db.models import Max
 from rest_framework import viewsets, views, permissions
 from rest_framework.response import Response
 from rest_auth.registration.views import RegisterView
@@ -31,6 +32,33 @@ class MemberViewSet(viewsets.ModelViewSet):
             return serializers.AdminMemberSerializer
         else:
             return serializers.MemberSerializer
+
+
+class CourseViewSet(viewsets.ModelViewSet):
+    permission_classes = [AllowMetadata | permissions.IsAuthenticated]
+    queryset = models.Course.objects.annotate(date=Max('sessions__datetime')).order_by('-date')
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return serializers.CourseDetailSerializer
+        else:
+            return serializers.CourseSerializer
+
+
+class SessionViewSet(viewsets.ModelViewSet):
+    permission_classes = [AllowMetadata | permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if self.action == 'list':
+            return models.Session.objects.order_by('-datetime')[:20]
+        else:
+            return models.Session.objects.all()
+
+    def get_serializer_class(self):
+        #if self.action == 'retrieve':
+        #    return serializers.CourseDetailSerializer
+        #else:
+        return serializers.SessionSerializer
 
 
 class MyUserView(views.APIView):

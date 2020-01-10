@@ -41,6 +41,40 @@ class TransactionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class SessionDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Training
+        exclude = ['user']
+
+class SessionSerializer(serializers.ModelSerializer):
+    student_count = serializers.SerializerMethodField()
+    class Meta:
+        model = models.Session
+        fields = '__all__'
+        depth = 1
+    def get_student_count(self, obj):
+        return len(obj.students.all())
+
+
+class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Course
+        fields = '__all__'
+
+class CourseDetailSerializer(serializers.ModelSerializer):
+    sessions = SessionSerializer(many=True)
+
+    class Meta:
+        model = models.Course
+        fields = '__all__'
+        depth = 1
+
+class AdminCourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Course
+        fields = '__all__'
+
+
 class RegistrationSerializer(RegisterSerializer):
     first_name = serializers.CharField(max_length=32)
     last_name = serializers.CharField(max_length=32)
