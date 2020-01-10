@@ -17,7 +17,6 @@ export function Transactions(props) {
 				<Table.Header>
 					<Table.Row>
 						<Table.HeaderCell>Date</Table.HeaderCell>
-						<Table.HeaderCell>ID</Table.HeaderCell>
 						<Table.HeaderCell>Amount</Table.HeaderCell>
 						<Table.HeaderCell>Account</Table.HeaderCell>
 						<Table.HeaderCell>Memo</Table.HeaderCell>
@@ -28,8 +27,9 @@ export function Transactions(props) {
 					{user.transactions.length ?
 						user.transactions.slice().reverse().map((x, i) =>
 							<Table.Row key={i}>
-								<Table.Cell>{x.date}</Table.Cell>
-								<Table.Cell><Link to={'/transactions/'+x.id}>{x.id}</Link></Table.Cell>
+								<Table.Cell>
+									<Link to={'/transactions/'+x.id}>{x.date}</Link>
+								</Table.Cell>
 								<Table.Cell>${x.amount}</Table.Cell>
 								<Table.Cell>{x.account_type}</Table.Cell>
 								<Table.Cell>{x.memo}</Table.Cell>

@@ -7,6 +7,7 @@ import { requester } from './utils.js';
 import { Home } from './Home.js';
 import { Transactions, TransactionDetail } from './Transactions.js';
 import { Cards } from './Cards.js';
+import { Training } from './Training.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 
 function App() {
@@ -41,9 +42,6 @@ function App() {
 		setUserCache(false);
 	}
 
-	let menuName = user && user.member && user.member.preferred_name || 'Profile';
-	menuName = menuName.length > 7 ? 'Profile' : menuName;
-
 	return (
 		<Router>
 			<Container>
@@ -60,12 +58,17 @@ function App() {
 						to='/'
 					/>
 
-					<Dropdown item text={menuName} id='ps-menu'>
+					<Dropdown item text='Profile' id='ps-menu'>
 						<Dropdown.Menu>
 							<Dropdown.Item
 								content='Transactions'
 								as={Link}
 								to='/transactions'
+							/>
+							<Dropdown.Item
+								content='Training'
+								as={Link}
+								to='/training'
 							/>
 							<Dropdown.Item
 								content='Cards'
@@ -113,6 +116,10 @@ function App() {
 
 						<Route path='/cards'>
 							<Cards user={user} />
+						</Route>
+
+						<Route path='/training'>
+							<Training user={user} />
 						</Route>
 
 						<Route path='/:page'>
