@@ -7,6 +7,49 @@ import moment from 'moment';
 import { requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 
+function ClassTable(props) {
+	const { classes } = props;
+
+	const getInstructor = (session) =>
+		session.instructor ? session.instructor.first_name : session.old_instructor;
+
+	return (
+		<Table basic='very'>
+			<Table.Header>
+				<Table.Row>
+					<Table.HeaderCell>ID</Table.HeaderCell>
+					<Table.HeaderCell>Name</Table.HeaderCell>
+					<Table.HeaderCell>Date</Table.HeaderCell>
+					<Table.HeaderCell>Instructor</Table.HeaderCell>
+					<Table.HeaderCell>Cost</Table.HeaderCell>
+					<Table.HeaderCell>Students</Table.HeaderCell>
+				</Table.Row>
+			</Table.Header>
+
+			<Table.Body>
+				{classes.length ?
+					classes.map((x, i) =>
+						<Table.Row key={i}>
+							<Table.Cell>{x.id}</Table.Cell>
+							<Table.Cell>{x.course.name}</Table.Cell>
+							<Table.Cell>
+								<Link to={'/classes/'+x.id}>
+									{moment.utc(x.datetime).format('ll')}
+								</Link>
+							</Table.Cell>
+							<Table.Cell>{getInstructor(x)}</Table.Cell>
+							<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
+							<Table.Cell>{x.student_count}</Table.Cell>
+						</Table.Row>
+					)
+				:
+					<p>None</p>
+				}
+			</Table.Body>
+		</Table>
+	);
+};
+
 export function Classes(props) {
 	const [classes, setClasses] = useState(false);
 	const { token } = props;
@@ -22,47 +65,22 @@ export function Classes(props) {
 		});
 	}, []);
 
-	const getInstructor = (session) =>
-		session.instructor ? session.instructor.first_name : session.old_instructor;
+	const now = new Date().toISOString();
 
 	return (
 		<Container>
-			<Header size='large'>Most Recent Classes</Header>
+			<Header size='large'>Class List</Header>
 
+			<Header size='medium'>Upcoming</Header>
 			{classes ?
-				<Table basic='very'>
-					<Table.Header>
-						<Table.Row>
-							<Table.HeaderCell>ID</Table.HeaderCell>
-							<Table.HeaderCell>Name</Table.HeaderCell>
-							<Table.HeaderCell>Date</Table.HeaderCell>
-							<Table.HeaderCell>Instructor</Table.HeaderCell>
-							<Table.HeaderCell>Cost</Table.HeaderCell>
-							<Table.HeaderCell>Students</Table.HeaderCell>
-						</Table.Row>
-					</Table.Header>
+				<ClassTable classes={classes.filter(x => x.datetime > now)} />
+			:
+				<p>Loading...</p>
+			}
 
-					<Table.Body>
-						{classes.length ?
-							classes.map((x, i) =>
-								<Table.Row key={i}>
-									<Table.Cell>{x.id}</Table.Cell>
-									<Table.Cell>{x.course.name}</Table.Cell>
-									<Table.Cell>
-										<Link to={'/classes/'+x.id}>
-											{moment.utc(x.datetime).format('LL')}
-										</Link>
-									</Table.Cell>
-									<Table.Cell>{getInstructor(x)}</Table.Cell>
-									<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
-									<Table.Cell>{x.student_count}</Table.Cell>
-								</Table.Row>
-							)
-						:
-							<p>None</p>
-						}
-					</Table.Body>
-				</Table>
+			<Header size='medium'>Recent</Header>
+			{classes ?
+				<ClassTable classes={classes.filter(x => x.datetime < now)} />
 			:
 				<p>Loading...</p>
 			}
@@ -96,7 +114,7 @@ export function ClassDetail(props) {
 			{!error ?
 				clazz ?
 					<div>
-						<Header size='large'>Class Detail</Header>
+						<Header size='large'>Class Details</Header>
 
 						<Table unstackable basic='very'>
 							<Table.Body>
@@ -111,7 +129,7 @@ export function ClassDetail(props) {
 								<Table.Row>
 									<Table.Cell>Date:</Table.Cell>
 									<Table.Cell>
-										{moment.utc(clazz.datetime).format('LL')}
+										{moment.utc(clazz.datetime).format('ll')}
 									</Table.Cell>
 								</Table.Row>
 								<Table.Row>

@@ -108,7 +108,7 @@ export function CourseDetail(props) {
 										<Table.Row key={i}>
 											<Table.Cell>
 												<Link to={'/classes/'+x.id}>
-													{moment.utc(x.datetime).format('LL')}
+													{moment.utc(x.datetime).format('ll')}
 												</Link>
 											</Table.Cell>
 											<Table.Cell>{moment.utc(x.datetime).format('LT')}</Table.Cell>
