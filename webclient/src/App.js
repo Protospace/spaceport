@@ -8,6 +8,8 @@ import { Home } from './Home.js';
 import { Transactions, TransactionDetail } from './Transactions.js';
 import { Cards } from './Cards.js';
 import { Training } from './Training.js';
+import { Courses, CourseDetail } from './Courses.js';
+import { Classes, ClassDetail } from './Classes.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 
 function App() {
@@ -85,6 +87,13 @@ function App() {
 							/>
 							<Dropdown.Item
 								content='Courses'
+								as={Link}
+								to='/courses'
+							/>
+							<Dropdown.Item
+								content='Classes'
+								as={Link}
+								to='/classes'
 							/>
 						</Dropdown.Menu>
 					</Dropdown>
@@ -120,6 +129,20 @@ function App() {
 
 						<Route path='/training'>
 							<Training user={user} />
+						</Route>
+
+						<Route path='/courses/:id'>
+							<CourseDetail token={token} />
+						</Route>
+						<Route path='/courses'>
+							<Courses token={token} />
+						</Route>
+
+						<Route path='/classes/:id'>
+							<ClassDetail token={token} />
+						</Route>
+						<Route path='/classes'>
+							<Classes token={token} />
 						</Route>
 
 						<Route path='/:page'>

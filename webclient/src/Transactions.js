@@ -43,7 +43,7 @@ export function Transactions(props) {
 
 		</Container>
 	);
-}
+};
 
 export function TransactionDetail(props) {
 	const { user } = props;
