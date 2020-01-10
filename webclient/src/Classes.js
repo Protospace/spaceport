@@ -17,9 +17,9 @@ function ClassTable(props) {
 		<Table basic='very'>
 			<Table.Header>
 				<Table.Row>
-					<Table.HeaderCell>ID</Table.HeaderCell>
 					<Table.HeaderCell>Name</Table.HeaderCell>
 					<Table.HeaderCell>Date</Table.HeaderCell>
+					<Table.HeaderCell>Time</Table.HeaderCell>
 					<Table.HeaderCell>Instructor</Table.HeaderCell>
 					<Table.HeaderCell>Cost</Table.HeaderCell>
 					<Table.HeaderCell>Students</Table.HeaderCell>
@@ -30,13 +30,13 @@ function ClassTable(props) {
 				{classes.length ?
 					classes.map((x, i) =>
 						<Table.Row key={i}>
-							<Table.Cell>{x.id}</Table.Cell>
 							<Table.Cell>{x.course.name}</Table.Cell>
 							<Table.Cell>
 								<Link to={'/classes/'+x.id}>
 									{moment.utc(x.datetime).format('ll')}
 								</Link>
 							</Table.Cell>
+							<Table.Cell>{moment.utc(x.datetime).format('LT')}</Table.Cell>
 							<Table.Cell>{getInstructor(x)}</Table.Cell>
 							<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
 							<Table.Cell>{x.student_count}</Table.Cell>

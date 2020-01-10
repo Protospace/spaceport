@@ -24,13 +24,12 @@ export function Courses(props) {
 
 	return (
 		<Container>
-			<Header size='large'>Courses / Events</Header>
+			<Header size='large'>Courses</Header>
 
 			{courses ?
 				<Table basic='very'>
 					<Table.Header>
 						<Table.Row>
-							<Table.HeaderCell>ID</Table.HeaderCell>
 							<Table.HeaderCell>Name</Table.HeaderCell>
 						</Table.Row>
 					</Table.Header>
@@ -39,7 +38,6 @@ export function Courses(props) {
 						{courses.length ?
 							courses.map((x, i) =>
 								<Table.Row key={i}>
-									<Table.Cell>{x.id}</Table.Cell>
 									<Table.Cell>
 										<Link to={'/courses/'+x.id}>{x.name}</Link>
 									</Table.Cell>
