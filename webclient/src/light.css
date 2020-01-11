@@ -39,3 +39,8 @@ body {
 	max-width: 150px;
 	max-height: 1500px;
 }
+
+.photo-404 {
+	max-width: 100%;
+	height: auto;
+}

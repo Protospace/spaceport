@@ -91,7 +91,7 @@ function MemberInfo(props) {
 				<Grid.Column width={6}>
 					<img
 						className='photo-medium'
-						src={member.photo_medium ? staticUrl + '/' + member.photo_medium : 'nophoto.png'} size='small'
+						src={member.photo_medium ? staticUrl + '/' + member.photo_medium : '/nophoto.png'} size='small'
 					/>
 				</Grid.Column>
 

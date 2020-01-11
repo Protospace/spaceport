@@ -21,6 +21,8 @@ export function NotFound() {
 				<Message.Header style={{ padding: 0 }}>The page you requested can't be found!</Message.Header>
 				<p>Visit our <Link to='/'>home page</Link> if you are lost.</p>
 			</Message>
+
+			<img className='photo-404' src='/404.jpg' />
 		</Container>
 	);
 };

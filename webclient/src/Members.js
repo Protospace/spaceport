@@ -65,7 +65,7 @@ export function Members(props) {
 									<Table.Cell>
 										<img
 											className='photo-small'
-											src={x.photo_small ? staticUrl + '/' + x.photo_small : 'nophoto.png'}
+											src={x.photo_small ? staticUrl + '/' + x.photo_small : '/nophoto.png'}
 										/>
 									</Table.Cell>
 									<Table.Cell>{x.preferred_name} {x.last_name}</Table.Cell>
