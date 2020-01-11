@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 if DEBUG:
     ALLOWED_HOSTS += [
         'spaceport-api.dns.t0.vc',
+        'api.spaceport.dns.t0.vc',
     ]
 
 
