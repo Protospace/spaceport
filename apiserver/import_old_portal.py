@@ -3,6 +3,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'apiserver.settings'
 django.setup()
 
 from apiserver.api import models, old_models
+from apiserver.api.serializers import process_image
 
 MEMBER_FIELDS = [
     'id',
@@ -67,6 +68,10 @@ TRAINING_FIELDS = [
     'paid_date',
 ]
 
+photo_folders = os.listdir('old_photos')
+print('Found {} member photo folders'.format(len(photo_folders)))
+
+
 print('Deleting all members...')
 models.Member.objects.all().delete()
 print('Importing old members...')
@@ -78,7 +83,14 @@ for o in old:
     for f in MEMBER_FIELDS:
         new[f] = o.__dict__.get(f, None)
 
-    models.Member.objects.create(**new)
+    small, medium, large = None, None, None
+    if str(o.id) in photo_folders:
+        folder = 'old_photos/' + str(o.id)
+        if 'photo.jpg' in os.listdir(folder):
+            small, medium, large = process_image(folder + '/photo.jpg')
+            print('Found a photo')
+
+    models.Member.objects.create(photo_small=small, photo_medium=medium, photo_large=large, **new)
     print('Imported member #{} - {} {}'.format(
         o.id, o.first_name, o.last_name
     ))

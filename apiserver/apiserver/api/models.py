@@ -21,6 +21,9 @@ class Member(models.Model):
     monthly_fees = models.IntegerField(default=55, blank=True, null=True)
     emergency_contact_name = models.CharField(max_length=64, blank=True)
     emergency_contact_phone = models.CharField(max_length=32, blank=True)
+    photo_large = models.CharField(max_length=64, blank=True, null=True)
+    photo_medium = models.CharField(max_length=64, blank=True, null=True)
+    photo_small = models.CharField(max_length=64, blank=True, null=True)
 
 class Transaction(models.Model):
     user = models.ForeignKey(User, related_name='transactions', blank=True, null=True, on_delete=models.SET_NULL)

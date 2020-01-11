@@ -2,10 +2,45 @@ from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_auth.registration.serializers import RegisterSerializer
+from uuid import uuid4
+from PIL import Image
 
 from . import models, old_models
 
 #custom_error = lambda x: ValidationError(dict(non_field_errors=x))
+
+STATIC_FOLDER = 'data/static/'
+LARGE_SIZE = 1080
+MEDIUM_SIZE = 150
+SMALL_SIZE = 80
+
+def process_image(upload):
+    try:
+        pic = Image.open(upload)
+    except OSError:
+        raise serializers.ValidationError('Invalid image file.')
+
+    if pic.format == 'PNG':
+        ext = '.png'
+    elif pic.format == 'JPEG':
+        ext = '.jpg'
+    else:
+        raise serializers.ValidationError('Image must be a jpg or png.')
+
+    large = str(uuid4()) + ext
+    pic.thumbnail([LARGE_SIZE, LARGE_SIZE], Image.ANTIALIAS)
+    pic.save(STATIC_FOLDER + large)
+
+    medium = str(uuid4()) + ext
+    pic.thumbnail([MEDIUM_SIZE, MEDIUM_SIZE], Image.ANTIALIAS)
+    pic.save(STATIC_FOLDER + medium)
+
+    small = str(uuid4()) + ext
+    pic.thumbnail([SMALL_SIZE, SMALL_SIZE], Image.ANTIALIAS)
+    pic.save(STATIC_FOLDER + small)
+
+    return small, medium, large
+
 
 class UserTrainingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,7 +64,7 @@ class OtherMemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Member
-        fields = ['q', 'seq', 'preferred_name', 'last_name', 'status', 'current_start_date']
+        fields = ['q', 'seq', 'preferred_name', 'last_name', 'status', 'current_start_date', 'photo_small']
 
 # member viewing himself
 class MemberSerializer(serializers.ModelSerializer):

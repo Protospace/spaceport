@@ -29,3 +29,13 @@ body {
 .topPadding {
 	padding-top: 1rem;
 }
+
+.photo-small {
+	max-width: 80px;
+	max-height: 80px;
+}
+
+.photo-medium {
+	max-width: 150px;
+	max-height: 1500px;
+}

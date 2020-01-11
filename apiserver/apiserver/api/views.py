@@ -16,18 +16,12 @@ class AllowMetadata(permissions.BasePermission):
 
 search_strings = {}
 def gen_search_strings():
-    import time
-    start = time.time()
-
     for m in models.Member.objects.all():
         string = '{} {}'.format(
             m.preferred_name,
             m.last_name,
         ).lower()
         search_strings[string] = m.id
-
-    print('Generated search strings in {} s'.format(time.time() - start))
-gen_search_strings()
 
 class SearchViewSet(viewsets.ViewSet):
     permission_classes = [AllowMetadata | permissions.IsAuthenticated]
@@ -60,6 +54,7 @@ class SearchViewSet(viewsets.ViewSet):
 
             queryset = result_objects
         else:
+            gen_search_strings()
             queryset = queryset.order_by('-vetted_date')[:NUM_SEARCH_RESULTS]
 
         return queryset
@@ -92,13 +87,6 @@ class MemberViewSet(viewsets.ModelViewSet):
             return serializers.AdminMemberSerializer
         else:
             return serializers.MemberSerializer
-
-    def update(self, request, *args, **kwargs):
-        gen_search_strings()
-        return super().update(request, *args, **kwargs)
-    def partial_update(self, request, *args, **kwargs):
-        gen_search_strings()
-        return super().partial_update(request, *args, **kwargs)
 
 
 class CourseViewSet(viewsets.ModelViewSet):

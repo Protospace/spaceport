@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { requester } from './utils.js';
+import { staticUrl, requester } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 
 function DetailsForm(props) {
@@ -89,7 +89,10 @@ function MemberInfo(props) {
 		<div>
 			<Grid stackable>
 				<Grid.Column width={6}>
-					<Image src='https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png' size='small' />
+					<img
+						className='photo-medium'
+						src={member.photo_medium ? staticUrl + '/' + member.photo_medium : 'nophoto.png'} size='small'
+					/>
 				</Grid.Column>
 
 				<Grid.Column width={10}>
@@ -182,7 +185,7 @@ export function Home(props) {
 				</Grid.Column>
 				<Grid.Column>
 					<Segment>
-						<Header size='medium'>Portal</Header>
+						<Header size='medium'>Home</Header>
 						<p>Welcome to the Protospace member portal! Here you can view member info, join classes, and manage your membership.</p>
 
 						<Header size='medium'>Quick Links</Header>

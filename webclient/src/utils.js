@@ -1,12 +1,16 @@
-var siteUrl, apiUrl;
+var siteUrl, apiUrl, staticUrl;
 
 if (process.env.NODE_ENV !== 'production') {
 	siteUrl = 'http://spaceport.dns.t0.vc';
 	apiUrl = 'http://spaceport-api.dns.t0.vc';
+	staticUrl = 'http://spaceport-static.dns.t0.vc';
 } else {
 	siteUrl = 'https://' + window.location.hostname;
 	apiUrl = 'https://api.' + window.location.hostname;
+	staticUrl = 'https://static.' + window.location.hostname;
 }
+
+export { siteUrl, apiUrl, staticUrl };
 
 export const requester = (route, method, token, data) => {
 	let options = {headers: {}};
