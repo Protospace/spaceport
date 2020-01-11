@@ -20,18 +20,20 @@ class UserViewSet(viewsets.ModelViewSet):
 
 search_strings = {}
 def gen_search_strings():
+    import time
+    start = time.time()
+
     for m in models.Member.objects.all():
-        string = '{} {}  {} {}'.format(
+        string = '{} {}'.format(
             m.preferred_name,
-            m.last_name,
-            m.first_name,
             m.last_name,
         ).lower()
         search_strings[string] = m.id
+
+    print('Generated search strings in {} s'.format(time.time() - start))
 gen_search_strings()
 
 class SearchViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [AllowMetadata | permissions.IsAuthenticated]
     serializer_class = serializers.OtherMemberSerializer
 
     def get_queryset(self):
@@ -40,7 +42,7 @@ class SearchViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = models.Member.objects.all()
         params = self.request.query_params
 
-        if 'q' in params and len(params['q']) >= 3:
+        if 'q' in params and len(params['q']):
             search = params['q'].lower()
             choices = search_strings.keys()
 
@@ -48,21 +50,33 @@ class SearchViewSet(viewsets.ReadOnlyModelViewSet):
             results = [x for x in choices if x.startswith(search)]
             # then get exact substring matches
             results += [x for x in choices if search in x]
-            # then get fuzzy matches
-            fuzzy_results = process.extract(search, choices, limit=NUM_SEARCH_RESULTS, scorer=fuzz.token_set_ratio)
-            results += [x[0] for x in fuzzy_results]
 
-            # remove dupes
-            results = list(OrderedDict.fromkeys(results))
+            if len(results) == 0 and len(search) >= 3:
+                # then get fuzzy matches
+                fuzzy_results = process.extract(search, choices, limit=NUM_SEARCH_RESULTS, scorer=fuzz.token_set_ratio)
+                results += [x[0] for x in fuzzy_results]
+
+            # remove dupes, truncate list
+            results = list(OrderedDict.fromkeys(results))[:NUM_SEARCH_RESULTS]
 
             result_ids = [search_strings[x] for x in results]
             result_objects = [queryset.get(id=x) for x in result_ids]
 
             queryset = result_objects
         else:
-            queryset = queryset.order_by('-vetted_date')
+            queryset = queryset.order_by('-vetted_date')[:NUM_SEARCH_RESULTS]
 
-        return queryset[:NUM_SEARCH_RESULTS]
+        return queryset
+
+    def list(self, request):
+        try:
+            seq = int(request.query_params.get('seq', 0))
+        except ValueError:
+            seq = 0
+
+        queryset = self.get_queryset()
+        serializer = self.serializer_class(queryset, many=True)
+        return Response({'seq': seq, 'results': serializer.data})
 
 
 class MemberViewSet(viewsets.ModelViewSet):
@@ -81,6 +95,13 @@ class MemberViewSet(viewsets.ModelViewSet):
             return serializers.AdminMemberSerializer
         else:
             return serializers.MemberSerializer
+
+    def update(self, request, *args, **kwargs):
+        gen_search_strings()
+        return super().update(request, *args, **kwargs)
+    def partial_update(self, request, *args, **kwargs):
+        gen_search_strings()
+        return super().partial_update(request, *args, **kwargs)
 
 
 class CourseViewSet(viewsets.ModelViewSet):

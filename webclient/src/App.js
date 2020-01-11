@@ -10,6 +10,7 @@ import { Cards } from './Cards.js';
 import { Training } from './Training.js';
 import { Courses, CourseDetail } from './Courses.js';
 import { Classes, ClassDetail } from './Classes.js';
+import { Members } from './Members.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 
 function App() {
@@ -84,6 +85,8 @@ function App() {
 						<Dropdown.Menu>
 							<Dropdown.Item
 								content='Members'
+								as={Link}
+								to='/members'
 							/>
 							<Dropdown.Item
 								content='Courses'
@@ -143,6 +146,10 @@ function App() {
 						</Route>
 						<Route path='/classes'>
 							<Classes token={token} />
+						</Route>
+
+						<Route path='/members'>
+							<Members token={token} />
 						</Route>
 
 						<Route path='/:page'>
