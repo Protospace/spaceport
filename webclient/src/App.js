@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
-import './light.css';
-import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import './light.css'; import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { requester } from './utils.js';
 import { Home } from './Home.js';
 import { Transactions, TransactionDetail } from './Transactions.js';
@@ -9,7 +8,7 @@ import { Cards } from './Cards.js';
 import { Training } from './Training.js';
 import { Courses, CourseDetail } from './Courses.js';
 import { Classes, ClassDetail } from './Classes.js';
-import { Members } from './Members.js';
+import { Members, MemberDetail } from './Members.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { Footer } from './Footer.js';
 
@@ -50,7 +49,7 @@ function App() {
 			<div className='content-wrap'>
 			<div className='content-wrap-inside'>
 			<Container>
-				<div className='header'>
+				<div className='hero'>
 					<img src='/logo-long.svg' className='logo-long' />
 				</div>
 			</Container>
@@ -63,8 +62,13 @@ function App() {
 						to='/'
 					/>
 
-					<Dropdown item text='Profile' id='ps-menu'>
+					<Dropdown item text='Member' id='ps-menu'>
 						<Dropdown.Menu>
+							<Dropdown.Item
+								content='Profile'
+								as={Link}
+								to='/transactions'
+							/>
 							<Dropdown.Item
 								content='Transactions'
 								as={Link}
@@ -80,13 +84,18 @@ function App() {
 								as={Link}
 								to='/cards'
 							/>
+							<Dropdown.Item
+								content='Account'
+								as={Link}
+								to='/cards'
+							/>
 						</Dropdown.Menu>
 					</Dropdown>
 
 					<Dropdown item text='Space' id='ps-menu'>
 						<Dropdown.Menu>
 							<Dropdown.Item
-								content='Members'
+								content='Member List'
 								as={Link}
 								to='/members'
 							/>
@@ -150,6 +159,9 @@ function App() {
 							<Classes token={token} />
 						</Route>
 
+						<Route path='/members/:id'>
+							<MemberDetail token={token} />
+						</Route>
 						<Route path='/members'>
 							<Members token={token} />
 						</Route>

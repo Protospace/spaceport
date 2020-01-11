@@ -1,6 +1,15 @@
+import React, { useState, useEffect } from 'react';
+import { Table } from 'semantic-ui-react';
+
 export const siteUrl = window.location.protocol + '//' + window.location.hostname;
 export const apiUrl = window.location.protocol + '//api.' + window.location.hostname;
 export const staticUrl = window.location.protocol + '//static.' + window.location.hostname;
+
+export const BasicTable = (props) => (
+	<Table collapsing padded unstackable basic='very'>
+		{props.children}
+	</Table>
+);
 
 export const requester = (route, method, token, data) => {
 	let options = {headers: {}};

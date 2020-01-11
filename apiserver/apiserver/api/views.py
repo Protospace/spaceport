@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from django.db.models import Max
-from rest_framework import viewsets, views, permissions
+from rest_framework import viewsets, views, permissions, mixins
 from rest_framework.response import Response
 from rest_auth.registration.views import RegisterView
 from fuzzywuzzy import fuzz, process
@@ -23,12 +23,12 @@ def gen_search_strings():
         ).lower()
         search_strings[string] = m.id
 
-class SearchViewSet(viewsets.ViewSet):
+NUM_SEARCH_RESULTS = 10
+class SearchViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     permission_classes = [AllowMetadata | permissions.IsAuthenticated]
     serializer_class = serializers.OtherMemberSerializer
 
     def get_queryset(self):
-        NUM_SEARCH_RESULTS = 10
 
         queryset = models.Member.objects.all()
         search = self.request.data.get('q', '').lower()
@@ -55,7 +55,7 @@ class SearchViewSet(viewsets.ViewSet):
             queryset = result_objects
         else:
             gen_search_strings()
-            queryset = queryset.order_by('-vetted_date')[:NUM_SEARCH_RESULTS]
+            queryset = queryset.order_by('-vetted_date')
 
         return queryset
 
@@ -66,7 +66,7 @@ class SearchViewSet(viewsets.ViewSet):
         except ValueError:
             seq = 0
 
-        queryset = self.get_queryset()
+        queryset = self.get_queryset()[:NUM_SEARCH_RESULTS]
         serializer = self.serializer_class(queryset, many=True)
         return Response({'seq': seq, 'results': serializer.data})
 

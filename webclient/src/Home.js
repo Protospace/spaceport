@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { staticUrl, requester } from './utils.js';
+import { BasicTable, staticUrl, requester } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 
-function DetailsForm(props) {
+function SignupDetailsForm(props) {
 	const member = props.user.member;
 	const [input, setInput] = useState({
 		preferred_name: member.preferred_name,
@@ -110,7 +110,7 @@ function MemberInfo(props) {
 			</Grid>
 
 			<Header size='medium'>Details</Header>
-			<Table unstackable basic='very'>
+			<BasicTable>
 				<Table.Body>
 					<Table.Row>
 						<Table.Cell>Expiry:</Table.Cell>
@@ -137,10 +137,10 @@ function MemberInfo(props) {
 						<Table.Cell>{lastCard && lastCard.card_number || 'None'}</Table.Cell>
 					</Table.Row>
 				</Table.Body>
-			</Table>
+			</BasicTable>
 
 			<Header size='medium'>Latest Transactions</Header>
-			<Table unstackable basic='very'>
+			<BasicTable>
 				<Table.Body>
 					{lastTrans.length ?
 						lastTrans.map((x, i) =>
@@ -156,7 +156,7 @@ function MemberInfo(props) {
 						<Table.Row><Table.Cell>None</Table.Cell></Table.Row>
 					}
 				</Table.Body>
-			</Table>
+			</BasicTable>
 		</div>
 	);
 };
@@ -172,7 +172,7 @@ export function Home(props) {
 						user.member.set_details ?
 							<MemberInfo user={user} />
 						:
-							<DetailsForm token={token} user={user} setUserCache={setUserCache} />
+							<SignupDetailsForm token={token} user={user} setUserCache={setUserCache} />
 					:
 						<div>
 							<LoginForm setTokenCache={setTokenCache} />

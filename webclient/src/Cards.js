@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { requester } from './utils.js';
+import { BasicTable, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 
 export function Cards(props) {
@@ -39,7 +39,7 @@ export function Cards(props) {
 						</Table.Body>
 					</Table>
 				:
-					<Table unstackable basic='very'>
+					<BasicTable>
 						<Table.Body>
 							<Table.Row>
 								<Table.Cell>Number:</Table.Cell>
@@ -58,7 +58,7 @@ export function Cards(props) {
 								<Table.Cell>{cardStatus(card)}</Table.Cell>
 							</Table.Row>
 						</Table.Body>
-					</Table>
+					</BasicTable>
 			:
 				<p>No cards yet! Ask a director for one after you are vetted.</p>
 			}

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
-import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Input, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Input, Item, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment';
-import { staticUrl, requester } from './utils.js';
+import { BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 
 export function Members(props) {
@@ -48,40 +48,74 @@ export function Members(props) {
 			</Header>
 
 			{members ?
-				<Table basic='very'>
-					<Table.Header>
-						<Table.Row>
-							<Table.HeaderCell></Table.HeaderCell>
-							<Table.HeaderCell>Name</Table.HeaderCell>
-							<Table.HeaderCell>Status</Table.HeaderCell>
-							<Table.HeaderCell>Member Since</Table.HeaderCell>
-						</Table.Row>
-					</Table.Header>
-
-					<Table.Body>
-						{members.results.length ?
-							members.results.map((x, i) =>
-								<Table.Row key={i}>
-									<Table.Cell>
-										<img
-											className='photo-small'
-											src={x.photo_small ? staticUrl + '/' + x.photo_small : '/nophoto.png'}
-										/>
-									</Table.Cell>
-									<Table.Cell>{x.preferred_name} {x.last_name}</Table.Cell>
-									<Table.Cell>{x.status}</Table.Cell>
-									<Table.Cell>{x.current_start_date}</Table.Cell>
-								</Table.Row>
-							)
-						:
-							<Table.Row><Table.Cell>No Results</Table.Cell></Table.Row>
-						}
-					</Table.Body>
-				</Table>
+				<Item.Group divided>
+					{members.results.length ?
+						members.results.map((x, i) =>
+							<Item key={i} as={Link} to={'/members/'+x.id}>
+								<Item.Image size='tiny' src={x.photo_small ? staticUrl + '/' + x.photo_small : '/nophoto.png'} />
+								<Item.Content verticalAlign='top'>
+									<Item.Header>{x.preferred_name} {x.last_name}</Item.Header>
+									<Item.Description>Status: {x.status || 'Unknown'}</Item.Description>
+									<Item.Description>Joined: {x.current_start_date || 'Unknown'}</Item.Description>
+								</Item.Content>
+							</Item>
+						)
+					:
+						<p>No Results</p>
+					}
+				</Item.Group>
 			:
 				<p>Loading...</p>
 			}
 
+		</Container>
+	);
+};
+
+export function MemberDetail(props) {
+	const [member, setMember] = useState(false);
+	const [error, setError] = useState(false);
+	const { token } = props;
+	const { id } = useParams();
+
+	useEffect(() => {
+		requester('/search/'+id+'/', 'GET', token)
+		.then(res => {
+			setMember(res);
+		})
+		.catch(err => {
+			console.log(err);
+			setError(true);
+		});
+	}, []);
+
+	return (
+		<Container>
+			{!error ?
+				member ?
+					<div>
+						<Header size='large'>{member.preferred_name} {member.last_name}</Header>
+
+						<Image rounded size='medium' src={member.photo_large ? staticUrl + '/' + member.photo_large : '/nophoto.png'} />
+
+						<BasicTable>
+							<Table.Body>
+								<Table.Row>
+									<Table.Cell>Status:</Table.Cell>
+									<Table.Cell>{member.status || 'Unknown'}</Table.Cell>
+								</Table.Row>
+								<Table.Row>
+									<Table.Cell>Joined:</Table.Cell>
+									<Table.Cell>{member.current_start_date || 'Unknown'}</Table.Cell>
+								</Table.Row>
+							</Table.Body>
+						</BasicTable>
+					</div>
+				:
+					<p>Loading...</p>
+			:
+				<NotFound />
+			}
 		</Container>
 	);
 };

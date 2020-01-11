@@ -15,12 +15,12 @@ body {
 	margin: 0;
 }
 
-.header {
+.hero {
 	padding-top: 1.5rem;
 	margin-bottom: 1.5rem;
 }
 
-.header .logo-long {
+.hero .logo-long {
 	max-width: 100%;
 	height: 2rem;
 	display: block;

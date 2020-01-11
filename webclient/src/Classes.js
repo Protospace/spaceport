@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-r
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment';
-import { requester } from './utils.js';
+import { BasicTable, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 
 function ClassTable(props) {
@@ -115,7 +115,7 @@ export function ClassDetail(props) {
 					<div>
 						<Header size='large'>Class Details</Header>
 
-						<Table unstackable basic='very'>
+						<BasicTable>
 							<Table.Body>
 								<Table.Row>
 									<Table.Cell>Name:</Table.Cell>
@@ -150,7 +150,7 @@ export function ClassDetail(props) {
 									<Table.Cell>{clazz.student_count}</Table.Cell>
 								</Table.Row>
 							</Table.Body>
-						</Table>
+						</BasicTable>
 
 						<Header size='medium'>Attendance</Header>
 					</div>
