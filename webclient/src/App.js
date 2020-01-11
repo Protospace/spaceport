@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
-import Logo from './logo.svg';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { requester } from './utils.js';
 import { Home } from './Home.js';
@@ -12,6 +11,7 @@ import { Courses, CourseDetail } from './Courses.js';
 import { Classes, ClassDetail } from './Classes.js';
 import { Members } from './Members.js';
 import { NotFound, PleaseLogin } from './Misc.js';
+import { Footer } from './Footer.js';
 
 function App() {
 	const [token, setToken] = useState(localStorage.getItem('token', ''));
@@ -47,9 +47,11 @@ function App() {
 
 	return (
 		<Router>
+			<div className='content-wrap'>
+			<div className='content-wrap-inside'>
 			<Container>
 				<div className='header'>
-					<img src={Logo} className='logo' />
+					<img src='/logo-long.svg' className='logo-long' />
 				</div>
 			</Container>
 
@@ -162,7 +164,10 @@ function App() {
 					</Route>
 				}
 			</div>
+			</div>
+			</div>
 
+			<Footer />
 		</Router>
 	)
 };
