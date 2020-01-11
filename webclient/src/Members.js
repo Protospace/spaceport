@@ -8,11 +8,11 @@ import { NotFound, PleaseLogin } from './Misc.js';
 
 export function Members(props) {
 	const [members, setMembers] = useState(false);
-	const [search, setSearch] = useState({t: 0, v: ''});
+	const [search, setSearch] = useState({seq: 0, q: ''});
 	const { token } = props;
 
 	useEffect(() => {
-		requester('/search/?seq='+search.t+'&q='+search.v, 'GET', '')
+		requester('/search/', 'POST', token, search)
 		.then(res => {
 			if (!members || res.seq > members.seq) {
 				setMembers(res);
@@ -30,12 +30,12 @@ export function Members(props) {
 			<Input autoFocus focus icon='search'
 				placeholder='Search...'
 				value={search.v}
-				onChange={(e, v) => setSearch({t: e.timeStamp, v: v.value})}
+				onChange={(e, v) => setSearch({seq: e.timeStamp, q: v.value})}
 				aria-label='search products'
 			/>
 
 			<Header size='medium'>
-				{search.length ? 'Search Results' : 'Recently Vetted'}
+				{search.q.length ? 'Search Results' : 'Recently Vetted'}
 			</Header>
 
 			{members ?
@@ -58,7 +58,7 @@ export function Members(props) {
 								</Table.Row>
 							)
 						:
-							<p>No Results</p>
+							<Table.Row><Table.Cell>No Results</Table.Cell></Table.Row>
 						}
 					</Table.Body>
 				</Table>

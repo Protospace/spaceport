@@ -13,10 +13,6 @@ class AllowMetadata(permissions.BasePermission):
         return request.method in ['OPTIONS', 'HEAD']
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = serializers.UserSerializer
-
 
 search_strings = {}
 def gen_search_strings():
@@ -33,17 +29,17 @@ def gen_search_strings():
     print('Generated search strings in {} s'.format(time.time() - start))
 gen_search_strings()
 
-class SearchViewSet(viewsets.ReadOnlyModelViewSet):
+class SearchViewSet(viewsets.ViewSet):
+    permission_classes = [AllowMetadata | permissions.IsAuthenticated]
     serializer_class = serializers.OtherMemberSerializer
 
     def get_queryset(self):
         NUM_SEARCH_RESULTS = 10
 
         queryset = models.Member.objects.all()
-        params = self.request.query_params
+        search = self.request.data.get('q', '').lower()
 
-        if 'q' in params and len(params['q']):
-            search = params['q'].lower()
+        if len(search):
             choices = search_strings.keys()
 
             # get exact starts with matches
@@ -68,9 +64,10 @@ class SearchViewSet(viewsets.ReadOnlyModelViewSet):
 
         return queryset
 
-    def list(self, request):
+    # must POST so query string doesn't change so preflight request is cached
+    def create(self, request):
         try:
-            seq = int(request.query_params.get('seq', 0))
+            seq = int(request.data.get('seq', 0))
         except ValueError:
             seq = 0
 

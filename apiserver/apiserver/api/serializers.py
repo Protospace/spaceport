@@ -24,9 +24,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 # member viewing member list or other member
 class OtherMemberSerializer(serializers.ModelSerializer):
+    q = serializers.CharField(write_only=True, max_length=64)
+    seq = serializers.IntegerField(write_only=True, )
+
     class Meta:
         model = models.Member
-        fields = ['preferred_name', 'last_name', 'status', 'current_start_date']
+        fields = ['q', 'seq', 'preferred_name', 'last_name', 'status', 'current_start_date']
 
 # member viewing himself
 class MemberSerializer(serializers.ModelSerializer):

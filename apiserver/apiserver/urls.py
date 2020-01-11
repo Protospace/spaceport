@@ -6,7 +6,7 @@ from rest_framework import routers
 from .api import views
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
+#router.register(r'users', views.UserViewSet)
 router.register(r'members', views.MemberViewSet, basename='member')
 router.register(r'courses', views.CourseViewSet, basename='course')
 router.register(r'sessions', views.SessionViewSet, basename='session')

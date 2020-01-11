@@ -36,7 +36,7 @@ export function Transactions(props) {
 							</Table.Row>
 						)
 					:
-						<p>None</p>
+						<Table.Row><Table.Cell>None</Table.Cell></Table.Row>
 					}
 				</Table.Body>
 			</Table>
