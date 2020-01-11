@@ -6,8 +6,12 @@ from apiserver.api import models, old_models
 
 MEMBER_FIELDS = [
     'id',
+    'first_name',
+    'last_name',
     'preferred_name',
+    'status',
     'phone',
+    'expire_date',
     'current_start_date',
     'application_date',
     'vetted_date',

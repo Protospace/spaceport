@@ -22,12 +22,20 @@ class UserSerializer(serializers.ModelSerializer):
         depth = 1
 
 
+# member viewing member list or other member
+class OtherMemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Member
+        fields = ['preferred_name', 'last_name', 'status', 'current_start_date']
+
+# member viewing himself
 class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Member
         fields = '__all__'
         read_only_fields = ['user', 'application_date', 'current_start_date', 'vetted_date', 'monthly_fees', 'old_member_id']
 
+# adming viewing member
 class AdminMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Member

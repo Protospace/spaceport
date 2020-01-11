@@ -12,7 +12,9 @@ class Member(models.Model):
 
     set_details = models.BooleanField(default=False)
     preferred_name = models.CharField(max_length=32, blank=True)
+    status = models.CharField(max_length=32, blank=True)
     phone = models.CharField(max_length=32, blank=True)
+    expire_date = models.DateField(default=date.today, blank=True, null=True)
     current_start_date = models.DateField(default=date.today, blank=True, null=True)
     application_date = models.DateField(default=date.today, blank=True, null=True)
     vetted_date = models.DateField(blank=True, null=True)

@@ -10,6 +10,7 @@ router.register(r'users', views.UserViewSet)
 router.register(r'members', views.MemberViewSet, basename='member')
 router.register(r'courses', views.CourseViewSet, basename='course')
 router.register(r'sessions', views.SessionViewSet, basename='session')
+router.register(r'search', views.SearchViewSet, basename='search')
 #router.register(r'me', views.FullMemberView, basename='fullmember')
 #router.register(r'registration', views.RegistrationViewSet, basename='register')
 
