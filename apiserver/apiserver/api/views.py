@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User, Group
 from django.db.models import Max
-from rest_framework import viewsets, views, permissions, mixins
+from rest_framework import viewsets, views, mixins, generics, exceptions
+from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 from rest_auth.registration.views import RegisterView
 from fuzzywuzzy import fuzz, process
@@ -8,10 +9,23 @@ from collections import OrderedDict
 
 from . import models, serializers
 
-class AllowMetadata(permissions.BasePermission):
+class AllowMetadata(BasePermission):
     def has_permission(self, request, view):
         return request.method in ['OPTIONS', 'HEAD']
 
+def is_admin_director(user):
+    return user.is_staff or user.member.is_director
+
+class IsOwnerOrAdmin(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.user == request.user or is_admin_director(request.user)
+
+class RetrieveUpdateViewSet(
+        viewsets.GenericViewSet,
+        mixins.RetrieveModelMixin,
+        mixins.UpdateModelMixin):
+    def list(self, request):
+        raise exceptions.PermissionDenied
 
 
 search_strings = {}
@@ -25,11 +39,10 @@ def gen_search_strings():
 
 NUM_SEARCH_RESULTS = 10
 class SearchViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
-    permission_classes = [AllowMetadata | permissions.IsAuthenticated]
+    permission_classes = [AllowMetadata | IsAuthenticated]
     serializer_class = serializers.OtherMemberSerializer
 
     def get_queryset(self):
-
         queryset = models.Member.objects.all()
         search = self.request.data.get('q', '').lower()
 
@@ -71,26 +84,19 @@ class SearchViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         return Response({'seq': seq, 'results': serializer.data})
 
 
-class MemberViewSet(viewsets.ModelViewSet):
-    permission_classes = [AllowMetadata | permissions.IsAuthenticated]
-    http_method_names = ['options', 'head', 'get', 'put', 'patch']
-
-    def get_queryset(self):
-        objects = models.Member.objects.all()
-        if self.request.user.is_staff:
-            return objects.order_by('id')
-        else:
-            return objects.filter(user=self.request.user)
+class MemberViewSet(RetrieveUpdateViewSet):
+    permission_classes = [AllowMetadata | IsAuthenticated, IsOwnerOrAdmin]
+    queryset = models.Member.objects.all()
 
     def get_serializer_class(self):
-        if self.request.user.is_staff:
+        if is_admin_director(self.request.user):
             return serializers.AdminMemberSerializer
         else:
             return serializers.MemberSerializer
 
 
 class CourseViewSet(viewsets.ModelViewSet):
-    permission_classes = [AllowMetadata | permissions.IsAuthenticated]
+    permission_classes = [AllowMetadata | IsAuthenticated]
     queryset = models.Course.objects.annotate(date=Max('sessions__datetime')).order_by('-date')
 
     def get_serializer_class(self):
@@ -101,7 +107,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
 
 class SessionViewSet(viewsets.ModelViewSet):
-    permission_classes = [AllowMetadata | permissions.IsAuthenticated]
+    permission_classes = [AllowMetadata | IsAuthenticated]
 
     def get_queryset(self):
         if self.action == 'list':
@@ -117,7 +123,7 @@ class SessionViewSet(viewsets.ModelViewSet):
 
 
 class MyUserView(views.APIView):
-    permission_classes = [AllowMetadata | permissions.IsAuthenticated]
+    permission_classes = [AllowMetadata | IsAuthenticated]
 
     def get(self, request):
         serializer = serializers.UserSerializer(request.user)

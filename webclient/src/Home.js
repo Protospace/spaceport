@@ -7,21 +7,11 @@ import { LoginForm, SignupForm } from './LoginSignup.js';
 
 function SignupDetailsForm(props) {
 	const member = props.user.member;
-	const [input, setInput] = useState({
-		preferred_name: member.preferred_name,
-		phone: member.phone,
-		emergency_contact_name: member.emergency_contact_name,
-		emergency_contact_phone: member.emergency_contact_phone,
-		set_details: true,
-	});
+	const [input, setInput] = useState({ ...member, set_details: true });
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
 
-	const handleValues = (e, v) => setInput({
-		...input,
-		[v.name]: v.value
-	});
-
+	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
 
 	const handleSubmit = (e) => {
@@ -39,36 +29,31 @@ function SignupDetailsForm(props) {
 		});
 	};
 
+	const makeProps = (name) => ({
+		name: name,
+		onChange: handleChange,
+		value: input[name],
+		error: error[name],
+	});
+
 	return (
 		<Form onSubmit={handleSubmit}>
 			<Header size='medium'>Enter Member Details</Header>
 			<Form.Input
-				label='Preferred Name'
-				name='preferred_name'
-				onChange={handleChange}
-				value={input.preferred_name}
-				error={error.preferred_name}
+				label='Preferred First Name'
+				{...makeProps('preferred_name')}
 			/>
 			<Form.Input
 				label='Phone Number (999) 555-1234'
-				name='phone'
-				onChange={handleChange}
-				value={input.phone}
-				error={error.phone}
+				{...makeProps('phone')}
 			/>
 			<Form.Input
 				label='Emergency Contact Name'
-				name='emergency_contact_name'
-				onChange={handleChange}
-				value={input.emergency_contact_name}
-				error={error.emergency_contact_name}
+				{...makeProps('emergency_contact_name')}
 			/>
 			<Form.Input
 				label='Emergency Contact Phone'
-				name='emergency_contact_phone'
-				onChange={handleChange}
-				value={input.emergency_contact_phone}
-				error={error.emergency_contact_phone}
+				{...makeProps('emergency_contact_phone')}
 			/>
 
 			<Form.Button loading={loading} error={error.non_field_errors}>
@@ -107,7 +92,7 @@ function MemberInfo(props) {
 						<Table.Body>
 							<Table.Row>
 								<Table.Cell>Status:</Table.Cell>
-								<Table.Cell>{member.status}</Table.Cell>
+								<Table.Cell>{member.status || 'Unknown'}</Table.Cell>
 							</Table.Row>
 							<Table.Row>
 								<Table.Cell>Expiry:</Table.Cell>
@@ -123,11 +108,11 @@ function MemberInfo(props) {
 				<Table.Body>
 					<Table.Row>
 						<Table.Cell>Application:</Table.Cell>
-						<Table.Cell>{member.application_date || '???'}</Table.Cell>
+						<Table.Cell>{member.application_date || 'Unknown'}</Table.Cell>
 					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Start:</Table.Cell>
-						<Table.Cell>{member.current_start_date || '???'}</Table.Cell>
+						<Table.Cell>{member.current_start_date || 'Unknown'}</Table.Cell>
 					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Vetted:</Table.Cell>
@@ -135,7 +120,7 @@ function MemberInfo(props) {
 					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Monthly:</Table.Cell>
-						<Table.Cell>${member.monthly_fees || '???'}</Table.Cell>
+						<Table.Cell>${member.monthly_fees || 'Unknown'}</Table.Cell>
 					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Card Number:</Table.Cell>

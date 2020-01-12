@@ -11,6 +11,8 @@ class Member(models.Model):
     last_name = models.CharField(max_length=32)
 
     set_details = models.BooleanField(default=False)
+    is_director = models.BooleanField(default=False)
+    is_instructor = models.BooleanField(default=False)
     preferred_name = models.CharField(max_length=32, blank=True)
     status = models.CharField(max_length=32, blank=True)
     phone = models.CharField(max_length=32, blank=True)

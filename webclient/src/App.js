@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-r
 import './light.css'; import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { requester } from './utils.js';
 import { Home } from './Home.js';
+import { Account } from './Account.js';
 import { Transactions, TransactionDetail } from './Transactions.js';
 import { Cards } from './Cards.js';
 import { Training } from './Training.js';
@@ -39,9 +40,9 @@ function App() {
 	}, [token]);
 
 	function logout() {
-		window.location = '/';
 		setTokenCache('');
 		setUserCache(false);
+		window.location = '/';
 	}
 
 	return (
@@ -65,9 +66,9 @@ function App() {
 					<Dropdown item text='Member' id='ps-menu'>
 						<Dropdown.Menu>
 							<Dropdown.Item
-								content='Profile'
+								content='Account'
 								as={Link}
-								to='/transactions'
+								to='/account'
 							/>
 							<Dropdown.Item
 								content='Transactions'
@@ -81,11 +82,6 @@ function App() {
 							/>
 							<Dropdown.Item
 								content='Cards'
-								as={Link}
-								to='/cards'
-							/>
-							<Dropdown.Item
-								content='Account'
 								as={Link}
 								to='/cards'
 							/>
@@ -130,6 +126,10 @@ function App() {
 			<div className='topPadding'>
 				{user ?
 					<Switch>
+						<Route path='/account'>
+							<Account token={token} user={user} setUserCache={setUserCache} />
+						</Route>
+
 						<Route path='/transactions/:id'>
 							<TransactionDetail user={user} />
 						</Route>

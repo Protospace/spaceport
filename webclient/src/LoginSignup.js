@@ -9,11 +9,7 @@ export function LoginForm(props) {
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
 
-	const handleValues = (e, v) => setInput({
-		...input,
-		[v.name]: v.value
-	});
-
+	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
 
 	const handleSubmit = (e) => {
@@ -60,11 +56,7 @@ export function SignupForm(props) {
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
 
-	const handleValues = (e, v) => setInput({
-		...input,
-		[v.name]: v.value
-	});
-
+	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
 
 	const genUsername = () => (
@@ -93,26 +85,26 @@ export function SignupForm(props) {
 	return (
 		<Form onSubmit={handleSubmit}>
 			<Header size='medium'>Sign Up</Header>
-			<Form.Group widths='equal'>
-				<Form.Input
-					label='First Name'
-					name='first_name'
-					onChange={handleChange}
-					error={error.first_name}
-				/>
-				<Form.Input
-					label='Last Name'
-					name='last_name'
-					onChange={handleChange}
-					error={error.last_name}
-				/>
-			</Form.Group>
+
+			<Form.Input
+				label='First Name'
+				name='first_name'
+				onChange={handleChange}
+				error={error.first_name}
+			/>
+			<Form.Input
+				label='Last Name'
+				name='last_name'
+				onChange={handleChange}
+				error={error.last_name}
+			/>
 
 			<Form.Input
 				label='Username'
 				name='username'
 				value={genUsername()}
 				error={error.username}
+				readOnly
 			/>
 			<Form.Input
 				label='Email'

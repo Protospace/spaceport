@@ -12,8 +12,8 @@ from . import models, old_models
 
 STATIC_FOLDER = 'data/static/'
 LARGE_SIZE = 1080
-MEDIUM_SIZE = 150
-SMALL_SIZE = 80
+MEDIUM_SIZE = 220
+SMALL_SIZE = 110
 
 def process_image(upload):
     try:
@@ -74,17 +74,49 @@ class OtherMemberSerializer(serializers.ModelSerializer):
 
 # member viewing himself
 class MemberSerializer(serializers.ModelSerializer):
+    photo = serializers.ImageField(write_only=True, required=False)
     class Meta:
         model = models.Member
         fields = '__all__'
-        read_only_fields = ['user', 'application_date', 'current_start_date', 'vetted_date', 'monthly_fees', 'old_member_id']
+        read_only_fields = [
+            'id',
+            'is_director',
+            'is_instructor',
+            'status',
+            'expire_date',
+            'current_start_date',
+            'application_date',
+            'vetted_date',
+            'monthly_fees',
+            'photo_large',
+            'photo_medium',
+            'photo_small',
+            'user',
+        ]
+
+    def update(self, instance, validated_data):
+        photo = validated_data.get('photo', None)
+        if photo:
+            small, medium, large = process_image(photo)
+            instance.photo_small = small
+            instance.photo_medium = medium
+            instance.photo_large = large
+
+        return super().update(instance, validated_data)
+
 
 # adming viewing member
-class AdminMemberSerializer(serializers.ModelSerializer):
+class AdminMemberSerializer(MemberSerializer):
     class Meta:
         model = models.Member
         fields = '__all__'
-        read_only_fields = ['id', 'user']
+        read_only_fields = [
+            'id',
+            'photo_large',
+            'photo_medium',
+            'photo_small',
+            'user',
+        ]
 
 
 class TransactionSerializer(serializers.ModelSerializer):
