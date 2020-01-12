@@ -3,6 +3,7 @@ from django.db.models import Max
 from rest_framework import viewsets, views, mixins, generics, exceptions
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
+from rest_auth.views import PasswordChangeView
 from rest_auth.registration.views import RegisterView
 from fuzzywuzzy import fuzz, process
 from collections import OrderedDict
@@ -130,15 +131,8 @@ class MyUserView(views.APIView):
         return Response(serializer.data)
 
 
-class RegistrationViewSet(RegisterView):
+class RegistrationView(RegisterView):
     serializer_class = serializers.RegistrationSerializer
 
-    #def create(self, request):
-    #    data = request.data.copy()
-    #    data['username'] = '{}.{}'.format(
-    #        data['first_name'],
-    #        data['last_name']
-    #    ).lower()
-    #    request._full_data = data
-    #    return super().create(request)
-
+class PasswordChangeView(PasswordChangeView):
+    permission_classes = [AllowMetadata | IsAuthenticated]

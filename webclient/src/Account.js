@@ -5,9 +5,67 @@ import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Me
 import { BasicTable, staticUrl, requester } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 
+function ChangePasswordForm(props) {
+	const [input, setInput] = useState({});
+	const [error, setError] = useState({});
+	const [loading, setLoading] = useState(false);
+	const history = useHistory();
+
+	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
+	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
+	const handleChange = (e) => handleValues(e, e.currentTarget);
+
+	const handleSubmit = (e) => {
+		setLoading(true);
+		requester('/rest-auth/password/change/', 'POST', props.token, input)
+		.then(res => {
+			setError({});
+			history.push('/');
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+			setError(err.data);
+		});
+	};
+
+	const makeProps = (name) => ({
+		name: name,
+		onChange: handleChange,
+		value: input[name],
+		error: error[name],
+	});
+
+	return (
+		<Form onSubmit={handleSubmit}>
+			<Header size='medium'>Change Password</Header>
+
+			<Form.Input
+				label='Old Password'
+				type='password'
+				{...makeProps('old_password')}
+			/>
+			<Form.Input
+				label='New Password'
+				type='password'
+				{...makeProps('new_password1')}
+			/>
+			<Form.Input
+				label='Confirm Password'
+				type='password'
+				{...makeProps('new_password2')}
+			/>
+
+			<Form.Button loading={loading} error={error.non_field_errors}>
+				Submit
+			</Form.Button>
+		</Form>
+	);
+};
+
 function AccountForm(props) {
 	const member = props.user.member;
-	const [input, setInput] = useState({ ...member, set_details: true });
+	const [input, setInput] = useState({ ...member });
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
 	const history = useHistory();
@@ -20,7 +78,6 @@ function AccountForm(props) {
 		setLoading(true);
 		requester('/members/' + member.id + '/', 'PATCH', props.token, input)
 		.then(res => {
-			console.log(res);
 			setError({});
 			props.setUserCache({...props.user, member: res});
 			history.push('/');
@@ -88,7 +145,14 @@ export function Account(props) {
 	return (
 		<Container>
 			<Header size='large'>Account Settings</Header>
-			<AccountForm {...props} />
+			<Grid stackable columns={2}>
+				<Grid.Column>
+					<Segment padded><AccountForm {...props} /></Segment>
+				</Grid.Column>
+				<Grid.Column>
+					<Segment padded><ChangePasswordForm {...props} /></Segment>
+				</Grid.Column>
+			</Grid>
 		</Container>
 	);
 };
