@@ -2,6 +2,7 @@ from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_auth.registration.serializers import RegisterSerializer
+from rest_auth.serializers import UserDetailsSerializer
 from uuid import uuid4
 from PIL import Image
 
@@ -47,6 +48,11 @@ class UserTrainingSerializer(serializers.ModelSerializer):
         model = models.Training
         exclude = ['user']
         depth = 2
+
+class UserDetailsSerializer(UserDetailsSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email']
 
 class UserSerializer(serializers.ModelSerializer):
     training = UserTrainingSerializer(many=True)
