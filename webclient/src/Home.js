@@ -88,34 +88,39 @@ function MemberInfo(props) {
 	return (
 		<div>
 			<Grid stackable>
-				<Grid.Column width={6}>
-					<img
-						className='photo-medium'
-						src={member.photo_medium ? staticUrl + '/' + member.photo_medium : '/nophoto.png'} size='small'
+				<Grid.Column width={5}>
+					<Image
+						size='small'
+						src={member.photo_medium ? staticUrl + '/' + member.photo_medium : '/nophoto.png'}
 					/>
 				</Grid.Column>
 
-				<Grid.Column width={10}>
+				<Grid.Column width={11}>
 					<Header size='large'>
 						<Icon.Group size='small'>
 							<Icon name='circle' color='green' />
 						</Icon.Group>
-						<Header.Content>{member.first_name} {member.last_name}</Header.Content>
+						<Header.Content>{member.preferred_name} {member.last_name}</Header.Content>
 					</Header>
 
-					<p>Preferred Name: {member.preferred_name || '???'}</p>
-					<p>Email: {user.email}</p>
-					<p>Status: Current</p>
+					<BasicTable>
+						<Table.Body>
+							<Table.Row>
+								<Table.Cell>Status:</Table.Cell>
+								<Table.Cell>{member.status}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>Expiry:</Table.Cell>
+								<Table.Cell>{member.expire_date}</Table.Cell>
+							</Table.Row>
+						</Table.Body>
+					</BasicTable>
 				</Grid.Column>
 			</Grid>
 
 			<Header size='medium'>Details</Header>
 			<BasicTable>
 				<Table.Body>
-					<Table.Row>
-						<Table.Cell>Expiry:</Table.Cell>
-						<Table.Cell>2099-01-01</Table.Cell>
-					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Application:</Table.Cell>
 						<Table.Cell>{member.application_date || '???'}</Table.Cell>
