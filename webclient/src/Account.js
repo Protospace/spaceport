@@ -107,33 +107,40 @@ export function AccountForm(props) {
 
 			<Form.Input
 				label='First Name'
+				required
 				{...makeProps('first_name')}
 			/>
 			<Form.Input
 				label='Last Name'
+				required
 				{...makeProps('last_name')}
 			/>
 			<Form.Input
 				label='Preferred First Name'
+				required
 				{...makeProps('preferred_name')}
 			/>
 
 			<Form.Input
 				label='Email Address'
+				required
 				{...makeProps('email')}
 			/>
 
 			<Form.Input
 				label='Phone Number (999) 555-1234'
+				required
 				{...makeProps('phone')}
 			/>
 
 			<Form.Input
 				label='Street Address'
+				required
 				{...makeProps('street_address')}
 			/>
 			<Form.Input
 				label='City, Province'
+				required
 				{...makeProps('city')}
 			/>
 
