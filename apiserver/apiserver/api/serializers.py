@@ -55,7 +55,7 @@ class OtherMemberSerializer(serializers.ModelSerializer):
 
 class UserEmailField(serializers.ModelField):
     def to_representation(self, obj):
-        return obj.user.email
+        return getattr(obj.user, 'email', obj.old_email)
     def to_internal_value(self, data):
         return serializers.EmailField().run_validation(data)
 
@@ -88,8 +88,9 @@ class MemberSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
-        instance.user.email = validated_data.get('email', instance.user.email)
-        instance.user.save()
+        if instance.user:
+            instance.user.email = validated_data.get('email', instance.user.email)
+            instance.user.save()
 
         photo = validated_data.get('photo', None)
         if photo:
@@ -107,6 +108,7 @@ class AdminMemberSerializer(MemberSerializer):
         fields = '__all__'
         read_only_fields = [
             'id',
+            'status',
             'photo_large',
             'photo_medium',
             'photo_small',
@@ -127,7 +129,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'member', 'transactions', 'cards', 'training']
+        fields = ['id', 'username', 'member', 'transactions', 'cards', 'training', 'is_staff']
         depth = 1
 
 

@@ -7,6 +7,7 @@ from apiserver.api.serializers import process_image
 
 MEMBER_FIELDS = [
     'id',
+    # email -> old_email
     'first_name',
     'last_name',
     'preferred_name',
@@ -91,6 +92,7 @@ for o in old:
 
     if o.city and o.province:
         new['city'] = '{}, {}'.format(o.city, o.province)
+    new['old_email'] = o.email
     new['is_minor'] = o.minor
 
     small, medium, large = None, None, None

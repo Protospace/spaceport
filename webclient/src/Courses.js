@@ -13,7 +13,6 @@ export function Courses(props) {
 	useEffect(() => {
 		requester('/courses/', 'GET', token)
 		.then(res => {
-			console.log(res);
 			setCourses(res.results);
 		})
 		.catch(err => {
@@ -64,7 +63,6 @@ export function CourseDetail(props) {
 	useEffect(() => {
 		requester('/courses/'+id+'/', 'GET', token)
 		.then(res => {
-			console.log(res);
 			setCourse(res);
 		})
 		.catch(err => {

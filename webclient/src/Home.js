@@ -46,6 +46,11 @@ function MemberInfo(props) {
 				</Grid.Column>
 			</Grid>
 
+			{!member.photo_medium && <Message warning>
+				<Message.Header>Please set a member photo!</Message.Header>
+				<p>Visit the <Link to='/account'>account settings</Link> page to set one.</p>
+			</Message>}
+
 			<Header size='medium'>Details</Header>
 			<BasicTable>
 				<Table.Body>

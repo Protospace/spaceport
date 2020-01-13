@@ -30,7 +30,6 @@ function App() {
 	useEffect(() => {
 		requester('/user/', 'GET', token)
 		.then(res => {
-			console.log(res);
 			setUserCache(res);
 		})
 		.catch(err => {
@@ -42,7 +41,6 @@ function App() {
 	function logout() {
 		setTokenCache('');
 		setUserCache(false);
-		window.location = '/';
 	}
 
 	return (
@@ -163,7 +161,7 @@ function App() {
 						</Route>
 
 						<Route path='/members/:id'>
-							<MemberDetail token={token} />
+							<MemberDetail token={token} user={user} />
 						</Route>
 						<Route path='/members'>
 							<Members token={token} />

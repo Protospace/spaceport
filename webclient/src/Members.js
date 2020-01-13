@@ -3,8 +3,9 @@ import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-r
 import './light.css';
 import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Input, Item, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment';
-import { BasicTable, staticUrl, requester } from './utils.js';
+import { isAdmin, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
+import { AdminMemberInfo, AdminMemberForm } from './Admin.js';
 
 export function Members(props) {
 	const [members, setMembers] = useState(false);
@@ -75,7 +76,7 @@ export function Members(props) {
 export function MemberDetail(props) {
 	const [member, setMember] = useState(false);
 	const [error, setError] = useState(false);
-	const { token } = props;
+	const { token, user } = props;
 	const { id } = useParams();
 
 	useEffect(() => {
@@ -96,20 +97,35 @@ export function MemberDetail(props) {
 					<div>
 						<Header size='large'>{member.preferred_name} {member.last_name}</Header>
 
-						<Image rounded size='medium' src={member.photo_large ? staticUrl + '/' + member.photo_large : '/nophoto.png'} />
+						<Grid stackable columns={2}>
+							<Grid.Column>
+								<p>
+									<Image rounded size='medium' src={member.photo_large ? staticUrl + '/' + member.photo_large : '/nophoto.png'} />
+								</p>
 
-						<BasicTable>
-							<Table.Body>
-								<Table.Row>
-									<Table.Cell>Status:</Table.Cell>
-									<Table.Cell>{member.status || 'Unknown'}</Table.Cell>
-								</Table.Row>
-								<Table.Row>
-									<Table.Cell>Joined:</Table.Cell>
-									<Table.Cell>{member.current_start_date || 'Unknown'}</Table.Cell>
-								</Table.Row>
-							</Table.Body>
-						</BasicTable>
+								{isAdmin(user) ?
+									<AdminMemberInfo {...props} />
+								:
+									<BasicTable>
+										<Table.Body>
+											<Table.Row>
+												<Table.Cell>Status:</Table.Cell>
+												<Table.Cell>{member.status || 'Unknown'}</Table.Cell>
+											</Table.Row>
+											<Table.Row>
+												<Table.Cell>Joined:</Table.Cell>
+												<Table.Cell>{member.current_start_date || 'Unknown'}</Table.Cell>
+											</Table.Row>
+										</Table.Body>
+									</BasicTable>
+								}
+							</Grid.Column>
+
+							<Grid.Column>
+								{isAdmin(user) && <Segment padded><AdminMemberForm {...props} /></Segment>}
+							</Grid.Column>
+						</Grid>
+
 					</div>
 				:
 					<p>Loading...</p>

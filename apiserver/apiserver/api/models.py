@@ -7,6 +7,7 @@ from . import old_models
 
 class Member(models.Model):
     user = models.OneToOneField(User, blank=True, null=True, on_delete=models.SET_NULL)
+    old_email = models.CharField(max_length=254, blank=True, null=True)
     photo_large = models.CharField(max_length=64, blank=True, null=True)
     photo_medium = models.CharField(max_length=64, blank=True, null=True)
     photo_small = models.CharField(max_length=64, blank=True, null=True)

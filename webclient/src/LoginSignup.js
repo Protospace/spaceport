@@ -16,7 +16,6 @@ export function LoginForm(props) {
 		setLoading(true);
 		requester('/rest-auth/login/', 'POST', '', input)
 		.then(res => {
-			console.log(res);
 			setError({});
 			props.setTokenCache(res.key);
 		})
@@ -71,7 +70,6 @@ export function SignupForm(props) {
 		input.username = genUsername();
 		requester('/registration/', 'POST', '', input)
 		.then(res => {
-			console.log(res);
 			setError({});
 			props.setTokenCache(res.key);
 		})

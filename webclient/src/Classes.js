@@ -56,7 +56,6 @@ export function Classes(props) {
 	useEffect(() => {
 		requester('/sessions/', 'GET', token)
 		.then(res => {
-			console.log(res);
 			setClasses(res.results);
 		})
 		.catch(err => {
@@ -96,7 +95,6 @@ export function ClassDetail(props) {
 	useEffect(() => {
 		requester('/sessions/'+id+'/', 'GET', token)
 		.then(res => {
-			console.log(res);
 			setClass(res);
 		})
 		.catch(err => {

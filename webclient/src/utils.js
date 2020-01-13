@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Table } from 'semantic-ui-react';
 
+export const isAdmin = (user) => user.is_staff || user.member.is_director;
+
 export const siteUrl = window.location.protocol + '//' + window.location.hostname;
 export const apiUrl = window.location.protocol + '//api.' + window.location.hostname;
 export const staticUrl = window.location.protocol + '//static.' + window.location.hostname;
@@ -23,7 +25,7 @@ export const requester = (route, method, token, data) => {
 	} else if (['POST', 'PUT', 'PATCH'].includes(method)) {
 		const formData = new FormData();
 		Object.keys(data).forEach(key =>
-			formData.append(key, data[key])
+			formData.append(key, data[key] === null ? '' : data[key])
 		);
 
 		options = {

@@ -65,11 +65,7 @@ function ChangePasswordForm(props) {
 
 export function AccountForm(props) {
 	const member = props.user.member;
-	const [input, setInput] = useState({
-		...member,
-		birthdate: member.birthdate || '',
-		set_details: true
-	});
+	const [input, setInput] = useState({ ...member, set_details: true });
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
 	const history = useHistory();
@@ -97,7 +93,7 @@ export function AccountForm(props) {
 	const makeProps = (name) => ({
 		name: name,
 		onChange: handleChange,
-		value: input[name],
+		value: input[name] || '',
 		error: error[name],
 	});
 
@@ -111,14 +107,14 @@ export function AccountForm(props) {
 				{...makeProps('first_name')}
 			/>
 			<Form.Input
-				label='Last Name'
-				required
-				{...makeProps('last_name')}
-			/>
-			<Form.Input
 				label='Preferred First Name'
 				required
 				{...makeProps('preferred_name')}
+			/>
+			<Form.Input
+				label='Last Name'
+				required
+				{...makeProps('last_name')}
 			/>
 
 			<Form.Input
@@ -148,7 +144,7 @@ export function AccountForm(props) {
 				<label>Are you under 18 years old?</label>
 				<Checkbox
 					label='I am a minor'
-					{...makeProps('is_minor')}
+					name='is_minor'
 					onChange={handleCheck}
 					checked={input.is_minor}
 				/>
@@ -159,7 +155,7 @@ export function AccountForm(props) {
 				{...makeProps('birthdate')}
 			/>}
 			{input.is_minor && <Form.Input
-				label="Parent's Name"
+				label="Guardian's Name"
 				{...makeProps('guardian_name')}
 			/>}
 
