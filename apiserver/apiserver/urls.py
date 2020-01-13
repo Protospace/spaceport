@@ -21,5 +21,5 @@ urlpatterns = [
     url(r'^rest-auth/', include('rest_auth.urls')),
     url(r'^registration/', views.RegistrationView.as_view(), name='rest_name_register'),
     url(r'^password/change/', views.PasswordChangeView.as_view(), name='rest_password_change'),
-    url(r'^me/', views.MyUserView.as_view(), name='fullmember'),
+    url(r'^user/', views.UserView.as_view(), name='user'),
 ]

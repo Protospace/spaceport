@@ -55,6 +55,10 @@ export const requester = (route, method, token, data) => {
 		} else if (code >= 400 && code < 500) {
 			return error.data.json()
 			.then(result => {
+				if (result.detail == 'Invalid token.') {
+					localStorage.clear();
+					window.location = '/';
+				}
 				throw customError(result);
 			});
 		} else if (code >= 500 && code < 600) {

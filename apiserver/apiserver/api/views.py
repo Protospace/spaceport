@@ -123,7 +123,7 @@ class SessionViewSet(viewsets.ModelViewSet):
         return serializers.SessionSerializer
 
 
-class MyUserView(views.APIView):
+class UserView(views.APIView):
     permission_classes = [AllowMetadata | IsAuthenticated]
 
     def get(self, request):

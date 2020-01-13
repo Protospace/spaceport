@@ -43,24 +43,21 @@ def process_image(upload):
     return small, medium, large
 
 
+
 class UserTrainingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Training
         exclude = ['user']
         depth = 2
 
-class UserDetailsSerializer(UserDetailsSerializer):
-    class Meta:
-        model = User
-        fields = ['username', 'email']
-
 class UserSerializer(serializers.ModelSerializer):
     training = UserTrainingSerializer(many=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'member', 'transactions', 'cards', 'training']
+        fields = ['id', 'username', 'member', 'transactions', 'cards', 'training']
         depth = 1
+
 
 
 # member viewing member list or other member
@@ -72,9 +69,16 @@ class OtherMemberSerializer(serializers.ModelSerializer):
         model = models.Member
         fields = ['q', 'seq', 'id', 'preferred_name', 'last_name', 'status', 'current_start_date', 'photo_small', 'photo_large']
 
+class UserEmailField(serializers.ModelField):
+    def to_representation(self, obj):
+        return obj.user.email
+    def to_internal_value(self, data):
+        return serializers.EmailField().run_validation(data)
+
 # member viewing himself
 class MemberSerializer(serializers.ModelSerializer):
     photo = serializers.ImageField(write_only=True, required=False)
+    email = UserEmailField(serializers.EmailField)
     class Meta:
         model = models.Member
         fields = '__all__'
@@ -95,6 +99,9 @@ class MemberSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
+        instance.user.email = validated_data.get('email', instance.user.email)
+        instance.user.save()
+
         photo = validated_data.get('photo', None)
         if photo:
             small, medium, large = process_image(photo)
@@ -103,7 +110,6 @@ class MemberSerializer(serializers.ModelSerializer):
             instance.photo_large = large
 
         return super().update(instance, validated_data)
-
 
 # adming viewing member
 class AdminMemberSerializer(MemberSerializer):
@@ -117,6 +123,7 @@ class AdminMemberSerializer(MemberSerializer):
             'photo_small',
             'user',
         ]
+
 
 
 class TransactionSerializer(serializers.ModelSerializer):

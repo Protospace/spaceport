@@ -175,10 +175,6 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': DEFAULT_AUTHENTICATION_CLASSES,
 }
 
-REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'apiserver.api.serializers.UserDetailsSerializer'
-}
-
 LOGGING = {
     'version': 1,
     'formatters': {

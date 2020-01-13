@@ -28,7 +28,7 @@ function App() {
 	}
 
 	useEffect(() => {
-		requester('/me/', 'GET', token)
+		requester('/user/', 'GET', token)
 		.then(res => {
 			console.log(res);
 			setUserCache(res);
@@ -49,6 +49,7 @@ function App() {
 		<Router>
 			<div className='content-wrap'>
 			<div className='content-wrap-inside'>
+
 			<Container>
 				<div className='hero'>
 					<img src='/logo-long.svg' className='logo-long' />
@@ -176,6 +177,7 @@ function App() {
 					</Route>
 				}
 			</div>
+
 			</div>
 			</div>
 
