@@ -44,22 +44,6 @@ def process_image(upload):
 
 
 
-class UserTrainingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Training
-        exclude = ['user']
-        depth = 2
-
-class UserSerializer(serializers.ModelSerializer):
-    training = UserTrainingSerializer(many=True)
-
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'member', 'transactions', 'cards', 'training']
-        depth = 1
-
-
-
 # member viewing member list or other member
 class OtherMemberSerializer(serializers.ModelSerializer):
     q = serializers.CharField(write_only=True, max_length=64)
@@ -79,6 +63,11 @@ class UserEmailField(serializers.ModelField):
 class MemberSerializer(serializers.ModelSerializer):
     photo = serializers.ImageField(write_only=True, required=False)
     email = UserEmailField(serializers.EmailField)
+    phone = serializers.CharField()
+    street_address = serializers.CharField()
+    city = serializers.CharField()
+    postal_code = serializers.CharField()
+
     class Meta:
         model = models.Member
         fields = '__all__'
@@ -123,6 +112,23 @@ class AdminMemberSerializer(MemberSerializer):
             'photo_small',
             'user',
         ]
+
+
+
+class UserTrainingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Training
+        exclude = ['user']
+        depth = 2
+
+class UserSerializer(serializers.ModelSerializer):
+    training = UserTrainingSerializer(many=True)
+    member = MemberSerializer()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'member', 'transactions', 'cards', 'training']
+        depth = 1
 
 
 

@@ -114,6 +114,8 @@ function App() {
 							content='Logout'
 							onClick={logout}
 							icon='cancel'
+							as={Link}
+							to='/'
 						/>
 						<Menu.Item fitted content='' />
 					</Menu.Menu>}
@@ -125,7 +127,7 @@ function App() {
 			</Route>
 
 			<div className='topPadding'>
-				{user ?
+				{user && user.member.set_details ?
 					<Switch>
 						<Route path='/account'>
 							<Account token={token} user={user} setUserCache={setUserCache} />

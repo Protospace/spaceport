@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
-import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Container, Checkbox, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { BasicTable, staticUrl, requester } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 
@@ -63,9 +63,13 @@ function ChangePasswordForm(props) {
 	);
 };
 
-function AccountForm(props) {
+export function AccountForm(props) {
 	const member = props.user.member;
-	const [input, setInput] = useState({ ...member });
+	const [input, setInput] = useState({
+		...member,
+		birthdate: member.birthdate || '',
+		set_details: true
+	});
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
 	const history = useHistory();
@@ -73,6 +77,7 @@ function AccountForm(props) {
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
+	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 
 	const handleSubmit = (e) => {
 		setLoading(true);
@@ -114,9 +119,43 @@ function AccountForm(props) {
 			/>
 
 			<Form.Input
+				label='Email Address'
+				{...makeProps('email')}
+			/>
+
+			<Form.Input
 				label='Phone Number (999) 555-1234'
 				{...makeProps('phone')}
 			/>
+
+			<Form.Input
+				label='Street Address'
+				{...makeProps('street_address')}
+			/>
+			<Form.Input
+				label='City, Province'
+				{...makeProps('city')}
+			/>
+
+			<Form.Field>
+				<label>Are you under 18 years old?</label>
+				<Checkbox
+					label='I am a minor'
+					{...makeProps('is_minor')}
+					onChange={handleCheck}
+					checked={input.is_minor}
+				/>
+			</Form.Field>
+
+			{input.is_minor && <Form.Input
+				label='Birthdate YYYY-MM-DD'
+				{...makeProps('birthdate')}
+			/>}
+			{input.is_minor && <Form.Input
+				label="Parent's Name"
+				{...makeProps('guardian_name')}
+			/>}
+
 			<Form.Input
 				label='Emergency Contact Name'
 				{...makeProps('emergency_contact_name')}

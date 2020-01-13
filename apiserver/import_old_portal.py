@@ -19,6 +19,12 @@ MEMBER_FIELDS = [
     'monthly_fees',
     'emergency_contact_name',
     'emergency_contact_phone',
+    # minor -> is_minor
+    'birthdate',
+    'guardian_name',
+    'street_address',
+    # city, provice -> city
+    'postal_code',
 ]
 
 TRANSACTION_FIELDS = [
@@ -82,6 +88,10 @@ for o in old:
 
     for f in MEMBER_FIELDS:
         new[f] = o.__dict__.get(f, None)
+
+    if o.city and o.province:
+        new['city'] = '{}, {}'.format(o.city, o.province)
+    new['is_minor'] = o.minor
 
     small, medium, large = None, None, None
     if str(o.id) in photo_folders:
