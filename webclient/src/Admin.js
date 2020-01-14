@@ -42,80 +42,77 @@ export function AdminMemberForm(props) {
 
 	return (
 		<div>
-			{!error ?
-				input ?
-					<Form onSubmit={handleSubmit}>
-						<Header size='medium'>Edit Member Details</Header>
+			{input ?
+				<Form onSubmit={handleSubmit}>
+					<Header size='medium'>Edit Member Details</Header>
 
-						<Form.Input
-							label='Email'
-							{...makeProps('email')}
+					<Form.Input
+						label='Email'
+						{...makeProps('email')}
+					/>
+
+					<Form.Input
+						label='Application Date'
+						{...makeProps('application_date')}
+					/>
+
+					<Form.Input
+						label='Current Start Date'
+						{...makeProps('current_start_date')}
+					/>
+
+					<Form.Input
+						label='Vetted Date'
+						{...makeProps('vetted_date')}
+					/>
+
+					<Form.Input
+						label='Expire Date'
+						{...makeProps('expire_date')}
+					/>
+
+					<Form.Input
+						label='Membership Fee'
+						{...makeProps('monthly_fees')}
+					/>
+
+					<Form.Field>
+						<label>Is the member a director?</label>
+						<Checkbox
+							label='Yes'
+							name='is_director'
+							onChange={handleCheck}
+							checked={input.is_director}
 						/>
+					</Form.Field>
 
-						<Form.Input
-							label='Application Date'
-							{...makeProps('application_date')}
+					<Form.Field>
+						<label>Is the member portal staff?</label>
+						<Checkbox
+							label='Yes'
+							name='is_staff'
+							onChange={handleCheck}
+							checked={input.is_staff}
 						/>
+					</Form.Field>
 
-						<Form.Input
-							label='Current Start Date'
-							{...makeProps('current_start_date')}
+					<Form.Field>
+						<label>Is the member an instructor?</label>
+						<Checkbox
+							label='Yes'
+							name='is_instructor'
+							onChange={handleCheck}
+							checked={input.is_instructor}
 						/>
+					</Form.Field>
 
-						<Form.Input
-							label='Vetted Date'
-							{...makeProps('vetted_date')}
-						/>
-
-						<Form.Input
-							label='Expire Date'
-							{...makeProps('Expire Date')}
-						/>
-
-						<Form.Input
-							label='Membership Fee'
-							{...makeProps('monthly_fees')}
-						/>
-
-						<Form.Field>
-							<label>Is the member a director?</label>
-							<Checkbox
-								label='Yes'
-								name='is_director'
-								onChange={handleCheck}
-								checked={input.is_director}
-							/>
-						</Form.Field>
-
-						<Form.Field>
-							<label>Is the member portal staff?</label>
-							<Checkbox
-								label='Yes'
-								name='is_staff'
-								onChange={handleCheck}
-								checked={input.is_staff}
-							/>
-						</Form.Field>
-
-						<Form.Field>
-							<label>Is the member an instructor?</label>
-							<Checkbox
-								label='Yes'
-								name='is_instructor'
-								onChange={handleCheck}
-								checked={input.is_instructor}
-							/>
-						</Form.Field>
-
-						{success && <p>Success!</p>}
-						<Form.Button loading={loading} error={error.non_field_errors}>
-							Submit
-						</Form.Button>
-					</Form>
-				:
-					<p>Loading...</p>
+					{success && <p>Success!</p>}
+					<Form.Button loading={loading} error={error.non_field_errors}>
+						Submit
+					</Form.Button>
+				</Form>
 			:
-				<p>Error loading member</p>
+				<p>Loading...</p>
 			}
 		</div>
 	);
@@ -123,73 +120,68 @@ export function AdminMemberForm(props) {
 
 export function AdminMemberInfo(props) {
 	const member = props.result.member;
-	const [error, setError] = useState(false);
-	const { id } = useParams();
 
 	return (
 		<div>
-			{!error ?
-				member ?
-					<div>
-						<Header size='medium'>Admin Details</Header>
+			{member ?
+				<div>
+					<Header size='medium'>Admin Details</Header>
 
-						<BasicTable>
-							<Table.Body>
-								<Table.Row>
-									<Table.Cell>Name:</Table.Cell>
-									<Table.Cell>{member.first_name} {member.last_name}</Table.Cell>
-								</Table.Row>
-								<Table.Row>
-									<Table.Cell>Status:</Table.Cell>
-									<Table.Cell>{member.status}</Table.Cell>
-								</Table.Row>
+					<BasicTable>
+						<Table.Body>
+							<Table.Row>
+								<Table.Cell>Name:</Table.Cell>
+								<Table.Cell>{member.first_name} {member.last_name}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>Status:</Table.Cell>
+								<Table.Cell>{member.status}</Table.Cell>
+							</Table.Row>
 
-								<Table.Row>
-									<Table.Cell>Phone:</Table.Cell>
-									<Table.Cell>{member.phone}</Table.Cell>
-								</Table.Row>
+							<Table.Row>
+								<Table.Cell>Phone:</Table.Cell>
+								<Table.Cell>{member.phone}</Table.Cell>
+							</Table.Row>
 
-								<Table.Row>
-									<Table.Cell>Address:</Table.Cell>
-									<Table.Cell>{member.street_address}</Table.Cell>
-								</Table.Row>
-								<Table.Row>
-									<Table.Cell>City:</Table.Cell>
-									<Table.Cell>{member.city}</Table.Cell>
-								</Table.Row>
-								<Table.Row>
-									<Table.Cell>Postal:</Table.Cell>
-									<Table.Cell>{member.postal_code}</Table.Cell>
-								</Table.Row>
+							<Table.Row>
+								<Table.Cell>Address:</Table.Cell>
+								<Table.Cell>{member.street_address}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>City:</Table.Cell>
+								<Table.Cell>{member.city}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>Postal:</Table.Cell>
+								<Table.Cell>{member.postal_code}</Table.Cell>
+							</Table.Row>
 
-								<Table.Row>
-									<Table.Cell>Minor:</Table.Cell>
-									<Table.Cell>{member.is_minor ? 'Yes' : 'No'}</Table.Cell>
-								</Table.Row>
-								{member.is_minor && <Table.Row>
-									<Table.Cell>Birthdate:</Table.Cell>
-									<Table.Cell>{member.birthdate}</Table.Cell>
-								</Table.Row>}
-								{member.is_minor && <Table.Row>
-									<Table.Cell>Guardian:</Table.Cell>
-									<Table.Cell>{member.guardian_name}</Table.Cell>
-								</Table.Row>}
+							<Table.Row>
+								<Table.Cell>Minor:</Table.Cell>
+								<Table.Cell>{member.is_minor ? 'Yes' : 'No'}</Table.Cell>
+							</Table.Row>
+							{member.is_minor && <Table.Row>
+								<Table.Cell>Birthdate:</Table.Cell>
+								<Table.Cell>{member.birthdate}</Table.Cell>
+							</Table.Row>}
+							{member.is_minor && <Table.Row>
+								<Table.Cell>Guardian:</Table.Cell>
+								<Table.Cell>{member.guardian_name}</Table.Cell>
+							</Table.Row>}
 
-								<Table.Row>
-									<Table.Cell>Emergency Contact Name:</Table.Cell>
-									<Table.Cell>{member.emergency_contact_name || 'None'}</Table.Cell>
-								</Table.Row>
-								<Table.Row>
-									<Table.Cell>Emergency Contact Phone:</Table.Cell>
-									<Table.Cell>{member.emergency_contact_phone || 'None'}</Table.Cell>
-								</Table.Row>
-							</Table.Body>
-						</BasicTable>
-					</div>
-				:
-					<p>Loading...</p>
+							<Table.Row>
+								<Table.Cell>Emergency Contact Name:</Table.Cell>
+								<Table.Cell>{member.emergency_contact_name || 'None'}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>Emergency Contact Phone:</Table.Cell>
+								<Table.Cell>{member.emergency_contact_phone || 'None'}</Table.Cell>
+							</Table.Row>
+						</Table.Body>
+					</BasicTable>
+				</div>
 			:
-				<p>Error loading member</p>
+				<p>Loading...</p>
 			}
 		</div>
 	);
