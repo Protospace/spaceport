@@ -27,6 +27,7 @@ class Member(models.Model):
     postal_code = models.CharField(max_length=16, null=True)
 
     is_director = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
     is_instructor = models.BooleanField(default=False)
     status = models.CharField(max_length=32, blank=True, null=True)
     expire_date = models.DateField(default=date.today, null=True)

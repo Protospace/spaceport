@@ -81,6 +81,7 @@ class MemberSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'id',
             'is_director',
+            'is_staff',
             'is_instructor',
             'status',
             'expire_date',

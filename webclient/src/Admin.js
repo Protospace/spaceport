@@ -88,6 +88,16 @@ export function AdminMemberForm(props) {
 						</Form.Field>
 
 						<Form.Field>
+							<label>Is the member portal staff?</label>
+							<Checkbox
+								label='Yes'
+								name='is_staff'
+								onChange={handleCheck}
+								checked={input.is_staff}
+							/>
+						</Form.Field>
+
+						<Form.Field>
 							<label>Is the member an instructor?</label>
 							<Checkbox
 								label='Yes'
@@ -135,10 +145,6 @@ export function AdminMemberInfo(props) {
 								</Table.Row>
 
 								<Table.Row>
-									<Table.Cell>Email:</Table.Cell>
-									<Table.Cell>{member.email}</Table.Cell>
-								</Table.Row>
-								<Table.Row>
 									<Table.Cell>Phone:</Table.Cell>
 									<Table.Cell>{member.phone}</Table.Cell>
 								</Table.Row>
@@ -171,11 +177,11 @@ export function AdminMemberInfo(props) {
 
 								<Table.Row>
 									<Table.Cell>Emergency Contact Name:</Table.Cell>
-									<Table.Cell>{member.emergency_contact_name}</Table.Cell>
+									<Table.Cell>{member.emergency_contact_name || 'None'}</Table.Cell>
 								</Table.Row>
 								<Table.Row>
 									<Table.Cell>Emergency Contact Phone:</Table.Cell>
-									<Table.Cell>{member.emergency_contact_phone}</Table.Cell>
+									<Table.Cell>{member.emergency_contact_phone || 'None'}</Table.Cell>
 								</Table.Row>
 							</Table.Body>
 						</BasicTable>
