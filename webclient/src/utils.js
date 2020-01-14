@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table } from 'semantic-ui-react';
 
-export const isAdmin = (user) => user.is_staff || user.member.is_director;
+export const isAdmin = (user) => user.is_staff || user.member.is_director || user.member.is_staff;
 
 export const siteUrl = window.location.protocol + '//' + window.location.hostname;
 export const apiUrl = window.location.protocol + '//api.' + window.location.hostname;
