@@ -21,6 +21,7 @@ class IsOwnerOrAdmin(BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.user == request.user or is_admin_director(request.user)
 
+
 class RetrieveUpdateViewSet(
         viewsets.GenericViewSet,
         mixins.RetrieveModelMixin,
@@ -41,11 +42,19 @@ def gen_search_strings():
 NUM_SEARCH_RESULTS = 10
 class SearchViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     permission_classes = [AllowMetadata | IsAuthenticated]
-    serializer_class = serializers.OtherMemberSerializer
+
+    def get_serializer_class(self):
+        if is_admin_director(self.request.user) and self.action == 'retrieve':
+            return serializers.AdminSearchSerializer
+        else:
+            return serializers.SearchSerializer
 
     def get_queryset(self):
         queryset = models.Member.objects.all()
         search = self.request.data.get('q', '').lower()
+
+        if not search_strings:
+            gen_search_strings() # init cache
 
         if len(search):
             choices = search_strings.keys()
@@ -68,7 +77,7 @@ class SearchViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
             queryset = result_objects
         else:
-            gen_search_strings()
+            gen_search_strings() # update cache
             queryset = queryset.order_by('-vetted_date')
 
         return queryset
@@ -81,7 +90,7 @@ class SearchViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
             seq = 0
 
         queryset = self.get_queryset()[:NUM_SEARCH_RESULTS]
-        serializer = self.serializer_class(queryset, many=True)
+        serializer = serializers.SearchSerializer(queryset, many=True)
         return Response({'seq': seq, 'results': serializer.data})
 
 

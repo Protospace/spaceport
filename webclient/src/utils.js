@@ -51,7 +51,7 @@ export const requester = (route, method, token, data) => {
 		return response.json();
 	})
 	.catch(error => {
-		const code = error.data.status;
+		const code = error.data ? error.data.status : null;
 		if (code == 413) {
 			throw customError({non_field_errors: ['File too big']});
 		} else if (code >= 400 && code < 500) {

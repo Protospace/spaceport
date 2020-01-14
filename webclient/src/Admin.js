@@ -5,7 +5,7 @@ import { Container, Checkbox, Divider, Dropdown, Form, Grid, Header, Icon, Image
 import { BasicTable, staticUrl, requester } from './utils.js';
 
 export function AdminMemberForm(props) {
-	const [input, setInput] = useState(false);
+	const [input, setInput] = useState(props.result.member);
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
@@ -16,17 +16,6 @@ export function AdminMemberForm(props) {
 	const handleChange = (e) => handleValues(e, e.currentTarget);
 	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 
-	useEffect(() => {
-		requester('/members/'+id+'/', 'GET', props.token)
-		.then(res => {
-			setInput(res);
-		})
-		.catch(err => {
-			console.log(err);
-			setError(true);
-		});
-	}, []);
-
 	const handleSubmit = (e) => {
 		setLoading(true);
 		setSuccess(false);
@@ -35,6 +24,7 @@ export function AdminMemberForm(props) {
 			setLoading(false);
 			setSuccess(true);
 			setError(false);
+			props.setResult({ ...props.result, member: res });
 		})
 		.catch(err => {
 			setLoading(false);
@@ -56,6 +46,11 @@ export function AdminMemberForm(props) {
 				input ?
 					<Form onSubmit={handleSubmit}>
 						<Header size='medium'>Edit Member Details</Header>
+
+						<Form.Input
+							label='Email'
+							{...makeProps('email')}
+						/>
 
 						<Form.Input
 							label='Application Date'
@@ -117,20 +112,9 @@ export function AdminMemberForm(props) {
 };
 
 export function AdminMemberInfo(props) {
-	const [member, setMember] = useState(false);
+	const member = props.result.member;
 	const [error, setError] = useState(false);
 	const { id } = useParams();
-
-	useEffect(() => {
-		requester('/members/'+id+'/', 'GET', props.token)
-		.then(res => {
-			setMember(res);
-		})
-		.catch(err => {
-			console.log(err);
-			setError(true);
-		});
-	}, []);
 
 	return (
 		<div>

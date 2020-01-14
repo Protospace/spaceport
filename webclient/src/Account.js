@@ -17,7 +17,7 @@ function ChangePasswordForm(props) {
 
 	const handleSubmit = (e) => {
 		setLoading(true);
-		requester('/rest-auth/password/change/', 'POST', props.token, input)
+		requester('/password/change/', 'POST', props.token, input)
 		.then(res => {
 			setError({});
 			history.push('/');
@@ -32,7 +32,7 @@ function ChangePasswordForm(props) {
 	const makeProps = (name) => ({
 		name: name,
 		onChange: handleChange,
-		value: input[name],
+		value: input[name] || '',
 		error: error[name],
 	});
 
@@ -43,16 +43,19 @@ function ChangePasswordForm(props) {
 			<Form.Input
 				label='Old Password'
 				type='password'
+				required
 				{...makeProps('old_password')}
 			/>
 			<Form.Input
 				label='New Password'
 				type='password'
+				required
 				{...makeProps('new_password1')}
 			/>
 			<Form.Input
 				label='Confirm Password'
 				type='password'
+				required
 				{...makeProps('new_password2')}
 			/>
 
@@ -138,6 +141,11 @@ export function AccountForm(props) {
 				label='City, Province'
 				required
 				{...makeProps('city')}
+			/>
+			<Form.Input
+				label='Postal Code'
+				required
+				{...makeProps('postal_code')}
 			/>
 
 			<Form.Field>

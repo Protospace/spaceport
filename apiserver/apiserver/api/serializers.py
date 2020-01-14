@@ -42,24 +42,31 @@ def process_image(upload):
 
     return small, medium, large
 
-
-
-# member viewing member list or other member
-class OtherMemberSerializer(serializers.ModelSerializer):
-    q = serializers.CharField(write_only=True, max_length=64)
-    seq = serializers.IntegerField(write_only=True)
-
-    class Meta:
-        model = models.Member
-        fields = ['q', 'seq', 'id', 'preferred_name', 'last_name', 'status', 'current_start_date', 'photo_small', 'photo_large']
-
 class UserEmailField(serializers.ModelField):
     def to_representation(self, obj):
         return getattr(obj.user, 'email', obj.old_email)
     def to_internal_value(self, data):
         return serializers.EmailField().run_validation(data)
 
-# member viewing himself
+
+
+class AdminCardSerializer(serializers.ModelSerializer):
+    card_number = serializers.CharField()
+    class Meta:
+        model = models.Card
+        fields = '__all__'
+        read_only_fields = ['last_seen_at']
+
+
+
+
+# member viewing other members
+class OtherMemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Member
+        fields = ['id', 'preferred_name', 'last_name', 'status', 'current_start_date', 'photo_small', 'photo_large']
+
+# member viewing his own details
 class MemberSerializer(serializers.ModelSerializer):
     photo = serializers.ImageField(write_only=True, required=False)
     email = UserEmailField(serializers.EmailField)
@@ -85,12 +92,15 @@ class MemberSerializer(serializers.ModelSerializer):
             'photo_medium',
             'photo_small',
             'user',
+            'old_email',
         ]
 
     def update(self, instance, validated_data):
         if instance.user:
             instance.user.email = validated_data.get('email', instance.user.email)
             instance.user.save()
+        else:
+            instance.old_email = validated_data.get('email', instance.old_email)
 
         photo = validated_data.get('photo', None)
         if photo:
@@ -101,7 +111,7 @@ class MemberSerializer(serializers.ModelSerializer):
 
         return super().update(instance, validated_data)
 
-# adming viewing member
+# admin viewing member details
 class AdminMemberSerializer(MemberSerializer):
     class Meta:
         model = models.Member
@@ -113,7 +123,38 @@ class AdminMemberSerializer(MemberSerializer):
             'photo_medium',
             'photo_small',
             'user',
+            'old_email',
         ]
+
+
+
+# member viewing member list or search result
+class SearchSerializer(serializers.Serializer):
+    q = serializers.CharField(write_only=True, max_length=64)
+    seq = serializers.IntegerField(write_only=True)
+    member = serializers.SerializerMethodField()
+
+    def get_member(self, obj):
+        serializer = OtherMemberSerializer(obj)
+        return serializer.data
+
+# admin viewing search result
+class AdminSearchSerializer(serializers.Serializer):
+    cards = serializers.SerializerMethodField()
+    member = serializers.SerializerMethodField()
+
+    def get_member(self, obj):
+        serializer = AdminMemberSerializer(obj)
+        return serializer.data
+
+    def get_cards(self, obj):
+        if obj.user:
+            queryset = obj.user.cards
+        else:
+            queryset = models.Card.objects.filter(member_id=obj.id)
+        serializer = AdminCardSerializer(data=queryset, many=True)
+        serializer.is_valid()
+        return serializer.data
 
 
 
@@ -172,6 +213,7 @@ class AdminCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Course
         fields = '__all__'
+
 
 
 class RegistrationSerializer(RegisterSerializer):

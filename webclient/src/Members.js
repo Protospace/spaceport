@@ -8,7 +8,7 @@ import { NotFound, PleaseLogin } from './Misc.js';
 import { AdminMemberInfo, AdminMemberForm } from './Admin.js';
 
 export function Members(props) {
-	const [members, setMembers] = useState(false);
+	const [response, setResponse] = useState(false);
 	const searchDefault = {seq: 0, q: ''};
 	const [search, setSearch] = useState(searchDefault);
 	const { token } = props;
@@ -16,8 +16,8 @@ export function Members(props) {
 	useEffect(() => {
 		requester('/search/', 'POST', token, search)
 		.then(res => {
-			if (!search.seq || res.seq > members.seq) {
-				setMembers(res);
+			if (!search.seq || res.seq > response.seq) {
+				setResponse(res);
 			}
 		})
 		.catch(err => {
@@ -48,16 +48,16 @@ export function Members(props) {
 				{search.q.length ? 'Search Results' : 'Newest Vetted Members'}
 			</Header>
 
-			{members ?
+			{response ?
 				<Item.Group divided>
-					{members.results.length ?
-						members.results.map((x, i) =>
-							<Item key={i} as={Link} to={'/members/'+x.id}>
-								<Item.Image size='tiny' src={x.photo_small ? staticUrl + '/' + x.photo_small : '/nophoto.png'} />
+					{response.results.length ?
+						response.results.map((x, i) =>
+							<Item key={i} as={Link} to={'/members/'+x.member.id}>
+								<Item.Image size='tiny' src={x.member.photo_small ? staticUrl + '/' + x.member.photo_small : '/nophoto.png'} />
 								<Item.Content verticalAlign='top'>
-									<Item.Header>{x.preferred_name} {x.last_name}</Item.Header>
-									<Item.Description>Status: {x.status || 'Unknown'}</Item.Description>
-									<Item.Description>Joined: {x.current_start_date || 'Unknown'}</Item.Description>
+									<Item.Header>{x.member.preferred_name} {x.member.last_name}</Item.Header>
+									<Item.Description>Status: {x.member.status || 'Unknown'}</Item.Description>
+									<Item.Description>Joined: {x.member.current_start_date || 'Unknown'}</Item.Description>
 								</Item.Content>
 							</Item>
 						)
@@ -74,7 +74,7 @@ export function Members(props) {
 };
 
 export function MemberDetail(props) {
-	const [member, setMember] = useState(false);
+	const [result, setResult] = useState(false);
 	const [error, setError] = useState(false);
 	const { token, user } = props;
 	const { id } = useParams();
@@ -82,13 +82,15 @@ export function MemberDetail(props) {
 	useEffect(() => {
 		requester('/search/'+id+'/', 'GET', token)
 		.then(res => {
-			setMember(res);
+			setResult(res);
 		})
 		.catch(err => {
 			console.log(err);
 			setError(true);
 		});
 	}, []);
+
+	const member = result.member || false;
 
 	return (
 		<Container>
@@ -104,7 +106,7 @@ export function MemberDetail(props) {
 								</p>
 
 								{isAdmin(user) ?
-									<AdminMemberInfo {...props} />
+									<AdminMemberInfo result={result} setResult={setResult} {...props} />
 								:
 									<BasicTable>
 										<Table.Body>
@@ -122,7 +124,9 @@ export function MemberDetail(props) {
 							</Grid.Column>
 
 							<Grid.Column>
-								{isAdmin(user) && <Segment padded><AdminMemberForm {...props} /></Segment>}
+								{isAdmin(user) && <Segment padded>
+									<AdminMemberForm result={result} setResult={setResult} {...props} />
+								</Segment>}
 							</Grid.Column>
 						</Grid>
 
