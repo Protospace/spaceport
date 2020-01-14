@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User, Group
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_auth.registration.serializers import RegisterSerializer
@@ -177,13 +178,22 @@ class CardSerializer(serializers.ModelSerializer):
 # admin viewing member details
 class AdminCardSerializer(CardSerializer):
     card_number = serializers.CharField()
+    member_id = serializers.IntegerField()
+    active_status = serializers.ChoiceField(['card_blocked', 'card_inactive', 'card_member_blocked', 'card_active'])
     class Meta:
         model = models.Card
         fields = '__all__'
         read_only_fields = [
             'id',
             'last_seen_at',
+            'user',
         ]
+
+    def create(self, validated_data):
+        member = get_object_or_404(models.Member, id=validated_data['member_id'])
+        if member.user:
+            validated_data['user'] = member.user
+        return super().create(validated_data)
 
 
 
