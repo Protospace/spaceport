@@ -27,7 +27,13 @@ class RetrieveUpdateViewSet(
         mixins.RetrieveModelMixin,
         mixins.UpdateModelMixin):
     def list(self, request):
-        raise exceptions.PermissionDenied
+        return Response([])
+
+class CreateRetrieveUpdateDeleteViewSet(
+        RetrieveUpdateViewSet,
+        mixins.CreateModelMixin,
+        mixins.DestroyModelMixin):
+    pass
 
 
 search_strings = {}
@@ -103,6 +109,17 @@ class MemberViewSet(RetrieveUpdateViewSet):
             return serializers.AdminMemberSerializer
         else:
             return serializers.MemberSerializer
+
+
+class CardViewSet(CreateRetrieveUpdateDeleteViewSet):
+    permission_classes = [AllowMetadata | IsAuthenticated, IsOwnerOrAdmin]
+    queryset = models.Card.objects.all()
+
+    def get_serializer_class(self):
+        if is_admin_director(self.request.user):
+            return serializers.AdminCardSerializer
+        else:
+            return serializers.CardSerializer
 
 
 class CourseViewSet(viewsets.ModelViewSet):

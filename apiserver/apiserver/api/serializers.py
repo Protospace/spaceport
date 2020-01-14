@@ -159,6 +159,34 @@ class AdminSearchSerializer(serializers.Serializer):
 
 
 
+# member viewing his own cards
+class CardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Card
+        fields = '__all__'
+        read_only_fields = [
+            'id',
+            'card_number',
+            'member_id',
+            'notes',
+            'last_seen_at',
+            'active_status',
+            'user',
+        ]
+
+# admin viewing member details
+class AdminCardSerializer(CardSerializer):
+    card_number = serializers.CharField()
+    class Meta:
+        model = models.Card
+        fields = '__all__'
+        read_only_fields = [
+            'id',
+            'last_seen_at',
+        ]
+
+
+
 class UserTrainingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Training
