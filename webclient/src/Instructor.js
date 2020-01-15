@@ -60,28 +60,30 @@ function InstructorCourseEditor(props) {
 	);
 }
 
-function InstructorCourseDetail(props) {
-	const [input, setInput] = useState({ ...props.card });
+export function InstructorCourseDetail(props) {
+	const { course, setCourse, token } = props;
+	const [open, setOpen] = useState(false);
+	const convertNewlineToPara = (t) => t.split('\n').map(x => '<p>'+x+'</p>').join('')
+	const [input, setInput] = useState({
+		...course,
+		description: course.is_old ? convertNewlineToPara(course.description) : course.description,
+	});
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
-	const id = props.card.id;
-
-	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
-	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
-	const handleChange = (e) => handleValues(e, e.currentTarget);
-	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
+	const { id } = useParams();
 
 	const handleSubmit = (e) => {
 		setLoading(true);
 		setSuccess(false);
-		const data = { ...input, member_id: props.result.member.id };
-		requester('/cards/'+id+'/', 'PUT', props.token, data)
+		const data = { ...input, is_old: false };
+		requester('/courses/'+id+'/', 'PUT', props.token, data)
 		.then(res => {
-			setLoading(false);
 			setSuccess(true);
+			setLoading(false);
 			setError(false);
-			setInput(res);
+			setOpen(false);
+			props.setCourse({...course, ...res});
 		})
 		.catch(err => {
 			setLoading(false);
@@ -90,65 +92,28 @@ function InstructorCourseDetail(props) {
 		});
 	};
 
-	const handleDelete = (e) => {
-		e.preventDefault();
-
-		requester('/cards/'+id+'/', 'DELETE', props.token)
-		.then(res => {
-			setInput(false);
-		})
-		.catch(err => {
-			console.log(err);
-		});
-	};
-
-	const statusOptions = [
-		{ key: '0', text: 'Card Active', value: 'card_active' },
-		{ key: '1', text: 'Card Blocked', value: 'card_blocked' },
-		{ key: '2', text: 'Card Inactive', value: 'card_inactive' },
-		{ key: '3', text: 'Card Member Blocked', value: 'card_member_blocked' },
-	];
-
 	return (
-		input ?
-			<Segment raised color={input.active_status === 'card_active' ? 'green' : 'red'}>
+		<div>
+			<Header size='medium'>Instructor Panel</Header>
+
+			{!open && success && <p>Saved!</p>}
+
+			{open ?
 				<Form onSubmit={handleSubmit}>
-					<Form.Group widths='equal'>
-						<Form.Input
-							fluid
-							{...makeProps('card_number')}
-						/>
-						<Form.Select
-							fluid
-							options={statusOptions}
-							{...makeProps('active_status')}
-							onChange={handleValues}
-						/>
+					<Header size='small'>Edit Course</Header>
 
-						<Form.Group widths='equal'>
-							<Form.Button
-								loading={loading}
-								error={error.non_field_errors}
-							>
-								{success ? 'Saved.' : 'Save'}
-							</Form.Button>
+					<InstructorCourseEditor input={input} setInput={setInput} error={error} />
 
-							<Form.Button
-								color='red'
-								onClick={handleDelete}
-							>
-								Delete
-							</Form.Button>
-						</Form.Group>
-					</Form.Group>
-
-					Notes: {input.notes || 'None'}
+					<Form.Button loading={loading} error={error.non_field_errors}>
+						Submit
+					</Form.Button>
 				</Form>
-			</Segment>
-		:
-			<Segment raised color='black'>
-				Deleted card: {props.card.card_number}
-			</Segment>
+			:
+				<Button onClick={() => setOpen(true)}>
+					Edit Course
+				</Button>
+			}
+		</div>
 	);
 };
 
@@ -184,7 +149,7 @@ export function InstructorCourseList(props) {
 		<div>
 			<Header size='medium'>Instructor Panel</Header>
 
-			{success && <p>Added to bottom of course list! <Link to={'/courses/'+success}>View the course.</Link></p>}
+			{!open && success && <p>Added to bottom of course list! <Link to={'/courses/'+success}>View the course.</Link></p>}
 
 			{open ?
 				<Form onSubmit={handleSubmit}>

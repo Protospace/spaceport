@@ -5,7 +5,7 @@ import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Me
 import moment from 'moment';
 import { isInstructor, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
-import { InstructorCourseList } from './Instructor.js';
+import { InstructorCourseList, InstructorCourseDetail } from './Instructor.js';
 
 export function Courses(props) {
 	const [courses, setCourses] = useState(false);
@@ -85,6 +85,10 @@ export function CourseDetail(props) {
 				course ?
 					<div>
 						<Header size='large'>{course.name}</Header>
+
+						{isInstructor && <Segment padded>
+							<InstructorCourseDetail course={course} setCourse={setCourse} {...props} />
+						</Segment>}
 
 						<Header size='medium'>Course Description</Header>
 						{course.is_old ?
