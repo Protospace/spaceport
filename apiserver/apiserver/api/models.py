@@ -55,7 +55,7 @@ class Card(models.Model):
     user = models.ForeignKey(User, related_name='cards', blank=True, null=True, on_delete=models.SET_NULL)
 
     member_id = models.IntegerField(blank=True, null=True)
-    card_number = models.CharField(max_length=16, blank=True, null=True)
+    card_number = models.CharField(unique=True, max_length=16, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     last_seen_at = models.DateField(default=date.today, blank=True, null=True)
     active_status = models.CharField(max_length=32, blank=True, null=True)

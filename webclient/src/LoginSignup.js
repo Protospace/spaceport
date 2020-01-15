@@ -84,18 +84,22 @@ export function SignupForm(props) {
 		<Form onSubmit={handleSubmit}>
 			<Header size='medium'>Sign Up</Header>
 
-			<Form.Input
-				label='First Name'
-				name='first_name'
-				onChange={handleChange}
-				error={error.first_name}
-			/>
-			<Form.Input
-				label='Last Name'
-				name='last_name'
-				onChange={handleChange}
-				error={error.last_name}
-			/>
+			<Form.Group widths='equal'>
+				<Form.Input
+					label='First Name'
+					name='first_name'
+					fluid
+					onChange={handleChange}
+					error={error.first_name}
+				/>
+				<Form.Input
+					label='Last Name'
+					name='last_name'
+					fluid
+					onChange={handleChange}
+					error={error.last_name}
+				/>
+			</Form.Group>
 
 			<Form.Input
 				label='Username'

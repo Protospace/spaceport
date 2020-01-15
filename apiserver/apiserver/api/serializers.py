@@ -2,6 +2,7 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from rest_framework.validators import UniqueValidator
 from rest_auth.registration.serializers import RegisterSerializer
 from rest_auth.serializers import UserDetailsSerializer
 from uuid import uuid4
@@ -48,15 +49,6 @@ class UserEmailField(serializers.ModelField):
         return getattr(obj.user, 'email', obj.old_email)
     def to_internal_value(self, data):
         return serializers.EmailField().run_validation(data)
-
-
-
-class AdminCardSerializer(serializers.ModelSerializer):
-    card_number = serializers.CharField()
-    class Meta:
-        model = models.Card
-        fields = '__all__'
-        read_only_fields = ['last_seen_at']
 
 
 
@@ -177,7 +169,10 @@ class CardSerializer(serializers.ModelSerializer):
 
 # admin viewing member details
 class AdminCardSerializer(CardSerializer):
-    card_number = serializers.CharField()
+    card_number = serializers.CharField(validators=[UniqueValidator(
+        queryset=models.Card.objects.all(),
+        message='Card number already exists.'
+    )])
     member_id = serializers.IntegerField()
     active_status = serializers.ChoiceField(['card_blocked', 'card_inactive', 'card_member_blocked', 'card_active'])
     class Meta:

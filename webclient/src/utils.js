@@ -33,6 +33,11 @@ export const requester = (route, method, token, data) => {
 			method: method,
 			body: formData,
 		};
+	} else if (method == 'DELETE') {
+		options = {
+			...options,
+			method: method,
+		};
 	} else {
 		throw new Error('Method not supported');
 	}
@@ -48,7 +53,7 @@ export const requester = (route, method, token, data) => {
 		if (!response.ok) {
 			throw customError(response);
 		}
-		return response.json();
+		return method === 'DELETE' ? {} : response.json();
 	})
 	.catch(error => {
 		const code = error.data ? error.data.status : null;

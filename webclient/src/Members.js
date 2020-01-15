@@ -5,7 +5,7 @@ import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, 
 import moment from 'moment';
 import { isAdmin, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
-import { AdminMemberInfo, AdminMemberForm } from './Admin.js';
+import { AdminMemberInfo, AdminMemberForm, AdminMemberCards } from './Admin.js';
 
 export function Members(props) {
 	const [response, setResponse] = useState(false);
@@ -49,7 +49,7 @@ export function Members(props) {
 			</Header>
 
 			{response ?
-				<Item.Group divided>
+				<Item.Group unstackable divided>
 					{response.results.length ?
 						response.results.map((x, i) =>
 							<Item key={i} as={Link} to={'/members/'+x.member.id}>
@@ -129,6 +129,10 @@ export function MemberDetail(props) {
 								</Segment>}
 							</Grid.Column>
 						</Grid>
+
+						{isAdmin(user) && <Segment padded>
+							<AdminMemberCards result={result} setResult={setResult} {...props} />
+						</Segment>}
 
 					</div>
 				:

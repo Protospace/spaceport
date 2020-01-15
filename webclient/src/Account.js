@@ -98,26 +98,32 @@ export function AccountForm(props) {
 		onChange: handleChange,
 		value: input[name] || '',
 		error: error[name],
+		...(input[name] ? {} : {icon: 'edit'}),
 	});
 
 	return (
 		<Form onSubmit={handleSubmit}>
 			<Header size='medium'>Member Details</Header>
 
-			<Form.Input
-				label='First Name'
-				required
-				{...makeProps('first_name')}
-			/>
+			<Form.Group widths='equal'>
+				<Form.Input
+					label='First Name'
+					fluid
+					required
+					{...makeProps('first_name')}
+				/>
+				<Form.Input
+					label='Last Name'
+					fluid
+					required
+					{...makeProps('last_name')}
+				/>
+			</Form.Group>
+
 			<Form.Input
 				label='Preferred First Name'
 				required
 				{...makeProps('preferred_name')}
-			/>
-			<Form.Input
-				label='Last Name'
-				required
-				{...makeProps('last_name')}
 			/>
 
 			<Form.Input
