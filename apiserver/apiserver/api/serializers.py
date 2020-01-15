@@ -7,6 +7,7 @@ from rest_auth.registration.serializers import RegisterSerializer
 from rest_auth.serializers import UserDetailsSerializer
 from uuid import uuid4
 from PIL import Image
+from bleach.sanitizer import Cleaner
 
 from . import models, old_models
 
@@ -44,12 +45,37 @@ def process_image(upload):
 
     return small, medium, large
 
+
+ALLOWED_TAGS = [
+        'h3',
+        'p',
+        'br',
+        'strong',
+        'em',
+        'u',
+        'code',
+        'ol',
+        'li',
+        'ul',
+        'a',
+        ]
+
+clean = Cleaner(tags=ALLOWED_TAGS).clean
+
+
+
+
+
 class UserEmailField(serializers.ModelField):
     def to_representation(self, obj):
         return getattr(obj.user, 'email', obj.old_email)
     def to_internal_value(self, data):
         return serializers.EmailField().run_validation(data)
 
+class HTMLField(serializers.CharField):
+    def to_internal_value(self, data):
+        data = clean(data)
+        return super().to_internal_value(data)
 
 
 
@@ -221,14 +247,13 @@ class SessionListSerializer(SessionSerializer):
 
 class CourseSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
-    description = serializers.CharField(write_only=True)
     class Meta:
         model = models.Course
-        fields = ['id', 'name', 'description']
+        fields = ['id', 'name']
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     sessions = SessionListSerializer(many=True, read_only=True)
-
+    description = HTMLField()
     class Meta:
         model = models.Course
         fields = '__all__'
