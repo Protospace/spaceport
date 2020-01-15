@@ -3,12 +3,13 @@ import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-r
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment';
-import { requester } from './utils.js';
+import { isInstructor, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
+import { InstructorCourseList } from './Instructor.js';
 
 export function Courses(props) {
 	const [courses, setCourses] = useState(false);
-	const { token } = props;
+	const { token, user } = props;
 
 	useEffect(() => {
 		requester('/courses/', 'GET', token)
@@ -23,6 +24,10 @@ export function Courses(props) {
 	return (
 		<Container>
 			<Header size='large'>Courses</Header>
+
+			{isInstructor && <Segment padded>
+				<InstructorCourseList courses={courses} setCourses={setCourses} {...props} />
+			</Segment>}
 
 			{courses ?
 				<Table basic='very'>
@@ -42,7 +47,7 @@ export function Courses(props) {
 								</Table.Row>
 							)
 						:
-							<p>None</p>
+							<Table.Row><Table.Cell>None</Table.Cell></Table.Row>
 						}
 					</Table.Body>
 				</Table>
@@ -82,9 +87,13 @@ export function CourseDetail(props) {
 						<Header size='large'>{course.name}</Header>
 
 						<Header size='medium'>Course Description</Header>
-						{course.description.split('\n').map((x, i) =>
-							<p key={i}>{x}</p>
-						)}
+						{course.is_old ?
+							course.description.split('\n').map((x, i) =>
+								<p key={i}>{x}</p>
+							)
+						:
+							<div dangerouslySetInnerHTML={{__html: course.description}} />
+						}
 
 						<Header size='medium'>Classes</Header>
 						<Table basic='very'>
@@ -112,7 +121,7 @@ export function CourseDetail(props) {
 										</Table.Row>
 									)
 								:
-									<p>None</p>
+									<Table.Row><Table.Cell>None</Table.Cell></Table.Row>
 								}
 							</Table.Body>
 						</Table>

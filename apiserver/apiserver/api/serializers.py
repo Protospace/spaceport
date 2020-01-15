@@ -220,6 +220,8 @@ class SessionListSerializer(SessionSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
+    name = serializers.CharField()
+    description = serializers.CharField()
     class Meta:
         model = models.Course
         fields = '__all__'
@@ -227,11 +229,6 @@ class CourseSerializer(serializers.ModelSerializer):
 class CourseDetailSerializer(serializers.ModelSerializer):
     sessions = SessionListSerializer(many=True)
 
-    class Meta:
-        model = models.Course
-        fields = '__all__'
-
-class AdminCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Course
         fields = '__all__'

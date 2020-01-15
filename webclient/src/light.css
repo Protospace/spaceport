@@ -63,6 +63,30 @@ body {
 	padding-bottom: 24rem;
 }
 
+.course-editor {
+	margin-bottom: 1rem;
+}
+
+.ql-container {
+	height: 30rem !important;
+	font-size: inherit !important;
+	font-family: inherit !important;
+}
+
+.ql-editor p,
+.ql-editor ol,
+.ql-editor ul,
+.ql-editor pre,
+.ql-editor blockquote,
+.ql-editor h1,
+.ql-editor h2,
+.ql-editor h3,
+.ql-editor h4,
+.ql-editor h5,
+.ql-editor h6 {
+	margin-bottom: 1rem !important;
+}
+
 .footer {
 	margin-top: -20rem;
 
