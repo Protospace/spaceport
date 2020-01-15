@@ -140,20 +140,15 @@ class CourseViewSet(Base, List, Retrieve, Create, Update):
             return serializers.CourseDetailSerializer
 
 
-class SessionViewSet(viewsets.ModelViewSet):
-    permission_classes = [AllowMetadata | IsAuthenticated]
+class SessionViewSet(Base, List, Retrieve, Create, Update):
+    permission_classes = [AllowMetadata | IsAuthenticated, IsAdminOrReadOnly | IsInstructorOrReadOnly]
+    serializer_class = serializers.SessionSerializer
 
     def get_queryset(self):
         if self.action == 'list':
             return models.Session.objects.order_by('-datetime')[:20]
         else:
             return models.Session.objects.all()
-
-    def get_serializer_class(self):
-        #if self.action == 'retrieve':
-        #    return serializers.CourseDetailSerializer
-        #else:
-        return serializers.SessionSerializer
 
 
 class UserView(views.APIView):

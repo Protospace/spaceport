@@ -225,24 +225,33 @@ class TransactionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class SessionDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Training
-        exclude = ['user']
 
 class SessionSerializer(serializers.ModelSerializer):
     student_count = serializers.SerializerMethodField()
+    course_name = serializers.SerializerMethodField()
+    instructor_name = serializers.SerializerMethodField()
+    datetime = serializers.DateTimeField()
+    instructor = serializers.PrimaryKeyRelatedField(queryset=models.User.objects.all())
+    course = serializers.PrimaryKeyRelatedField(queryset=models.Course.objects.all())
     class Meta:
         model = models.Session
         fields = '__all__'
-        depth = 1
     def get_student_count(self, obj):
         return len(obj.students.all())
+    def get_course_name(self, obj):
+        return obj.course.name
+    def get_instructor_name(self, obj):
+        if obj.instructor and hasattr(obj.instructor, 'member'):
+            name = '{} {}'.format(obj.instructor.member.preferred_name, obj.instructor.member.last_name[0])
+        else:
+            name = 'Unknown'
+        return obj.old_instructor or name
 
 class SessionListSerializer(SessionSerializer):
     class Meta:
         model = models.Session
         fields = '__all__'
+
 
 
 class CourseSerializer(serializers.ModelSerializer):

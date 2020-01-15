@@ -9,9 +9,6 @@ import { NotFound, PleaseLogin } from './Misc.js';
 function ClassTable(props) {
 	const { classes } = props;
 
-	const getInstructor = (session) =>
-		session.instructor ? session.instructor.first_name : session.old_instructor;
-
 	return (
 		<Table basic='very'>
 			<Table.Header>
@@ -29,14 +26,14 @@ function ClassTable(props) {
 				{classes.length ?
 					classes.map((x, i) =>
 						<Table.Row key={i}>
-							<Table.Cell>{x.course.name}</Table.Cell>
+							<Table.Cell>{x.course_name}</Table.Cell>
 							<Table.Cell>
 								<Link to={'/classes/'+x.id}>
 									{moment.utc(x.datetime).format('ll')}
 								</Link>
 							</Table.Cell>
 							<Table.Cell>{moment.utc(x.datetime).format('LT')}</Table.Cell>
-							<Table.Cell>{getInstructor(x)}</Table.Cell>
+							<Table.Cell>{x.instructor_name}</Table.Cell>
 							<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
 							<Table.Cell>{x.student_count}</Table.Cell>
 						</Table.Row>
@@ -103,9 +100,6 @@ export function ClassDetail(props) {
 		});
 	}, []);
 
-	const getInstructor = (session) =>
-		session.instructor ? session.instructor.first_name : session.old_instructor;
-
 	return (
 		<Container>
 			{!error ?
@@ -118,8 +112,8 @@ export function ClassDetail(props) {
 								<Table.Row>
 									<Table.Cell>Name:</Table.Cell>
 									<Table.Cell>
-										<Link to={'/courses/'+clazz.course.id}>
-											{clazz.course.name}
+										<Link to={'/courses/'+clazz.course}>
+											{clazz.course_name}
 										</Link>
 									</Table.Cell>
 								</Table.Row>
@@ -137,7 +131,7 @@ export function ClassDetail(props) {
 								</Table.Row>
 								<Table.Row>
 									<Table.Cell>Instructor:</Table.Cell>
-									<Table.Cell>{getInstructor(clazz)}</Table.Cell>
+									<Table.Cell>{clazz.instructor_name}</Table.Cell>
 								</Table.Row>
 								<Table.Row>
 									<Table.Cell>Cost:</Table.Cell>

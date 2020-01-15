@@ -6,7 +6,7 @@ from django.utils.timezone import now
 from . import old_models
 
 class Member(models.Model):
-    user = models.OneToOneField(User, blank=True, null=True, on_delete=models.SET_NULL)
+    user = models.OneToOneField(User, related_name='member', blank=True, null=True, on_delete=models.SET_NULL)
     old_email = models.CharField(max_length=254, blank=True, null=True)
     photo_large = models.CharField(max_length=64, blank=True, null=True)
     photo_medium = models.CharField(max_length=64, blank=True, null=True)
@@ -69,6 +69,7 @@ class Session(models.Model):
     instructor = models.ForeignKey(User, related_name='teaching', blank=True, null=True, on_delete=models.SET_NULL)
     course = models.ForeignKey(Course, related_name='sessions', blank=True, null=True, on_delete=models.SET_NULL)
 
+    is_cancelled = models.BooleanField(default=False)
     old_instructor = models.TextField(blank=True, null=True)
     datetime = models.DateTimeField(blank=True, null=True)
     cost = models.DecimalField(max_digits=5, decimal_places=2)
