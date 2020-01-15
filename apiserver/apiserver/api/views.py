@@ -39,18 +39,13 @@ class IsInstructorOrReadOnly(BasePermission):
 
 
 
-class RetrieveUpdateViewSet(
-        viewsets.GenericViewSet,
-        mixins.RetrieveModelMixin,
-        mixins.UpdateModelMixin):
-    def list(self, request):
-        return Response([])
+Base = viewsets.GenericViewSet
+List = mixins.ListModelMixin
+Retrieve = mixins.RetrieveModelMixin
+Create = mixins.CreateModelMixin
+Update = mixins.UpdateModelMixin
+Destroy = mixins.DestroyModelMixin
 
-class CreateRetrieveUpdateDeleteViewSet(
-        RetrieveUpdateViewSet,
-        mixins.CreateModelMixin,
-        mixins.DestroyModelMixin):
-    pass
 
 
 search_strings = {}
@@ -117,7 +112,7 @@ class SearchViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         return Response({'seq': seq, 'results': serializer.data})
 
 
-class MemberViewSet(RetrieveUpdateViewSet):
+class MemberViewSet(Base, Retrieve, Update):
     permission_classes = [AllowMetadata | IsAuthenticated, IsOwnerOrAdmin]
     queryset = models.Member.objects.all()
 
@@ -128,21 +123,21 @@ class MemberViewSet(RetrieveUpdateViewSet):
             return serializers.MemberSerializer
 
 
-class CardViewSet(CreateRetrieveUpdateDeleteViewSet):
+class CardViewSet(Base, Create, Retrieve, Update, Destroy):
     permission_classes = [AllowMetadata | IsAuthenticated, IsOwnerOrAdmin, IsAdminOrReadOnly]
     queryset = models.Card.objects.all()
     serializer_class = serializers.CardSerializer
 
 
-class CourseViewSet(viewsets.ModelViewSet):
+class CourseViewSet(Base, List, Retrieve, Create, Update):
     permission_classes = [AllowMetadata | IsAuthenticated, IsAdminOrReadOnly | IsInstructorOrReadOnly]
     queryset = models.Course.objects.annotate(date=Max('sessions__datetime')).order_by('-date')
 
     def get_serializer_class(self):
-        if self.action == 'retrieve':
-            return serializers.CourseDetailSerializer
-        else:
+        if self.action == 'list':
             return serializers.CourseSerializer
+        else:
+            return serializers.CourseDetailSerializer
 
 
 class SessionViewSet(viewsets.ModelViewSet):

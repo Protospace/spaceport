@@ -221,13 +221,13 @@ class SessionListSerializer(SessionSerializer):
 
 class CourseSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
-    description = serializers.CharField()
+    description = serializers.CharField(write_only=True)
     class Meta:
         model = models.Course
-        fields = '__all__'
+        fields = ['id', 'name', 'description']
 
 class CourseDetailSerializer(serializers.ModelSerializer):
-    sessions = SessionListSerializer(many=True)
+    sessions = SessionListSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.Course
