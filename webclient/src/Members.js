@@ -32,7 +32,7 @@ export function Members(props) {
 			<Input autoFocus focus icon='search'
 				placeholder='Search...'
 				value={search.q}
-				onChange={(e, v) => setSearch({seq: e.timeStamp, q: v.value})}
+				onChange={(e, v) => setSearch({seq: parseInt(e.timeStamp), q: v.value})}
 				aria-label='search products'
 				style={{ marginRight: '0.5rem' }}
 			/>
