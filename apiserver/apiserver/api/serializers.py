@@ -255,14 +255,14 @@ class SessionListSerializer(SessionSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
-    name = serializers.CharField()
     class Meta:
         model = models.Course
         fields = ['id', 'name']
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     sessions = SessionListSerializer(many=True, read_only=True)
-    description = HTMLField()
+    name = serializers.CharField(max_length=100)
+    description = HTMLField(max_length=6000)
     class Meta:
         model = models.Course
         fields = '__all__'
