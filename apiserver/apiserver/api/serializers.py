@@ -146,29 +146,13 @@ class AdminSearchSerializer(serializers.Serializer):
             queryset = obj.user.cards
         else:
             queryset = models.Card.objects.filter(member_id=obj.id)
-        serializer = AdminCardSerializer(data=queryset, many=True)
+        serializer = CardSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
 
 
 
-# member viewing his own cards
 class CardSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Card
-        fields = '__all__'
-        read_only_fields = [
-            'id',
-            'card_number',
-            'member_id',
-            'notes',
-            'last_seen_at',
-            'active_status',
-            'user',
-        ]
-
-# admin viewing member details
-class AdminCardSerializer(CardSerializer):
     card_number = serializers.CharField(validators=[UniqueValidator(
         queryset=models.Card.objects.all(),
         message='Card number already exists.'

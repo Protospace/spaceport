@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from django.db.models import Max
 from rest_framework import viewsets, views, mixins, generics, exceptions
-from rest_framework.permissions import BasePermission, IsAuthenticated
+from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 from rest_auth.views import PasswordChangeView
 from rest_auth.registration.views import RegisterView
@@ -19,11 +19,24 @@ def is_admin_director(user):
 
 class IsOwnerOrAdmin(BasePermission):
     def has_object_permission(self, request, view, obj):
-        return obj.user == request.user or is_admin_director(request.user)
+        return request.user and (obj.user == request.user or is_admin_director(request.user))
 
-class IsInstructor(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return user.member.is_instructor
+class IsAdminOrReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return bool(
+            request.method in SAFE_METHODS or
+            request.user and
+            is_admin_director(request.user)
+        )
+
+class IsInstructorOrReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return bool(
+            request.method in SAFE_METHODS or
+            request.user and
+            request.user.member.is_instructor
+        )
+
 
 
 class RetrieveUpdateViewSet(
@@ -116,18 +129,13 @@ class MemberViewSet(RetrieveUpdateViewSet):
 
 
 class CardViewSet(CreateRetrieveUpdateDeleteViewSet):
-    permission_classes = [AllowMetadata | IsAuthenticated, IsOwnerOrAdmin]
+    permission_classes = [AllowMetadata | IsAuthenticated, IsOwnerOrAdmin, IsAdminOrReadOnly]
     queryset = models.Card.objects.all()
-
-    def get_serializer_class(self):
-        if is_admin_director(self.request.user):
-            return serializers.AdminCardSerializer
-        else:
-            return serializers.CardSerializer
+    serializer_class = serializers.CardSerializer
 
 
 class CourseViewSet(viewsets.ModelViewSet):
-    permission_classes = [AllowMetadata | IsAuthenticated]
+    permission_classes = [AllowMetadata | IsAuthenticated, IsAdminOrReadOnly | IsInstructorOrReadOnly]
     queryset = models.Course.objects.annotate(date=Max('sessions__datetime')).order_by('-date')
 
     def get_serializer_class(self):
