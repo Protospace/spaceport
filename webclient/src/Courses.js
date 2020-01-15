@@ -76,9 +76,6 @@ export function CourseDetail(props) {
 		});
 	}, []);
 
-	const getInstructor = (session) =>
-		session.instructor ? session.instructor.first_name : session.old_instructor;
-
 	return (
 		<Container>
 			{!error ?
@@ -119,8 +116,8 @@ export function CourseDetail(props) {
 													{moment.utc(x.datetime).format('ll')}
 												</Link>
 											</Table.Cell>
-											<Table.Cell>{moment.utc(x.datetime).format('LT')}</Table.Cell>
-											<Table.Cell>{getInstructor(x)}</Table.Cell>
+											<Table.Cell>{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).format('LT')}</Table.Cell>
+											<Table.Cell>{x.instructor_name}</Table.Cell>
 											<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
 										</Table.Row>
 									)
