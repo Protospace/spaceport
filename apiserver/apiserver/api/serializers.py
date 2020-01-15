@@ -229,6 +229,11 @@ class SessionSerializer(serializers.ModelSerializer):
     def get_student_count(self, obj):
         return len(obj.students.all())
 
+class SessionListSerializer(SessionSerializer):
+    class Meta:
+        model = models.Session
+        fields = '__all__'
+
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -236,12 +241,11 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CourseDetailSerializer(serializers.ModelSerializer):
-    sessions = SessionSerializer(many=True)
+    sessions = SessionListSerializer(many=True)
 
     class Meta:
         model = models.Course
         fields = '__all__'
-        depth = 1
 
 class AdminCourseSerializer(serializers.ModelSerializer):
     class Meta:

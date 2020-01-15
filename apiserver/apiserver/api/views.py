@@ -21,6 +21,10 @@ class IsOwnerOrAdmin(BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.user == request.user or is_admin_director(request.user)
 
+class IsInstructor(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return user.member.is_instructor
+
 
 class RetrieveUpdateViewSet(
         viewsets.GenericViewSet,
