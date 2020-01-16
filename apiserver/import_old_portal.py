@@ -62,7 +62,7 @@ SESSION_FIELDS = [
     'id',
     # course_id -> course
     # instructor -> old_instructor
-    'datetime',
+    # datetime -> fix timezone
     'cost',
 ]
 
@@ -173,6 +173,7 @@ for o in old:
         new[f] = o.__dict__.get(f, None)
     new['course'] = models.Course.objects.get(id=o.course_id)
     new['old_instructor'] = o.instructor
+    new['datetime'] = str(o.datetime).replace('Z', '-07:00')
 
     models.Session.objects.create(**new)
     print('Imported session #{} - {} {}'.format(
