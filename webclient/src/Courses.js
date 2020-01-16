@@ -119,10 +119,10 @@ export function CourseDetail(props) {
 										<Table.Row key={i}>
 											<Table.Cell>
 												<Link to={'/classes/'+x.id}>
-													{moment.utc(x.datetime).format('ll')}
+													{moment.utc(x.datetime).local().format('ll')}
 												</Link>
 											</Table.Cell>
-											<Table.Cell>{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).format('LT')}</Table.Cell>
+											<Table.Cell>{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).local().format('LT')}</Table.Cell>
 											<Table.Cell>{x.instructor_name}</Table.Cell>
 											<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
 										</Table.Row>

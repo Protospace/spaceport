@@ -30,10 +30,10 @@ function ClassTable(props) {
 							<Table.Cell>{x.course_name}</Table.Cell>
 							<Table.Cell>
 								<Link to={'/classes/'+x.id}>
-									{moment.utc(x.datetime).format('ll')}
+									{moment.utc(x.datetime).local().format('ll')}
 								</Link>
 							</Table.Cell>
-							<Table.Cell>{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).format('LT')}</Table.Cell>
+							<Table.Cell>{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).local().format('LT')}</Table.Cell>
 							<Table.Cell>{x.instructor_name}</Table.Cell>
 							<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
 							<Table.Cell>{x.student_count}</Table.Cell>
@@ -125,13 +125,13 @@ export function ClassDetail(props) {
 								<Table.Row>
 									<Table.Cell>Date:</Table.Cell>
 									<Table.Cell>
-										{moment.utc(clazz.datetime).format('ll')}
+										{moment.utc(clazz.datetime).local().format('ll')}
 									</Table.Cell>
 								</Table.Row>
 								<Table.Row>
 									<Table.Cell>Time:</Table.Cell>
 									<Table.Cell>
-										{clazz.is_cancelled ? 'Cancelled' : moment.utc(clazz.datetime).format('LT')}
+										{clazz.is_cancelled ? 'Cancelled' : moment.utc(clazz.datetime).local().format('LT')}
 									</Table.Cell>
 								</Table.Row>
 								<Table.Row>
