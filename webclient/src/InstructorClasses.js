@@ -7,6 +7,83 @@ import './light.css';
 import { Button, Container, Checkbox, Divider, Dropdown, Form, Grid, Header, Icon, Image, Label, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { BasicTable, staticUrl, requester } from './utils.js';
 
+function AttendanceRow(props) {
+	const { student, token } = props;
+	const [training, setTraining] = useState(student);
+	const [error, setError] = useState(false);
+
+	const handleMark = (newStatus) => {
+		const data = { attendance_status: newStatus };
+		requester('/training/'+training.id+'/', 'PATCH', token, data)
+		.then(res => {
+			setTraining(res);
+			setError(false);
+		})
+		.catch(err => {
+			console.log(err);
+			setError(true);
+		});
+	};
+
+	// 'withdrawn', 'rescheduled', 'no-show', 'attended', 'confirmed'
+
+	const makeProps = (name) => ({
+		onClick: () => handleMark(name),
+		toggle: true,
+		active: training.attendance_status === name,
+	});
+
+	return (
+		<div>
+			<p>{training.student_name}:</p>
+
+			<Button {...makeProps('withdrawn')}>
+				Withdrawn
+			</Button>
+
+			<Button {...makeProps('confirmed')}>
+				Confirmed
+			</Button>
+
+			<Button {...makeProps('rescheduled')}>
+				Rescheduled
+			</Button>
+
+			<Button {...makeProps('no-show')}>
+				No-show
+			</Button>
+
+			<Button {...makeProps('attended')}>
+				Attended
+			</Button>
+
+			{error && <p>Error: something went wrong!</p>}
+
+		</div>
+	);
+}
+
+export function InstructorClassAttendance(props) {
+	const { clazz, token } = props;
+	const [error, setError] = useState(false);
+
+	return (
+		<div>
+			<Header size='medium'>Instructor Panel</Header>
+
+			<Header size='small'>Mark Attendance</Header>
+
+			{clazz.students.length ?
+				clazz.students.map((x, i) =>
+					<p><AttendanceRow key={i} student={x} {...props} /></p>
+				)
+			:
+				<p>No students yet.</p>
+			}
+		</div>
+	);
+};
+
 function InstructorClassEditor(props) {
 	const { input, setInput, error, editing } = props;
 

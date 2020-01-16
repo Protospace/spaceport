@@ -154,7 +154,7 @@ function App() {
 						</Route>
 
 						<Route path='/classes/:id'>
-							<ClassDetail token={token} user={user} />
+							<ClassDetail token={token} user={user} setUserCache={setUserCache} />
 						</Route>
 						<Route path='/classes'>
 							<Classes token={token} />

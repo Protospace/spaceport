@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
-import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment';
-import { isInstructor, BasicTable, requester } from './utils.js';
+import { isAdmin, isInstructor, BasicTable, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
-import { InstructorClassDetail } from './InstructorClasses.js';
+import { InstructorClassDetail, InstructorClassAttendance } from './InstructorClasses.js';
 
 function ClassTable(props) {
 	const { classes } = props;
@@ -66,8 +66,7 @@ export function Classes(props) {
 	return (
 		<Container>
 			<Header size='large'>Class List</Header>
-
-			<Header size='medium'>Upcoming</Header>
+<Header size='medium'>Upcoming</Header>
 			{classes ?
 				<ClassTable classes={classes.filter(x => x.datetime > now)} />
 			:
@@ -87,8 +86,9 @@ export function Classes(props) {
 export function ClassDetail(props) {
 	const [clazz, setClass] = useState(false);
 	const [error, setError] = useState(false);
-	const { token, user } = props;
+	const { token, user, setUserCache } = props;
 	const { id } = useParams();
+	const userTraining = user.training.find(x => x.session.id == id);
 
 	useEffect(() => {
 		requester('/sessions/'+id+'/', 'GET', token)
@@ -100,6 +100,42 @@ export function ClassDetail(props) {
 			setError(true);
 		});
 	}, []);
+
+	const handleSignup = () => {
+		const data = { attendance_status: 'waiting for payment', session: id };
+		requester('/training/', 'POST', token, data)
+		.then(res => {
+			// bad code:
+			const newClass = { ...clazz, student_count: clazz.student_count+1 };
+			setUserCache({ ...user, training: [...user.training, {...res, session: newClass }] });
+			setClass(newClass);
+		})
+		.catch(err => {
+			console.log(err);
+			setError(true);
+		});
+	};
+
+	const handleToggle = (newStatus) => {
+		const data = { attendance_status: newStatus, session: id };
+		requester('/training/'+userTraining.id+'/', 'PUT', token, data)
+		.then(res => {
+			// bad code:
+			const studentChange = newStatus === 'withdrawn' ? -1 : 1
+			const newClass = { ...clazz, student_count: clazz.student_count + studentChange };
+			const trainingIndex = user.training.indexOf(userTraining);
+			const newTraining = user.training;
+			newTraining[trainingIndex] = {...res, session: newClass };
+			setUserCache({ ...user, training: newTraining });
+			setClass(newClass);
+		})
+		.catch(err => {
+			console.log(err);
+			setError(true);
+		});
+	};
+
+	// TODO: calculate yesterday and lock signups
 
 	return (
 		<Container>
@@ -150,6 +186,37 @@ export function ClassDetail(props) {
 						</BasicTable>
 
 						<Header size='medium'>Attendance</Header>
+
+						{(isAdmin(user) || clazz.instructor === user.id) &&
+							<Segment padded>
+								<InstructorClassAttendance clazz={clazz} {...props} />
+							</Segment>
+						}
+
+						{clazz.instructor != user.id &&
+							(userTraining ?
+								<div>
+									<p>Status: {userTraining.attendance_status}</p>
+									{userTraining.attendance_status === 'withdrawn' ?
+										<Button onClick={() => handleToggle('waiting for payment')}>
+											Sign back up
+										</Button>
+									:
+										<Button onClick={() => handleToggle('withdrawn')}>
+											Withdraw from Class
+										</Button>
+									}
+								</div>
+							:
+								((clazz.max_students && clazz.student_count >= clazz.max_students) ?
+									<p>The course is full.</p>
+								:
+									<Button onClick={handleSignup}>
+										Sign me up!
+									</Button>
+								)
+							)
+						}
 					</div>
 				:
 					<p>Loading...</p>

@@ -202,23 +202,6 @@ class CardSerializer(serializers.ModelSerializer):
 
 
 
-class UserTrainingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Training
-        exclude = ['user']
-        depth = 2
-
-class UserSerializer(serializers.ModelSerializer):
-    training = UserTrainingSerializer(many=True)
-    member = MemberSerializer()
-
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'member', 'transactions', 'cards', 'training', 'is_staff']
-        depth = 1
-
-
-
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Transaction
@@ -229,10 +212,18 @@ class TransactionSerializer(serializers.ModelSerializer):
 class TrainingSerializer(serializers.ModelSerializer):
     attendance_status = serializers.ChoiceField(['waiting for payment', 'withdrawn', 'rescheduled', 'no-show', 'attended', 'confirmed'])
     session = serializers.PrimaryKeyRelatedField(queryset=models.Session.objects.all())
+    student_name = serializers.SerializerMethodField()
     class Meta:
         model = models.Training
         fields = '__all__'
         read_only_fields = ['user', 'sign_up_date', 'paid_date', 'member_id']
+    def get_student_name(self, obj):
+        if obj.user:
+            member = obj.user.member
+        else:
+            member = models.Member.objects.get(id=obj.member_id)
+        return member.preferred_name + ' ' + member.last_name
+
 
 class StudentTrainingSerializer(TrainingSerializer):
     attendance_status = serializers.ChoiceField(['waiting for payment', 'withdrawn'])
@@ -278,6 +269,24 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Course
         fields = '__all__'
+
+
+
+class UserTrainingSerializer(serializers.ModelSerializer):
+    session = SessionListSerializer()
+    class Meta:
+        model = models.Training
+        exclude = ['user']
+        depth = 2
+
+class UserSerializer(serializers.ModelSerializer):
+    training = UserTrainingSerializer(many=True)
+    member = MemberSerializer()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'member', 'transactions', 'cards', 'training', 'is_staff']
+        depth = 1
 
 
 

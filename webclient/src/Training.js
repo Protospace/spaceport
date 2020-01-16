@@ -27,14 +27,12 @@ export function Training(props) {
 					<Table.Body>
 						{user.training.map((x, i) =>
 							<Table.Row key={i}>
-								<Table.Cell>
-									<Link to={'/courses/'+x.session.course.id}>{x.session.course.name}</Link>
-								</Table.Cell>
+								<Table.Cell>{x.session.course_name}</Table.Cell>
 								<Table.Cell>
 									<Link to={'/classes/'+x.session.id}>{moment(x.session.datetime).format('MMMM Do YYYY')}</Link>
 								</Table.Cell>
 								<Table.Cell>{x.attendance_status}</Table.Cell>
-								<Table.Cell>{x.session.old_instructor}</Table.Cell>
+								<Table.Cell>{x.session.instructor_name}</Table.Cell>
 							</Table.Row>
 						)}
 					</Table.Body>
