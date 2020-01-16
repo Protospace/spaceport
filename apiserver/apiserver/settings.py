@@ -33,6 +33,8 @@ ALLOWED_HOSTS = []
 
 if DEBUG:
     ALLOWED_HOSTS += [
+        'localhost',
+        '127.0.0.1',
         'spaceport-api.dns.t0.vc',
         'api.spaceport.dns.t0.vc',
     ]
@@ -95,7 +97,7 @@ WSGI_APPLICATION = 'apiserver.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, 'data/db.sqlite3'),
     },
     'old_portal': {
         'ENGINE': 'django.db.backends.sqlite3',
