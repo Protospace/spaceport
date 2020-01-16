@@ -25,6 +25,16 @@ function InstructorClassEditor(props) {
 
 	return (
 		<div className='class-editor'>
+			<Form.Input
+				label='Cost ($)'
+				{...makeProps('cost')}
+			/>
+
+			<Form.Input
+				label='Max Students — Blank for Unlimited'
+				{...makeProps('max_students')}
+			/>
+
 			<Form.Field>
 				<label>Time and Date</label>
 				<Datetime
@@ -38,16 +48,6 @@ function InstructorClassEditor(props) {
 					</Label>
 				}
 			</Form.Field>
-
-			<Form.Input
-				label='Cost ($)'
-				{...makeProps('cost')}
-			/>
-
-			<Form.Input
-				label='Max Students — Blank for Unlimited'
-				{...makeProps('max_students')}
-			/>
 
 			{editing && <Form.Field>
 				<label>Is the class cancelled?</label>
