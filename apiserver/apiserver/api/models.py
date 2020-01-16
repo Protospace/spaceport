@@ -82,4 +82,4 @@ class Training(models.Model):
     member_id = models.IntegerField(blank=True, null=True)
     attendance_status = models.TextField(blank=True, null=True)
     sign_up_date = models.DateField(default=date.today, blank=True, null=True)
-    paid_date = models.DateField(default=date.today, blank=True, null=True)
+    paid_date = models.DateField(blank=True, null=True)

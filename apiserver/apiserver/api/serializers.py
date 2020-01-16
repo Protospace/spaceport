@@ -226,19 +226,32 @@ class TransactionSerializer(serializers.ModelSerializer):
 
 
 
+class TrainingSerializer(serializers.ModelSerializer):
+    attendance_status = serializers.ChoiceField(['waiting for payment', 'withdrawn', 'rescheduled', 'no-show', 'attended', 'confirmed'])
+    session = serializers.PrimaryKeyRelatedField(queryset=models.Session.objects.all())
+    class Meta:
+        model = models.Training
+        fields = '__all__'
+        read_only_fields = ['user', 'sign_up_date', 'paid_date', 'member_id']
+
+class StudentTrainingSerializer(TrainingSerializer):
+    attendance_status = serializers.ChoiceField(['waiting for payment', 'withdrawn'])
+
+
+
 class SessionSerializer(serializers.ModelSerializer):
     student_count = serializers.SerializerMethodField()
     course_name = serializers.SerializerMethodField()
     instructor_name = serializers.SerializerMethodField()
     datetime = serializers.DateTimeField()
-    instructor = serializers.PrimaryKeyRelatedField(queryset=models.User.objects.all())
     course = serializers.PrimaryKeyRelatedField(queryset=models.Course.objects.all())
+    students = TrainingSerializer(many=True, read_only=True)
     class Meta:
         model = models.Session
         fields = '__all__'
-        read_only_fields = ['old_instructor']
+        read_only_fields = ['old_instructor', 'instructor']
     def get_student_count(self, obj):
-        return len(obj.students.all())
+        return len([x for x in obj.students.all() if x.attendance_status != 'withdrawn'])
     def get_course_name(self, obj):
         return obj.course.name
     def get_instructor_name(self, obj):
@@ -249,9 +262,7 @@ class SessionSerializer(serializers.ModelSerializer):
         return obj.old_instructor or name
 
 class SessionListSerializer(SessionSerializer):
-    class Meta:
-        model = models.Session
-        fields = '__all__'
+    students = None
 
 
 

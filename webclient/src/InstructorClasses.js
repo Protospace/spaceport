@@ -116,7 +116,7 @@ export function InstructorClassDetail(props) {
 };
 
 export function InstructorClassList(props) {
-	const { course, setCourse, token, user } = props;
+	const { course, setCourse, token } = props;
 	const [open, setOpen] = useState(false);
 	const [input, setInput] = useState({});
 	const [error, setError] = useState(false);
@@ -126,7 +126,7 @@ export function InstructorClassList(props) {
 	const handleSubmit = (e) => {
 		setLoading(true);
 		setSuccess(false);
-		const data = { ...input, instructor: user.id, course: course.id };
+		const data = { ...input, course: course.id };
 		requester('/sessions/', 'POST', token, data)
 		.then(res => {
 			setSuccess(res.id);

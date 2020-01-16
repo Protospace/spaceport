@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User, Group
+from django.shortcuts import get_object_or_404
 from django.db.models import Max
 from rest_framework import viewsets, views, mixins, generics, exceptions
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
@@ -15,11 +16,21 @@ class AllowMetadata(BasePermission):
         return request.method in ['OPTIONS', 'HEAD']
 
 def is_admin_director(user):
-    return user.is_staff or user.member.is_director or user.member.is_staff
+    return bool(user.is_staff or user.member.is_director or user.member.is_staff)
 
-class IsOwnerOrAdmin(BasePermission):
+class IsObjOwnerOrAdmin(BasePermission):
     def has_object_permission(self, request, view, obj):
-        return request.user and (obj.user == request.user or is_admin_director(request.user))
+        return bool(request.user and (obj.user == request.user or is_admin_director(request.user)))
+
+class IsSessionInstructorOrAdmin(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return bool(request.user and (obj.session.instructor == request.user or is_admin_director(request.user)))
+
+class ReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.method in SAFE_METHODS)
+    def has_object_permission(self, request, view, obj):
+        return bool(request.method in SAFE_METHODS)
 
 class IsAdminOrReadOnly(BasePermission):
     def has_permission(self, request, view):
@@ -58,7 +69,7 @@ def gen_search_strings():
         search_strings[string] = m.id
 
 NUM_SEARCH_RESULTS = 10
-class SearchViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+class SearchViewSet(Base, Retrieve):
     permission_classes = [AllowMetadata | IsAuthenticated]
 
     def get_serializer_class(self):
@@ -113,7 +124,7 @@ class SearchViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
 
 class MemberViewSet(Base, Retrieve, Update):
-    permission_classes = [AllowMetadata | IsAuthenticated, IsOwnerOrAdmin]
+    permission_classes = [AllowMetadata | IsAuthenticated, IsObjOwnerOrAdmin]
     queryset = models.Member.objects.all()
 
     def get_serializer_class(self):
@@ -124,7 +135,7 @@ class MemberViewSet(Base, Retrieve, Update):
 
 
 class CardViewSet(Base, Create, Retrieve, Update, Destroy):
-    permission_classes = [AllowMetadata | IsAuthenticated, IsOwnerOrAdmin, IsAdminOrReadOnly]
+    permission_classes = [AllowMetadata | IsAuthenticated, IsObjOwnerOrAdmin, IsAdminOrReadOnly]
     queryset = models.Card.objects.all()
     serializer_class = serializers.CardSerializer
 
@@ -142,13 +153,43 @@ class CourseViewSet(Base, List, Retrieve, Create, Update):
 
 class SessionViewSet(Base, List, Retrieve, Create, Update):
     permission_classes = [AllowMetadata | IsAuthenticated, IsAdminOrReadOnly | IsInstructorOrReadOnly]
-    serializer_class = serializers.SessionSerializer
 
     def get_queryset(self):
         if self.action == 'list':
             return models.Session.objects.order_by('-datetime')[:20]
         else:
             return models.Session.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return serializers.SessionListSerializer
+        else:
+            return serializers.SessionSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(instructor=self.request.user)
+
+class TrainingViewSet(Base, Retrieve, Create, Update):
+    permission_classes = [AllowMetadata | IsAuthenticated, IsObjOwnerOrAdmin | IsSessionInstructorOrAdmin | ReadOnly]
+    serializer_class = serializers.TrainingSerializer
+    queryset = models.Training.objects.all()
+
+    def get_serializer_class(self):
+        user = self.request.user
+        if is_admin_director(user) or user.member.is_instructor:
+            return serializers.TrainingSerializer
+        else:
+            return serializers.StudentTrainingSerializer
+
+    def perform_create(self, serializer):
+        session_id = self.request.data['session']
+        session = get_object_or_404(models.Session, id=session_id)
+        training = models.Training.objects.filter(user=self.request.user, session=session)
+        if training.exists():
+            raise exceptions.ValidationError('You have already registered')
+        if self.request.user == session.instructor:
+            raise exceptions.ValidationError('You are teaching this session')
+        serializer.save(user=self.request.user)
 
 
 class UserView(views.APIView):

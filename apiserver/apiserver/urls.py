@@ -7,11 +7,12 @@ from .api import views
 
 router = routers.DefaultRouter()
 #router.register(r'users', views.UserViewSet)
+router.register(r'cards', views.CardViewSet, basename='card')
+router.register(r'search', views.SearchViewSet, basename='search')
 router.register(r'members', views.MemberViewSet, basename='members')
 router.register(r'courses', views.CourseViewSet, basename='course')
 router.register(r'sessions', views.SessionViewSet, basename='session')
-router.register(r'search', views.SearchViewSet, basename='search')
-router.register(r'cards', views.CardViewSet, basename='card')
+router.register(r'training', views.TrainingViewSet, basename='training')
 #router.register(r'me', views.FullMemberView, basename='fullmember')
 #router.register(r'registration', views.RegistrationViewSet, basename='register')
 
