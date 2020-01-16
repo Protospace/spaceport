@@ -5,7 +5,8 @@ import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Me
 import moment from 'moment';
 import { isInstructor, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
-import { InstructorCourseList, InstructorCourseDetail } from './Instructor.js';
+import { InstructorCourseList, InstructorCourseDetail } from './InstructorCourses.js';
+import { InstructorClassList } from './InstructorClasses.js';
 
 export function Courses(props) {
 	const [courses, setCourses] = useState(false);
@@ -25,7 +26,7 @@ export function Courses(props) {
 		<Container>
 			<Header size='large'>Courses</Header>
 
-			{isInstructor && <Segment padded>
+			{isInstructor(user) && <Segment padded>
 				<InstructorCourseList courses={courses} setCourses={setCourses} {...props} />
 			</Segment>}
 
@@ -62,7 +63,7 @@ export function Courses(props) {
 export function CourseDetail(props) {
 	const [course, setCourse] = useState(false);
 	const [error, setError] = useState(false);
-	const { token } = props;
+	const { token, user } = props;
 	const { id } = useParams();
 
 	useEffect(() => {
@@ -83,7 +84,7 @@ export function CourseDetail(props) {
 					<div>
 						<Header size='large'>{course.name}</Header>
 
-						{isInstructor && <Segment padded>
+						{isInstructor(user) && <Segment padded>
 							<InstructorCourseDetail course={course} setCourse={setCourse} {...props} />
 						</Segment>}
 
@@ -97,6 +98,11 @@ export function CourseDetail(props) {
 						}
 
 						<Header size='medium'>Classes</Header>
+
+						{isInstructor(user) && <Segment padded>
+							<InstructorClassList course={course} setCourse={setCourse} {...props} />
+						</Segment>}
+
 						<Table basic='very'>
 							<Table.Header>
 								<Table.Row>

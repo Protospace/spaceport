@@ -3,8 +3,9 @@ import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-r
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment';
-import { BasicTable, requester } from './utils.js';
+import { isInstructor, BasicTable, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
+import { InstructorClassDetail } from './InstructorClasses.js';
 
 function ClassTable(props) {
 	const { classes } = props;
@@ -86,7 +87,7 @@ export function Classes(props) {
 export function ClassDetail(props) {
 	const [clazz, setClass] = useState(false);
 	const [error, setError] = useState(false);
-	const { token } = props;
+	const { token, user } = props;
 	const { id } = useParams();
 
 	useEffect(() => {
@@ -106,6 +107,10 @@ export function ClassDetail(props) {
 				clazz ?
 					<div>
 						<Header size='large'>Class Details</Header>
+
+						{isInstructor(user) && <Segment padded>
+							<InstructorClassDetail clazz={clazz} setClass={setClass} {...props} />
+						</Segment>}
 
 						<BasicTable>
 							<Table.Body>

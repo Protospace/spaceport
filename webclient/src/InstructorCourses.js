@@ -44,7 +44,7 @@ function InstructorCourseEditor(props) {
 			/>
 
 			<Form.Field>
-				<label>Description — {input.description ? input.description.length : 0}/6000</label>
+				<label>Description — {input.description ? input.description.length : 0} / 6000</label>
 				<ReactQuill
 					value={input.description || ''}
 					modules={modules}
@@ -77,13 +77,13 @@ export function InstructorCourseDetail(props) {
 		setLoading(true);
 		setSuccess(false);
 		const data = { ...input, is_old: false };
-		requester('/courses/'+id+'/', 'PUT', props.token, data)
+		requester('/courses/'+id+'/', 'PUT', token, data)
 		.then(res => {
 			setSuccess(true);
 			setLoading(false);
 			setError(false);
 			setOpen(false);
-			props.setCourse({...course, ...res});
+			setCourse({...course, ...res});
 		})
 		.catch(err => {
 			setLoading(false);
@@ -129,14 +129,14 @@ export function InstructorCourseList(props) {
 		setLoading(true);
 		setSuccess(false);
 		const data = { ...input, is_old: false };
-		requester('/courses/', 'POST', props.token, data)
+		requester('/courses/', 'POST', token, data)
 		.then(res => {
 			setSuccess(res.id);
 			setInput({});
 			setLoading(false);
 			setError(false);
 			setOpen(false);
-			props.setCourses([ ...courses, res ]);
+			setCourses([ ...courses, res ]);
 		})
 		.catch(err => {
 			setLoading(false);
@@ -169,4 +169,3 @@ export function InstructorCourseList(props) {
 		</div>
 	);
 };
-

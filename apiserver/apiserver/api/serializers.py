@@ -236,6 +236,7 @@ class SessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Session
         fields = '__all__'
+        read_only_fields = ['old_instructor']
     def get_student_count(self, obj):
         return len(obj.students.all())
     def get_course_name(self, obj):

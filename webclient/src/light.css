@@ -63,7 +63,7 @@ body {
 	padding-bottom: 24rem;
 }
 
-.course-editor {
+.course-editor, .class-editor {
 	margin-bottom: 1rem;
 }
 
@@ -85,6 +85,11 @@ body {
 .ql-editor h5,
 .ql-editor h6 {
 	margin-bottom: 1rem !important;
+}
+
+.rdtTimeToggle {
+	font-size: 2rem;
+	padding-top: 1rem;
 }
 
 .footer {

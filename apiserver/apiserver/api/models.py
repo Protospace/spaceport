@@ -73,6 +73,7 @@ class Session(models.Model):
     old_instructor = models.TextField(blank=True, null=True)
     datetime = models.DateTimeField(blank=True, null=True)
     cost = models.DecimalField(max_digits=5, decimal_places=2)
+    max_students = models.IntegerField(blank=True, null=True)
 
 class Training(models.Model):
     user = models.ForeignKey(User, related_name='training', blank=True, null=True, on_delete=models.SET_NULL)

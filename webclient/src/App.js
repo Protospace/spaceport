@@ -147,14 +147,14 @@ function App() {
 						</Route>
 
 						<Route path='/courses/:id'>
-							<CourseDetail token={token} />
+							<CourseDetail token={token} user={user} />
 						</Route>
 						<Route path='/courses'>
 							<Courses token={token} user={user} />
 						</Route>
 
 						<Route path='/classes/:id'>
-							<ClassDetail token={token} />
+							<ClassDetail token={token} user={user} />
 						</Route>
 						<Route path='/classes'>
 							<Classes token={token} />
