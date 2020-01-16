@@ -36,7 +36,7 @@ function ClassTable(props) {
 							<Table.Cell>{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).local().format('LT')}</Table.Cell>
 							<Table.Cell>{x.instructor_name}</Table.Cell>
 							<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
-							<Table.Cell>{x.student_count}</Table.Cell>
+							<Table.Cell>{x.student_count} {x.max_students && '/ '+x.max_students}</Table.Cell>
 						</Table.Row>
 					)
 				:
@@ -144,7 +144,7 @@ export function ClassDetail(props) {
 								</Table.Row>
 								<Table.Row>
 									<Table.Cell>Students:</Table.Cell>
-									<Table.Cell>{clazz.student_count}</Table.Cell>
+									<Table.Cell>{clazz.student_count} {clazz.max_students && '/ '+clazz.max_students}</Table.Cell>
 								</Table.Row>
 							</Table.Body>
 						</BasicTable>

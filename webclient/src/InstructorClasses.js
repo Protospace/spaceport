@@ -45,7 +45,7 @@ function InstructorClassEditor(props) {
 			/>
 
 			<Form.Input
-				label='Max Number of Students'
+				label='Max Students — Blank for Unlimited'
 				{...makeProps('max_students')}
 			/>
 
