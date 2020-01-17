@@ -135,7 +135,7 @@ class MemberViewSet(Base, Retrieve, Update):
 
 
 class CardViewSet(Base, Create, Retrieve, Update, Destroy):
-    permission_classes = [AllowMetadata | IsAuthenticated, IsObjOwnerOrAdmin, IsAdminOrReadOnly]
+    permission_classes = [AllowMetadata | IsAuthenticated, IsObjOwnerOrAdmin]
     queryset = models.Card.objects.all()
     serializer_class = serializers.CardSerializer
 
@@ -190,6 +190,15 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         if self.request.user == session.instructor:
             raise exceptions.ValidationError('You are teaching this session')
         serializer.save(user=self.request.user)
+
+
+class TransactionViewSet(Base, Create, Retrieve, Update):
+    permission_classes = [AllowMetadata | IsAuthenticated, IsObjOwnerOrAdmin]
+    queryset = models.Transaction.objects.all()
+    serializer_class = serializers.TransactionSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(recorder=self.request.user)
 
 
 class UserView(views.APIView):

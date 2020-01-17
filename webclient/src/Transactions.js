@@ -75,7 +75,7 @@ export function TransactionDetail(props) {
 						</Table.Row>
 						<Table.Row>
 							<Table.Cell>Account:</Table.Cell>
-							<Table.Cell>{t.account}</Table.Cell>
+							<Table.Cell>{t.account_type}</Table.Cell>
 						</Table.Row>
 						<Table.Row>
 							<Table.Cell>Info Source:</Table.Cell>
