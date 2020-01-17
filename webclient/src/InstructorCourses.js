@@ -44,7 +44,12 @@ function InstructorCourseEditor(props) {
 			/>
 
 			<Form.Field>
-				<label>Description — {input.description ? input.description.length : 0} / 6000</label>
+				<label>
+					Description
+					{input.description && input.description.length > 3000 && (
+						' — ' + (input.description.length+' / 6000')
+					)}
+				</label>
 				<ReactQuill
 					value={input.description || ''}
 					modules={modules}
