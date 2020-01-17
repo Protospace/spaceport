@@ -10,6 +10,7 @@ from PIL import Image
 from bleach.sanitizer import Cleaner
 
 from . import models, old_models
+from .. import settings
 
 #custom_error = lambda x: ValidationError(dict(non_field_errors=x))
 
@@ -303,6 +304,14 @@ class UserSerializer(serializers.ModelSerializer):
         depth = 1
 
 
+def request_from_protospace(request):
+    whitelist = ['24.66.110.96', '205.233.15.76', '205.233.15.69']
+
+    # set (not appended) directly by nginx so we can trust it
+    real_ip = request.META.get('HTTP_X_REAL_IP', False)
+
+    return real_ip in whitelist
+
 
 class RegistrationSerializer(RegisterSerializer):
     first_name = serializers.CharField(max_length=32)
@@ -311,6 +320,12 @@ class RegistrationSerializer(RegisterSerializer):
 
     def custom_signup(self, request, user):
         data = request.data
+
+        is_test_signup = bool(settings.DEBUG and data['last_name'] == 'tester')
+
+        if not request_from_protospace(request) and not is_test_signup:
+            user.delete()
+            raise ValidationError(dict(non_field_errors='Can only register from Protospace.'))
 
         if data['existing_member'] == 'true':
             old_members = old_models.Members.objects.using('old_portal')

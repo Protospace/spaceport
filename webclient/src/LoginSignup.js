@@ -18,6 +18,7 @@ export function LoginForm(props) {
 		.then(res => {
 			setError({});
 			props.setTokenCache(res.key);
+			window.scrollTo(0, 0);
 		})
 		.catch(err => {
 			setLoading(false);
@@ -72,6 +73,7 @@ export function SignupForm(props) {
 		.then(res => {
 			setError({});
 			props.setTokenCache(res.key);
+			window.scrollTo(0, 0);
 		})
 		.catch(err => {
 			setLoading(false);
@@ -82,7 +84,7 @@ export function SignupForm(props) {
 
 	return (
 		<Form onSubmit={handleSubmit}>
-			<Header size='medium'>Sign Up</Header>
+			<Header size='medium'>Sign Up from Protospace</Header>
 
 			<Form.Group widths='equal'>
 				<Form.Input
