@@ -80,6 +80,27 @@ class HTMLField(serializers.CharField):
 
 
 
+class TransactionSerializer(serializers.ModelSerializer):
+    account_type = serializers.ChoiceField(['Interac', 'TD Chequing', 'Paypal', 'Dream Pmt', 'PayPal', 'Square Pmt', 'Member', 'Clearing', 'Cash'])
+    info_source = serializers.ChoiceField(['Web', 'DB Edit', 'System', 'Receipt or Stmt', 'Quicken Import', 'Paypal IPN', 'Auto', 'Nexus DB Bulk', 'PayPal IPN', 'IPN Trigger', 'Intranet Receipt', 'Automatic', 'Manual'])
+    class Meta:
+        model = models.Transaction
+        fields = '__all__'
+        read_only_fields = [
+            'id',
+            'last_seen_at',
+            'user',
+            'recorder',
+        ]
+
+    def create(self, validated_data):
+        member = get_object_or_404(models.Member, id=validated_data['member_id'])
+        if member.user:
+            validated_data['user'] = member.user
+        return super().create(validated_data)
+
+
+
 # member viewing other members
 class OtherMemberSerializer(serializers.ModelSerializer):
     class Meta:
@@ -163,6 +184,7 @@ class SearchSerializer(serializers.Serializer):
 class AdminSearchSerializer(serializers.Serializer):
     cards = serializers.SerializerMethodField()
     member = serializers.SerializerMethodField()
+    transactions = serializers.SerializerMethodField()
 
     def get_member(self, obj):
         serializer = AdminMemberSerializer(obj)
@@ -173,7 +195,18 @@ class AdminSearchSerializer(serializers.Serializer):
             queryset = obj.user.cards
         else:
             queryset = models.Card.objects.filter(member_id=obj.id)
+        queryset = queryset.order_by('-last_seen_at')
         serializer = CardSerializer(data=queryset, many=True)
+        serializer.is_valid()
+        return serializer.data
+
+    def get_transactions(self, obj):
+        if obj.user:
+            queryset = obj.user.transactions
+        else:
+            queryset = models.Transaction.objects.filter(member_id=obj.id)
+        queryset = queryset.order_by('-date')
+        serializer = TransactionSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
 
@@ -193,27 +226,6 @@ class CardSerializer(serializers.ModelSerializer):
             'id',
             'last_seen_at',
             'user',
-        ]
-
-    def create(self, validated_data):
-        member = get_object_or_404(models.Member, id=validated_data['member_id'])
-        if member.user:
-            validated_data['user'] = member.user
-        return super().create(validated_data)
-
-
-
-class TransactionSerializer(serializers.ModelSerializer):
-    account_type = serializers.ChoiceField(['Interac', 'TD Chequing', 'Paypal', 'Dream Pmt', 'PayPal', 'Square Pmt', 'Member', 'Clearing', 'Cash'])
-    info_source = serializers.ChoiceField(['Web', 'DB Edit', 'System', 'Receipt or Stmt', 'Quicken Import', 'Paypal IPN', 'Auto', 'Nexus DB Bulk', 'PayPal IPN', 'IPN Trigger', 'Intranet Receipt', 'Automatic', 'Manual'])
-    class Meta:
-        model = models.Transaction
-        fields = '__all__'
-        read_only_fields = [
-            'id',
-            'last_seen_at',
-            'user',
-            'recorder',
         ]
 
     def create(self, validated_data):

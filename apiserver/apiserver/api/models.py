@@ -5,6 +5,8 @@ from django.utils.timezone import now
 
 from . import old_models
 
+IGNORE = '+'
+
 class Member(models.Model):
     user = models.OneToOneField(User, related_name='member', blank=True, null=True, on_delete=models.SET_NULL)
     old_email = models.CharField(max_length=254, blank=True, null=True)
@@ -38,14 +40,14 @@ class Member(models.Model):
 
 class Transaction(models.Model):
     user = models.ForeignKey(User, related_name='transactions', blank=True, null=True, on_delete=models.SET_NULL)
-    recorder = models.ForeignKey(User, related_name='+', blank=True, null=True, on_delete=models.SET_NULL)
+    recorder = models.ForeignKey(User, related_name=IGNORE, blank=True, null=True, on_delete=models.SET_NULL)
 
     member_id = models.IntegerField(blank=True, null=True)
     date = models.DateField(default=date.today)
     amount = models.DecimalField(max_digits=7, decimal_places=2)
     reference_number = models.CharField(max_length=32, blank=True, null=True)
     memo = models.TextField(blank=True, null=True)
-    number_of_membership_months = models.TextField(blank=True, null=True)
+    number_of_membership_months = models.IntegerField(blank=True, null=True)
     payment_method = models.TextField(blank=True, null=True)
     category = models.TextField(blank=True, null=True)
     account_type = models.TextField(blank=True, null=True)
