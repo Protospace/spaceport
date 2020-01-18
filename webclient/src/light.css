@@ -92,6 +92,14 @@ body {
 	padding-top: 1rem;
 }
 
+.attendance-row {
+	margin-top: 1rem;
+}
+
+.attendance-row .button {
+	margin-bottom: 4px;
+}
+
 .footer {
 	margin-top: -20rem;
 

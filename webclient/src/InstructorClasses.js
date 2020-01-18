@@ -35,7 +35,7 @@ function AttendanceRow(props) {
 	});
 
 	return (
-		<div>
+		<div className='attendance-row'>
 			<p>{training.student_name}:</p>
 
 			<Button {...makeProps('withdrawn')}>
@@ -76,7 +76,7 @@ export function InstructorClassAttendance(props) {
 
 			{clazz.students.length ?
 				clazz.students.map(x =>
-					<p><AttendanceRow key={x.id} student={x} {...props} /></p>
+					<AttendanceRow key={x.id} student={x} {...props} />
 				)
 			:
 				<p>No students yet.</p>
