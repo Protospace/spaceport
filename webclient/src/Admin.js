@@ -185,8 +185,8 @@ export function AdminMemberCards(props) {
 			<Header size='small'>Current Cards</Header>
 
 			{cards.length ?
-				cards.map((x, i) =>
-					<AdminCardDetail key={i} card={x} {...props} />
+				cards.map(x =>
+					<AdminCardDetail key={x.id} card={x} {...props} />
 				)
 			:
 				<p>None</p>

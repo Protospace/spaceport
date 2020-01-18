@@ -40,8 +40,8 @@ export function Courses(props) {
 
 					<Table.Body>
 						{courses.length ?
-							courses.map((x, i) =>
-								<Table.Row key={i}>
+							courses.map(x =>
+								<Table.Row key={x.id}>
 									<Table.Cell>
 										<Link to={'/courses/'+x.id}>{x.name}</Link>
 									</Table.Cell>
@@ -115,8 +115,8 @@ export function CourseDetail(props) {
 
 							<Table.Body>
 								{course.sessions.length ?
-									course.sessions.sort((a, b) => a.datetime < b.datetime ? 1 : -1).slice(0,10).map((x, i) =>
-										<Table.Row key={i}>
+									course.sessions.sort((a, b) => a.datetime < b.datetime ? 1 : -1).slice(0,10).map(x =>
+										<Table.Row key={x.id}>
 											<Table.Cell>
 												<Link to={'/classes/'+x.id}>
 													{moment.utc(x.datetime).local().format('ll')}

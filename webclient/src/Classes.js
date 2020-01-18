@@ -25,8 +25,8 @@ function ClassTable(props) {
 
 			<Table.Body>
 				{classes.length ?
-					classes.map((x, i) =>
-						<Table.Row key={i}>
+					classes.map(x =>
+						<Table.Row key={x.id}>
 							<Table.Cell>{x.course_name}</Table.Cell>
 							<Table.Cell>
 								<Link to={'/classes/'+x.id}>
@@ -182,7 +182,7 @@ export function ClassDetail(props) {
 
 						{(isAdmin(user) || clazz.instructor === user.id) &&
 							<Segment padded>
-								<InstructorClassAttendance clazz={clazz} {...props} />
+								<InstructorClassAttendance clazz={clazz} refreshClass={refreshClass} {...props} />
 							</Segment>
 						}
 

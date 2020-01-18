@@ -25,8 +25,8 @@ export function Training(props) {
 					</Table.Header>
 
 					<Table.Body>
-						{user.training.map((x, i) =>
-							<Table.Row key={i}>
+						{user.training.map(x =>
+							<Table.Row key={x.id}>
 								<Table.Cell>{x.session.course_name}</Table.Cell>
 								<Table.Cell>
 									<Link to={'/classes/'+x.session.id}>{moment(x.session.datetime).format('MMMM Do YYYY')}</Link>

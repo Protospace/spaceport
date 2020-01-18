@@ -24,8 +24,8 @@ export function Transactions(props) {
 
 				<Table.Body>
 					{user.transactions.length ?
-						user.transactions.slice().reverse().map((x, i) =>
-							<Table.Row key={i}>
+						user.transactions.slice().reverse().map(x =>
+							<Table.Row key={x.id}>
 								<Table.Cell>
 									<Link to={'/transactions/'+x.id}>{x.date}</Link>
 								</Table.Cell>

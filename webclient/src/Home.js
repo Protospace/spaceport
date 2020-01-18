@@ -81,8 +81,8 @@ function MemberInfo(props) {
 			<BasicTable>
 				<Table.Body>
 					{lastTrans.length ?
-						lastTrans.map((x, i) =>
-							<Table.Row key={i}>
+						lastTrans.map(x =>
+							<Table.Row key={x.id}>
 								<Table.Cell>
 									<Link to={'/transactions/'+x.id}>{x.date}</Link>
 								</Table.Cell>

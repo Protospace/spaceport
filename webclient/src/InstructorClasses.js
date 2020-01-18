@@ -8,7 +8,7 @@ import { Button, Container, Checkbox, Divider, Dropdown, Form, Grid, Header, Ico
 import { BasicTable, staticUrl, requester } from './utils.js';
 
 function AttendanceRow(props) {
-	const { student, token } = props;
+	const { student, token, refreshClass } = props;
 	const [training, setTraining] = useState(student);
 	const [error, setError] = useState(false);
 
@@ -17,6 +17,7 @@ function AttendanceRow(props) {
 		requester('/training/'+training.id+'/', 'PATCH', token, data)
 		.then(res => {
 			setTraining(res);
+			refreshClass();
 			setError(false);
 		})
 		.catch(err => {
@@ -74,8 +75,8 @@ export function InstructorClassAttendance(props) {
 			<Header size='small'>Mark Attendance</Header>
 
 			{clazz.students.length ?
-				clazz.students.map((x, i) =>
-					<p><AttendanceRow key={i} student={x} {...props} /></p>
+				clazz.students.map(x =>
+					<p><AttendanceRow key={x.id} student={x} {...props} /></p>
 				)
 			:
 				<p>No students yet.</p>

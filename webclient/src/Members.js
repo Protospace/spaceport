@@ -50,8 +50,8 @@ export function Members(props) {
 			{response ?
 				<Item.Group unstackable divided>
 					{response.results.length ?
-						response.results.map((x, i) =>
-							<Item key={i} as={Link} to={'/members/'+x.member.id}>
+						response.results.map(x =>
+							<Item key={x.member.id} as={Link} to={'/members/'+x.member.id}>
 								<Item.Image size='tiny' src={x.member.photo_small ? staticUrl + '/' + x.member.photo_small : '/nophoto.png'} />
 								<Item.Content verticalAlign='top'>
 									<Item.Header>{x.member.preferred_name} {x.member.last_name}</Item.Header>

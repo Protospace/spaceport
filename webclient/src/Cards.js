@@ -28,8 +28,8 @@ export function Cards(props) {
 						</Table.Header>
 
 						<Table.Body>
-							{user.cards.map((x, i) =>
-								<Table.Row key={i}>
+							{user.cards.map(x =>
+								<Table.Row key={x.id}>
 									<Table.Cell>{x.card_number}</Table.Cell>
 									<Table.Cell>{x.notes}</Table.Cell>
 									<Table.Cell>{x.last_seen_at}</Table.Cell>
