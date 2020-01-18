@@ -5,7 +5,7 @@ import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Me
 import { isAdmin, BasicTable, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 
-function TransactionEditor(props) {
+export function TransactionEditor(props) {
 	const { input, setInput, error } = props;
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
@@ -178,6 +178,40 @@ function EditTransaction(props) {
 	);
 };
 
+export function TransactionList(props) {
+	const { transactions } = props;
+
+	return (
+		<Table basic='very'>
+			<Table.Header>
+				<Table.Row>
+					<Table.HeaderCell>Date</Table.HeaderCell>
+					<Table.HeaderCell>Amount</Table.HeaderCell>
+					<Table.HeaderCell>Account</Table.HeaderCell>
+					<Table.HeaderCell>Memo</Table.HeaderCell>
+				</Table.Row>
+			</Table.Header>
+
+			<Table.Body>
+				{transactions.length ?
+					transactions.slice().sort((a, b) => a.date < b.date ? 1 : -1).map(x =>
+						<Table.Row key={x.id}>
+							<Table.Cell>
+								<Link to={'/transactions/'+x.id}>{x.date}</Link>
+							</Table.Cell>
+							<Table.Cell>${x.amount}</Table.Cell>
+							<Table.Cell>{x.account_type}</Table.Cell>
+							<Table.Cell>{x.memo}</Table.Cell>
+						</Table.Row>
+					)
+				:
+					<Table.Row><Table.Cell>None</Table.Cell></Table.Row>
+				}
+			</Table.Body>
+		</Table>
+	);
+};
+
 export function Transactions(props) {
 	const { user } = props;
 
@@ -185,33 +219,7 @@ export function Transactions(props) {
 		<Container>
 			<Header size='large'>Transactions</Header>
 
-			<Table basic='very'>
-				<Table.Header>
-					<Table.Row>
-						<Table.HeaderCell>Date</Table.HeaderCell>
-						<Table.HeaderCell>Amount</Table.HeaderCell>
-						<Table.HeaderCell>Account</Table.HeaderCell>
-						<Table.HeaderCell>Memo</Table.HeaderCell>
-					</Table.Row>
-				</Table.Header>
-
-				<Table.Body>
-					{user.transactions.length ?
-						user.transactions.slice().reverse().map(x =>
-							<Table.Row key={x.id}>
-								<Table.Cell>
-									<Link to={'/transactions/'+x.id}>{x.date}</Link>
-								</Table.Cell>
-								<Table.Cell>${x.amount}</Table.Cell>
-								<Table.Cell>{x.account_type}</Table.Cell>
-								<Table.Cell>{x.memo}</Table.Cell>
-							</Table.Row>
-						)
-					:
-						<Table.Row><Table.Cell>None</Table.Cell></Table.Row>
-					}
-				</Table.Body>
-			</Table>
+			<TransactionList transactions={user.transactions} />
 
 		</Container>
 	);

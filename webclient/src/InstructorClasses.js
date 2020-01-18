@@ -245,4 +245,3 @@ export function InstructorClassList(props) {
 		</div>
 	);
 };
-
