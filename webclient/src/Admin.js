@@ -5,11 +5,12 @@ import { Container, Checkbox, Divider, Dropdown, Form, Grid, Header, Icon, Image
 import { BasicTable, staticUrl, requester } from './utils.js';
 
 function AdminCardDetail(props) {
-	const [input, setInput] = useState({ ...props.card });
+	const { token, result, card } = props;
+	const [input, setInput] = useState({ ...card });
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
-	const id = props.card.id;
+	const id = card.id;
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
@@ -19,8 +20,8 @@ function AdminCardDetail(props) {
 	const handleSubmit = (e) => {
 		setLoading(true);
 		setSuccess(false);
-		const data = { ...input, member_id: props.result.member.id };
-		requester('/cards/'+id+'/', 'PUT', props.token, data)
+		const data = { ...input, member_id: result.member.id };
+		requester('/cards/'+id+'/', 'PUT', token, data)
 		.then(res => {
 			setLoading(false);
 			setSuccess(true);
@@ -37,7 +38,7 @@ function AdminCardDetail(props) {
 	const handleDelete = (e) => {
 		e.preventDefault();
 
-		requester('/cards/'+id+'/', 'DELETE', props.token)
+		requester('/cards/'+id+'/', 'DELETE', token)
 		.then(res => {
 			setInput(false);
 		})
@@ -98,13 +99,14 @@ function AdminCardDetail(props) {
 			</Segment>
 		:
 			<Segment raised color='black'>
-				Deleted card: {props.card.card_number}
+				Deleted card: {card.card_number}
 			</Segment>
 	);
 };
 
 export function AdminMemberCards(props) {
-	const cards = props.result.cards;
+	const { token, result, refreshResult } = props;
+	const cards = result.cards;
 	const [input, setInput] = useState({ active_status: 'card_active' });
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -119,13 +121,13 @@ export function AdminMemberCards(props) {
 	const handleSubmit = (e) => {
 		setLoading(true);
 		setSuccess(false);
-		const data = { ...input, member_id: props.result.member.id };
-		requester('/cards/', 'POST', props.token, data)
+		const data = { ...input, member_id: result.member.id };
+		requester('/cards/', 'POST', token, data)
 		.then(res => {
 			setLoading(false);
 			setSuccess(true);
 			setError(false);
-			props.setResult({ ...props.result, cards: [...cards, res] });
+			refreshResult();
 		})
 		.catch(err => {
 			setLoading(false);
@@ -194,7 +196,8 @@ export function AdminMemberCards(props) {
 };
 
 export function AdminMemberForm(props) {
-	const [input, setInput] = useState(props.result.member);
+	const { token, result, refreshResult } = props;
+	const [input, setInput] = useState(result.member);
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
@@ -208,12 +211,12 @@ export function AdminMemberForm(props) {
 	const handleSubmit = (e) => {
 		setLoading(true);
 		setSuccess(false);
-		requester('/members/' + id + '/', 'PATCH', props.token, input)
+		requester('/members/' + id + '/', 'PATCH', token, input)
 		.then(res => {
 			setLoading(false);
 			setSuccess(true);
 			setError(false);
-			props.setResult({ ...props.result, member: res });
+			refreshResult();
 		})
 		.catch(err => {
 			setLoading(false);

@@ -6,6 +6,7 @@ import { BasicTable, staticUrl, requester } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 
 function ChangePasswordForm(props) {
+	const { token } = props;
 	const [input, setInput] = useState({});
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
@@ -17,7 +18,7 @@ function ChangePasswordForm(props) {
 
 	const handleSubmit = (e) => {
 		setLoading(true);
-		requester('/password/change/', 'POST', props.token, input)
+		requester('/password/change/', 'POST', token, input)
 		.then(res => {
 			setError({});
 			history.push('/');
@@ -67,7 +68,8 @@ function ChangePasswordForm(props) {
 };
 
 export function AccountForm(props) {
-	const member = props.user.member;
+	const { token, user, refreshUser } = props;
+	const member = user.member;
 	const [input, setInput] = useState({ ...member, set_details: true });
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
@@ -80,10 +82,10 @@ export function AccountForm(props) {
 
 	const handleSubmit = (e) => {
 		setLoading(true);
-		requester('/members/' + member.id + '/', 'PATCH', props.token, input)
+		requester('/members/' + member.id + '/', 'PATCH', token, input)
 		.then(res => {
 			setError({});
-			props.setUserCache({...props.user, member: res});
+			refreshUser();
 			history.push('/');
 		})
 		.catch(err => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
@@ -66,7 +66,8 @@ export function Classes(props) {
 	return (
 		<Container>
 			<Header size='large'>Class List</Header>
-<Header size='medium'>Upcoming</Header>
+
+			<Header size='medium'>Upcoming</Header>
 			{classes ?
 				<ClassTable classes={classes.filter(x => x.datetime > now)} />
 			:
@@ -85,8 +86,9 @@ export function Classes(props) {
 
 export function ClassDetail(props) {
 	const [clazz, setClass] = useState(false);
+	const [refreshCount, refreshClass] = useReducer(x => x + 1, 0);
 	const [error, setError] = useState(false);
-	const { token, user, setUserCache } = props;
+	const { token, user, refreshUser } = props;
 	const { id } = useParams();
 	const userTraining = user.training.find(x => x.session.id == id);
 
@@ -99,20 +101,17 @@ export function ClassDetail(props) {
 			console.log(err);
 			setError(true);
 		});
-	}, []);
+	}, [refreshCount]);
 
 	const handleSignup = () => {
 		const data = { attendance_status: 'waiting for payment', session: id };
 		requester('/training/', 'POST', token, data)
 		.then(res => {
-			// bad code:
-			const newClass = { ...clazz, student_count: clazz.student_count+1 };
-			setUserCache({ ...user, training: [...user.training, {...res, session: newClass }] });
-			setClass(newClass);
+			refreshClass();
+			refreshUser();
 		})
 		.catch(err => {
 			console.log(err);
-			setError(true);
 		});
 	};
 
@@ -120,14 +119,8 @@ export function ClassDetail(props) {
 		const data = { attendance_status: newStatus, session: id };
 		requester('/training/'+userTraining.id+'/', 'PUT', token, data)
 		.then(res => {
-			// bad code:
-			const studentChange = newStatus === 'withdrawn' ? -1 : 1
-			const newClass = { ...clazz, student_count: clazz.student_count + studentChange };
-			const trainingIndex = user.training.indexOf(userTraining);
-			const newTraining = user.training;
-			newTraining[trainingIndex] = {...res, session: newClass };
-			setUserCache({ ...user, training: newTraining });
-			setClass(newClass);
+			refreshClass();
+			refreshUser();
 		})
 		.catch(err => {
 			console.log(err);

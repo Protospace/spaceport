@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css'; import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { requester } from './utils.js';
@@ -16,6 +16,7 @@ import { Footer } from './Footer.js';
 function App() {
 	const [token, setToken] = useState(localStorage.getItem('token', ''));
 	const [user, setUser] = useState(JSON.parse(localStorage.getItem('user', 'false')));
+	const [refreshCount, refreshUser] = useReducer(x => x + 1, 0);
 
 	function setTokenCache(x) {
 		setToken(x);
@@ -36,7 +37,7 @@ function App() {
 			console.log(err);
 			setUser(false);
 		});
-	}, [token]);
+	}, [token, refreshCount]);
 
 	function logout() {
 		setTokenCache('');
@@ -121,14 +122,14 @@ function App() {
 			</Menu>
 
 			<Route exact path='/'>
-				<Home token={token} setTokenCache={setTokenCache} user={user} setUserCache={setUserCache} />
+				<Home token={token} setTokenCache={setTokenCache} user={user} refreshUser={refreshUser} />
 			</Route>
 
 			<div className='topPadding'>
 				{user && user.member.set_details ?
 					<Switch>
 						<Route path='/account'>
-							<Account token={token} user={user} setUserCache={setUserCache} />
+							<Account token={token} user={user} refreshUser={refreshUser} />
 						</Route>
 
 						<Route path='/transactions/:id'>
@@ -154,7 +155,7 @@ function App() {
 						</Route>
 
 						<Route path='/classes/:id'>
-							<ClassDetail token={token} user={user} setUserCache={setUserCache} />
+							<ClassDetail token={token} user={user} refreshUser={refreshUser} />
 						</Route>
 						<Route path='/classes'>
 							<Classes token={token} />

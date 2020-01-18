@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Input, Item, Menu, Message, Segment, Table } from 'semantic-ui-react';
@@ -74,6 +74,7 @@ export function Members(props) {
 
 export function MemberDetail(props) {
 	const [result, setResult] = useState(false);
+	const [refreshCount, refreshResult] = useReducer(x => x + 1, 0);
 	const [error, setError] = useState(false);
 	const { token, user } = props;
 	const { id } = useParams();
@@ -87,7 +88,7 @@ export function MemberDetail(props) {
 			console.log(err);
 			setError(true);
 		});
-	}, []);
+	}, [refreshCount]);
 
 	const member = result.member || false;
 
@@ -105,7 +106,7 @@ export function MemberDetail(props) {
 								</p>
 
 								{isAdmin(user) ?
-									<AdminMemberInfo result={result} setResult={setResult} {...props} />
+									<AdminMemberInfo result={result} refreshResult={refreshResult} {...props} />
 								:
 									<BasicTable>
 										<Table.Body>
@@ -124,13 +125,13 @@ export function MemberDetail(props) {
 
 							<Grid.Column>
 								{isAdmin(user) && <Segment padded>
-									<AdminMemberForm result={result} setResult={setResult} {...props} />
+									<AdminMemberForm result={result} refreshResult={refreshResult} {...props} />
 								</Segment>}
 							</Grid.Column>
 						</Grid>
 
 						{isAdmin(user) && <Segment padded>
-							<AdminMemberCards result={result} setResult={setResult} {...props} />
+							<AdminMemberCards result={result} refreshResult={refreshResult} {...props} />
 						</Segment>}
 
 					</div>
