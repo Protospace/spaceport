@@ -133,7 +133,7 @@ function App() {
 						</Route>
 
 						<Route path='/transactions/:id'>
-							<TransactionDetail user={user} />
+							<TransactionDetail token={token} user={user} refreshUser={refreshUser} />
 						</Route>
 						<Route path='/transactions'>
 							<Transactions user={user} />

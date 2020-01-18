@@ -82,7 +82,9 @@ class HTMLField(serializers.CharField):
 
 class TransactionSerializer(serializers.ModelSerializer):
     account_type = serializers.ChoiceField(['Interac', 'TD Chequing', 'Paypal', 'Dream Pmt', 'PayPal', 'Square Pmt', 'Member', 'Clearing', 'Cash'])
-    info_source = serializers.ChoiceField(['Web', 'DB Edit', 'System', 'Receipt or Stmt', 'Quicken Import', 'Paypal IPN', 'Auto', 'Nexus DB Bulk', 'PayPal IPN', 'IPN Trigger', 'Intranet Receipt', 'Automatic', 'Manual'])
+    info_source = serializers.ChoiceField(['Web', 'DB Edit', 'System', 'Receipt or Stmt', 'Quicken Import', 'Paypal IPN', 'PayPal IPN', 'Auto', 'Nexus DB Bulk', 'IPN Trigger', 'Intranet Receipt', 'Automatic', 'Manual'])
+    member_name = serializers.SerializerMethodField()
+    date = serializers.DateField()
     class Meta:
         model = models.Transaction
         fields = '__all__'
@@ -98,6 +100,13 @@ class TransactionSerializer(serializers.ModelSerializer):
         if member.user:
             validated_data['user'] = member.user
         return super().create(validated_data)
+
+    def get_member_name(self, obj):
+        if obj.user:
+            member = obj.user.member
+        else:
+            member = models.Member.objects.get(id=obj.member_id)
+        return member.preferred_name + ' ' + member.last_name
 
 
 
@@ -309,6 +318,7 @@ class UserTrainingSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     training = UserTrainingSerializer(many=True)
     member = MemberSerializer()
+    transactions = TransactionSerializer(many=True)
 
     class Meta:
         model = User
