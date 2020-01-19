@@ -7,8 +7,9 @@ from . import models, old_models
 
 def num_months_spanned(d1, d2):
     '''
-    Return number of months thresholds two dates span.
+    Return number of month thresholds two dates span.
     Order of arguments is same as subtraction
+    ie. Feb 2, Jan 29 returns 1
     '''
     return (d1.year - d2.year) * 12 + d1.month - d2.month
 
@@ -16,13 +17,14 @@ def num_months_difference(d1, d2):
     '''
     Return number of whole months between two dates.
     Order of arguments is same as subtraction
+    ie. Feb 2, Jan 29 returns 0
     '''
     r = relativedelta.relativedelta(d1, d2)
     return r.months + 12 * r.years
 
 def calc_member_status(expire_date, fake_date=None):
     '''
-    Returns the member's status and if their membership should stop
+    Return: status, if we should pause them
     '''
     today = fake_date or datetime.date.today()
     difference = num_months_difference(expire_date, today)
