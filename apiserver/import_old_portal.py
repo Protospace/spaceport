@@ -2,7 +2,8 @@ import django, sys, os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'apiserver.settings'
 django.setup()
 
-from apiserver.api import models, old_models
+import datetime
+from apiserver.api import models, old_models, utils
 from apiserver.api.serializers import process_image
 
 MEMBER_FIELDS = [
@@ -110,6 +111,40 @@ for o in old:
 
 print('Deleting all transactions...')
 models.Transaction.objects.all().delete()
+print('Faking membership months...')
+members = models.Member.objects.all()
+bad_count = 0
+
+for m in members:
+    old_status = m.status
+    old_expire = m.expire_date
+
+    if not m.current_start_date: continue
+    if 'Former' in old_status:
+        m.status = 'Old Portal ' + old_status
+        m.save()
+        continue
+
+    import_date = datetime.date(2020, 1, 3)
+    tx = utils.fake_missing_membership_months(m)
+    utils.tally_membership_months(m, import_date)
+
+    print(m.first_name, m.last_name, tx.memo)
+
+    if old_status != m.status or old_expire != m.expire_date:
+        print('Expire mismatch member:', m.__dict__)
+        print('New status:', m.status)
+        print('Old status:', old_status)
+        print('Old expire:', old_expire)
+        bad_count += 1
+
+print('Import mismatch count:', bad_count)
+
+print('Pausing former members...')
+for m in members:
+    if 'Former' in m.status:
+        paused_date = m.expire_date or datetime.date.today()
+
 print('Importing old transactions...')
 old = old_models.Transactions.objects.using('old_portal').all()
 
@@ -123,6 +158,7 @@ for o in old:
     print('Imported transaction #{} - {} {}'.format(
         o.id, o.member_id, o.category
     ))
+
 
 
 print('Deleting all cards...')

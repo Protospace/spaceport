@@ -20,20 +20,24 @@ def num_months_difference(d1, d2):
     r = relativedelta.relativedelta(d1, d2)
     return r.months + 12 * r.years
 
-def calc_member_status(expire_date):
-    today = datetime.date.today()
+def calc_member_status(expire_date, fake_date=None):
+    '''
+    Returns the member's status and if their membership should stop
+    '''
+    today = fake_date or datetime.date.today()
     difference = num_months_difference(expire_date, today)
 
+    #if today + datetime.timedelta(days=29) < expire_date:
     if difference >= 1:
-        return 'Prepaid'
+        return 'Prepaid', False
     elif difference <= -3:
-        return 'Former Member'
+        return 'Overdue', True
     elif difference <= -1:
-        return 'Overdue'
-    elif today <= expire_date:
-        return 'Current'
-    elif today > expire_date:
-        return 'Due'
+        return 'Overdue', False
+    elif today < expire_date:
+        return 'Current', False
+    elif today >= expire_date:
+        return 'Due', False
     else:
         raise()
 
@@ -70,7 +74,7 @@ def fake_missing_membership_months(member):
 
     return tx
 
-def tally_membership_months(member):
+def tally_membership_months(member, fake_date=None):
     '''
     Sum together member's dues and calculate their new expire date and status
     Doesn't work if member is paused.
@@ -78,18 +82,19 @@ def tally_membership_months(member):
     if member.paused_date: return False
 
     start_date = member.current_start_date
+    if not start_date: return False
 
     txs = models.Transaction.objects.filter(member_id=member.id)
     total_months_agg = txs.aggregate(Sum('number_of_membership_months'))
     total_months = total_months_agg['number_of_membership_months__sum']
 
     expire_date = add_months(start_date, total_months)
-    status = calc_member_status(expire_date)
+    status, former = calc_member_status(expire_date, fake_date)
 
     member.expire_date = expire_date
     member.status = status
 
-    if status == 'Former Member':
+    if former:
         member.paused_date = expire_date
 
     member.save()

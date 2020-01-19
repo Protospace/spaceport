@@ -136,51 +136,58 @@ class TestCalcStatus(TestCase):
     def test_calc_member_status_14_days(self):
         expire_date = datetime.date.today() + datetime.timedelta(days=14)
 
-        status = utils.calc_member_status(expire_date)
+        status, former = utils.calc_member_status(expire_date)
 
         self.assertEqual(status, 'Current')
+        self.assertEqual(former, False)
 
     def test_calc_member_status_90_days(self):
         expire_date = datetime.date.today() + datetime.timedelta(days=90)
 
-        status = utils.calc_member_status(expire_date)
+        status, former = utils.calc_member_status(expire_date)
 
         self.assertEqual(status, 'Prepaid')
+        self.assertEqual(former, False)
 
     def test_calc_member_status_tomorrow(self):
         expire_date = datetime.date.today() + datetime.timedelta(days=1)
 
-        status = utils.calc_member_status(expire_date)
+        status, former = utils.calc_member_status(expire_date)
 
         self.assertEqual(status, 'Current')
+        self.assertEqual(former, False)
 
     def test_calc_member_status_today(self):
         expire_date = datetime.date.today()
 
-        status = utils.calc_member_status(expire_date)
+        status, former = utils.calc_member_status(expire_date)
 
-        self.assertEqual(status, 'Current')
+        self.assertEqual(status, 'Due')
+        self.assertEqual(former, False)
 
     def test_calc_member_status_yesterday(self):
         expire_date = datetime.date.today() - datetime.timedelta(days=1)
 
-        status = utils.calc_member_status(expire_date)
+        status, former = utils.calc_member_status(expire_date)
 
         self.assertEqual(status, 'Due')
+        self.assertEqual(former, False)
 
     def test_calc_member_status_85_days_ago(self):
         expire_date = datetime.date.today() - datetime.timedelta(days=85)
 
-        status = utils.calc_member_status(expire_date)
+        status, former = utils.calc_member_status(expire_date)
 
         self.assertEqual(status, 'Overdue')
+        self.assertEqual(former, False)
 
     def test_calc_member_status_95_days_ago(self):
         expire_date = datetime.date.today() - datetime.timedelta(days=95)
 
-        status = utils.calc_member_status(expire_date)
+        status, former = utils.calc_member_status(expire_date)
 
-        self.assertEqual(status, 'Former Member')
+        self.assertEqual(status, 'Overdue')
+        self.assertEqual(former, True)
 
 
 class TestFakeMonths(TestCase):
@@ -308,7 +315,7 @@ class TestTallyMembership(TestCase):
         self.assertEqual(member.expire_date, end_date)
         self.assertEqual(member.status, 'Overdue')
 
-    def test_tally_membership_months_overdue(self):
+    def test_tally_membership_months_overdue_pause(self):
         member = self.get_member_clear_transactions()
         test_num_months = 1
         start_date = datetime.date.today() - relativedelta.relativedelta(months=6, days=14)
@@ -328,7 +335,7 @@ class TestTallyMembership(TestCase):
 
         self.assertEqual(member.expire_date, end_date)
         self.assertEqual(member.paused_date, end_date)
-        self.assertEqual(member.status, 'Former Member')
+        self.assertEqual(member.status, 'Overdue')
 
     def test_tally_membership_months_dont_run(self):
         member = self.get_member_clear_transactions()

@@ -100,8 +100,7 @@ function MemberInfo(props) {
 };
 
 export function Home(props) {
-	const { token, setTokenCache, user, setUserCache } = props;
-
+	const { user } = props;
 	return (
 		<Container>
 			<Grid stackable padded columns={2}>
@@ -110,14 +109,14 @@ export function Home(props) {
 						user.member.set_details ?
 							<MemberInfo user={user} />
 						:
-							<AccountForm token={token} user={user} setUserCache={setUserCache} />
+							<AccountForm {...props} />
 					:
 						<div>
-							<LoginForm setTokenCache={setTokenCache} />
+							<LoginForm {...props} />
 
 							<Divider section horizontal>Or</Divider>
 
-							<SignupForm setTokenCache={setTokenCache} />
+							<SignupForm {...props} />
 						</div>
 					}
 				</Grid.Column>
