@@ -9,7 +9,7 @@ from rest_auth.registration.views import RegisterView
 from fuzzywuzzy import fuzz, process
 from collections import OrderedDict
 
-from . import models, serializers
+from . import models, serializers, utils
 
 class AllowMetadata(BasePermission):
     def has_permission(self, request, view):
@@ -197,8 +197,18 @@ class TransactionViewSet(Base, Create, Retrieve, Update):
     queryset = models.Transaction.objects.all()
     serializer_class = serializers.TransactionSerializer
 
+    def retally_membership(self):
+        member_id = self.request.data['member_id']
+        member = get_object_or_404(models.Member, id=member_id)
+        utils.tally_membership_months(member)
+
     def perform_create(self, serializer):
         serializer.save(recorder=self.request.user)
+        self.retally_membership()
+
+    def perform_update(self, serializer):
+        serializer.save()
+        self.retally_membership()
 
 
 class UserView(views.APIView):
