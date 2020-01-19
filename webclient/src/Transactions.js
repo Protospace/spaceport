@@ -32,7 +32,7 @@ export function TransactionEditor(props) {
 	];
 
 	const sourceOptions = [
-		{ key: '0', text: 'Web', value: 'Web' },
+		{ key: '0', text: 'Web (Spaceport)', value: 'Web' },
 		{ key: '1', text: 'Database Edit', value: 'DB Edit' },
 		{ key: '2', text: 'System', value: 'System' },
 		{ key: '3', text: 'Receipt or Statement', value: 'Receipt or Stmt' },

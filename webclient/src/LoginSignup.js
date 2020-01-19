@@ -29,7 +29,7 @@ export function LoginForm(props) {
 
 	return (
 		<Form onSubmit={handleSubmit}>
-			<Header size='medium'>Login to Spaceport</Header>
+			<Header size='medium'>Log In to Spaceport</Header>
 			<Form.Input
 				label='Username'
 				name='username'
@@ -45,7 +45,7 @@ export function LoginForm(props) {
 				error={error.password}
 			/>
 			<Form.Button loading={loading} error={error.non_field_errors}>
-				Login
+				Log In
 			</Form.Button>
 		</Form>
 	);

@@ -36,6 +36,7 @@ class Member(models.Model):
     current_start_date = models.DateField(default=date.today, null=True)
     application_date = models.DateField(default=date.today, null=True)
     vetted_date = models.DateField(blank=True, null=True)
+    paused_date = models.DateField(blank=True, null=True)
     monthly_fees = models.IntegerField(default=55, blank=True, null=True)
 
 class Transaction(models.Model):
