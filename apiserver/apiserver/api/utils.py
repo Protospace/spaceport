@@ -77,7 +77,7 @@ def fake_missing_membership_months(member):
             date=add_months(start_date, i),
         )
 
-    return tx
+    return tx, missing_months
 
 def tally_membership_months(member, fake_date=None):
     '''

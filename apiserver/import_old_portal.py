@@ -141,7 +141,7 @@ for m in members:
     if not m.current_start_date: continue
 
     import_date = datetime.date(2020, 1, 3)
-    tx = utils.fake_missing_membership_months(m)
+    tx, _ = utils.fake_missing_membership_months(m)
     utils.tally_membership_months(m, import_date)
 
     if tx:

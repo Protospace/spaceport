@@ -195,33 +195,33 @@ class TestFakeMonths(TestCase):
         testing_member.current_start_date = datetime.date(2018, 6, 6)
         testing_member.expire_date = datetime.date(2018, 7, 6)
 
-        tx = utils.fake_missing_membership_months(testing_member)
+        tx, count = utils.fake_missing_membership_months(testing_member)
 
-        self.assertEqual(tx.number_of_membership_months, 1)
+        self.assertEqual(count, 1)
 
     def test_fake_missing_membership_months_one_and_half_month(self):
         testing_member.current_start_date = datetime.date(2018, 6, 1)
         testing_member.expire_date = datetime.date(2018, 7, 15)
 
-        tx = utils.fake_missing_membership_months(testing_member)
+        tx, count = utils.fake_missing_membership_months(testing_member)
 
-        self.assertEqual(tx.number_of_membership_months, 1)
+        self.assertEqual(count, 1)
 
     def test_fake_missing_membership_months_one_year(self):
         testing_member.current_start_date = datetime.date(2018, 6, 6)
         testing_member.expire_date = datetime.date(2019, 6, 6)
 
-        tx = utils.fake_missing_membership_months(testing_member)
+        tx, count = utils.fake_missing_membership_months(testing_member)
 
-        self.assertEqual(tx.number_of_membership_months, 12)
+        self.assertEqual(count, 12)
 
     def test_fake_missing_membership_months_same_month(self):
         testing_member.current_start_date = datetime.date(2018, 6, 6)
         testing_member.expire_date = datetime.date(2018, 6, 16)
 
-        tx = utils.fake_missing_membership_months(testing_member)
+        tx, count = utils.fake_missing_membership_months(testing_member)
 
-        self.assertEqual(tx.number_of_membership_months, 0)
+        self.assertEqual(count, 0)
 
 
 class TestTallyMembership(TestCase):
