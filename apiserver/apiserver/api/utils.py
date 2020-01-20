@@ -48,8 +48,8 @@ def add_months(date, num_months):
 
 def fake_missing_membership_months(member):
     '''
-    Return a transaction adding fake months on importing the member so the
-    length of their membership resolves to their imported expiry date
+    Add fake months on importing the member so the length of their membership
+    resolves to their imported expiry date
     '''
     start_date = member.current_start_date
     expire_date = member.expire_date
@@ -57,22 +57,25 @@ def fake_missing_membership_months(member):
     missing_months = num_months_spanned(expire_date, start_date)
 
     user = member.user if member.user else None
-    memo = '{} mth membership dues accounting old portal import, {} to {}'.format(
-        str(missing_months), start_date, expire_date
-    )
+    tx = False
+    for i in range(missing_months):
+        memo = '{} / {} month membership dues accounting old portal import, {} to {} - hidden'.format(
+            str(i+1), str(missing_months), start_date, expire_date
+        )
 
-    tx = models.Transaction.objects.create(
-        amount=0,
-        user=user,
-        memo=memo,
-        member_id=member.id,
-        reference_number='',
-        info_source='System',
-        payment_method='N/A',
-        category='Membership',
-        account_type='Clearing',
-        number_of_membership_months=missing_months,
-    )
+        tx = models.Transaction.objects.create(
+            amount=0,
+            user=user,
+            memo=memo,
+            member_id=member.id,
+            reference_number='',
+            info_source='System',
+            payment_method='N/A',
+            category='Memberships:Fake Months',
+            account_type='Clearing',
+            number_of_membership_months=1,
+            date=add_months(start_date, i),
+        )
 
     return tx
 
@@ -88,7 +91,7 @@ def tally_membership_months(member, fake_date=None):
 
     txs = models.Transaction.objects.filter(member_id=member.id)
     total_months_agg = txs.aggregate(Sum('number_of_membership_months'))
-    total_months = total_months_agg['number_of_membership_months__sum']
+    total_months = total_months_agg['number_of_membership_months__sum'] or 0
 
     expire_date = add_months(start_date, total_months)
     status, former = calc_member_status(expire_date, fake_date)

@@ -144,13 +144,16 @@ for m in members:
     tx = utils.fake_missing_membership_months(m)
     utils.tally_membership_months(m, import_date)
 
-    print(m.first_name, m.last_name, tx.memo)
+    if tx:
+        print(m.first_name, m.last_name, tx.memo)
 
     if old_status != m.status or old_expire != m.expire_date:
         print('Expire / status mismatch member:', m.__dict__)
         print('New status:', m.status)
         print('Old status:', old_status)
+        print('New expire:', m.expire_date)
         print('Old expire:', old_expire)
+        print('')
         bad_count += 1
 
 print('Import mismatch count:', bad_count)

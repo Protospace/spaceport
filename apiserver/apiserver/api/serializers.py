@@ -138,6 +138,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'current_start_date',
             'application_date',
             'vetted_date',
+            'paused_date',
             'monthly_fees',
             'photo_large',
             'photo_medium',
@@ -170,6 +171,8 @@ class AdminMemberSerializer(MemberSerializer):
         read_only_fields = [
             'id',
             'status',
+            'expire_date',
+            'paused_date',
             'photo_large',
             'photo_medium',
             'photo_small',
@@ -214,7 +217,7 @@ class AdminSearchSerializer(serializers.Serializer):
             queryset = obj.user.transactions
         else:
             queryset = models.Transaction.objects.filter(member_id=obj.id)
-        queryset = queryset.order_by('-date')
+        queryset = queryset.order_by('-id', '-date')
         serializer = TransactionSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
@@ -318,12 +321,20 @@ class UserTrainingSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     training = UserTrainingSerializer(many=True)
     member = MemberSerializer()
-    transactions = TransactionSerializer(many=True)
+    transactions = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ['id', 'username', 'member', 'transactions', 'cards', 'training', 'is_staff']
         depth = 1
+
+    def get_transactions(self, obj):
+        queryset = models.Transaction.objects.filter(user=obj)
+        queryset = queryset.exclude(category='Memberships:Fake Months')
+        queryset = queryset.order_by('-id', '-date')
+        serializer = TransactionSerializer(data=queryset, many=True)
+        serializer.is_valid()
+        return serializer.data
 
 
 def request_from_protospace(request):

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
-import { Button, Container, Checkbox, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment';
 import { BasicTable, staticUrl, requester } from './utils.js';
 import { TransactionList, TransactionEditor } from './Transactions.js';
@@ -170,6 +170,7 @@ function AdminCardDetail(props) {
 export function AdminMemberCards(props) {
 	const { token, result, refreshResult } = props;
 	const cards = result.cards;
+	const [dimmed, setDimmed] = useState(result.member.paused_date && cards.length);
 	const [input, setInput] = useState({ active_status: 'card_active' });
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -247,13 +248,25 @@ export function AdminMemberCards(props) {
 
 			<Header size='small'>Current Cards</Header>
 
-			{cards.length ?
-				cards.map(x =>
-					<AdminCardDetail key={x.id} card={x} {...props} />
-				)
-			:
-				<p>None</p>
-			}
+			<Dimmer.Dimmable dimmed={dimmed}>
+				{cards.length ?
+					cards.map(x =>
+						<AdminCardDetail key={x.id} card={x} {...props} />
+					)
+				:
+					<p>None</p>
+				}
+
+				<Dimmer active={dimmed}>
+					<p>
+						Member paused, {cards.length} card{cards.length === 1 ? '' : 's'} ignored anyway.
+					</p>
+					<p>
+						<Button size='tiny' onClick={() => setDimmed(false)}>Close</Button>
+					</p>
+				</Dimmer>
+			</Dimmer.Dimmable>
+
 		</div>
 	);
 };
@@ -321,11 +334,6 @@ export function AdminMemberForm(props) {
 				/>
 
 				<Form.Input
-					label='Expire Date'
-					{...makeProps('expire_date')}
-				/>
-
-				<Form.Input
 					label='Membership Fee'
 					{...makeProps('monthly_fees')}
 				/>
@@ -386,6 +394,15 @@ export function AdminMemberInfo(props) {
 						<Table.Cell>Status:</Table.Cell>
 						<Table.Cell>{member.status}</Table.Cell>
 					</Table.Row>
+
+					<Table.Row>
+						<Table.Cell>Expire Date:</Table.Cell>
+						<Table.Cell>{member.expire_date}</Table.Cell>
+					</Table.Row>
+					{member.paused_date && <Table.Row>
+						<Table.Cell>Paused Date:</Table.Cell>
+						<Table.Cell>{member.paused_date}</Table.Cell>
+					</Table.Row>}
 
 					<Table.Row>
 						<Table.Cell>Phone:</Table.Cell>
