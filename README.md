@@ -109,7 +109,7 @@ server {
         add_header 'Access-Control-Allow-Origin' '*' always;
         add_header 'Access-Control-Allow-Headers' 'content-type, authorization' always;
         add_header 'Access-Control-Allow-Methods' 'HEAD,GET,POST,PUT,PATCH,DELETE' always;
-        add_header 'Access-Control-Max-Age' '600' always;
+        add_header 'Access-Control-Max-Age' '86400' always;
         proxy_pass http://127.0.0.1:8002/;
         proxy_set_header Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -126,6 +126,7 @@ server {
     server_name static.example.com;
 
     location / {
+        add_header 'cache-control' 'max-age=2678400' always;
         try_files $uri $uri/ =404;
     }
 }
