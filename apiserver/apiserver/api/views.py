@@ -143,7 +143,7 @@ class MemberViewSet(Base, Retrieve, Update):
         member = serializer.save()
         utils.tally_membership_months(member)
 
-    @action(detail=True)
+    @action(detail=True, methods=['post'])
     def pause(self, request, pk=None):
         if not is_admin_director(self.request.user):
             raise exceptions.PermissionDenied()
@@ -152,7 +152,7 @@ class MemberViewSet(Base, Retrieve, Update):
         member.save()
         return Response(200)
 
-    @action(detail=True)
+    @action(detail=True, methods=['post'])
     def unpause(self, request, pk=None):
         if not is_admin_director(self.request.user):
             raise exceptions.PermissionDenied()

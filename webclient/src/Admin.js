@@ -293,7 +293,7 @@ export function AdminMemberPause(props) {
 		if (yousure) {
 			setLoading(true);
 			setSuccess(false);
-			requester('/members/' + id + '/pause/', 'GET', token)
+			requester('/members/' + id + '/pause/', 'POST', token, {})
 			.then(res => {
 				setYousure(false);
 				setSuccess(true);
@@ -313,7 +313,7 @@ export function AdminMemberPause(props) {
 	const handleUnpause = (e) => {
 		setLoading(true);
 		setSuccess(false);
-		requester('/members/' + id + '/unpause/', 'GET', token)
+		requester('/members/' + id + '/unpause/', 'POST', token, {})
 		.then(res => {
 			setSuccess(true);
 			setError(false);
