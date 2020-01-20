@@ -249,6 +249,34 @@ class UserView(views.APIView):
         return Response(serializer.data)
 
 
+class DoorViewSet(Base, List):
+    serializer_class = serializers.CardSerializer
+
+    def list(self, request):
+        cards = models.Card.objects.filter(active_status='card_active')
+        active_member_cards = {}
+
+        # format cards to match Emrah's conversion script, fix later
+        for card in cards:
+            member = get_object_or_404(models.Member, id=card.member_id)
+            if member.paused_date: continue
+
+            active_member_cards[card.card_number] = dict(
+                name=member.first_name + ' ' + member.last_name[0],
+                id=member.id,
+                enabled=True,
+            )
+
+        return Response(active_member_cards)
+
+    @action(detail=True, methods=['post'])
+    def seen(self, request, pk=None):
+        card = get_object_or_404(models.Card, card_number=pk)
+        card.last_seen_at = datetime.date.today()
+        card.save()
+        return Response(200)
+
+
 class RegistrationView(RegisterView):
     serializer_class = serializers.RegistrationSerializer
 
