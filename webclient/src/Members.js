@@ -2,7 +2,7 @@ import React, { useState, useEffect, useReducer } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Input, Item, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { isAdmin, BasicTable, staticUrl, requester } from './utils.js';
+import { statusColor, isAdmin, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { AdminMemberInfo, AdminMemberPause, AdminMemberForm, AdminMemberCards, AdminTransactions } from './Admin.js';
 
@@ -54,7 +54,10 @@ export function Members(props) {
 							<Item key={x.member.id} as={Link} to={'/members/'+x.member.id}>
 								<Item.Image size='tiny' src={x.member.photo_small ? staticUrl + '/' + x.member.photo_small : '/nophoto.png'} />
 								<Item.Content verticalAlign='top'>
-									<Item.Header>{x.member.preferred_name} {x.member.last_name}</Item.Header>
+									<Item.Header>
+										<Icon name='circle' color={statusColor[x.member.status]} />
+										{x.member.preferred_name} {x.member.last_name}
+									</Item.Header>
 									<Item.Description>Status: {x.member.status || 'Unknown'}</Item.Description>
 									<Item.Description>Joined: {x.member.current_start_date || 'Unknown'}</Item.Description>
 								</Item.Content>
@@ -112,7 +115,10 @@ export function MemberDetail(props) {
 										<Table.Body>
 											<Table.Row>
 												<Table.Cell>Status:</Table.Cell>
-												<Table.Cell>{member.status || 'Unknown'}</Table.Cell>
+												<Table.Cell>
+													<Icon name='circle' color={statusColor[member.status]} />
+													{member.status || 'Unknown'}
+												</Table.Cell>
 											</Table.Row>
 											<Table.Row>
 												<Table.Cell>Joined:</Table.Cell>

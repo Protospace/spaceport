@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { BasicTable, staticUrl, requester } from './utils.js';
+import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 import { AccountForm } from './Account.js';
 
@@ -24,18 +24,16 @@ function MemberInfo(props) {
 				</Grid.Column>
 
 				<Grid.Column width={11}>
-					<Header size='large'>
-						<Icon.Group size='small'>
-							<Icon name='circle' color='green' />
-						</Icon.Group>
-						<Header.Content>{member.preferred_name} {member.last_name}</Header.Content>
-					</Header>
+					<Header size='large'>{member.preferred_name} {member.last_name}</Header>
 
 					<BasicTable>
 						<Table.Body>
 							<Table.Row>
 								<Table.Cell>Status:</Table.Cell>
-								<Table.Cell>{member.status || 'Unknown'}</Table.Cell>
+								<Table.Cell>
+									<Icon name='circle' color={statusColor[member.status]} />
+									{member.status || 'Unknown'}
+								</Table.Cell>
 							</Table.Row>
 							<Table.Row>
 								<Table.Cell>Expiry:</Table.Cell>

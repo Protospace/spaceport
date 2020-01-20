@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Table } from 'semantic-ui-react';
 
-export const isAdmin = (user) => user.is_staff || user.member.is_director || user.member.is_staff;
-export const isInstructor = (user) => isAdmin(user) || user.member.is_instructor;
-
 export const siteUrl = window.location.protocol + '//' + window.location.hostname;
 export const apiUrl = window.location.protocol + '//api.' + window.location.hostname;
 export const staticUrl = window.location.protocol + '//static.' + window.location.hostname;
+
+export const isAdmin = (user) => user.is_staff || user.member.is_director || user.member.is_staff;
+export const isInstructor = (user) => isAdmin(user) || user.member.is_instructor;
+
+export const statusColor = {
+	'Current': 'green',
+	'Due': 'yellow',
+	'Overdue': 'red',
+	'Former Member': 'black',
+};
 
 export const BasicTable = (props) => (
 	<Table collapsing padded unstackable basic='very'>

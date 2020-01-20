@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } f
 import './light.css';
 import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment';
-import { BasicTable, staticUrl, requester } from './utils.js';
+import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { TransactionList, TransactionEditor } from './Transactions.js';
 
 export function AdminTransactions(props) {
@@ -473,7 +473,10 @@ export function AdminMemberInfo(props) {
 					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Status:</Table.Cell>
-						<Table.Cell>{member.status}</Table.Cell>
+						<Table.Cell>
+							<Icon name='circle' color={statusColor[member.status]} />
+							{member.status || 'Unknown'}
+						</Table.Cell>
 					</Table.Row>
 
 					<Table.Row>
