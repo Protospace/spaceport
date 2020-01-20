@@ -90,6 +90,7 @@ def tally_membership_months(member, fake_date=None):
     if not start_date: return False
 
     txs = models.Transaction.objects.filter(member_id=member.id)
+    txs = txs.filter(date__gte=start_date)
     total_months_agg = txs.aggregate(Sum('number_of_membership_months'))
     total_months = total_months_agg['number_of_membership_months__sum'] or 0
 

@@ -1,7 +1,9 @@
+import datetime
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from django.db.models import Max
 from rest_framework import viewsets, views, mixins, generics, exceptions
+from rest_framework.decorators import action
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 from rest_auth.views import PasswordChangeView
@@ -132,6 +134,34 @@ class MemberViewSet(Base, Retrieve, Update):
             return serializers.AdminMemberSerializer
         else:
             return serializers.MemberSerializer
+
+    def perform_create(self, serializer):
+        member = serializer.save()
+        utils.tally_membership_months(member)
+
+    def perform_update(self, serializer):
+        member = serializer.save()
+        utils.tally_membership_months(member)
+
+    @action(detail=True)
+    def pause(self, request, pk=None):
+        if not is_admin_director(self.request.user):
+            raise exceptions.PermissionDenied()
+        member = get_object_or_404(self.queryset, pk=pk)
+        member.paused_date = datetime.date.today()
+        member.save()
+        return Response(200)
+
+    @action(detail=True)
+    def unpause(self, request, pk=None):
+        if not is_admin_director(self.request.user):
+            raise exceptions.PermissionDenied()
+        member = get_object_or_404(self.queryset, pk=pk)
+        member.current_start_date = datetime.date.today()
+        member.paused_date = None
+        member.save()
+        utils.tally_membership_months(member)
+        return Response(200)
 
 
 class CardViewSet(Base, Create, Retrieve, Update, Destroy):
