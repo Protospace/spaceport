@@ -58,7 +58,15 @@ Place `old_portal.sqlite3` in the same directory as `manage.py`.
 (env) $ time python import_old_portal.py
 ```
 
-Give it about 5 minutes to run. This will import old models into the new portal database, ready to be linked to user's emails when they sign up.
+Give it about 15 minutes to run. This will import old models into the new portal database, ready to be linked to user's emails when they sign up.
+
+#### Testing
+
+There are unit tests in `apiserver/api/tests.py` that you can run with:
+
+```text
+(env) $ python manage.py test
+```
 
 ### Webclient
 
