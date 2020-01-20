@@ -4,7 +4,7 @@ import './light.css';
 import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Input, Item, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { isAdmin, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
-import { AdminMemberInfo, AdminMemberForm, AdminMemberCards, AdminTransactions } from './Admin.js';
+import { AdminMemberInfo, AdminMemberPause, AdminMemberForm, AdminMemberCards, AdminTransactions } from './Admin.js';
 
 export function Members(props) {
 	const [response, setResponse] = useState(false);
@@ -126,6 +126,10 @@ export function MemberDetail(props) {
 							<Grid.Column>
 								{isAdmin(user) && <Segment padded>
 									<AdminMemberForm result={result} refreshResult={refreshResult} {...props} />
+								</Segment>}
+
+								{isAdmin(user) && <Segment padded>
+									<AdminMemberPause result={result} refreshResult={refreshResult} {...props} />
 								</Segment>}
 							</Grid.Column>
 						</Grid>

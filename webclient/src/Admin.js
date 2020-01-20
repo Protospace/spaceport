@@ -170,12 +170,18 @@ function AdminCardDetail(props) {
 export function AdminMemberCards(props) {
 	const { token, result, refreshResult } = props;
 	const cards = result.cards;
-	const [dimmed, setDimmed] = useState(result.member.paused_date && cards.length);
+	const startDimmed = Boolean(result.member.paused_date && cards.length);
+	const [dimmed, setDimmed] = useState(startDimmed);
 	const [input, setInput] = useState({ active_status: 'card_active' });
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
 	const { id } = useParams();
+
+	useEffect(() => {
+		const startDimmed = Boolean(result.member.paused_date && cards.length);
+		setDimmed(startDimmed);
+	}, [result.member]);
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
@@ -271,6 +277,77 @@ export function AdminMemberCards(props) {
 	);
 };
 
+export function AdminMemberPause(props) {
+	const { token, result, refreshResult } = props;
+	const [error, setError] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const [success, setSuccess] = useState(false);
+	const [yousure, setYousure] = useState(false);
+	const { id } = useParams();
+
+	useEffect(() => {
+		setLoading(false);
+	}, [result.member]);
+
+	const handlePause = (e) => {
+		if (yousure) {
+			setLoading(true);
+			setSuccess(false);
+			requester('/members/' + id + '/pause/', 'GET', token)
+			.then(res => {
+				setYousure(false);
+				setSuccess(true);
+				setError(false);
+				refreshResult();
+			})
+			.catch(err => {
+				setLoading(false);
+				console.log(err);
+				setError(true);
+			});
+		} else {
+			setYousure(true);
+		}
+	};
+
+	const handleUnpause = (e) => {
+		setLoading(true);
+		setSuccess(false);
+		requester('/members/' + id + '/unpause/', 'GET', token)
+		.then(res => {
+			setSuccess(true);
+			setError(false);
+			refreshResult();
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+			setError(true);
+		});
+	};
+
+	return (
+		<div>
+			<Header size='medium'>Pause / Unpause Membership</Header>
+
+			<p>Pause members who are inactive, former, or on vacation.</p>
+
+			{success && <p>Success!</p>}
+			{error && <p>Error, something went wrong.</p>}
+
+			{result.member.paused_date ?
+				<Button onClick={handleUnpause} loading={loading}>
+					Unpause
+				</Button>
+			:
+				<Button onClick={handlePause} loading={loading}>
+					{yousure ? 'You Sure?' : 'Pause'}
+				</Button>
+			}
+		</div>
+	);
+};
+
 export function AdminMemberForm(props) {
 	const { token, result, refreshResult } = props;
 	const [input, setInput] = useState(result.member);
@@ -278,6 +355,10 @@ export function AdminMemberForm(props) {
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
 	const { id } = useParams();
+
+	useEffect(() => {
+		setInput(result.member);
+	}, [result.member]);
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
