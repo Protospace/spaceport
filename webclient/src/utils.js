@@ -9,6 +9,7 @@ export const isAdmin = (user) => user.is_staff || user.member.is_director || use
 export const isInstructor = (user) => isAdmin(user) || user.member.is_instructor;
 
 export const statusColor = {
+	'Prepaid': 'green',
 	'Current': 'green',
 	'Due': 'yellow',
 	'Overdue': 'red',
