@@ -14,7 +14,8 @@ export function LoginForm(props) {
 
 	const handleSubmit = (e) => {
 		setLoading(true);
-		requester('/rest-auth/login/', 'POST', '', input)
+		const data = { ...input, username: input.username.toLowerCase() };
+		requester('/rest-auth/login/', 'POST', '', data)
 		.then(res => {
 			setError({});
 			props.setTokenCache(res.key);

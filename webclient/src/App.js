@@ -17,6 +17,7 @@ function App() {
 	const [token, setToken] = useState(localStorage.getItem('token', ''));
 	const [user, setUser] = useState(JSON.parse(localStorage.getItem('user', 'false')));
 	const [refreshCount, refreshUser] = useReducer(x => x + 1, 0);
+	const [yousure, setYousure] = useState(false);
 
 	function setTokenCache(x) {
 		setToken(x);
@@ -40,8 +41,13 @@ function App() {
 	}, [token, refreshCount]);
 
 	function logout() {
-		setTokenCache('');
-		setUserCache(false);
+		if (yousure) {
+			setTokenCache('');
+			setUserCache(false);
+			setYousure(false);
+		} else {
+			setYousure(true);
+		}
 	}
 
 	return (
@@ -110,7 +116,7 @@ function App() {
 
 					{user && <Menu.Menu position='right'>
 						<Menu.Item
-							content='Logout'
+							content={yousure ? 'You Sure?' : 'Log Out'}
 							onClick={logout}
 							icon='cancel'
 							as={Link}
