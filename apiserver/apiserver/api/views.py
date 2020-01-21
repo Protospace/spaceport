@@ -107,13 +107,14 @@ class SearchViewSet(Base, Retrieve):
             result_objects = [queryset.get(id=x) for x in result_ids]
 
             queryset = result_objects
-        else:
+        elif self.action == 'create':
             gen_search_strings() # update cache
             queryset = queryset.order_by('-vetted_date')
 
         return queryset
 
     # must POST so query string doesn't change so preflight request is cached
+    # to save an OPTIONS request so search is fast
     def create(self, request):
         try:
             seq = int(request.data.get('seq', 0))

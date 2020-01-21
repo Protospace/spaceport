@@ -39,6 +39,8 @@ if DEBUG:
         'api.spaceport.dns.t0.vc',
     ]
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 # Application definition
 
