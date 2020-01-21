@@ -83,6 +83,7 @@ class HTMLField(serializers.CharField):
 class TransactionSerializer(serializers.ModelSerializer):
     account_type = serializers.ChoiceField(['Interac', 'TD Chequing', 'Paypal', 'Dream Pmt', 'PayPal', 'Square Pmt', 'Member', 'Clearing', 'Cash'])
     info_source = serializers.ChoiceField(['Web', 'DB Edit', 'System', 'Receipt or Stmt', 'Quicken Import', 'Paypal IPN', 'PayPal IPN', 'Auto', 'Nexus DB Bulk', 'IPN Trigger', 'Intranet Receipt', 'Automatic', 'Manual'])
+    member_id = serializers.IntegerField()
     member_name = serializers.SerializerMethodField()
     date = serializers.DateField()
     class Meta:
