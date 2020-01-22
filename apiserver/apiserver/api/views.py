@@ -1,4 +1,3 @@
-import datetime
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from django.db.models import Max
@@ -10,48 +9,20 @@ from rest_auth.views import PasswordChangeView
 from rest_auth.registration.views import RegisterView
 from fuzzywuzzy import fuzz, process
 from collections import OrderedDict
+import datetime
 
 from . import models, serializers, utils
+from .permissions import (
+    is_admin_director,
+    AllowMetadata,
+    IsObjOwnerOrAdmin,
+    IsSessionInstructorOrAdmin,
+    ReadOnly,
+    IsAdminOrReadOnly,
+    IsInstructorOrReadOnly
+)
 
-class AllowMetadata(BasePermission):
-    def has_permission(self, request, view):
-        return request.method in ['OPTIONS', 'HEAD']
-
-def is_admin_director(user):
-    return bool(user.is_staff or user.member.is_director or user.member.is_staff)
-
-class IsObjOwnerOrAdmin(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return bool(request.user and (obj.user == request.user or is_admin_director(request.user)))
-
-class IsSessionInstructorOrAdmin(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return bool(request.user and (obj.session.instructor == request.user or is_admin_director(request.user)))
-
-class ReadOnly(BasePermission):
-    def has_permission(self, request, view):
-        return bool(request.method in SAFE_METHODS)
-    def has_object_permission(self, request, view, obj):
-        return bool(request.method in SAFE_METHODS)
-
-class IsAdminOrReadOnly(BasePermission):
-    def has_permission(self, request, view):
-        return bool(
-            request.method in SAFE_METHODS or
-            request.user and
-            is_admin_director(request.user)
-        )
-
-class IsInstructorOrReadOnly(BasePermission):
-    def has_permission(self, request, view):
-        return bool(
-            request.method in SAFE_METHODS or
-            request.user and
-            request.user.member.is_instructor
-        )
-
-
-
+# define some shortcuts
 Base = viewsets.GenericViewSet
 List = mixins.ListModelMixin
 Retrieve = mixins.RetrieveModelMixin
@@ -59,18 +30,9 @@ Create = mixins.CreateModelMixin
 Update = mixins.UpdateModelMixin
 Destroy = mixins.DestroyModelMixin
 
-
-
-search_strings = {}
-def gen_search_strings():
-    for m in models.Member.objects.all():
-        string = '{} {}'.format(
-            m.preferred_name,
-            m.last_name,
-        ).lower()
-        search_strings[string] = m.id
-
 NUM_SEARCH_RESULTS = 10
+
+
 class SearchViewSet(Base, Retrieve):
     permission_classes = [AllowMetadata | IsAuthenticated]
 
@@ -84,11 +46,11 @@ class SearchViewSet(Base, Retrieve):
         queryset = models.Member.objects.all()
         search = self.request.data.get('q', '').lower()
 
-        if not search_strings:
-            gen_search_strings() # init cache
+        if not utils.search_strings:
+            utils.gen_search_strings() # init cache
 
         if len(search):
-            choices = search_strings.keys()
+            choices = utils.search_strings.keys()
 
             # get exact starts with matches
             results = [x for x in choices if x.startswith(search)]
@@ -103,12 +65,12 @@ class SearchViewSet(Base, Retrieve):
             # remove dupes, truncate list
             results = list(OrderedDict.fromkeys(results))[:NUM_SEARCH_RESULTS]
 
-            result_ids = [search_strings[x] for x in results]
+            result_ids = [utils.search_strings[x] for x in results]
             result_objects = [queryset.get(id=x) for x in result_ids]
 
             queryset = result_objects
         elif self.action == 'create':
-            gen_search_strings() # update cache
+            utils.gen_search_strings() # update cache
             queryset = queryset.order_by('-vetted_date')
 
         return queryset
@@ -200,6 +162,7 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
     def perform_create(self, serializer):
         serializer.save(instructor=self.request.user)
 
+
 class TrainingViewSet(Base, Retrieve, Create, Update):
     permission_classes = [AllowMetadata | IsAuthenticated, IsObjOwnerOrAdmin | IsSessionInstructorOrAdmin | ReadOnly]
     serializer_class = serializers.TrainingSerializer
@@ -280,6 +243,7 @@ class DoorViewSet(Base, List):
 
 class RegistrationView(RegisterView):
     serializer_class = serializers.RegistrationSerializer
+
 
 class PasswordChangeView(PasswordChangeView):
     permission_classes = [AllowMetadata | IsAuthenticated]

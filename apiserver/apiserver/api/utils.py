@@ -1,5 +1,8 @@
 import datetime
 from dateutil import relativedelta
+from uuid import uuid4
+from PIL import Image
+from bleach.sanitizer import Cleaner
 
 from django.db.models import Sum
 
@@ -107,3 +110,118 @@ def tally_membership_months(member, fake_date=None):
 
     member.save()
     return True
+
+
+search_strings = {}
+def gen_search_strings():
+    '''
+    Generate a cache dict of names to member ids for rapid string matching
+    '''
+    for m in models.Member.objects.all():
+        string = '{} {}'.format(
+            m.preferred_name,
+            m.last_name,
+        ).lower()
+        search_strings[string] = m.id
+
+
+STATIC_FOLDER = 'data/static/'
+LARGE_SIZE = 1080
+MEDIUM_SIZE = 220
+SMALL_SIZE = 110
+
+def process_image_upload(upload):
+    '''
+    Save an image upload in small, medium, large sizes and return filenames
+    '''
+    try:
+        pic = Image.open(upload)
+    except OSError:
+        raise serializers.ValidationError('Invalid image file.')
+
+    if pic.format == 'PNG':
+        ext = '.png'
+    elif pic.format == 'JPEG':
+        ext = '.jpg'
+    else:
+        raise serializers.ValidationError('Image must be a jpg or png.')
+
+    large = str(uuid4()) + ext
+    pic.thumbnail([LARGE_SIZE, LARGE_SIZE], Image.ANTIALIAS)
+    pic.save(STATIC_FOLDER + large)
+
+    medium = str(uuid4()) + ext
+    pic.thumbnail([MEDIUM_SIZE, MEDIUM_SIZE], Image.ANTIALIAS)
+    pic.save(STATIC_FOLDER + medium)
+
+    small = str(uuid4()) + ext
+    pic.thumbnail([SMALL_SIZE, SMALL_SIZE], Image.ANTIALIAS)
+    pic.save(STATIC_FOLDER + small)
+
+    return small, medium, large
+
+
+ALLOWED_TAGS = [
+    'h3',
+    'p',
+    'br',
+    'strong',
+    'em',
+    'u',
+    'code',
+    'ol',
+    'li',
+    'ul',
+    'a',
+]
+
+clean = Cleaner(tags=ALLOWED_TAGS).clean
+
+
+def is_request_from_protospace(request):
+    whitelist = ['24.66.110.96', '205.233.15.76', '205.233.15.69']
+
+    # set (not appended) directly by nginx so we can trust it
+    real_ip = request.META.get('HTTP_X_REAL_IP', False)
+
+    return real_ip in whitelist
+
+def link_old_member(data, user):
+    '''
+    If a member claims they have an account on the old protospace portal,
+    go through and link their objects to their new user using the member_id
+    found with their email as a hint
+    '''
+    old_members = old_models.Members.objects.using('old_portal')
+
+    try:
+        old_member = old_members.get(email=data['email'])
+    except old_models.Members.DoesNotExist:
+        user.delete()
+        raise ValidationError(dict(email='Unable to find email in old database.'))
+
+    member = models.Member.objects.get(id=old_member.id)
+
+    if member.user:
+        raise ValidationError(dict(email='Old member already claimed.'))
+
+    member.user = user
+    member.first_name = data['first_name']
+    member.last_name = data['last_name']
+    member.preferred_name = data['first_name']
+    member.save()
+
+    transactions = models.Transaction.objects.filter(member_id=member.id)
+    for t in transactions:
+        t.user = user
+        t.save()
+
+    cards = models.Card.objects.filter(member_id=member.id)
+    for c in cards:
+        c.user = user
+        c.save()
+
+    training = models.Training.objects.filter(member_id=member.id)
+    for t in training:
+        t.user = user
+        t.save()
