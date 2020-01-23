@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useReducer } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
+import React, { useState, useEffect, useReducer, useContext } from 'react';
+import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
 import './light.css'; import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { requester } from './utils.js';
 import { Home } from './Home.js';
@@ -18,6 +18,7 @@ function App() {
 	const [user, setUser] = useState(JSON.parse(localStorage.getItem('user', 'false')));
 	const [refreshCount, refreshUser] = useReducer(x => x + 1, 0);
 	const [yousure, setYousure] = useState(false);
+	const history = useHistory();
 
 	function setTokenCache(x) {
 		setToken(x);
@@ -45,13 +46,14 @@ function App() {
 			setTokenCache('');
 			setUserCache(false);
 			setYousure(false);
+			history.push('/');
 		} else {
 			setYousure(true);
 		}
 	}
 
 	return (
-		<Router>
+		<div>
 			<div className='content-wrap'>
 			<div className='content-wrap-inside'>
 
@@ -119,8 +121,6 @@ function App() {
 							content={yousure ? 'You Sure?' : 'Log Out'}
 							onClick={logout}
 							icon='cancel'
-							as={Link}
-							to='/'
 						/>
 						<Menu.Item fitted content='' />
 					</Menu.Menu>}
@@ -189,7 +189,7 @@ function App() {
 			</div>
 
 			<Footer />
-		</Router>
+		</div>
 	)
 };
 
