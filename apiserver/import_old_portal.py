@@ -100,7 +100,7 @@ for o in old:
     if str(o.id) in photo_folders:
         folder = 'old_photos/' + str(o.id)
         if 'photo.jpg' in os.listdir(folder):
-            small, medium, large = utils.process_image(folder + '/photo.jpg')
+            small, medium, large = utils.process_image_upload(folder + '/photo.jpg')
             print('Found a photo')
 
     models.Member.objects.create(photo_small=small, photo_medium=medium, photo_large=large, **new)
