@@ -9,8 +9,9 @@ from django.db.models import Sum
 
 from . import models
 try:
-    import old_models
+    from . import old_models
 except ModuleNotFoundError:
+    logging.info('Running without old portal data...')
     old_models = None
 
 def num_months_spanned(d1, d2):
