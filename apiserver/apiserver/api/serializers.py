@@ -103,6 +103,8 @@ class MemberSerializer(serializers.ModelSerializer):
             'is_director',
             'is_staff',
             'is_instructor',
+            'first_name',
+            'last_name',
             'status',
             'expire_date',
             'current_start_date',

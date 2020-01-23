@@ -394,6 +394,19 @@ export function AdminMemberForm(props) {
 			<Form onSubmit={handleSubmit}>
 				<Header size='medium'>Edit Member Details</Header>
 
+				<Form.Group widths='equal'>
+					<Form.Input
+						label='First Name'
+						fluid
+						{...makeProps('first_name')}
+					/>
+					<Form.Input
+						label='Last Name'
+						fluid
+						{...makeProps('last_name')}
+					/>
+				</Form.Group>
+
 				<Form.Input
 					label='Email'
 					{...makeProps('email')}

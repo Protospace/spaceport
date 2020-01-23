@@ -107,21 +107,6 @@ export function AccountForm(props) {
 		<Form onSubmit={handleSubmit}>
 			<Header size='medium'>Member Details</Header>
 
-			<Form.Group widths='equal'>
-				<Form.Input
-					label='First Name'
-					fluid
-					required
-					{...makeProps('first_name')}
-				/>
-				<Form.Input
-					label='Last Name'
-					fluid
-					required
-					{...makeProps('last_name')}
-				/>
-			</Form.Group>
-
 			<Form.Input
 				label='Preferred First Name'
 				required

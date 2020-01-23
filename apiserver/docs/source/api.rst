@@ -287,8 +287,6 @@ Edit Member Details
     :json postal_code:
     :json boolean set_details: Set true if they've filled out the new member
         form on sign up so the UI stops showing it.
-    :json first_name:
-    :json last_name:
     :json preferred_name: What's shown throughout the UI.
     :json emergency_contact_name: optional
     :json emergency_contact_phone: optional
@@ -300,6 +298,8 @@ Edit Member Details
 
     Can modify any member. Above fields, plus:
 
+    :json first_name:
+    :json last_name:
     :json boolean is_director: Grants admin privileges to member.
     :json boolean is_staff: Same as director, just not named one.
     :json boolean is_instructor: Able to create and edit courses and sessions.
