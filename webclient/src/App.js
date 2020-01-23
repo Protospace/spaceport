@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useReducer, useContext } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
-import './light.css'; import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import './semantic-ui/semantic.min.css';
+import './light.css';
+import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { requester } from './utils.js';
 import { Home } from './Home.js';
 import { Account } from './Account.js';
