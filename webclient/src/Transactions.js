@@ -169,10 +169,10 @@ function EditTransaction(props) {
 			<Form onSubmit={handleSubmit}>
 				<TransactionEditor input={input} setInput={setInput} error={error} />
 
-				{success && <p>Success!</p>}
 				<Form.Button loading={loading} error={error.non_field_errors}>
 					Save
 				</Form.Button>
+				{success && <div>Success!</div>}
 			</Form>
 		</div>
 	);

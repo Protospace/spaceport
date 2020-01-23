@@ -44,10 +44,10 @@ export function AdminTransactions(props) {
 
 				<TransactionEditor input={input} setInput={setInput} error={error} />
 
-				{success && <p>Added! <Link to={'/transactions/'+success}>View the transaction.</Link></p>}
 				<Form.Button loading={loading} error={error.non_field_errors}>
 					Submit
 				</Form.Button>
+				{success && <p>Added! <Link to={'/transactions/'+success}>View the transaction.</Link></p>}
 			</Form>
 
 			<Header size='small'>Current Transactions</Header>
@@ -246,10 +246,10 @@ export function AdminMemberCards(props) {
 					/>
 				</Form.Group>
 
-				{success && <p>Success!</p>}
 				<Form.Button loading={loading} error={error.non_field_errors}>
 					Submit
 				</Form.Button>
+				{success && <div>Success!</div>}
 			</Form>
 
 			<Header size='small'>Current Cards</Header>
@@ -332,18 +332,20 @@ export function AdminMemberPause(props) {
 
 			<p>Pause members who are inactive, former, or on vacation.</p>
 
-			{success && <p>Success!</p>}
-			{error && <p>Error, something went wrong.</p>}
+			<p>
+				{result.member.paused_date ?
+					<Button onClick={handleUnpause} loading={loading}>
+						Unpause
+					</Button>
+				:
+					<Button onClick={handlePause} loading={loading}>
+						{yousure ? 'You Sure?' : 'Pause'}
+					</Button>
+				}
+			</p>
 
-			{result.member.paused_date ?
-				<Button onClick={handleUnpause} loading={loading}>
-					Unpause
-				</Button>
-			:
-				<Button onClick={handlePause} loading={loading}>
-					{yousure ? 'You Sure?' : 'Pause'}
-				</Button>
-			}
+			{success && <div>Success!</div>}
+			{error && <p>Error, something went wrong.</p>}
 		</div>
 	);
 };
@@ -462,10 +464,10 @@ export function AdminMemberForm(props) {
 					/>
 				</Form.Field>
 
-				{success && <p>Success!</p>}
 				<Form.Button loading={loading} error={error.non_field_errors}>
 					Submit
 				</Form.Button>
+				{success && <div>Success!</div>}
 			</Form>
 		</div>
 	);
