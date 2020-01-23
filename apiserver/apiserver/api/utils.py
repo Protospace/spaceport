@@ -7,7 +7,11 @@ from bleach.sanitizer import Cleaner
 
 from django.db.models import Sum
 
-from . import models, old_models
+from . import models
+try:
+    import old_models
+except ModuleNotFoundError:
+    old_models = None
 
 def num_months_spanned(d1, d2):
     '''
@@ -192,7 +196,14 @@ def link_old_member(data, user):
     If a member claims they have an account on the old protospace portal,
     go through and link their objects to their new user using the member_id
     found with their email as a hint
+
+    Since this runs AFTER registration, we need to delete the user on any
+    failures or else the username will be taken when they try again
     '''
+    if not old_models:
+        user.delete()
+        raise ValidationError(dict(email='Unable to link, old DB wasn\'t imported.'))
+
     old_members = old_models.Members.objects.using('old_portal')
 
     try:
@@ -204,6 +215,7 @@ def link_old_member(data, user):
     member = models.Member.objects.get(id=old_member.id)
 
     if member.user:
+        user.delete()
         raise ValidationError(dict(email='Old member already claimed.'))
 
     member.user = user

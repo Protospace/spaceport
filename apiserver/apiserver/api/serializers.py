@@ -6,9 +6,8 @@ from rest_framework.validators import UniqueValidator
 from rest_auth.registration.serializers import RegisterSerializer
 from rest_auth.serializers import UserDetailsSerializer
 
-from . import models, old_models, fields, utils
+from . import models, fields, utils
 from .. import settings
-
 
 class TransactionSerializer(serializers.ModelSerializer):
     # fields directly from old portal. replace with slugs we want
