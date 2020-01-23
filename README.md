@@ -4,6 +4,10 @@ Spaceport is Calgary Protospace's member portal. It tracks membership, courses, 
 
 Demo: https://spaceport.dns.t0.vc
 
+## Documentation
+
+https://docs.spaceport.dns.t0.vc/
+
 ## Development Setup
 
 https://docs.spaceport.dns.t0.vc/dev.html
