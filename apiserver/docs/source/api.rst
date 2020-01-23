@@ -756,10 +756,10 @@ Cards
             "user": 113
         }
 
-.. http:post:: /card/
-.. http:put:: /card/(id)/
-.. http:patch:: /card/(id)/
-.. http:delete:: /card/(id)/
+.. http:post:: /cards/
+.. http:put:: /cards/(id)/
+.. http:patch:: /cards/(id)/
+.. http:delete:: /cards/(id)/
 
     Admins only. Don't change the status when pausing a member, paused member's
     cards are filtered out automatically.

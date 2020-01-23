@@ -70,9 +70,9 @@ Quick Reference
 .. http:put:: /training/(id)/
 .. http:patch:: /training/(id)/
 .. http:get:: /cards/(id)/
-.. http:post:: /card/
-.. http:put:: /card/(id)/
-.. http:patch:: /card/(id)/
-.. http:delete:: /card/(id)/
+.. http:post:: /cards/
+.. http:put:: /cards/(id)/
+.. http:patch:: /cards/(id)/
+.. http:delete:: /cards/(id)/
 .. http:get:: /door/
 .. http:post:: /door/(card_number)/seen/
