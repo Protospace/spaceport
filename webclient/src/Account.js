@@ -1,9 +1,50 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
-import { Container, Checkbox, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Button, Container, Checkbox, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { BasicTable, staticUrl, requester } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
+
+function LogoutEverywhere(props) {
+	const { token } = props;
+	const [error, setError] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const [yousure, setYousure] = useState(false);
+	const history = useHistory();
+
+	const handleClick = () => {
+		if (yousure) {
+			setLoading(true);
+			requester('/rest-auth/logout/', 'POST', token, {})
+			.then(res => {
+				setYousure(false);
+				history.push('/');
+				window.scrollTo(0, 0);
+			})
+			.catch(err => {
+				setLoading(false);
+				console.log(err);
+				setError(err.data);
+			});
+		} else {
+			setYousure(true);
+		}
+	};
+
+	return (
+		<div>
+			<Header size='medium'>Log Out from Everywhere</Header>
+
+			<p>Use this to log out from all sessions on all computers.</p>
+
+			{error && <p>Error, something went wrong.</p>}
+
+			<Button onClick={handleClick} loading={loading}>
+				{yousure ? 'You Sure?' : 'Log Out Everywhere'}
+			</Button>
+		</div>
+	);
+};
 
 function ChangePasswordForm(props) {
 	const { token } = props;
@@ -194,6 +235,7 @@ export function Account(props) {
 				</Grid.Column>
 				<Grid.Column>
 					<Segment padded><ChangePasswordForm {...props} /></Segment>
+					<Segment padded><LogoutEverywhere {...props} /></Segment>
 				</Grid.Column>
 			</Grid>
 		</Container>

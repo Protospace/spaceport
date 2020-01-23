@@ -47,6 +47,7 @@ function App() {
 			setUserCache(false);
 			setYousure(false);
 			history.push('/');
+			window.scrollTo(0, 0);
 		} else {
 			setYousure(true);
 		}
