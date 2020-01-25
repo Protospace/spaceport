@@ -488,7 +488,8 @@ Create Transaction
     Add a transaction to a member. Admins only.
 
     :json date: YYYY-MM-DD
-    :json decimal amount: positive is money going to Protospace, XX.XX.
+    :json int member_id: Which member the transaction belongs to.
+    :json decimal amount: Positive is money going to Protospace, XX.XX.
     :json account_type: One of: ``Interac``, ``TD Chequing``, ``Paypal``, ``Dream Pmt``,
         ``PayPal``, ``Square Pmt``, ``Member``, ``Clearing``, ``Cash``
     :json info_source: One of: ``Web``, ``DB Edit``, ``System``, ``Receipt or Stmt``, ``Quicken
