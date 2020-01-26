@@ -103,10 +103,12 @@ class MemberViewSet(Base, Retrieve, Update):
     def perform_create(self, serializer):
         member = serializer.save()
         utils.tally_membership_months(member)
+        utils.gen_member_forms(member)
 
     def perform_update(self, serializer):
         member = serializer.save()
         utils.tally_membership_months(member)
+        utils.gen_member_forms(member)
 
     @action(detail=True, methods=['post'])
     def pause(self, request, pk=None):
@@ -127,13 +129,6 @@ class MemberViewSet(Base, Retrieve, Update):
         member.save()
         utils.tally_membership_months(member)
         return Response(200)
-
-    @action(detail=True)
-    def forms(self, request, pk=None):
-        member = self.get_object()
-        serializer = self.get_serializer(member)
-        form = utils.generate_application_pdf(serializer.data)
-        return HttpResponse(File(form), content_type='application/pdf')
 
 
 class CardViewSet(Base, Create, Retrieve, Update, Destroy):

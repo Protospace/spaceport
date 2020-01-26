@@ -93,6 +93,7 @@ Full User
                 "photo_large": "uuid.jpg",
                 "photo_medium": "uuid.jpg",
                 "photo_small": "uuid.jpg",
+                "member_forms": "uuid.pdf",
                 "set_details": true,
                 "first_name": "Tanner",
                 "last_name": "Collin",
@@ -226,6 +227,7 @@ Member Details
             "photo_large": "uuid.jpg",
             "photo_medium": "uuid.jpg",
             "photo_small": "uuid.jpg",
+            "member_forms": "uuid.pdf",
             "set_details": true,
             "first_name": "Tanner",
             "last_name": "Collin",
@@ -253,6 +255,7 @@ Member Details
         object to users when they claim their old member.
     :json photo\_\*: Should be served by nginx on the ``static`` subdomain. Refers
         to photo filenames in the ``apiserver/data/static`` directory.
+    :json member_forms: Should be served by nginx on the ``static`` subdomain.
     :json status: Derived by subtracting today's date from expire_date.  More
         than one month: Prepaid, less than one month: Current, less than one
         month behind: Due, more than one month behind: Overdue.  Members more
@@ -272,6 +275,8 @@ Edit Member Details
 .. http:patch:: /members/(id)/
 
     Set member details.
+
+    Member PDF forms will automatically be regenerated on any change.
 
     **Users**
 
@@ -342,18 +347,6 @@ Pausing / Unpausing Member
     **Response**
 
     :status 200:
-
-Member PDF Forms
-++++++++++++++++
-
-.. http:get:: /members/(id)/forms/
-
-    Generate member's application PDF forms. Users can only view their own,
-    admins can view anyone's.
-
-    :param id:
-
-    :requestheader Authorization: ``Token <token>``
 
 
 Search

@@ -44,6 +44,15 @@ function MemberInfo(props) {
 				</Grid.Column>
 			</Grid>
 
+			{!member.photo_medium && <Message>
+				<Message.Header>Welcome, new member!</Message.Header>
+				<p>
+					<a href={staticUrl + '/' + member.member_forms} target='_blank'>
+						Click here
+					</a> to view your appliction forms.
+				</p>
+			</Message>}
+
 			{!member.photo_medium && <Message warning>
 				<Message.Header>Please set a member photo!</Message.Header>
 				<p>Visit the <Link to='/account'>account settings</Link> page to set one.</p>
@@ -74,6 +83,12 @@ function MemberInfo(props) {
 					</Table.Row>
 				</Table.Body>
 			</BasicTable>
+
+			{member.photo_medium && <p>
+				<a href={staticUrl + '/' + member.member_forms} target='_blank'>
+					View application forms
+				</a>
+			</p>}
 
 			<Header size='medium'>Latest Transactions</Header>
 			<BasicTable>

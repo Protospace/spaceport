@@ -114,6 +114,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'photo_large',
             'photo_medium',
             'photo_small',
+            'member_forms',
             'user',
             'old_email',
         ]
@@ -150,6 +151,7 @@ class AdminMemberSerializer(MemberSerializer):
             'photo_large',
             'photo_medium',
             'photo_small',
+            'member_forms',
             'user',
             'old_email',
         ]

@@ -11,12 +11,15 @@ from reportlab.lib.pagesizes import letter
 
 from django.db.models import Sum
 
-from . import models
+from . import models, serializers
 try:
     from . import old_models
 except ImportError:
     print('Running without old portal data...')
     old_models = None
+
+STATIC_FOLDER = 'data/static/'
+
 
 def num_months_spanned(d1, d2):
     '''
@@ -135,7 +138,6 @@ def gen_search_strings():
         search_strings[string] = m.id
 
 
-STATIC_FOLDER = 'data/static/'
 LARGE_SIZE = 1080
 MEDIUM_SIZE = 220
 SMALL_SIZE = 110
@@ -246,25 +248,27 @@ def link_old_member(data, user):
 
 
 BLANK_FORM = 'misc/blank_member_form.pdf'
-def generate_application_pdf(member):
-    packet = io.BytesIO()
+def gen_member_forms(member):
+    serializer = serializers.MemberSerializer(member)
+    data = serializer.data
 
+    packet = io.BytesIO()
     can = canvas.Canvas(packet, pagesize=letter)
     can.drawRightString(580, 770, '{} {} ({})'.format(
-        member['first_name'],
-        member['last_name'],
-        member['id'],
+        data['first_name'],
+        data['last_name'],
+        data['id'],
     ))
-    can.drawString(34, 683, member['first_name'])
-    can.drawString(218, 683, member['last_name'])
-    can.drawString(403, 683, member['preferred_name'])
-    can.drawString(34, 654, member['street_address'])
-    can.drawString(275, 654, member['city'])
-    can.drawString(459, 654, member['postal_code'])
-    can.drawString(34, 626, member['email'])
-    can.drawString(332, 626, member['phone'])
-    can.drawString(34, 570, member['emergency_contact_name'])
-    can.drawString(332, 570, member['emergency_contact_phone'])
+    can.drawString(34, 683, data['first_name'])
+    can.drawString(218, 683, data['last_name'])
+    can.drawString(403, 683, data['preferred_name'])
+    can.drawString(34, 654, data['street_address'])
+    can.drawString(275, 654, data['city'])
+    can.drawString(459, 654, data['postal_code'])
+    can.drawString(34, 626, data['email'])
+    can.drawString(332, 626, data['phone'])
+    can.drawString(34, 570, data['emergency_contact_name'])
+    can.drawString(332, 570, data['emergency_contact_phone'])
     can.save()
 
     packet.seek(0)
@@ -279,6 +283,9 @@ def generate_application_pdf(member):
     page = existing_pdf.getPage(2)
     output.addPage(page)
 
-    outputStream = io.BytesIO()
+    file_name = str(uuid4()) + '.pdf'
+    outputStream = open(STATIC_FOLDER + file_name, 'wb')
     output.write(outputStream)
-    return outputStream
+
+    member.member_forms = file_name
+    member.save()
