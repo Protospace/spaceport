@@ -544,6 +544,12 @@ export function AdminMemberInfo(props) {
 					</Table.Row>
 				</Table.Body>
 			</BasicTable>
+
+			{member.member_forms && <p>
+				<a href={staticUrl + '/' + member.member_forms} target='_blank'>
+					View application forms
+				</a>
+			</p>}
 		</div>
 	);
 };
