@@ -128,6 +128,7 @@ class MemberViewSet(Base, Retrieve, Update):
         member.paused_date = None
         member.save()
         utils.tally_membership_months(member)
+        utils.gen_member_forms(member)
         return Response(200)
 
 
