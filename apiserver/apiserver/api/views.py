@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from django.db.models import Max
+from django.http import HttpResponse
+from django.core.files.base import File
 from rest_framework import viewsets, views, mixins, generics, exceptions
 from rest_framework.decorators import action
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
@@ -110,7 +112,7 @@ class MemberViewSet(Base, Retrieve, Update):
     def pause(self, request, pk=None):
         if not is_admin_director(self.request.user):
             raise exceptions.PermissionDenied()
-        member = get_object_or_404(self.queryset, pk=pk)
+        member = self.get_object()
         member.paused_date = datetime.date.today()
         member.save()
         return Response(200)
@@ -119,12 +121,19 @@ class MemberViewSet(Base, Retrieve, Update):
     def unpause(self, request, pk=None):
         if not is_admin_director(self.request.user):
             raise exceptions.PermissionDenied()
-        member = get_object_or_404(self.queryset, pk=pk)
+        member = self.get_object()
         member.current_start_date = datetime.date.today()
         member.paused_date = None
         member.save()
         utils.tally_membership_months(member)
         return Response(200)
+
+    @action(detail=True)
+    def forms(self, request, pk=None):
+        member = self.get_object()
+        serializer = self.get_serializer(member)
+        form = utils.generate_application_pdf(serializer.data)
+        return HttpResponse(File(form), content_type='application/pdf')
 
 
 class CardViewSet(Base, Create, Retrieve, Update, Destroy):

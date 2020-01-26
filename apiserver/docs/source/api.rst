@@ -343,6 +343,18 @@ Pausing / Unpausing Member
 
     :status 200:
 
+Member PDF Forms
+++++++++++++++++
+
+.. http:get:: /members/(id)/forms/
+
+    Generate member's application PDF forms. Users can only view their own,
+    admins can view anyone's.
+
+    :param id:
+
+    :requestheader Authorization: ``Token <token>``
+
 
 Search
 ------

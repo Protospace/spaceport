@@ -1,9 +1,13 @@
-from rest_framework.exceptions import ValidationError
 import datetime
+import io
+from rest_framework.exceptions import ValidationError
 from dateutil import relativedelta
 from uuid import uuid4
 from PIL import Image
 from bleach.sanitizer import Cleaner
+from PyPDF2 import PdfFileWriter, PdfFileReader
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 
 from django.db.models import Sum
 
@@ -239,3 +243,42 @@ def link_old_member(data, user):
     for t in training:
         t.user = user
         t.save()
+
+
+BLANK_FORM = 'misc/blank_member_form.pdf'
+def generate_application_pdf(member):
+    packet = io.BytesIO()
+
+    can = canvas.Canvas(packet, pagesize=letter)
+    can.drawRightString(580, 770, '{} {} ({})'.format(
+        member['first_name'],
+        member['last_name'],
+        member['id'],
+    ))
+    can.drawString(34, 683, member['first_name'])
+    can.drawString(218, 683, member['last_name'])
+    can.drawString(403, 683, member['preferred_name'])
+    can.drawString(34, 654, member['street_address'])
+    can.drawString(275, 654, member['city'])
+    can.drawString(459, 654, member['postal_code'])
+    can.drawString(34, 626, member['email'])
+    can.drawString(332, 626, member['phone'])
+    can.drawString(34, 570, member['emergency_contact_name'])
+    can.drawString(332, 570, member['emergency_contact_phone'])
+    can.save()
+
+    packet.seek(0)
+    new_pdf = PdfFileReader(packet)
+    existing_pdf = PdfFileReader(open(BLANK_FORM, 'rb'))
+    output = PdfFileWriter()
+    page = existing_pdf.getPage(0)
+    page.mergePage(new_pdf.getPage(0))
+    output.addPage(page)
+    page = existing_pdf.getPage(1)
+    output.addPage(page)
+    page = existing_pdf.getPage(2)
+    output.addPage(page)
+
+    outputStream = io.BytesIO()
+    output.write(outputStream)
+    return outputStream
