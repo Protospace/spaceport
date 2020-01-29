@@ -53,6 +53,10 @@ class Transaction(models.Model):
     account_type = models.TextField(blank=True, null=True)
     info_source = models.TextField(blank=True, null=True)
 
+class PayPalHint(models.Model):
+    account = models.CharField(unique=True, max_length=13)
+    member_id = models.IntegerField()
+
 class Card(models.Model):
     user = models.ForeignKey(User, related_name='cards', blank=True, null=True, on_delete=models.SET_NULL)
 

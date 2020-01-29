@@ -109,3 +109,4 @@ old_models.py
 migrations/
 data/
 old_photos/
+old_paypal/
