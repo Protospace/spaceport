@@ -40,6 +40,11 @@ class TransactionSerializer(serializers.ModelSerializer):
     member_id = serializers.IntegerField()
     member_name = serializers.SerializerMethodField()
     date = serializers.DateField()
+    report_type = serializers.ChoiceField([
+        'Unmatched Member',
+        'Unmatched Purchase',
+        'User Flagged',
+    ])
 
     class Meta:
         model = models.Transaction

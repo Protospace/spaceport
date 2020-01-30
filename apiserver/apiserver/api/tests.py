@@ -5,8 +5,9 @@ django.setup()
 from django.test import TestCase
 import datetime
 from dateutil import relativedelta
+from rest_framework.exceptions import ValidationError
 
-from apiserver.api import utils, models
+from apiserver.api import utils, utils_paypal, models
 
 testing_member, _ = models.Member.objects.get_or_create(
     first_name='unittest',
@@ -348,3 +349,28 @@ class TestTallyMembership(TestCase):
         result = utils.tally_membership_months(member)
 
         self.assertEqual(result, False)
+
+class TestParsePaypalDate(TestCase):
+    def test_parse(self):
+        string = '20:12:59 Jan 13, 2009 PST'
+
+        result = utils_paypal.parse_paypal_date(string)
+
+        self.assertEqual(str(result), '2009-01-14 04:12:59+00:00')
+
+    def test_parse_dst(self):
+        string = '20:12:59 Jul 13, 2009 PDT'
+
+        result = utils_paypal.parse_paypal_date(string)
+
+        self.assertEqual(str(result), '2009-07-14 03:12:59+00:00')
+
+    def test_parse_bad_tz(self):
+        string = '20:12:59 Jul 13, 2009 QOT'
+
+        self.assertRaises(ValidationError, utils_paypal.parse_paypal_date, string)
+
+    def test_parse_bad_string(self):
+        string = 'ave satanas'
+
+        self.assertRaises(ValidationError, utils_paypal.parse_paypal_date, string)

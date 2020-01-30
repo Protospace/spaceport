@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.timezone import now
@@ -52,10 +52,20 @@ class Transaction(models.Model):
     category = models.TextField(blank=True, null=True)
     account_type = models.TextField(blank=True, null=True)
     info_source = models.TextField(blank=True, null=True)
+    paypal_txn_id = models.CharField(max_length=17, unique=True, blank=True, null=True)
+    paypal_payer_id = models.CharField(max_length=13, blank=True, null=True)
+
+    report_type = models.TextField(blank=True, null=True)
+    report_memo = models.TextField(blank=True, null=True)
 
 class PayPalHint(models.Model):
     account = models.CharField(unique=True, max_length=13)
     member_id = models.IntegerField()
+
+class IPN(models.Model):
+    datetime = models.DateTimeField(auto_now_add=True)
+    data = models.TextField()
+    status = models.CharField(max_length=32)
 
 class Card(models.Model):
     user = models.ForeignKey(User, related_name='cards', blank=True, null=True, on_delete=models.SET_NULL)

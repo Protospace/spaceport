@@ -13,7 +13,9 @@ from fuzzywuzzy import fuzz, process
 from collections import OrderedDict
 import datetime
 
-from . import models, serializers, utils
+import requests
+
+from . import models, serializers, utils, utils_paypal
 from .permissions import (
     is_admin_director,
     AllowMetadata,
@@ -218,9 +220,7 @@ class UserView(views.APIView):
         return Response(serializer.data)
 
 
-class DoorViewSet(Base, List):
-    serializer_class = serializers.CardSerializer
-
+class DoorViewSet(viewsets.ViewSet, List):
     def list(self, request):
         cards = models.Card.objects.filter(active_status='card_active')
         active_member_cards = {}
@@ -244,6 +244,17 @@ class DoorViewSet(Base, List):
         card.last_seen_at = datetime.date.today()
         card.save()
         return Response(200)
+
+
+
+class IpnViewSet(viewsets.ViewSet, Create):
+    def create(self, request):
+        try:
+            utils_paypal.process_paypal_ipn(request.data)
+        except BaseException as e:
+            print('Problem processing IPN: {} - {}'.format(e.__class__.__name__, str(e)))
+        finally:
+            return Response(200)
 
 
 class RegistrationView(RegisterView):
