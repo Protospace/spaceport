@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { MembersDropdown } from './Members.js';
 import { isAdmin, BasicTable, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 
 export function TransactionEditor(props) {
-	const { input, setInput, error } = props;
+	const { token, input, setInput, error } = props;
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
@@ -26,7 +27,7 @@ export function TransactionEditor(props) {
 		{ key: '2', text: 'Square (Credit)', value: 'Square Pmt' },
 		{ key: '3', text: 'Dream Payments (Debit/Credit)', value: 'Dream Pmt' },
 		{ key: '4', text: 'Deposit to TD (Not Interac)', value: 'TD Chequing' },
-		{ key: '5', text: 'PayPal', value: 'Paypal' },
+		{ key: '5', text: 'PayPal', value: 'PayPal' },
 		{ key: '6', text: 'Member Balance / Protocash', value: 'Member' },
 		{ key: '7', text: 'Supense (Clearing)  Acct / Membership Adjustment', value: 'Clearing' },
 	];
@@ -37,7 +38,7 @@ export function TransactionEditor(props) {
 		{ key: '2', text: 'System', value: 'System' },
 		{ key: '3', text: 'Receipt or Statement', value: 'Receipt or Stmt' },
 		{ key: '4', text: 'Quicken Import', value: 'Quicken Import' },
-		{ key: '5', text: 'PayPal IPN', value: 'Paypal IPN' },
+		{ key: '5', text: 'PayPal IPN', value: 'PayPal IPN' },
 		{ key: '6', text: 'Auto', value: 'Auto' },
 		{ key: '7', text: 'Nexus Database Bulk', value: 'Nexus DB Bulk' },
 		{ key: '8', text: 'IPN Trigger', value: 'IPN Trigger' },
@@ -60,6 +61,16 @@ export function TransactionEditor(props) {
 
 	return (
 		<div className='transaction-editor'>
+			<Form.Field error={error.member_id}>
+				<label>Member (search)</label>
+				<MembersDropdown
+					token={token}
+					{...makeProps('member_id')}
+					onChange={handleValues}
+					initial={input.member_name}
+				/>
+			</Form.Field>
+
 			<Form.Group widths='equal'>
 				<Form.Input
 					label='Date'
@@ -144,7 +155,8 @@ function EditTransaction(props) {
 	const handleSubmit = (e) => {
 		setLoading(true);
 		setSuccess(false);
-		requester('/transactions/'+id+'/', 'PUT', token, input)
+		const data = { ...input, report_type: null, report_memo: '' };
+		requester('/transactions/'+id+'/', 'PUT', token, data)
 		.then(res => {
 			setLoading(false);
 			setSuccess(true);
@@ -167,7 +179,7 @@ function EditTransaction(props) {
 			<Header size='medium'>Edit Transaction</Header>
 
 			<Form onSubmit={handleSubmit}>
-				<TransactionEditor input={input} setInput={setInput} error={error} />
+				<TransactionEditor token={token} input={input} setInput={setInput} error={error} />
 
 				<Form.Button loading={loading} error={error.non_field_errors}>
 					Save
@@ -201,7 +213,7 @@ export function TransactionList(props) {
 							</Table.Cell>
 							<Table.Cell>${x.amount}</Table.Cell>
 							<Table.Cell>{x.account_type}</Table.Cell>
-							<Table.Cell>{x.memo}</Table.Cell>
+							<Table.Cell>{x.memo || x.report_memo}</Table.Cell>
 						</Table.Row>
 					)
 				:
@@ -295,6 +307,15 @@ export function TransactionDetail(props) {
 											<Table.Cell>Memo:</Table.Cell>
 											<Table.Cell>{transaction.memo}</Table.Cell>
 										</Table.Row>
+
+										{transaction.report_type && <Table.Row>
+											<Table.Cell>Report Type:</Table.Cell>
+											<Table.Cell>{transaction.report_type}</Table.Cell>
+										</Table.Row>}
+										{transaction.report_memo && <Table.Row>
+											<Table.Cell>Report Memo:</Table.Cell>
+											<Table.Cell>{transaction.report_memo}</Table.Cell>
+										</Table.Row>}
 									</Table.Body>
 								</BasicTable>
 							</Grid.Column>

@@ -6,6 +6,42 @@ import moment from 'moment';
 import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { TransactionList, TransactionEditor } from './Transactions.js';
 
+export function AdminReportedTransactions(props) {
+	const { token, user } = props;
+	const [transactions, setTransactions] = useState(false);
+	const [error, setError] = useState(false);
+
+	useEffect(() => {
+		requester('/transactions/', 'GET', token)
+		.then(res => {
+			setTransactions(res.results);
+			setError(false);
+		})
+		.catch(err => {
+			console.log(err);
+			setError(true);
+		});
+	}, []);
+
+	return (
+		<Container>
+			<Header size='large'>Reported Transactions</Header>
+
+			{!error ?
+				transactions ?
+					<div>
+						<TransactionList transactions={transactions} />
+					</div>
+				:
+					<p>Loading...</p>
+			:
+				<NotFound />
+			}
+
+		</Container>
+	);
+};
+
 export function AdminTransactions(props) {
 	const { token, result, refreshResult } = props;
 	const transactions = result.transactions;

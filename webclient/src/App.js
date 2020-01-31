@@ -3,12 +3,13 @@ import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } f
 import './semantic-ui/semantic.min.css';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { requester } from './utils.js';
+import { isAdmin, requester } from './utils.js';
 import { Home } from './Home.js';
 import { Account } from './Account.js';
 import { Transactions, TransactionDetail } from './Transactions.js';
 import { Cards } from './Cards.js';
 import { Training } from './Training.js';
+import { AdminReportedTransactions } from './Admin.js';
 import { Courses, CourseDetail } from './Courses.js';
 import { Classes, ClassDetail } from './Classes.js';
 import { Members, MemberDetail } from './Members.js';
@@ -116,6 +117,12 @@ function App() {
 								as={Link}
 								to='/classes'
 							/>
+
+							{user && isAdmin(user) && <Dropdown.Item
+								content='Admin Trans.'
+								as={Link}
+								to='/admintrans'
+							/>}
 						</Dropdown.Menu>
 					</Dropdown>
 
@@ -176,6 +183,12 @@ function App() {
 						<Route path='/members'>
 							<Members token={token} />
 						</Route>
+
+						{user && isAdmin(user) &&
+							<Route path='/admintrans'>
+								<AdminReportedTransactions token={token} user={user} />
+							</Route>
+						}
 
 						<Route path='/:page'>
 							<NotFound />

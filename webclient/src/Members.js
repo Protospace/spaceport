@@ -6,6 +6,50 @@ import { statusColor, isAdmin, BasicTable, staticUrl, requester } from './utils.
 import { NotFound, PleaseLogin } from './Misc.js';
 import { AdminMemberInfo, AdminMemberPause, AdminMemberForm, AdminMemberCards, AdminTransactions } from './Admin.js';
 
+export function MembersDropdown(props) {
+	const { token, name, onChange, value, initial } = props;
+	const [response, setResponse] = useState({ results: [] });
+	const searchDefault = {seq: 0, q: initial || ''};
+	const [search, setSearch] = useState(searchDefault);
+
+	useEffect(() => {
+		requester('/search/', 'POST', token, search)
+		.then(res => {
+			if (!search.seq || res.seq > response.seq) {
+				setResponse(res);
+			}
+		})
+		.catch(err => {
+			console.log(err);
+		});
+	}, [search]);
+
+	const options = response.results.map((x, i) => ({
+		key: x.member.id,
+		value: x.member.id,
+		text: x.member.preferred_name + ' ' + x.member.last_name,
+		image: { avatar: true, src: x.member.photo_small ? staticUrl + '/' + x.member.photo_small : '/nophoto.png' },
+	}));
+
+	console.log(value, initial);
+
+	return (
+		<Dropdown
+			clearable
+			fluid
+			selection
+			search
+			name={name}
+			options={options}
+			value={value}
+			placeholder='Search for Member'
+			onChange={onChange}
+			onSearchChange={(e, v) => setSearch({seq: parseInt(e.timeStamp), q: v.searchQuery})}
+		/>
+
+	);
+};
+
 export function Members(props) {
 	const [response, setResponse] = useState(false);
 	const searchDefault = {seq: 0, q: ''};
