@@ -105,7 +105,7 @@ def build_tx(data):
 def create_unmatched_member_tx(data):
     transactions = models.Transaction.objects
 
-    report_memo = 'Cant link sender name: {} {}, email: {}, note: {}'.format(
+    report_memo = 'Cant link sender name, {} {}, email: {}, note: {}'.format(
         data['first_name'],
         data['last_name'],
         data['payer_email'],
@@ -150,7 +150,7 @@ def create_unmatched_purchase_tx(data, member):
     transactions = models.Transaction.objects
 
     user = getattr(member, 'user', None)
-    report_memo = 'Unknown payment reason: {} {}, email: {}, note: {}'.format(
+    report_memo = 'Unknown payment reason, {} {}, email: {}, note: {}'.format(
         data['first_name'],
         data['last_name'],
         data['payer_email'],

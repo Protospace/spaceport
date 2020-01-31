@@ -193,10 +193,16 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         serializer.save(user=self.request.user)
 
 
-class TransactionViewSet(Base, Create, Retrieve, Update):
+class TransactionViewSet(Base, List, Create, Retrieve, Update):
     permission_classes = [AllowMetadata | IsAuthenticated, IsObjOwnerOrAdmin]
-    queryset = models.Transaction.objects.all()
     serializer_class = serializers.TransactionSerializer
+
+    def get_queryset(self):
+        queryset = models.Transaction.objects
+        if self.action == 'list':
+            return queryset.exclude(report_type__isnull=True).order_by('-id', '-date')
+        else:
+            return queryset.all()
 
     def retally_membership(self):
         member_id = self.request.data['member_id']
@@ -210,6 +216,11 @@ class TransactionViewSet(Base, Create, Retrieve, Update):
     def perform_update(self, serializer):
         serializer.save()
         self.retally_membership()
+
+    def list(self, request):
+        if not is_admin_director(self.request.user):
+            raise exceptions.PermissionDenied()
+        return super().list(request)
 
 
 class UserView(views.APIView):

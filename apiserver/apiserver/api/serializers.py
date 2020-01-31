@@ -44,7 +44,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         'Unmatched Member',
         'Unmatched Purchase',
         'User Flagged',
-    ])
+    ], allow_null=True)
 
     class Meta:
         model = models.Transaction
@@ -62,7 +62,14 @@ class TransactionSerializer(serializers.ModelSerializer):
             validated_data['user'] = member.user
         return super().create(validated_data)
 
+    def update(self, instance, validated_data):
+        member = get_object_or_404(models.Member, id=validated_data['member_id'])
+        validated_data['user'] = member.user
+        return super().update(instance, validated_data)
+
     def get_member_name(self, obj):
+        if not obj.member_id: return 'Unknown'
+
         if obj.user:
             member = obj.user.member
         else:
