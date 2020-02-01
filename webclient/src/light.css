@@ -39,6 +39,10 @@ body {
 	padding-top: 1rem;
 }
 
+.topPadding > .ui.container{
+	min-height: 45rem;
+}
+
 .photo-small {
 	max-width: 80px;
 	max-height: 80px;

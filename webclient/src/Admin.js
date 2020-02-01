@@ -78,7 +78,7 @@ export function AdminTransactions(props) {
 			<Form onSubmit={handleSubmit}>
 				<Header size='small'>Add a Transaction</Header>
 
-				<TransactionEditor input={input} setInput={setInput} error={error} />
+				<TransactionEditor noMemberSearch input={input} setInput={setInput} error={error} />
 
 				<Form.Button loading={loading} error={error.non_field_errors}>
 					Submit

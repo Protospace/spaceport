@@ -7,7 +7,7 @@ import { isAdmin, BasicTable, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 
 export function TransactionEditor(props) {
-	const { token, input, setInput, error } = props;
+	const { token, input, setInput, error, noMemberSearch } = props;
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
@@ -61,7 +61,7 @@ export function TransactionEditor(props) {
 
 	return (
 		<div className='transaction-editor'>
-			<Form.Field error={error.member_id}>
+			{!noMemberSearch &&<Form.Field error={error.member_id}>
 				<label>Member (search)</label>
 				<MembersDropdown
 					token={token}
@@ -69,7 +69,7 @@ export function TransactionEditor(props) {
 					onChange={handleValues}
 					initial={input.member_name}
 				/>
-			</Form.Field>
+			</Form.Field>}
 
 			<Form.Group widths='equal'>
 				<Form.Input

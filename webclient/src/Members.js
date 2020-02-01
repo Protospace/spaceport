@@ -31,8 +31,6 @@ export function MembersDropdown(props) {
 		image: { avatar: true, src: x.member.photo_small ? staticUrl + '/' + x.member.photo_small : '/nophoto.png' },
 	}));
 
-	console.log(value, initial);
-
 	return (
 		<Dropdown
 			clearable
