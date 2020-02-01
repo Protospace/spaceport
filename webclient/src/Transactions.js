@@ -147,11 +147,6 @@ function EditTransaction(props) {
 	const [success, setSuccess] = useState(false);
 	const { id } = useParams();
 
-	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
-	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
-	const handleChange = (e) => handleValues(e, e.currentTarget);
-	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
-
 	const handleSubmit = (e) => {
 		setLoading(true);
 		setSuccess(false);
@@ -182,7 +177,70 @@ function EditTransaction(props) {
 				<TransactionEditor token={token} input={input} setInput={setInput} error={error} />
 
 				<Form.Button loading={loading} error={error.non_field_errors}>
-					Save
+					{transaction.report_type ? 'Save & Unreport' : 'Save'}
+				</Form.Button>
+				{success && <div>Success!</div>}
+			</Form>
+		</div>
+	);
+};
+
+function ReportTransaction(props) {
+	const { transaction, setTransaction, token, refreshUser } = props;
+	const [input, setInput] = useState(transaction);
+	const [error, setError] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const [success, setSuccess] = useState(false);
+	const { id } = useParams();
+
+	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
+	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
+	const handleChange = (e) => handleValues(e, e.currentTarget);
+	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
+
+	const handleSubmit = (e) => {
+		setLoading(true);
+		setSuccess(false);
+		requester('/transactions/'+id+'/report/', 'POST', token, input)
+		.then(res => {
+			setLoading(false);
+			setSuccess(true);
+			setError(false);
+			if (refreshUser) {
+				refreshUser();
+			}
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+			setError(err.data);
+		});
+	};
+
+	const makeProps = (name) => ({
+		name: name,
+		onChange: handleChange,
+		value: input[name] || '',
+		error: error[name],
+	});
+
+	return (
+		<div>
+			<Header size='medium'>Report Transaction</Header>
+
+			<p>If this transaction was made in error or there is anything incorrect about it, please report it using this form.</p>
+			<p>A staff member will review the report as soon as possible.</p>
+			<p>Follow up with <a href='mailto:directors@protospace.ca' target='_blank' rel='noopener noreferrer'>directors@protospace.ca</a>.</p>
+
+			<Form onSubmit={handleSubmit}>
+				<Form.TextArea
+					label='Reason'
+					fluid
+					{...makeProps('report_memo')}
+				/>
+
+				<Form.Button loading={loading} error={error.non_field_errors}>
+					Submit Report
 				</Form.Button>
 				{success && <div>Success!</div>}
 			</Form>
@@ -254,7 +312,7 @@ export function TransactionDetail(props) {
 			console.log(err);
 			setError(true);
 		});
-	}, []);
+	}, [ownTransaction]);
 
 	return (
 		<Container>
@@ -329,9 +387,15 @@ export function TransactionDetail(props) {
 							</Grid.Column>
 
 							<Grid.Column>
-								{isAdmin(user) && <Segment padded>
-									<EditTransaction transaction={transaction} setTransaction={setTransaction} {...props} />
-								</Segment>}
+								{isAdmin(user) ?
+									<Segment padded>
+										<EditTransaction transaction={transaction} setTransaction={setTransaction} {...props} />
+									</Segment>
+								:
+									<Segment padded>
+										<ReportTransaction transaction={transaction} setTransaction={setTransaction} {...props} />
+									</Segment>
+								}
 							</Grid.Column>
 						</Grid>
 
