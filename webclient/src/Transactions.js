@@ -269,7 +269,15 @@ export function TransactionDetail(props) {
 									<Table.Body>
 										<Table.Row>
 											<Table.Cell>Member:</Table.Cell>
-											<Table.Cell>{transaction.member_name}</Table.Cell>
+											{isAdmin(user) && transaction.member_id ?
+												<Table.Cell>
+													<Link to={'/members/'+transaction.member_id}>
+														{transaction.member_name}
+													</Link>
+												</Table.Cell>
+											:
+												<Table.Cell>{transaction.member_name}</Table.Cell>
+											}
 										</Table.Row>
 										<Table.Row>
 											<Table.Cell>ID:</Table.Cell>
