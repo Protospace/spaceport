@@ -209,13 +209,21 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
         member = get_object_or_404(models.Member, id=member_id)
         utils.tally_membership_months(member)
 
+    def train_paypal_hint(self, tx):
+        if tx.paypal_payer_id and tx.member_id:
+            models.PayPalHint.objects.update_or_create(
+                account=tx.paypal_payer_id,
+                defaults=dict(member_id=tx.member_id),
+            )
+
     def perform_create(self, serializer):
         serializer.save(recorder=self.request.user)
         self.retally_membership()
 
     def perform_update(self, serializer):
-        serializer.save()
+        tx = serializer.save()
         self.retally_membership()
+        self.train_paypal_hint(tx)
 
     def list(self, request):
         if not is_admin_director(self.request.user):

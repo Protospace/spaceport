@@ -54,6 +54,8 @@ class TransactionSerializer(serializers.ModelSerializer):
             'last_seen_at',
             'user',
             'recorder',
+            'paypal_txn_id',
+            'paypal_payer_id',
         ]
 
     def create(self, validated_data):
