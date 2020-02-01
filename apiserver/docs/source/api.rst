@@ -464,25 +464,67 @@ Transaction Details
 
     :requestheader Authorization: ``Token <token>``
 
-    **Example user response**:
+    **Example response**:
 
     .. sourcecode:: json
 
         {
-            "id": 9320,
+            "id": 40720,
             "account_type": "PayPal",
-            "info_source": "Paypal IPN",
+            "info_source": "PayPal IPN",
             "member_id": 1685,
             "member_name": "Tanner Collin",
-            "date": "2017-01-30",
-            "amount": "50.00",
-            "reference_number": "2DS184750R9",
-            "memo": "1685, email",
-            "number_of_membership_months": null,
-            "payment_method": null,
-            "category": "Memberships:Paypal Payments",
-            "user": 113,
+            "date": "2020-01-30",
+            "report_type": null,
+            "amount": "100.00",
+            "reference_number": "234236326",
+            "memo": "1685, text, email, etc",
+            "number_of_membership_months": 2,
+            "payment_method": "instant",
+            "category": "Memberships:PayPal Payments",
+            "paypal_txn_id": "234236326",
+            "paypal_payer_id": "123ABCDEFGHIJ",
+            "report_memo": null,
+            "user": 2,
             "recorder": null
+        }
+
+
+Reported Transactions
++++++++++++++++++++++
+
+.. http:get:: /transactions/
+
+    Retrieve a list of reported transactions. Admins only.
+
+    Reported transactions are one with a report_type not null.
+
+    :requestheader Authorization: ``Token <token>``
+
+    **Example response**
+
+    Truncated.
+
+    .. sourcecode:: json
+
+        {
+            "count": 6,
+            "next": null,
+            "previous": null,
+            "results": [
+                {
+                    "id": 40715,
+                    "etc": "...",
+                },
+                {
+                    "id": 40716,
+                    "etc": "...",
+                },
+                {
+                    "id": 40717,
+                    "etc": "...",
+                }
+            ]
         }
 
 Create Transaction
@@ -506,6 +548,9 @@ Create Transaction
     :json memo: optional
     :json payment_method: optional
     :json category: optional
+    :json report_type: One of: ``null``, ``Unmatched Member``, ``Unmatched Purchase``,
+        ``User Flagged``
+    :json report_memo: The reason for the report, optional.
 
     :requestheader Authorization: ``Token <token>``
 
