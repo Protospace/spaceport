@@ -117,7 +117,7 @@ Full User
             "transactions": [
                 {
                     "id": 31783,
-                    "account_type": "Paypal",
+                    "account_type": "PayPal",
                     "info_source": "PayPal IPN",
                     "member_name": "Tanner Collin",
                     "date": "2019-12-22",
@@ -127,7 +127,7 @@ Full User
                     "memo": "text",
                     "number_of_membership_months": null,
                     "payment_method": null,
-                    "category": "Memberships:Paypal Payments",
+                    "category": "Memberships:PayPal Payments",
                     "user": 113,
                     "recorder": null
                 }
@@ -537,10 +537,10 @@ Create Transaction
     :json date: YYYY-MM-DD
     :json int member_id: Which member the transaction belongs to.
     :json decimal amount: Positive is money going to Protospace, XX.XX.
-    :json account_type: One of: ``Interac``, ``TD Chequing``, ``Paypal``, ``Dream Pmt``,
+    :json account_type: One of: ``Interac``, ``TD Chequing``, ``Dream Pmt``,
         ``PayPal``, ``Square Pmt``, ``Member``, ``Clearing``, ``Cash``
     :json info_source: One of: ``Web``, ``DB Edit``, ``System``, ``Receipt or Stmt``, ``Quicken
-        Import``, ``Paypal IPN``, ``PayPal IPN``, ``Auto``, ``Nexus DB Bulk``, ``IPN Trigger``,
+        Import``, ``PayPal IPN``, ``Auto``, ``Nexus DB Bulk``, ``IPN Trigger``,
         ``Intranet Receipt``, ``Automatic``, ``Manual``
     :json number_of_membership_months: Used when calculating member status and
         expire date, optional.

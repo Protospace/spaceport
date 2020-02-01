@@ -350,7 +350,7 @@ class TestTallyMembership(TestCase):
 
         self.assertEqual(result, False)
 
-class TestParsePaypalDate(TestCase):
+class TestParsePayPalDate(TestCase):
     def test_parse(self):
         string = '20:12:59 Jan 13, 2009 PST'
 

@@ -21,7 +21,7 @@ else:
 
 def parse_paypal_date(string):
     '''
-    Convert paypal date string into python datetime. Paypal's a bunch of idiots.
+    Convert paypal date string into python datetime. PayPal's a bunch of idiots.
     Their API returns dates in some custom format, so we have to parse it.
 
     Stolen from:

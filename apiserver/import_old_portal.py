@@ -118,7 +118,7 @@ for o in old:
     new = {}
 
     for f in TRANSACTION_FIELDS:
-        new[f] = o.__dict__.get(f, None)
+        new[f] = o.__dict__.get(f, None).replace('Paypal', 'PayPal')
 
     models.Transaction.objects.create(**new)
     print('Imported transaction #{} - {} {}'.format(

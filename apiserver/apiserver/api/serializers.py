@@ -14,7 +14,6 @@ class TransactionSerializer(serializers.ModelSerializer):
     account_type = serializers.ChoiceField([
         'Interac',
         'TD Chequing',
-        'Paypal',
         'Dream Pmt',
         'PayPal',
         'Square Pmt',
@@ -28,7 +27,6 @@ class TransactionSerializer(serializers.ModelSerializer):
         'System',
         'Receipt or Stmt',
         'Quicken Import',
-        'Paypal IPN',
         'PayPal IPN',
         'Auto',
         'Nexus DB Bulk',
@@ -44,7 +42,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         'Unmatched Member',
         'Unmatched Purchase',
         'User Flagged',
-    ], allow_null=True)
+    ], allow_null=True, required=False)
 
     class Meta:
         model = models.Transaction
