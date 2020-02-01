@@ -573,6 +573,25 @@ Edit Transaction
 
     Same as PATCH but requires all fields present.
 
+Report Transaction
+++++++++++++++++++
+
+.. http:post:: /transactions/(id)/report/
+
+    Allows users to report their own transactions for review.
+
+    ``report_type`` will automatically be set to ``User Flagged``.
+
+    :param id: The transaction's ID.
+
+    :json report_memo: The reason for the report, required.
+
+    :requestheader Authorization: ``Token <token>``
+
+    **Response**
+
+    :status 200:
+
 
 Courses
 -------
