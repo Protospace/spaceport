@@ -39,6 +39,8 @@ Create a venv, activate it, and install:
     $ source env/bin/activate
     (env) $ pip install -r requirements.txt
 
+Edit ``apiserver/secrets.py.example`` and save it as ``apiserver/secrets.py``.
+
 Now setup Django and run it:
 
 .. sourcecode:: bash

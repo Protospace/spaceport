@@ -277,8 +277,8 @@ class DoorViewSet(viewsets.ViewSet, List):
 
 
 
-class IpnViewSet(viewsets.ViewSet, Create):
-    def create(self, request):
+class IpnView(views.APIView):
+    def post(self, request):
         try:
             utils_paypal.process_paypal_ipn(request.data)
         except BaseException as e:

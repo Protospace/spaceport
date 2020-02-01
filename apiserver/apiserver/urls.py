@@ -4,9 +4,12 @@ from django.urls import include, path
 from rest_framework import routers
 
 from .api import views
+from . import secrets
+
+IPN_ROUTE = r'^ipn/{}/'.format(secrets.IPN_RANDOM)
+print('IPN route is:', '/'+IPN_ROUTE[1:])
 
 router = routers.DefaultRouter()
-router.register(r'ipn', views.IpnViewSet, basename='ipn')
 router.register(r'door', views.DoorViewSet, basename='door')
 router.register(r'cards', views.CardViewSet, basename='card')
 router.register(r'search', views.SearchViewSet, basename='search')
@@ -26,4 +29,5 @@ urlpatterns = [
     url(r'^registration/', views.RegistrationView.as_view(), name='rest_name_register'),
     url(r'^password/change/', views.PasswordChangeView.as_view(), name='rest_password_change'),
     url(r'^user/', views.UserView.as_view(), name='user'),
+    url(IPN_ROUTE, views.IpnView.as_view(), name='ipn'),
 ]
