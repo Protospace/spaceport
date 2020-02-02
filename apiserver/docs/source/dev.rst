@@ -54,14 +54,19 @@ Django will now be running on port 8002, connect to localhost:8002 to test it.
 Import Old Portal Data
 ++++++++++++++++++++++
 
-Place `old_portal.sqlite3` in the same directory as `manage.py`.
+Place ``old_portal.sqlite3`` in the same directory as ``manage.py``.
+
+Place old member photo folders in ``old_photos/``, for example: ``old_photos/1685/photo.jpg``.
 
 .. sourcecode:: bash
 
     (env) $ bash gen_old_models.sh
-    (env) $ time python import_old_portal.py
+    (env) $ time python import_old_portal.py YYYY-MM-DD
 
-Give it about 15 minutes to run. This will import old models into the new portal database, ready to be linked to user's emails when they sign up.
+Pass the date of the portal scrape in as an argument to the script.
+
+Give it about 15 minutes to run. This will import old models into the new portal
+database, ready to be linked to user's emails when they sign up.
 
 Testing
 +++++++
