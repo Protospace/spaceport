@@ -5,6 +5,7 @@ import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Hea
 import moment from 'moment';
 import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { TransactionList, TransactionEditor } from './Transactions.js';
+import { NotFound } from './Misc.js';
 
 export function AdminReportedTransactions(props) {
 	const { token, user } = props;
