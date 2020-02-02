@@ -29,7 +29,11 @@ DEBUG = DEBUG_ENV or False
 if DEBUG: print('Debug mode ON')
 
 # production hosts
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'api.spaceport-prod.dns.t0.vc',
+    'api.spaceport.protospace.ca',
+    'api.my.protospace.ca',
+]
 
 if DEBUG:
     ALLOWED_HOSTS += [
