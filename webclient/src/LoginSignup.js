@@ -5,7 +5,7 @@ import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Me
 import { requester } from './utils.js';
 
 export function LoginForm(props) {
-	const [input, setInput] = useState({});
+	const [input, setInput] = useState({ username: '' });
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
 
