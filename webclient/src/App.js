@@ -40,14 +40,14 @@ function App() {
 		})
 		.catch(err => {
 			console.log(err);
-			setUser(false);
+			setUserCache(null);
 		});
 	}, [token, refreshCount]);
 
 	function logout() {
 		if (yousure) {
 			setTokenCache('');
-			setUserCache(false);
+			setUserCache(null);
 			setYousure(false);
 			history.push('/');
 			window.scrollTo(0, 0);
@@ -55,6 +55,18 @@ function App() {
 			setYousure(true);
 		}
 	}
+
+	useEffect(() => {
+		user && requester('/ping/', 'POST', token, {})
+		.then()
+		.catch(err => {
+			console.log(err);
+			if (err.data && err.data.detail === 'Invalid token.') {
+				logout(); // You Sure?
+				logout();
+			}
+		});
+	}, [history.location]);
 
 	return (
 		<div>
