@@ -250,6 +250,14 @@ class UserView(views.APIView):
         return Response(serializer.data)
 
 
+class PingView(views.APIView):
+    permission_classes = [AllowMetadata | IsAuthenticated]
+
+    def post(self, request):
+        return Response(200)
+
+
+
 class DoorViewSet(viewsets.ViewSet, List):
     def list(self, request):
         cards = models.Card.objects.filter(active_status='card_active')

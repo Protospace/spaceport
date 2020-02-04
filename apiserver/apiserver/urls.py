@@ -29,5 +29,6 @@ urlpatterns = [
     url(r'^registration/', views.RegistrationView.as_view(), name='rest_name_register'),
     url(r'^password/change/', views.PasswordChangeView.as_view(), name='rest_password_change'),
     url(r'^user/', views.UserView.as_view(), name='user'),
+    url(r'^ping/', views.PingView.as_view(), name='ping'),
     url(IPN_ROUTE, views.IpnView.as_view(), name='ipn'),
 ]
