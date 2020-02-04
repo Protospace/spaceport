@@ -124,16 +124,16 @@ export function SignupForm(props) {
 				<Form.Radio
 					label='I have an account on the old portal'
 					name='existing_member'
-					value={true}
-					checked={input.existing_member === true}
+					value={'true'}
+					checked={input.existing_member === 'true'}
 					onChange={handleValues}
 					error={!!error.existing_member}
 				/>
 				<Form.Radio
 					label='I am new to Protospace'
 					name='existing_member'
-					value={false}
-					checked={input.existing_member === false}
+					value={'false'}
+					checked={input.existing_member === 'false'}
 					onChange={handleValues}
 					error={!!error.existing_member}
 				/>
