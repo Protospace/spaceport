@@ -8,9 +8,6 @@ errors and HTTP response status codes are to designate success and failure.
 
 Request bodies can be JSON or form data.
 
-API Routes
-----------
-
 All API routes require a trailing slash. This is a Django default and you'll get
 a 301 redirect if you forget it.
 
@@ -52,9 +49,11 @@ Quick Reference
 .. http:post:: /search/
 .. http:get:: /search/(id)/
 .. http:get:: /transactions/(id)/
-.. http:post:: /transaction/
+.. http:get:: /transactions/
+.. http:post:: /transactions/
 .. http:patch:: /transactions/(id)
 .. http:put:: /transactions/(id)/
+.. http:post:: /transactions/(id)/report/
 .. http:get:: /courses/
 .. http:get:: /courses/(id)/
 .. http:post:: /courses/
@@ -76,3 +75,4 @@ Quick Reference
 .. http:delete:: /cards/(id)/
 .. http:get:: /door/
 .. http:post:: /door/(card_number)/seen/
+.. http:post:: /ping/

@@ -893,3 +893,17 @@ Door
     :param card_number: Usually a 10 character hex string.
 
     No authentication required.
+
+
+Ping
+----
+
+.. http:post:: /ping/
+
+    Does nothing except check if a user's auth token is still valid.
+
+    :requestheader Authorization: ``Token <token>``
+
+    **Response**
+
+    :status 200:
