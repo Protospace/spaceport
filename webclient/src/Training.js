@@ -25,7 +25,7 @@ export function Training(props) {
 					</Table.Header>
 
 					<Table.Body>
-						{user.training.map(x =>
+						{user.training.slice().sort((a, b) => a.session.datetime < b.session.datetime ? 1 : -1).map(x =>
 							<Table.Row key={x.id}>
 								<Table.Cell>{x.session.course_name}</Table.Cell>
 								<Table.Cell>
