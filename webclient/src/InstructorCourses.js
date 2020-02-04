@@ -79,6 +79,7 @@ export function InstructorCourseDetail(props) {
 	const { id } = useParams();
 
 	const handleSubmit = (e) => {
+		if (loading) return;
 		setLoading(true);
 		setSuccess(false);
 		const data = { ...input, is_old: false };
@@ -131,6 +132,7 @@ export function InstructorCourseList(props) {
 	const [success, setSuccess] = useState(false);
 
 	const handleSubmit = (e) => {
+		if (loading) return;
 		setLoading(true);
 		setSuccess(false);
 		const data = { ...input, is_old: false };

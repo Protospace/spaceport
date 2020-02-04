@@ -151,6 +151,7 @@ export function InstructorClassDetail(props) {
 	const { id } = useParams();
 
 	const handleSubmit = (e) => {
+		if (loading) return;
 		setLoading(true);
 		setSuccess(false);
 		requester('/sessions/'+id+'/', 'PUT', token, input)
@@ -202,6 +203,7 @@ export function InstructorClassList(props) {
 	const [success, setSuccess] = useState(false);
 
 	const handleSubmit = (e) => {
+		if (loading) return;
 		setLoading(true);
 		setSuccess(false);
 		const data = { ...input, course: course.id };

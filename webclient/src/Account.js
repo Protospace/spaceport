@@ -14,6 +14,7 @@ function LogoutEverywhere(props) {
 
 	const handleClick = () => {
 		if (yousure) {
+			if (loading) return;
 			setLoading(true);
 			requester('/rest-auth/logout/', 'POST', token, {})
 			.then(res => {
@@ -58,6 +59,7 @@ function ChangePasswordForm(props) {
 	const handleChange = (e) => handleValues(e, e.currentTarget);
 
 	const handleSubmit = (e) => {
+		if (loading) return;
 		setLoading(true);
 		requester('/password/change/', 'POST', token, input)
 		.then(res => {
@@ -122,6 +124,7 @@ export function AccountForm(props) {
 	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 
 	const handleSubmit = (e) => {
+		if (loading) return;
 		setLoading(true);
 		requester('/members/' + member.id + '/', 'PATCH', token, input)
 		.then(res => {

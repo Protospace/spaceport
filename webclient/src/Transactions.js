@@ -148,6 +148,7 @@ function EditTransaction(props) {
 	const { id } = useParams();
 
 	const handleSubmit = (e) => {
+		if (loading) return;
 		setLoading(true);
 		setSuccess(false);
 		const data = { ...input, report_type: null, report_memo: '' };
@@ -199,6 +200,7 @@ function ReportTransaction(props) {
 	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 
 	const handleSubmit = (e) => {
+		if (loading) return;
 		setLoading(true);
 		setSuccess(false);
 		requester('/transactions/'+id+'/report/', 'POST', token, input)

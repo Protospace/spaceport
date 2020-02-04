@@ -54,6 +54,7 @@ export function AdminTransactions(props) {
 	const { id } = useParams();
 
 	const handleSubmit = (e) => {
+		if (loading) return;
 		setLoading(true);
 		setSuccess(false);
 		const data = { ...input, member_id: id };
@@ -118,6 +119,7 @@ function AdminCardDetail(props) {
 	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 
 	const handleSubmit = (e) => {
+		if (loading) return;
 		setLoading(true);
 		setSuccess(false);
 		const data = { ...input, member_id: result.member.id };
@@ -226,6 +228,7 @@ export function AdminMemberCards(props) {
 	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 
 	const handleSubmit = (e) => {
+		if (loading) return;
 		setLoading(true);
 		setSuccess(false);
 		const data = { ...input, member_id: result.member.id };
@@ -328,6 +331,7 @@ export function AdminMemberPause(props) {
 
 	const handlePause = (e) => {
 		if (yousure) {
+			if (loading) return;
 			setLoading(true);
 			setSuccess(false);
 			requester('/members/' + id + '/pause/', 'POST', token, {})
@@ -348,6 +352,7 @@ export function AdminMemberPause(props) {
 	};
 
 	const handleUnpause = (e) => {
+		if (loading) return;
 		setLoading(true);
 		setSuccess(false);
 		requester('/members/' + id + '/unpause/', 'POST', token, {})
@@ -405,6 +410,7 @@ export function AdminMemberForm(props) {
 	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 
 	const handleSubmit = (e) => {
+		if (loading) return;
 		setLoading(true);
 		setSuccess(false);
 		requester('/members/' + id + '/', 'PATCH', token, input)

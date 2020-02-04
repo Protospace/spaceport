@@ -13,6 +13,7 @@ export function LoginForm(props) {
 	const handleChange = (e) => handleValues(e, e.currentTarget);
 
 	const handleSubmit = (e) => {
+		if (loading) return;
 		setLoading(true);
 		const data = { ...input, username: input.username.toLowerCase() };
 		requester('/rest-auth/login/', 'POST', '', data)
@@ -68,6 +69,7 @@ export function SignupForm(props) {
 	);
 
 	const handleSubmit = (e) => {
+		if (loading) return;
 		setLoading(true);
 		input.username = genUsername();
 		requester('/registration/', 'POST', '', input)
