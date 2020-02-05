@@ -10,6 +10,7 @@ defusedxml==0.6.0
 Django==3.0.2
 django-allauth==0.41.0
 django-rest-auth==0.9.5
+django-simple-history==2.8.0
 djangorestframework==3.11.0
 docutils==0.16
 fuzzywuzzy==0.17.0

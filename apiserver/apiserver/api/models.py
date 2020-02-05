@@ -2,6 +2,10 @@ from datetime import date, datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.timezone import now
+from simple_history.models import HistoricalRecords
+from simple_history import register
+
+register(User)
 
 IGNORE = '+'
 
@@ -38,6 +42,8 @@ class Member(models.Model):
     paused_date = models.DateField(blank=True, null=True)
     monthly_fees = models.IntegerField(default=55, blank=True, null=True)
 
+    history = HistoricalRecords()
+
 class Transaction(models.Model):
     user = models.ForeignKey(User, related_name='transactions', blank=True, null=True, on_delete=models.SET_NULL)
     recorder = models.ForeignKey(User, related_name=IGNORE, blank=True, null=True, on_delete=models.SET_NULL)
@@ -58,14 +64,20 @@ class Transaction(models.Model):
     report_type = models.TextField(blank=True, null=True)
     report_memo = models.TextField(blank=True, null=True)
 
+    history = HistoricalRecords()
+
 class PayPalHint(models.Model):
     account = models.CharField(unique=True, max_length=13)
     member_id = models.IntegerField()
+
+    history = HistoricalRecords()
 
 class IPN(models.Model):
     datetime = models.DateTimeField(auto_now_add=True)
     data = models.TextField()
     status = models.CharField(max_length=32)
+
+    history = HistoricalRecords()
 
 class Card(models.Model):
     user = models.ForeignKey(User, related_name='cards', blank=True, null=True, on_delete=models.SET_NULL)
@@ -76,10 +88,14 @@ class Card(models.Model):
     last_seen_at = models.DateField(default=date.today, blank=True, null=True)
     active_status = models.CharField(max_length=32, blank=True, null=True)
 
+    history = HistoricalRecords()
+
 class Course(models.Model):
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     is_old = models.BooleanField(default=False)
+
+    history = HistoricalRecords()
 
 class Session(models.Model):
     instructor = models.ForeignKey(User, related_name='teaching', blank=True, null=True, on_delete=models.SET_NULL)
@@ -91,6 +107,8 @@ class Session(models.Model):
     cost = models.DecimalField(max_digits=5, decimal_places=2)
     max_students = models.IntegerField(blank=True, null=True)
 
+    history = HistoricalRecords()
+
 class Training(models.Model):
     user = models.ForeignKey(User, related_name='training', blank=True, null=True, on_delete=models.SET_NULL)
     session = models.ForeignKey(Session, related_name='students', blank=True, null=True, on_delete=models.SET_NULL)
@@ -99,3 +117,5 @@ class Training(models.Model):
     attendance_status = models.TextField(blank=True, null=True)
     sign_up_date = models.DateField(default=date.today, blank=True, null=True)
     paid_date = models.DateField(blank=True, null=True)
+
+    history = HistoricalRecords()
