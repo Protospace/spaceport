@@ -15,13 +15,13 @@ def check_auth():
 def index():
     return '<i>SEE YOU SPACE SAMURAI...</i>'
 
-@app.route('/check-username-exists', methods=['GET'])
+@app.route('/find-user', methods=['POST'])
 def check_username_exists():
     check_auth()
 
     username = request.form['username']
 
-    return ldap_functions.check_username_exists(username)
+    return ldap_functions.find_user(username)
 
 @app.route('/create-user', methods=['POST'])
 def create_user():
