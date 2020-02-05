@@ -1,7 +1,7 @@
 from flask import Flask, abort, request
 app = Flask(__name__)
 
-import ldap
+import ldap_functions
 import secrets
 
 HTTP_UNAUTHORIZED = 401
@@ -15,6 +15,14 @@ def check_auth():
 def index():
     return '<i>SEE YOU SPACE SAMURAI...</i>'
 
+@app.route('/check-username-exists', methods=['GET'])
+def check_username_exists():
+    check_auth()
+
+    username = request.form['username']
+
+    return ldap_functions.check_username_exists(username)
+
 @app.route('/create-user', methods=['POST'])
 def create_user():
     check_auth()
@@ -25,7 +33,7 @@ def create_user():
     email = request.form['email']
     password = request.form['password']
 
-    ldap.create_user(first, last, username, email, password)
+    ldap_functions.create_user(first, last, username, email, password)
     return ''
 
 @app.route('/set-password', methods=['POST'])
@@ -35,7 +43,7 @@ def set_password():
     username = request.form['username']
     password = request.form['password']
 
-    ldap.set_password(username, password)
+    ldap_functions.set_password(username, password)
     return ''
 
 if __name__ == '__main__':
