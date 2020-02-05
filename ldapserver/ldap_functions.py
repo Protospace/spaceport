@@ -1,11 +1,11 @@
 import time
 import ldap
 import ldap.modlist as modlist
-from secrets import *
+import secrets
 import base64
 
 ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
-ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, LDAP_CERT)
+ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, secrets.LDAP_CERT)
 l = ldap.initialize('ldaps://ldap.ps.protospace.ca:636')
 l.set_option(ldap.OPT_REFERRALS, 0)
 l.set_option(ldap.OPT_PROTOCOL_VERSION, 3)
@@ -23,7 +23,7 @@ def search(query):
     Search for a user by sAMAccountname
     '''
     try:
-        bind = l.simple_bind_s(LDAP_USERNAME, LDAP_PASSWORD)
+        bind = l.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
 
         criteria = '(&(objectClass=user)(sAMAccountName={})(!(objectClass=computer)))'.format(query)
         results = l.search_s(BASE_Members, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName','email'] )
@@ -49,7 +49,7 @@ def finduser(query):
     Search for a user by sAMAccountname
     '''
     try:
-        bind = l.simple_bind_s(LDAP_USERNAME, LDAP_PASSWORD)
+        bind = l.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
 
         criteria = '(&(objectClass=user)(sAMAccountName={})(!(objectClass=computer)))'.format(query)
         results = l.search_s(BASE_Groups, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName','email'] )
@@ -91,7 +91,7 @@ def findgroup(query):
     Search for a group by sAMAccountname
     '''
     try:
-        bind = l.simple_bind_s(LDAP_USERNAME, LDAP_PASSWORD)
+        bind = l.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
 
         criteria = '(&(objectClass=group)(sAMAccountName={}))'.format(query)
         results = l.search_s(BASE_Groups, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName'] )
@@ -119,7 +119,7 @@ def create_user(first, last, username, email, password):
     Note: this creates a disabled user, then sets a password, then enables the user
     '''
     try:
-        bind = l.simple_bind_s(LDAP_USERNAME, LDAP_PASSWORD)
+        bind = l.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
         dn = 'CN={} {},{}'.format(first, last, BASE_Members)
         full_name = '{} {}'.format(first, last)
 
@@ -168,7 +168,7 @@ def create_group(groupname):
     '''
     try:
         dn = 'CN={},{}'.format(groupname, BASE)
-        bind = l.simple_bind_s(LDAP_USERNAME, LDAP_PASSWORD)
+        bind = l.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
 
         ldif = [
             ('objectClass', [b'group']),
