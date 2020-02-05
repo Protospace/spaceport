@@ -4,6 +4,9 @@ import ldap.modlist as modlist
 import secrets
 import base64
 
+from flask import abort
+HTTP_NOTFOUND = 404
+
 ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
 ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, './ProtospaceAD.cer')
 l = ldap.initialize('ldaps://ldap.ps.protospace.ca:636')
@@ -15,7 +18,8 @@ l.set_option(ldap.OPT_DEBUG_LEVEL, 255)
 
 # === Protospace ===
 BASE = 'DC=ps,DC=protospace,DC=ca'
-BASE_Members = 'OU=XTest,OU=GroupsOU,DC=ps,DC=protospace,DC=ca'
+#BASE_Members = 'OU=XTest,OU=GroupsOU,DC=ps,DC=protospace,DC=ca'
+BASE_Members = 'OU=MembersOU,DC=ps,DC=protospace,DC=ca'
 BASE_Groups  = 'OU=GroupsOU,DC=ps,DC=protospace,DC=ca'
 
 def search(query):
@@ -51,11 +55,15 @@ def find_user(query):
     try:
         bind = l.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
         criteria = '(&(objectClass=user)(sAMAccountName={})(!(objectClass=computer)))'.format(query)
-        results = l.search_s(BASE_Groups, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName','email'] )
+        results = l.search_s(BASE_Members, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName','email'] )
+
+        if len(results) != 1:
+            return False
+
+        return results[0][0]
     finally:
         l.unbind()
-
-    return(results)
+        print('unbound find')
 
 def findgroup(query):
     '''
@@ -145,6 +153,26 @@ def create_group(groupname):
     finally:
         l.unbind()
 
+def set_password(username, password):
+    try:
+        bind = l.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
+        criteria = '(&(objectClass=user)(sAMAccountName={})(!(objectClass=computer)))'.format(username)
+        results = l.search_s(BASE_Members, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName','email'] )
+
+        if len(results) != 1:
+            abort(HTTP_NOTFOUND)
+
+        dn = results[0][0]
+
+        # set password
+        pass_quotes = '"{}"'.format(password)
+        pass_uni = pass_quotes.encode('utf-16-le')
+        change_des = [(ldap.MOD_REPLACE, 'unicodePwd', [pass_uni])]
+        result = l.modify_s(dn, change_des)
+    finally:
+        l.unbind()
+
+
 if __name__ == '__main__':
     
 # ===========================================
@@ -173,5 +201,5 @@ if __name__ == '__main__':
     #    
     #print("ReturnCode = " + str(rCode))
     
-    find_user('tanner.collin')
-
+    #print(find_user('tanner.collin'))
+    print(set_password('dsaftanner.collin', 'Supersecret@@'))
