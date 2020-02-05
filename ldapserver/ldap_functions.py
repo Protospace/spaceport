@@ -5,7 +5,7 @@ import secrets
 import base64
 
 ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
-ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, secrets.LDAP_CERT)
+ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, './ProtospaceAD.cer')
 l = ldap.initialize('ldaps://ldap.ps.protospace.ca:636')
 l.set_option(ldap.OPT_REFERRALS, 0)
 l.set_option(ldap.OPT_PROTOCOL_VERSION, 3)
@@ -44,47 +44,18 @@ def search(query):
     finally:
         l.unbind()
 
-def finduser(query):
+def find_user(query):
     '''
     Search for a user by sAMAccountname
     '''
     try:
         bind = l.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
-
         criteria = '(&(objectClass=user)(sAMAccountName={})(!(objectClass=computer)))'.format(query)
         results = l.search_s(BASE_Groups, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName','email'] )
-
-        print(" =============")
-        print(" Found %d Objects" % len(results))
-        print(" =============")
-        count = len(results)
-        rCode = count
-        
-        if (count == 0):
-            rCode = "None"
-        elif (count == 1):
-            for result in results:
-                #print("   --- ")
-                #print(results)
-                dn, attr = result
-                print(dn, attr)
-            rCode = dn
-        else:
-            for result in results:
-                #print("   --- ")
-                #print(results)
-                dn, attr = result
-                print(dn, attr)
-            rCode(" Found %d Objects" % len(results))
-            
-    except Exception as inst:
-        print("== Entering Except ==")
-        rCode = type(inst)
-        print(type(inst))    # the exception instance
-        
     finally:
         l.unbind()
-        return(rCode)
+
+    return(results)
 
 def findgroup(query):
     '''
@@ -147,16 +118,7 @@ def create_user(first, last, username, email, password):
         # 512 will set user account to enabled
         mod_acct = [(ldap.MOD_REPLACE, 'userAccountControl', b'512')]
         result = l.modify_s(dn, mod_acct)
-        
-    except Exception as inst:
-        print("== Entering Except ==")
-        rCode = type(inst)
-        print(type(inst))    # the exception instance
-        
-    else:
-        #rCode = "Else"
-        print("== Entering Else ==")
-        
+
     finally:
         print("== Entering Finally ==")
         l.unbind()
@@ -188,27 +150,28 @@ if __name__ == '__main__':
 # ===========================================
 #  Sample Progams
 # ===========================================
-    print("----------------------------------------------------------------------------------------")
-    i = 3
+    #print("----------------------------------------------------------------------------------------")
+    #i = 3
+    #
+    #if ( i == 1):
+    #    rCode = find_user('*')
+    #elif (i == 2):
+    #    rCode = search('*')
+    #elif (i == 3):
+    #    rCode = create_user(
+    #    'billy',
+    #    'gates',
+    #    'billy.gates',
+    #    'billy.gates@protospace.ca',
+    #    'P@ssw0rd99'
+    #    )
+    #elif ( i == 4):
+    #    create_group('testgroup')
+    #else:
+    #    print("No function selected")
+    #    
+    #    
+    #print("ReturnCode = " + str(rCode))
     
-    if ( i == 1):
-        rCode = finduser('*')
-    elif (i == 2):
-        rCode = search('*')
-    elif (i == 3):
-        rCode = create_user(
-        'billy',
-        'gates',
-        'billy.gates',
-        'billy.gates@protospace.ca',
-        'P@ssw0rd99'
-        )
-    elif ( i == 4):
-        create_group('testgroup')
-    else:
-        print("No function selected")
-        
-        
-    print("ReturnCode = " + str(rCode))
-    
+    find_user('tanner.collin')
 
