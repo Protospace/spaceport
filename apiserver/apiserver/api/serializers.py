@@ -5,6 +5,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
 from rest_auth.registration.serializers import RegisterSerializer
 from rest_auth.serializers import UserDetailsSerializer
+import re
 
 from . import models, fields, utils
 from .. import settings
@@ -350,6 +351,11 @@ class RegistrationSerializer(RegisterSerializer):
     first_name = serializers.CharField(max_length=32)
     last_name = serializers.CharField(max_length=32)
     existing_member = serializers.ChoiceField(['true', 'false'])
+
+    def validate_username(self, username):
+        if re.search(r'[^a-z.]', username):
+            raise ValidationError('Invalid characters.')
+        return super().validate_username(username)
 
     def custom_signup(self, request, user):
         data = request.data
