@@ -182,15 +182,27 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         else:
             return serializers.StudentTrainingSerializer
 
+    # TODO: turn these into @actions
     def perform_create(self, serializer):
         session_id = self.request.data['session']
+        status = self.request.data['attendance_status']
         session = get_object_or_404(models.Session, id=session_id)
         training = models.Training.objects.filter(user=self.request.user, session=session)
         if training.exists():
             raise exceptions.ValidationError('You have already registered')
         if self.request.user == session.instructor:
             raise exceptions.ValidationError('You are teaching this session')
-        serializer.save(user=self.request.user)
+        if status == 'waiting for payment' and session.cost == 0:
+            status = 'confirmed'
+        serializer.save(user=self.request.user, attendance_status=status)
+
+    def perform_update(self, serializer):
+        session_id = self.request.data['session']
+        status = self.request.data['attendance_status']
+        session = get_object_or_404(models.Session, id=session_id)
+        if status == 'waiting for payment' and session.cost == 0:
+            status = 'confirmed'
+        serializer.save(attendance_status=status)
 
 
 class TransactionViewSet(Base, List, Create, Retrieve, Update):
