@@ -118,7 +118,11 @@ for o in old:
     new = {}
 
     for f in TRANSACTION_FIELDS:
-        new[f] = o.__dict__.get(f, None).replace('Paypal', 'PayPal')
+        tmp = o.__dict__.get(f, None)
+        if isinstance(tmp, str):
+            new[f] = tmp.replace('Paypal', 'PayPal')
+        else:
+            new[f] = tmp
 
     models.Transaction.objects.create(**new)
     print('Imported transaction #{} - {} {}'.format(
