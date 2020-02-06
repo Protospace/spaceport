@@ -30,11 +30,13 @@ DEBUG_ENV = os.environ.get('DEBUG', False)
 DEBUG = DEBUG_ENV or False
 if DEBUG: print('Debug mode ON')
 
+
+PRODUCTION_HOST = 'spaceport.protospace.ca'
+
+
 # production hosts
 ALLOWED_HOSTS = [
-    'api.spaceport-prod.dns.t0.vc',
-    'api.spaceport.protospace.ca',
-    'api.my.protospace.ca',
+    'api.' + PRODUCTION_HOST,
 ]
 
 if DEBUG:
@@ -160,7 +162,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
+if DEBUG:
+    STATIC_URL = '/static/'
+else:
+    STATIC_URL = 'https://static.{}/'.format(PRODUCTION_HOST)
+    STATIC_ROOT = os.path.join(BASE_DIR, 'data/static')
+
 
 DEFAULT_RENDERER_CLASSES = (
     'rest_framework.renderers.JSONRenderer',
