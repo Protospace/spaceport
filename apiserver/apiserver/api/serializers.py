@@ -354,7 +354,7 @@ class RegistrationSerializer(RegisterSerializer):
     def custom_signup(self, request, user):
         data = request.data
 
-        is_test_signup = bool(settings.DEBUG and data['last_name'] == 'tester')
+        is_test_signup = bool(data['last_name'] == 'tester')
 
         if not utils.is_request_from_protospace(request) and not is_test_signup:
             user.delete()
