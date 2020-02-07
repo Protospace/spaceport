@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from apiserver.api import models, utils
+from apiserver.api import models, utils, utils_stats
 
 import time
 
@@ -22,3 +22,5 @@ class Command(BaseCommand):
         self.stdout.write('Tallied {} active members in {} s'.format(
             count, str(time.time() - start)
         ))
+
+        utils_stats.changed_card()

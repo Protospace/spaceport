@@ -1,3 +1,4 @@
+from django.core.cache import cache
 import time
 
 DEFAULTS = {
@@ -10,3 +11,10 @@ DEFAULTS = {
     'bay_108_temp': None,
     'bay_110_temp': None,
 }
+
+def changed_card():
+    '''
+    Called whenever the card list could change, ie. cards added, modified, or
+    user status becoming overdue by 3 months
+    '''
+    cache.set('last_card_change', time.time())

@@ -134,6 +134,7 @@ class MemberViewSet(Base, Retrieve, Update):
         member.save()
         utils.tally_membership_months(member)
         utils.gen_member_forms(member)
+        utils_stats.changed_card()
         return Response(200)
 
 
@@ -141,6 +142,14 @@ class CardViewSet(Base, Create, Retrieve, Update, Destroy):
     permission_classes = [AllowMetadata | IsAuthenticated, IsObjOwnerOrAdmin]
     queryset = models.Card.objects.all()
     serializer_class = serializers.CardSerializer
+
+    def perform_create(self, serializer):
+        serializer.save()
+        utils_stats.changed_card()
+
+    def perform_update(self, serializer):
+        serializer.save()
+        utils_stats.changed_card()
 
 
 class CourseViewSet(Base, List, Retrieve, Create, Update):
