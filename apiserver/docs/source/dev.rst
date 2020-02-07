@@ -9,7 +9,6 @@ Install dependencies:
 
 .. sourcecode:: bash
 
-    # Misc:
     $ sudo apt update
     $ sudo apt install memcached
 

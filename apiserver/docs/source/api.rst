@@ -855,9 +855,6 @@ Door
 
     List all active cards of unpaused members.
 
-    The json dict format is to match the current front door controller's script
-    and will likely be changed in the future.
-
     No authentication required.
 
     **Example response**
@@ -867,22 +864,12 @@ Door
     .. sourcecode:: json
 
         {
-            "0000001234": {
-                "name": "Tanner C",
-                "id": 1685,
-                "enabled": true
-            },
-            "000000ABCD": {
-                "name": "Tanner C",
-                "id": 1685,
-                "enabled": true
-            }
+            "0000001234": "Tanner C (1685)",
+            "000000ABCD": "Tanner C (1685)",
         }
 
     :json key: The dict keys are the card numbers.
-    :json int id: Member's ID.
-    :json name: Member's name.
-    :json boolean enabled: Always true.
+    :json value: Member's name and ID.
 
 .. http:post:: /door/(card_number)/seen/
 
