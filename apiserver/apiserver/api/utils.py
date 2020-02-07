@@ -11,6 +11,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 
 from django.db.models import Sum
+from django.core.cache import cache
 
 from . import models, serializers
 try:
@@ -126,17 +127,18 @@ def tally_membership_months(member, fake_date=None):
     return True
 
 
-search_strings = {}
 def gen_search_strings():
     '''
     Generate a cache dict of names to member ids for rapid string matching
     '''
+    search_strings = {}
     for m in models.Member.objects.all():
         string = '{} {}'.format(
             m.preferred_name,
             m.last_name,
         ).lower()
         search_strings[string] = m.id
+    cache.set('search_strings', search_strings)
 
 
 LARGE_SIZE = 1080

@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Max
 from django.http import HttpResponse
 from django.core.files.base import File
+from django.core.cache import cache
 from rest_framework import viewsets, views, mixins, generics, exceptions
 from rest_framework.decorators import action
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
@@ -50,11 +51,13 @@ class SearchViewSet(Base, Retrieve):
         queryset = models.Member.objects.all()
         search = self.request.data.get('q', '').lower()
 
-        if not utils.search_strings:
+        if not cache.touch('search_strings'):
             utils.gen_search_strings() # init cache
 
+        search_strings = cache.get('search_strings', {})
+
         if len(search):
-            choices = utils.search_strings.keys()
+            choices = search_strings.keys()
 
             # get exact starts with matches
             results = [x for x in choices if x.startswith(search)]
@@ -69,7 +72,7 @@ class SearchViewSet(Base, Retrieve):
             # remove dupes, truncate list
             results = list(OrderedDict.fromkeys(results))[:NUM_SEARCH_RESULTS]
 
-            result_ids = [utils.search_strings[x] for x in results]
+            result_ids = [search_strings[x] for x in results]
             result_objects = [queryset.get(id=x) for x in result_ids]
 
             queryset = result_objects
@@ -306,6 +309,7 @@ class IpnView(views.APIView):
             print('Problem processing IPN: {} - {}'.format(e.__class__.__name__, str(e)))
         finally:
             return Response(200)
+
 
 
 class RegistrationView(RegisterView):

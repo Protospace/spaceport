@@ -9,8 +9,11 @@ Install dependencies:
 
 .. sourcecode:: bash
 
-    # Python:
+    # Misc:
     $ sudo apt update
+    $ sudo apt install memcached
+
+    # Python:
     $ sudo apt install python3 python3-pip python-virtualenv python3-virtualenv
 
     # Yarn / nodejs:
