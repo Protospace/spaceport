@@ -84,6 +84,9 @@ models.Member.objects.all().delete()
 print('Importing old members...')
 old = old_models.Members.objects.using('old_portal').all()
 
+import_date = old.last().web_crawl_date.date()
+print('Using import date:', import_date)
+
 for o in old:
     new = {}
 
@@ -143,7 +146,6 @@ for m in members:
         continue
     if not m.current_start_date: continue
 
-    import_date = datetime.date(2020, 1, 3)
     tx, _ = utils.fake_missing_membership_months(m)
     utils.tally_membership_months(m, import_date)
     utils.gen_member_forms(m)
