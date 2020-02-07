@@ -3,6 +3,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'apiserver.settings'
 django.setup()
 
 import datetime
+from django.utils import timezone
 from apiserver.api import models, old_models, utils
 
 MEMBER_FIELDS = [
@@ -222,7 +223,9 @@ for o in old:
         new[f] = o.__dict__.get(f, None)
     new['course'] = models.Course.objects.get(id=o.course_id)
     new['old_instructor'] = o.instructor
-    new['datetime'] = str(o.datetime).replace('+00:00', '-07:00')
+    dt = o.datetime.replace(tzinfo=None)
+    dt = timezone.pytz.timezone('America/Edmonton').localize(dt)
+    new['datetime'] = dt.astimezone(timezone.pytz.UTC)
 
     models.Session.objects.create(**new)
     print('Imported session #{} - {} {}'.format(
