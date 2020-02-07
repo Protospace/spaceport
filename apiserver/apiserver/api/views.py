@@ -16,7 +16,7 @@ import datetime
 
 import requests
 
-from . import models, serializers, utils, utils_paypal
+from . import models, serializers, utils, utils_paypal, utils_stats
 from .permissions import (
     is_admin_director,
     AllowMetadata,
@@ -309,6 +309,16 @@ class IpnView(views.APIView):
             print('Problem processing IPN: {} - {}'.format(e.__class__.__name__, str(e)))
         finally:
             return Response(200)
+
+
+
+class StatsView(views.APIView):
+    def get(self, request):
+        stats_keys = utils_stats.DEFAULTS.keys()
+        cached_stats = cache.get_many(stats_keys)
+        stats = utils_stats.DEFAULTS.copy()
+        stats.update(cached_stats)
+        return Response(stats)
 
 
 

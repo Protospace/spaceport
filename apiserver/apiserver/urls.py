@@ -30,5 +30,6 @@ urlpatterns = [
     url(r'^password/change/', views.PasswordChangeView.as_view(), name='rest_password_change'),
     url(r'^user/', views.UserView.as_view(), name='user'),
     url(r'^ping/', views.PingView.as_view(), name='ping'),
+    url(r'^stats/', views.StatsView.as_view(), name='stats'),
     url(IPN_ROUTE, views.IpnView.as_view(), name='ipn'),
 ]
