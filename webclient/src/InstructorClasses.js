@@ -9,14 +9,12 @@ import { BasicTable, staticUrl, requester } from './utils.js';
 
 function AttendanceRow(props) {
 	const { student, token, refreshClass } = props;
-	const [training, setTraining] = useState(student);
 	const [error, setError] = useState(false);
 
 	const handleMark = (newStatus) => {
-		const data = { attendance_status: newStatus };
-		requester('/training/'+training.id+'/', 'PATCH', token, data)
+		const data = { ...student, attendance_status: newStatus };
+		requester('/training/'+student.id+'/', 'PATCH', token, data)
 		.then(res => {
-			setTraining(res);
 			refreshClass();
 			setError(false);
 		})
@@ -26,35 +24,33 @@ function AttendanceRow(props) {
 		});
 	};
 
-	// 'withdrawn', 'rescheduled', 'no-show', 'attended', 'confirmed'
-
 	const makeProps = (name) => ({
 		onClick: () => handleMark(name),
 		toggle: true,
-		active: training.attendance_status === name,
+		active: student.attendance_status === name,
 	});
 
 	return (
 		<div className='attendance-row'>
-			<p>{training.student_name}:</p>
+			<p>{student.student_name}:</p>
 
-			<Button {...makeProps('withdrawn')}>
+			<Button {...makeProps('Withdrawn')}>
 				Withdrawn
 			</Button>
 
-			<Button {...makeProps('confirmed')}>
+			<Button {...makeProps('Confirmed')}>
 				Confirmed
 			</Button>
 
-			<Button {...makeProps('rescheduled')}>
+			<Button {...makeProps('Rescheduled')}>
 				Rescheduled
 			</Button>
 
-			<Button {...makeProps('no-show')}>
+			<Button {...makeProps('No-show')}>
 				No-show
 			</Button>
 
-			<Button {...makeProps('attended')}>
+			<Button {...makeProps('Attended')}>
 				Attended
 			</Button>
 
@@ -104,7 +100,7 @@ function InstructorClassEditor(props) {
 	return (
 		<div className='class-editor'>
 			<Form.Input
-				label='Cost ($)'
+				label='Cost ($) — 0 for free'
 				{...makeProps('cost')}
 			/>
 

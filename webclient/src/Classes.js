@@ -90,7 +90,7 @@ export function ClassDetail(props) {
 	const [error, setError] = useState(false);
 	const { token, user, refreshUser } = props;
 	const { id } = useParams();
-	const userTraining = user.training.find(x => x.session.id == id);
+	const userTraining = clazz && clazz.students.find(x => x.user == user.id);
 
 	useEffect(() => {
 		requester('/sessions/'+id+'/', 'GET', token)
@@ -104,7 +104,7 @@ export function ClassDetail(props) {
 	}, [refreshCount]);
 
 	const handleSignup = () => {
-		const data = { attendance_status: 'waiting for payment', session: id };
+		const data = { attendance_status: 'Waiting for payment', session: id };
 		requester('/training/', 'POST', token, data)
 		.then(res => {
 			refreshClass();
@@ -190,12 +190,12 @@ export function ClassDetail(props) {
 							(userTraining ?
 								<div>
 									<p>Status: {userTraining.attendance_status}</p>
-									{userTraining.attendance_status === 'withdrawn' ?
-										<Button onClick={() => handleToggle('waiting for payment')}>
+									{userTraining.attendance_status === 'Withdrawn' ?
+										<Button onClick={() => handleToggle('Waiting for payment')}>
 											Sign back up
 										</Button>
 									:
-										<Button onClick={() => handleToggle('withdrawn')}>
+										<Button onClick={() => handleToggle('Withdrawn')}>
 											Withdraw from Class
 										</Button>
 									}

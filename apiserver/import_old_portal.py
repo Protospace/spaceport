@@ -70,7 +70,7 @@ TRAINING_FIELDS = [
     'id',
     # class_session_id -> session
     'member_id',
-    'attendance_status',
+    # attendance_status -> capitalize
     'sign_up_date',
     'paid_date',
 ]
@@ -239,6 +239,7 @@ for o in old:
     for f in TRAINING_FIELDS:
         new[f] = o.__dict__.get(f, None)
     new['session'] = models.Session.objects.get(id=o.class_session_id)
+    new['attendance_status'] = o.attendance_status.capitalize()
 
     models.Training.objects.create(**new)
     print('Imported training #{} - {} {}'.format(

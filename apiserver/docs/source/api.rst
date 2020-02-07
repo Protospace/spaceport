@@ -160,7 +160,7 @@ Full User
                         "instructor": null
                     },
                     "member_id": 1685,
-                    "attendance_status": "confirmed",
+                    "attendance_status": "Confirmed",
                     "sign_up_date": null,
                     "paid_date": null
                 }
@@ -530,7 +530,7 @@ Reported Transactions
 Create Transaction
 ++++++++++++++++++
 
-.. http:post:: /transaction/
+.. http:post:: /transactions/
 
     Add a transaction to a member. Admins only.
 
@@ -764,7 +764,7 @@ Training
 
         {
             "id": 971,
-            "attendance_status": "confirmed",
+            "attendance_status": "Confirmed",
             "session": 11073,
             "student_name": "Tanner Collin",
             "member_id": 1685,
@@ -779,13 +779,13 @@ Training
 
     **Users**
 
-    :json attendance_status: One of: ``waiting for payment``, ``withdrawn``
+    :json attendance_status: One of: ``Waiting for payment``, ``Withdrawn``
     :json int session: The session (class) to register for.
 
     **Instructors and Admins**
 
-    :json attendance_status: One of: ``waiting for payment``, ``withdrawn``,
-        ``rescheduled``, ``no-show``, ``attended``, ``confirmed``
+    :json attendance_status: One of: ``Waiting for payment``, ``Withdrawn``,
+        ``Rescheduled``, ``No-show``, ``Attended``, ``Confirmed``
     :json int session: The session (class) to register for.
 
     :requestheader Authorization: ``Token <token>``
