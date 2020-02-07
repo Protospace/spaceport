@@ -1,13 +1,14 @@
 from datetime import date, datetime
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils.timezone import now
+from django.utils.timezone import now, pytz
 from simple_history.models import HistoricalRecords
 from simple_history import register
 
 register(User)
 
 IGNORE = '+'
+today_alberta_tz = lambda: datetime.now(pytz.timezone('America/Edmonton')).date()
 
 class Member(models.Model):
     user = models.OneToOneField(User, related_name='member', blank=True, null=True, on_delete=models.SET_NULL)
@@ -35,9 +36,9 @@ class Member(models.Model):
     is_staff = models.BooleanField(default=False)
     is_instructor = models.BooleanField(default=False)
     status = models.CharField(max_length=32, blank=True, null=True)
-    expire_date = models.DateField(default=date.today, null=True)
-    current_start_date = models.DateField(default=date.today, null=True)
-    application_date = models.DateField(default=date.today, null=True)
+    expire_date = models.DateField(default=today_alberta_tz, null=True)
+    current_start_date = models.DateField(default=today_alberta_tz, null=True)
+    application_date = models.DateField(default=today_alberta_tz, null=True)
     vetted_date = models.DateField(blank=True, null=True)
     paused_date = models.DateField(blank=True, null=True)
     monthly_fees = models.IntegerField(default=55, blank=True, null=True)
@@ -49,7 +50,7 @@ class Transaction(models.Model):
     recorder = models.ForeignKey(User, related_name=IGNORE, blank=True, null=True, on_delete=models.SET_NULL)
 
     member_id = models.IntegerField(blank=True, null=True)
-    date = models.DateField(default=date.today)
+    date = models.DateField(default=today_alberta_tz)
     amount = models.DecimalField(max_digits=7, decimal_places=2)
     reference_number = models.CharField(max_length=32, blank=True, null=True)
     memo = models.TextField(blank=True, null=True)
@@ -85,7 +86,7 @@ class Card(models.Model):
     member_id = models.IntegerField(blank=True, null=True)
     card_number = models.CharField(unique=True, max_length=16, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
-    last_seen_at = models.DateField(default=date.today, blank=True, null=True)
+    last_seen_at = models.DateField(default=today_alberta_tz, blank=True, null=True)
     active_status = models.CharField(max_length=32, blank=True, null=True)
 
     history = HistoricalRecords()
@@ -115,7 +116,7 @@ class Training(models.Model):
 
     member_id = models.IntegerField(blank=True, null=True)
     attendance_status = models.TextField(blank=True, null=True)
-    sign_up_date = models.DateField(default=date.today, blank=True, null=True)
+    sign_up_date = models.DateField(default=today_alberta_tz, blank=True, null=True)
     paid_date = models.DateField(blank=True, null=True)
 
     history = HistoricalRecords()
