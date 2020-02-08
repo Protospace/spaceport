@@ -16,7 +16,7 @@ def index():
     return '<i>SEE YOU SPACE SAMURAI...</i>'
 
 @app.route('/find-user', methods=['POST'])
-def check_username_exists():
+def find_user():
     check_auth()
 
     username = request.form['username']
