@@ -211,7 +211,6 @@ def link_old_member(data, user):
     failures or else the username will be taken when they try again
     '''
     if not old_models:
-        user.delete()
         raise ValidationError(dict(email='Unable to link, old DB wasn\'t imported.'))
 
     old_members = old_models.Members.objects.using('old_portal')
@@ -219,13 +218,11 @@ def link_old_member(data, user):
     try:
         old_member = old_members.get(email=data['email'])
     except old_models.Members.DoesNotExist:
-        user.delete()
-        raise ValidationError(dict(email='Unable to find email in old database.'))
+        raise ValidationError(dict(email='Unable to find email in old portal.'))
 
     member = models.Member.objects.get(id=old_member.id)
 
     if member.user:
-        user.delete()
         raise ValidationError(dict(email='Old member already claimed.'))
 
     member.user = user
@@ -249,6 +246,28 @@ def link_old_member(data, user):
         t.user = user
         t.save()
 
+def create_new_member(data, user):
+    if old_models:
+        old_members = old_models.Members.objects.using('old_portal')
+        if old_members.filter(email=data['email']).exists():
+            raise ValidationError(dict(email='Account was found in old portal.'))
+
+    models.Member.objects.create(
+        user=user,
+        first_name=data['first_name'],
+        last_name=data['last_name'],
+        preferred_name=data['first_name'],
+    )
+
+def register_user(data, user):
+    try:
+        if data['existing_member'] == 'true':
+            link_old_member(data, user)
+        else:
+            create_new_member(data, user)
+    except ValidationError:
+        user.delete()
+        raise
 
 BLANK_FORM = 'misc/blank_member_form.pdf'
 def gen_member_forms(member):

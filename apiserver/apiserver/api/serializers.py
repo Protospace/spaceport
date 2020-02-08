@@ -366,12 +366,4 @@ class RegistrationSerializer(RegisterSerializer):
             user.delete()
             raise ValidationError(dict(non_field_errors='Can only register from Protospace.'))
 
-        if data['existing_member'] == 'true':
-            utils.link_old_member(data, user)
-        else:
-            models.Member.objects.create(
-                user=user,
-                first_name=data['first_name'],
-                last_name=data['last_name'],
-                preferred_name=data['first_name'],
-            )
+        utils.register_user(data, user)
