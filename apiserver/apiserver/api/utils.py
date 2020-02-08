@@ -13,7 +13,7 @@ from reportlab.lib.pagesizes import letter
 from django.db.models import Sum
 from django.core.cache import cache
 
-from . import models, serializers
+from . import models, serializers, utils_ldap
 try:
     from . import old_models
 except ImportError:
@@ -225,6 +225,18 @@ def link_old_member(data, user):
     if member.user:
         raise ValidationError(dict(email='Old member already claimed.'))
 
+    if utils_ldap.is_configured():
+        result = utils_ldap.find_user(user.username)
+        if result == 200:
+            pass
+        elif result == 404:
+            raise ValidationError(dict(username='Unable to find username in old portal.'))
+        else:
+            raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: find.'))
+
+        if utils_ldap.set_password(data) != 200:
+            raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: set.'))
+
     member.user = user
     member.first_name = data['first_name']
     member.last_name = data['last_name']
@@ -252,6 +264,18 @@ def create_new_member(data, user):
         if old_members.filter(email=data['email']).exists():
             raise ValidationError(dict(email='Account was found in old portal.'))
 
+    if utils_ldap.is_configured():
+        result = utils_ldap.find_user(user.username)
+        if result == 200:
+            raise ValidationError(dict(username='Username was found in old portal.'))
+        elif result == 404:
+            pass
+        else:
+            raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server.'))
+
+        if utils_ldap.create_user(data) != 200:
+            raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: create.'))
+
     models.Member.objects.create(
         user=user,
         first_name=data['first_name'],
@@ -265,7 +289,7 @@ def register_user(data, user):
             link_old_member(data, user)
         else:
             create_new_member(data, user)
-    except ValidationError:
+    except:
         user.delete()
         raise
 
