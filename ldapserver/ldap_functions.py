@@ -61,6 +61,7 @@ def create_user(first, last, username, email, password):
             ('DisplayName', [full_name.encode()]),
             ('userAccountControl', [b'514']),
             ('mail', [email.encode()]),
+            ('company', [b'Spaceport']),
         ]
 
         ldap_conn.add_s(dn, ldif)
