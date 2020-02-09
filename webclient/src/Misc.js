@@ -12,6 +12,9 @@ export function PleaseLogin() {
 			</Message>
 
 			<img className='photo-404' src='/404.jpg' />
+			<p style={{ textAlign: 'right' }}>
+				<i>Space shuttle Endeavour, NASA (2011)</i>
+			</p>
 		</Container>
 	);
 };
@@ -25,6 +28,9 @@ export function NotFound() {
 			</Message>
 
 			<img className='photo-404' src='/404.jpg' />
+			<p style={{ textAlign: 'right' }}>
+				<i>Space shuttle Endeavour, NASA (2011)</i>
+			</p>
 		</Container>
 	);
 };
