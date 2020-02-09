@@ -75,7 +75,9 @@ function App() {
 
 			<Container>
 				<div className='hero'>
-					<img src='/logo-long.svg' className='logo-long' />
+					<Link to='/'>
+						<img src='/logo-long.svg' className='logo-long' />
+					</Link>
 				</div>
 			</Container>
 

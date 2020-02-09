@@ -27,6 +27,10 @@ body {
 	margin: auto;
 }
 
+.hero a {
+	outline: none;
+}
+
 #ps-menu .menu .item {
 	padding: 1.25rem 1rem !important;
 }
