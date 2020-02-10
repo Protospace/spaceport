@@ -135,7 +135,7 @@ class TestAddMonths(TestCase):
 
 class TestCalcStatus(TestCase):
     def test_calc_member_status_14_days(self):
-        expire_date = datetime.date.today() + datetime.timedelta(days=14)
+        expire_date = utils.today_alberta_tz() + datetime.timedelta(days=14)
 
         status, former = utils.calc_member_status(expire_date)
 
@@ -143,7 +143,7 @@ class TestCalcStatus(TestCase):
         self.assertEqual(former, False)
 
     def test_calc_member_status_90_days(self):
-        expire_date = datetime.date.today() + datetime.timedelta(days=90)
+        expire_date = utils.today_alberta_tz() + datetime.timedelta(days=90)
 
         status, former = utils.calc_member_status(expire_date)
 
@@ -151,7 +151,7 @@ class TestCalcStatus(TestCase):
         self.assertEqual(former, False)
 
     def test_calc_member_status_tomorrow(self):
-        expire_date = datetime.date.today() + datetime.timedelta(days=1)
+        expire_date = utils.today_alberta_tz() + datetime.timedelta(days=1)
 
         status, former = utils.calc_member_status(expire_date)
 
@@ -167,7 +167,7 @@ class TestCalcStatus(TestCase):
         self.assertEqual(former, False)
 
     def test_calc_member_status_yesterday(self):
-        expire_date = datetime.date.today() - datetime.timedelta(days=1)
+        expire_date = utils.today_alberta_tz() - datetime.timedelta(days=1)
 
         status, former = utils.calc_member_status(expire_date)
 
@@ -175,7 +175,7 @@ class TestCalcStatus(TestCase):
         self.assertEqual(former, False)
 
     def test_calc_member_status_85_days_ago(self):
-        expire_date = datetime.date.today() - datetime.timedelta(days=85)
+        expire_date = utils.today_alberta_tz() - datetime.timedelta(days=85)
 
         status, former = utils.calc_member_status(expire_date)
 
@@ -183,7 +183,7 @@ class TestCalcStatus(TestCase):
         self.assertEqual(former, False)
 
     def test_calc_member_status_95_days_ago(self):
-        expire_date = datetime.date.today() - datetime.timedelta(days=95)
+        expire_date = utils.today_alberta_tz() - datetime.timedelta(days=95)
 
         status, former = utils.calc_member_status(expire_date)
 
@@ -235,7 +235,7 @@ class TestTallyMembership(TestCase):
     def test_tally_membership_months_prepaid(self):
         member = self.get_member_clear_transactions()
         test_num_months = 8
-        start_date = datetime.date.today() - relativedelta.relativedelta(months=6, days=14)
+        start_date = utils.today_alberta_tz() - relativedelta.relativedelta(months=6, days=14)
         end_date = start_date + relativedelta.relativedelta(months=test_num_months)
 
         member.current_start_date = start_date
@@ -256,7 +256,7 @@ class TestTallyMembership(TestCase):
     def test_tally_membership_months_current(self):
         member = self.get_member_clear_transactions()
         test_num_months = 7
-        start_date = datetime.date.today() - relativedelta.relativedelta(months=6, days=14)
+        start_date = utils.today_alberta_tz() - relativedelta.relativedelta(months=6, days=14)
         end_date = start_date + relativedelta.relativedelta(months=test_num_months)
 
         member.current_start_date = start_date
@@ -277,7 +277,7 @@ class TestTallyMembership(TestCase):
     def test_tally_membership_months_due(self):
         member = self.get_member_clear_transactions()
         test_num_months = 6
-        start_date = datetime.date.today() - relativedelta.relativedelta(months=6, days=14)
+        start_date = utils.today_alberta_tz() - relativedelta.relativedelta(months=6, days=14)
         end_date = start_date + relativedelta.relativedelta(months=test_num_months)
 
         member.current_start_date = start_date
@@ -298,7 +298,7 @@ class TestTallyMembership(TestCase):
     def test_tally_membership_months_overdue(self):
         member = self.get_member_clear_transactions()
         test_num_months = 5
-        start_date = datetime.date.today() - relativedelta.relativedelta(months=6, days=14)
+        start_date = utils.today_alberta_tz() - relativedelta.relativedelta(months=6, days=14)
         end_date = start_date + relativedelta.relativedelta(months=test_num_months)
 
         member.current_start_date = start_date
@@ -319,7 +319,7 @@ class TestTallyMembership(TestCase):
     def test_tally_membership_months_overdue_pause(self):
         member = self.get_member_clear_transactions()
         test_num_months = 1
-        start_date = datetime.date.today() - relativedelta.relativedelta(months=6, days=14)
+        start_date = utils.today_alberta_tz() - relativedelta.relativedelta(months=6, days=14)
         end_date = start_date + relativedelta.relativedelta(months=test_num_months)
 
         member.current_start_date = start_date
@@ -340,7 +340,7 @@ class TestTallyMembership(TestCase):
 
     def test_tally_membership_months_dont_run(self):
         member = self.get_member_clear_transactions()
-        start_date = datetime.date.today()
+        start_date = utils.today_alberta_tz()
 
         member.current_start_date = start_date
         member.paused_date = start_date
