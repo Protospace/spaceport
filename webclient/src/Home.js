@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
+import moment from 'moment';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
@@ -114,6 +115,23 @@ function MemberInfo(props) {
 
 export function Home(props) {
 	const { user } = props;
+	const [stats, setStats] = useState(JSON.parse(localStorage.getItem('stats', 'false')));
+
+	useEffect(() => {
+		requester('/stats/', 'GET')
+		.then(res => {
+			setStats(res);
+			localStorage.setItem('stats', JSON.stringify(res));
+		})
+		.catch(err => {
+			console.log(err);
+			setUserCache(null);
+		});
+	}, []);
+
+	const getStat = (x) => stats && stats[x] ? stats[x] : '?';
+	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).local().format('ll') : '?';
+
 	return (
 		<Container>
 			<Grid stackable padded columns={2}>
@@ -149,13 +167,13 @@ export function Home(props) {
 
 						<div>
 							<Header size='medium'>Protospace Stats</Header>
-							<p>Next member meeting: Jan 01, 2099</p>
-							<p>Next monthly clean: Jan 01, 2099</p>
-							<p>Current member count: 200</p>
-							<p>Due members: 20</p>
-							<p>Expired members: 100</p>
-							<p>Bay 108 temperature: 21 C</p>
-							<p>Bay 110 temperature: 22 C</p>
+							<p>Next member meeting: {getDateStat('next_meeting')}</p>
+							<p>Next monthly clean: {getDateStat('next_clean')}</p>
+							<p>Member count: {getStat('member_count')}</p>
+							<p>Green members: {getStat('green_count')}</p>
+							<p>Old members: {getStat('paused_count')}</p>
+							<p>Bay 108 temperature: {getStat('bay_108_temp')} °C</p>
+							<p>Bay 110 temperature: {getStat('bay_110_temp')} °C</p>
 						</div>
 
 					</Segment>
