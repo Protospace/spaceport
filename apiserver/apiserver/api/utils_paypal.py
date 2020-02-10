@@ -185,7 +185,7 @@ def create_member_training_tx(data, member, training):
         user=user,
     )
 
-def check_training(data, member, training_id, amount):
+def check_training(data, training_id, amount):
     trainings = models.Training.objects
 
     if not trainings.filter(id=training_id).exists():
@@ -208,10 +208,10 @@ def check_training(data, member, training_id, amount):
     if not training.user:
         return False
 
-    if training.user.member != member:
-        return False
+    member = training.user.member
 
     training.attendance_status = 'confirmed'
+    training.paid_date = datetime.date.today()
     training.save()
 
     print('Amount valid for training cost, id:', training.id)
@@ -260,6 +260,21 @@ def process_paypal_ipn(data):
         update_ipn(ipn, 'Duplicate')
         return False
 
+    try:
+        custom_json = json.loads(data['custom'])
+    except (KeyError, ValueError):
+        custom_json = False
+
+    if custom_json and 'training' in custom_json:
+        tx = check_training(data, custom_json['training'], amount)
+        if tx:
+            print('Training matched, adding hint and returning')
+            hints.objects.update_or_create(
+                account=data['payer_id'],
+                defaults=dict(member_id=tx.member_id),
+            )
+            return tx
+
     if not hints.filter(account=data['payer_id']).exists():
         print('Unable to associate with member, reporting')
         update_ipn(ipn, 'Accepted, Unmatched Member')
@@ -278,15 +293,6 @@ def process_paypal_ipn(data):
         print('Amount valid for membership dues, adding months:', num_months)
         update_ipn(ipn, 'Accepted, Member Dues')
         return create_member_dues_tx(data, member, num_months)
-
-    try:
-        custom_json = json.loads(data['custom'])
-    except (KeyError, ValueError):
-        custom_json = False
-
-    if custom_json and 'training' in custom_json:
-        tx = check_training(data, member, custom_json['training'], amount)
-        if tx: return tx
 
     print('Unable to find a reason for payment, reporting')
     update_ipn(ipn, 'Accepted, Unmatched Purchase')

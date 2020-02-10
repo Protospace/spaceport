@@ -196,6 +196,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
 
     # TODO: turn these into @actions
     # TODO: check if full
+    # TODO: if already paid, skip to confirmed
     def perform_create(self, serializer):
         session_id = self.request.data['session']
         status = self.request.data['attendance_status']
