@@ -226,7 +226,9 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
     def get_queryset(self):
         queryset = models.Transaction.objects
         if self.action == 'list':
-            return queryset.exclude(report_type__isnull=True).order_by('-id', '-date')
+            queryset = queryset.exclude(report_type__isnull=True)
+            queryset = queryset.exclude(report_type='')
+            return queryset.order_by('-id', '-date')
         else:
             return queryset.all()
 
