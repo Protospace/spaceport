@@ -159,7 +159,7 @@ class TestCalcStatus(TestCase):
         self.assertEqual(former, False)
 
     def test_calc_member_status_today(self):
-        expire_date = datetime.date.today()
+        expire_date = utils.today_alberta_tz()
 
         status, former = utils.calc_member_status(expire_date)
 

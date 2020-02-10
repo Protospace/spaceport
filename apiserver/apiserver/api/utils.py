@@ -1,6 +1,6 @@
-import datetime
 import io
 import requests
+from datetime import datetime, timedelta
 from rest_framework.exceptions import ValidationError
 from dateutil import relativedelta
 from uuid import uuid4
@@ -12,6 +12,7 @@ from reportlab.lib.pagesizes import letter
 
 from django.db.models import Sum
 from django.core.cache import cache
+from django.utils.timezone import now, pytz
 
 from . import models, serializers, utils_ldap
 try:
@@ -22,6 +23,9 @@ except ImportError:
 
 STATIC_FOLDER = 'data/static/'
 
+
+def today_alberta_tz():
+    return datetime.now(pytz.timezone('America/Edmonton')).date()
 
 def num_months_spanned(d1, d2):
     '''
@@ -44,7 +48,8 @@ def calc_member_status(expire_date, fake_date=None):
     '''
     Return: status, if we should pause them
     '''
-    today = fake_date or datetime.date.today()
+    today = fake_date or today_alberta_tz()
+
     difference = num_months_difference(expire_date, today)
 
     #if today + datetime.timedelta(days=29) < expire_date:
