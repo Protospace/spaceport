@@ -333,8 +333,9 @@ class StatsView(views.APIView):
 
 
 class RegistrationView(RegisterView):
-    serializer_class = serializers.RegistrationSerializer
+    serializer_class = serializers.MyRegisterSerializer
 
 
 class PasswordChangeView(PasswordChangeView):
     permission_classes = [AllowMetadata | IsAuthenticated]
+    serializer_class = serializers.MyPasswordChangeSerializer

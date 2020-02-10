@@ -4,10 +4,11 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
 from rest_auth.registration.serializers import RegisterSerializer
+from rest_auth.serializers import PasswordChangeSerializer
 from rest_auth.serializers import UserDetailsSerializer
 import re
 
-from . import models, fields, utils
+from . import models, fields, utils, utils_ldap
 from .. import settings
 
 class TransactionSerializer(serializers.ModelSerializer):
@@ -347,7 +348,7 @@ class UserSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
-class RegistrationSerializer(RegisterSerializer):
+class MyRegisterSerializer(RegisterSerializer):
     first_name = serializers.CharField(max_length=32)
     last_name = serializers.CharField(max_length=32)
     existing_member = serializers.ChoiceField(['true', 'false'])
@@ -367,3 +368,16 @@ class RegistrationSerializer(RegisterSerializer):
             raise ValidationError(dict(non_field_errors='Can only register from Protospace.'))
 
         utils.register_user(data, user)
+
+class MyPasswordChangeSerializer(PasswordChangeSerializer):
+    def save(self):
+        data = dict(
+            username=self.user.username,
+            password1=self.request.data['new_password1'],
+        )
+
+        if utils_ldap.is_configured():
+            if utils_ldap.set_password(data) != 200:
+                raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: set.'))
+
+        super().save()
