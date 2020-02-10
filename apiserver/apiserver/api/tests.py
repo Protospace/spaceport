@@ -142,6 +142,14 @@ class TestCalcStatus(TestCase):
         self.assertEqual(status, 'Current')
         self.assertEqual(former, False)
 
+    def test_calc_member_status_1_month(self):
+        expire_date = utils.today_alberta_tz() + relativedelta.relativedelta(months=1)
+
+        status, former = utils.calc_member_status(expire_date)
+
+        self.assertEqual(status, 'Current')
+        self.assertEqual(former, False)
+
     def test_calc_member_status_90_days(self):
         expire_date = utils.today_alberta_tz() + datetime.timedelta(days=90)
 

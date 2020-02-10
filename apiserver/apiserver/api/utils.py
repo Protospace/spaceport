@@ -52,8 +52,7 @@ def calc_member_status(expire_date, fake_date=None):
 
     difference = num_months_difference(expire_date, today)
 
-    #if today + datetime.timedelta(days=29) < expire_date:
-    if difference >= 1:
+    if today + timedelta(days=29) < expire_date:
         return 'Prepaid', False
     elif difference <= -3:
         return 'Overdue', True
