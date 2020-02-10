@@ -8,7 +8,9 @@ from simple_history import register
 register(User)
 
 IGNORE = '+'
-today_alberta_tz = lambda: datetime.now(pytz.timezone('America/Edmonton')).date()
+
+def today_alberta_tz():
+    return datetime.now(pytz.timezone('America/Edmonton')).date()
 
 class Member(models.Model):
     user = models.OneToOneField(User, related_name='member', blank=True, null=True, on_delete=models.SET_NULL)
@@ -59,7 +61,7 @@ class Transaction(models.Model):
     category = models.TextField(blank=True, null=True)
     account_type = models.TextField(blank=True, null=True)
     info_source = models.TextField(blank=True, null=True)
-    paypal_txn_id = models.CharField(max_length=17, unique=True, blank=True, null=True)
+    paypal_txn_id = models.CharField(max_length=17, blank=True, null=True)
     paypal_payer_id = models.CharField(max_length=13, blank=True, null=True)
 
     report_type = models.TextField(blank=True, null=True)
