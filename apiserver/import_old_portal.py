@@ -91,6 +91,12 @@ print('Using import date:', import_date)
 for o in old:
     new = {}
 
+    if o.status == 'Contractor':
+        print('Skipping contractor member #{} - {} {}'.format(
+            o.id, o.first_name, o.last_name
+        ))
+        continue
+
     for f in MEMBER_FIELDS:
         new[f] = o.__dict__.get(f, None)
 
