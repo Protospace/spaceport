@@ -145,14 +145,18 @@ export function Home(props) {
 						<p><a href='https://groups.google.com/forum/#!forum/protospace-administration' target='_blank' rel='noopener noreferrer'>Admin Google Group</a></p>
 						<p><a href='https://drive.google.com/open?id=0By-vvp6fxFekfmU1cmdxaVRlaldiYXVyTE9rRnNVNjhkc3FjdkFIbjBwQkZ3MVVQX2Ezc3M' target='_blank' rel='noopener noreferrer'>Google Drive</a></p>
 
-						<Header size='medium'>Protospace Stats</Header>
-						<p>Next member meeting: Jan 01, 2099</p>
-						<p>Next monthly clean: Jan 01, 2099</p>
-						<p>Current member count: 200</p>
-						<p>Due members: 20</p>
-						<p>Expired members: 100</p>
-						<p>Bay 108 temperature: 21 C</p>
-						<p>Bay 110 temperature: 22 C</p>
+						<img className='swordfish' src='/swordfish.png' />
+
+						<div>
+							<Header size='medium'>Protospace Stats</Header>
+							<p>Next member meeting: Jan 01, 2099</p>
+							<p>Next monthly clean: Jan 01, 2099</p>
+							<p>Current member count: 200</p>
+							<p>Due members: 20</p>
+							<p>Expired members: 100</p>
+							<p>Bay 108 temperature: 21 C</p>
+							<p>Bay 110 temperature: 22 C</p>
+						</div>
 
 					</Segment>
 				</Grid.Column>
