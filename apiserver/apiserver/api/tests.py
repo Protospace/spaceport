@@ -143,9 +143,10 @@ class TestCalcStatus(TestCase):
         self.assertEqual(former, False)
 
     def test_calc_member_status_1_month(self):
-        expire_date = utils.today_alberta_tz() + relativedelta.relativedelta(months=1)
+        today = datetime.date(2019, 2, 10)
+        expire_date = datetime.date(2019, 3, 10)
 
-        status, former = utils.calc_member_status(expire_date)
+        status, former = utils.calc_member_status(expire_date, today)
 
         self.assertEqual(status, 'Current')
         self.assertEqual(former, False)
@@ -180,6 +181,15 @@ class TestCalcStatus(TestCase):
         status, former = utils.calc_member_status(expire_date)
 
         self.assertEqual(status, 'Due')
+        self.assertEqual(former, False)
+
+    def test_calc_member_status_1_month_ago(self):
+        today = datetime.date(2019, 4, 10)
+        expire_date = datetime.date(2019, 3, 10)
+
+        status, former = utils.calc_member_status(expire_date, today)
+
+        self.assertEqual(status, 'Overdue')
         self.assertEqual(former, False)
 
     def test_calc_member_status_85_days_ago(self):

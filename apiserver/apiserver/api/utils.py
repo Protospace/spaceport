@@ -56,7 +56,7 @@ def calc_member_status(expire_date, fake_date=None):
         return 'Prepaid', False
     elif difference <= -3:
         return 'Overdue', True
-    elif difference <= -1:
+    elif today - timedelta(days=29) >= expire_date:
         return 'Overdue', False
     elif today < expire_date:
         return 'Current', False
