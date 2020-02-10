@@ -5,9 +5,6 @@ from apiserver import secrets
 def is_configured():
     return bool(secrets.LDAP_API_URL and secrets.LDAP_API_KEY)
 
-if not is_configured:
-    print('LDAP connection not configured.')
-
 
 def ldap_api(route, data):
     try:

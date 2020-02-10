@@ -7,7 +7,6 @@ from .api import views
 from . import secrets
 
 IPN_ROUTE = r'^ipn/{}/'.format(secrets.IPN_RANDOM)
-print('IPN route is:', '/'+IPN_ROUTE[1:])
 
 router = routers.DefaultRouter()
 router.register(r'door', views.DoorViewSet, basename='door')
