@@ -1,5 +1,7 @@
 import time
+import datetime
 from django.core.cache import cache
+from django.utils.timezone import now
 from apiserver.api import models
 
 DEFAULTS = {
@@ -23,11 +25,13 @@ def changed_card():
 def calc_next_events():
     sessions = models.Session.objects
 
-    member_meeting = sessions.filter(course=317).last()
-    monthly_clean = sessions.filter(course=273).last()
+    member_meeting = sessions.filter(course=317, datetime__gte=now()).first()
+    monthly_clean = sessions.filter(course=273, datetime__gte=now()).first()
 
-    cache.set('next_meeting', member_meeting.datetime)
-    cache.set('next_clean', monthly_clean.datetime)
+    if member_meeting:
+        cache.set('next_meeting', member_meeting.datetime)
+    if monthly_clean:
+        cache.set('next_clean', monthly_clean.datetime)
 
 def calc_member_counts():
     members = models.Member.objects
