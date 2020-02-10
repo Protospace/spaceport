@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.timezone import now
 from apiserver.api import models, utils, utils_stats
 
 import time
@@ -17,6 +18,7 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
+        self.stdout.write('{} - Beginning daily tasks'.format(str(now())))
         start = time.time()
 
         count = self.tally_active_members()

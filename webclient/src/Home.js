@@ -125,7 +125,7 @@ export function Home(props) {
 		})
 		.catch(err => {
 			console.log(err);
-			setUserCache(null);
+			setStats(false);
 		});
 	}, []);
 
