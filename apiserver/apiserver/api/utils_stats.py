@@ -1,13 +1,14 @@
-from django.core.cache import cache
 import time
+from django.core.cache import cache
+from apiserver.api import models
 
 DEFAULTS = {
     'last_card_change': time.time(),
     'next_meeting': None,
     'next_clean': None,
     'member_count': None,
-    'due_members': None,
-    'old_members': None,
+    'paused_count': None,
+    'green_count': None,
     'bay_108_temp': None,
     'bay_110_temp': None,
 }
@@ -18,3 +19,24 @@ def changed_card():
     user status becoming overdue by 3 months
     '''
     cache.set('last_card_change', time.time())
+
+def calc_next_events():
+    sessions = models.Session.objects
+
+    member_meeting = sessions.filter(course=317).last()
+    monthly_clean = sessions.filter(course=273).last()
+
+    cache.set('next_meeting', member_meeting.datetime)
+    cache.set('next_clean', monthly_clean.datetime)
+
+def calc_member_counts():
+    members = models.Member.objects
+
+    num_not_paused = members.filter(paused_date__isnull=True).count()
+    num_paused = members.filter(paused_date__isnull=False).count()
+    num_current = members.filter(status='Current').count()
+    num_prepaid = members.filter(status='Prepaid').count()
+
+    cache.set('member_count', num_not_paused)
+    cache.set('paused_count', num_paused)
+    cache.set('green_count', num_current + num_prepaid)
