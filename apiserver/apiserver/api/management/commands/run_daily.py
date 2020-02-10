@@ -18,9 +18,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start = time.time()
+
         count = self.tally_active_members()
-        self.stdout.write('Tallied {} active members in {} s'.format(
-            count, str(time.time() - start)
-        ))
+        self.stdout.write('Tallied {} active members'.format(count))
 
         utils_stats.changed_card()
+        self.stdout.write('Updated card change time')
+
+        self.stdout.write('Completed tasks in {} s'.format(
+            str(time.time() - start)
+        ))
