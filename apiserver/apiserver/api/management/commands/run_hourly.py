@@ -16,7 +16,7 @@ class Command(BaseCommand):
         self.stdout.write('{} - Beginning hourly tasks'.format(str(now())))
         start = time.time()
 
-        count = self.generate_stats()
+        self.generate_stats()
         self.stdout.write('Generated stats')
 
         self.stdout.write('Completed tasks in {} s'.format(
