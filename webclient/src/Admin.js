@@ -478,26 +478,6 @@ export function AdminMemberForm(props) {
 				/>
 
 				<Form.Field>
-					<label>Is the member a director?</label>
-					<Checkbox
-						label='Yes'
-						name='is_director'
-						onChange={handleCheck}
-						checked={input.is_director}
-					/>
-				</Form.Field>
-
-				<Form.Field>
-					<label>Is the member portal staff?</label>
-					<Checkbox
-						label='Yes'
-						name='is_staff'
-						onChange={handleCheck}
-						checked={input.is_staff}
-					/>
-				</Form.Field>
-
-				<Form.Field>
 					<label>Is the member an instructor?</label>
 					<Checkbox
 						label='Yes'
