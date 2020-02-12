@@ -168,6 +168,8 @@ class AdminMemberSerializer(MemberSerializer):
             'member_forms',
             'user',
             'old_email',
+            'is_director',
+            'is_staff',
         ]
 
 
