@@ -6,6 +6,7 @@ from uuid import uuid4
 
 from django.db.models import Sum
 from django.utils import timezone
+from django.utils.timezone import now
 
 from . import models, serializers, utils
 
@@ -33,6 +34,8 @@ def parse_paypal_date(string):
         'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
         'Sep', 'Oct', 'Nov', 'Dec',
     ]
+
+    if not string: return now()
 
     value = string.strip()
     try:
@@ -90,26 +93,26 @@ def verify_paypal_ipn(data):
     return True
 
 def build_tx(data):
-    amount = float(data['mc_gross'])
+    amount = float(data.get('mc_gross', 0))
     return dict(
         account_type='PayPal',
         amount=amount,
-        date=parse_paypal_date(data['payment_date']),
+        date=parse_paypal_date(data.get('payment_date', '')),
         info_source='PayPal IPN',
-        payment_method=data['payment_type'],
-        paypal_payer_id=data['payer_id'],
-        paypal_txn_id=data['txn_id'],
-        reference_number=data['txn_id'],
+        payment_method=data.get('payment_type', 'unknown'),
+        paypal_payer_id=data.get('payer_id', 'unknown'),
+        paypal_txn_id=data.get('txn_id', 'unknown'),
+        reference_number=data.get('txn_id', 'unknown'),
     )
 
 def create_unmatched_member_tx(data):
     transactions = models.Transaction.objects
 
     report_memo = 'Cant link sender name, {} {}, email: {}, note: {}'.format(
-        data['first_name'],
-        data['last_name'],
-        data['payer_email'],
-        data['custom'],
+        data.get('first_name', 'unknown'),
+        data.get('last_name', 'unknown'),
+        data.get('payer_email', 'unknown'),
+        data.get('custom', 'none'),
     )
 
     return transactions.create(
@@ -131,9 +134,9 @@ def create_member_dues_tx(data, member, num_months):
     user = getattr(member, 'user', None)
     memo = '{}{} {} - Protospace Membership, {}'.format(
         deal,
-        data['first_name'],
-        data['last_name'],
-        data['payer_email'],
+        data.get('first_name', 'unknown'),
+        data.get('last_name', 'unknown'),
+        data.get('payer_email', 'unknown'),
     )
 
     tx = transactions.create(
@@ -151,10 +154,10 @@ def create_unmatched_purchase_tx(data, member):
 
     user = getattr(member, 'user', None)
     report_memo = 'Unknown payment reason, {} {}, email: {}, note: {}'.format(
-        data['first_name'],
-        data['last_name'],
-        data['payer_email'],
-        data['custom'],
+        data.get('first_name', 'unknown'),
+        data.get('last_name', 'unknown'),
+        data.get('payer_email', 'unknown'),
+        data.get('custom', 'none'),
     )
 
     return transactions.create(
@@ -170,10 +173,10 @@ def create_member_training_tx(data, member, training):
 
     user = getattr(member, 'user', None)
     memo = '{} {} - {} Course, email: {}, session: {}, training: {}'.format(
-        data['first_name'],
-        data['last_name'],
+        data.get('first_name', 'unknown'),
+        data.get('last_name', 'unknown'),
         training.session.course.name,
-        data['payer_email'],
+        data.get('payer_email', 'unknown'),
         str(training.session.id),
         str(training.id),
     )
@@ -234,19 +237,19 @@ def process_paypal_ipn(data):
         update_ipn(ipn, 'Verification Failed')
         return False
 
-    amount = float(data['mc_gross'])
+    amount = float(data.get('mc_gross', '0'))
 
-    if data['payment_status'] != 'Completed':
+    if data.get('payment_status', 'unknown') != 'Completed':
         print('Payment not yet completed, ignoring')
         update_ipn(ipn, 'Payment Incomplete')
         return False
 
-    if data['receiver_email'] != OUR_EMAIL:
+    if data.get('receiver_email', 'unknown') != OUR_EMAIL:
         print('Payment not for us, ignoring')
         update_ipn(ipn, 'Invalid Receiver')
         return False
 
-    if data['mc_currency'] != OUR_CURRENCY:
+    if data.get('mc_currency', 'unknown') != OUR_CURRENCY:
         print('Payment currency invalid, ignoring')
         update_ipn(ipn, 'Invalid Currency')
         return False
@@ -255,13 +258,13 @@ def process_paypal_ipn(data):
     members = models.Member.objects
     hints = models.PayPalHint.objects
 
-    if transactions.filter(paypal_txn_id=data['txn_id']).exists():
+    if transactions.filter(paypal_txn_id=data.get('txn_id', 'unknown')).exists():
         print('Duplicate transaction, ignoring')
         update_ipn(ipn, 'Duplicate')
         return False
 
     try:
-        custom_json = json.loads(data['custom'])
+        custom_json = json.loads(data.get('custom', ''))
     except (KeyError, ValueError):
         custom_json = False
 
@@ -270,12 +273,12 @@ def process_paypal_ipn(data):
         if tx:
             print('Training matched, adding hint and returning')
             hints.objects.update_or_create(
-                account=data['payer_id'],
+                account=data.get('payer_id', 'unknown'),
                 defaults=dict(member_id=tx.member_id),
             )
             return tx
 
-    if not hints.filter(account=data['payer_id']).exists():
+    if 'payer_id' in data and not hints.filter(account=data['payer_id']).exists():
         print('Unable to associate with member, reporting')
         update_ipn(ipn, 'Accepted, Unmatched Member')
         return create_unmatched_member_tx(data)
