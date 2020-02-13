@@ -5,7 +5,7 @@ export function PayPal(props) {
 
 	return (
 		<div className='paypal-container'>
-			<form action='https://sandbox.paypal.com/cgi-bin/webscr' method='post' target='_top'>
+			<form action='https://paypal.com/cgi-bin/webscr' method='post' target='_top'>
 				<input type='hidden' name='cmd' value='_xclick' />
 				<input type='hidden' name='business' value='info@protospace.ca' />
 				<input type='hidden' name='lc' value='CA' />
