@@ -10,14 +10,14 @@ from django.utils.timezone import now
 
 from . import models, serializers, utils
 
-SANDBOX = True
+SANDBOX = False
 if SANDBOX:
     VERIFY_URL = 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr'
     OUR_EMAIL = 'seller@paypalsandbox.com'
     OUR_CURRENCY = 'USD'
 else:
     VERIFY_URL = 'https://ipnpb.paypal.com/cgi-bin/webscr'
-    OUR_EMAIL = 'dunno'
+    OUR_EMAIL = 'info@protospace.ca'
     OUR_CURRENCY = 'CAD'
 
 def parse_paypal_date(string):
