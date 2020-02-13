@@ -305,8 +305,6 @@ Edit Member Details
 
     :json first_name:
     :json last_name:
-    :json boolean is_director: Grants admin privileges to member.
-    :json boolean is_staff: Same as director, just not named one.
     :json boolean is_instructor: Able to create and edit courses and sessions.
     :json application_date: When they applied to Protospace, YYYY-MM-DD.
     :json current_start_date: When to start counting their membership dues from.
