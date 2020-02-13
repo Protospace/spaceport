@@ -287,7 +287,7 @@ def process_paypal_ipn(data):
     member = members.get(id=member_id)
     monthly_fees = member.monthly_fees
 
-    if amount.is_integer() and amount % monthly_fees == 0:
+    if amount.is_integer() and monthly_fees and amount % monthly_fees == 0:
         num_months = int(amount // monthly_fees)
     else:
         num_months = 0

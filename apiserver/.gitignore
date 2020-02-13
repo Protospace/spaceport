@@ -110,4 +110,5 @@ migrations/
 data/
 old_photos/
 old_paypal/
+missing_paypal/
 secrets.py
