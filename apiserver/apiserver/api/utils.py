@@ -232,14 +232,14 @@ def link_old_member(data, user):
     if utils_ldap.is_configured():
         result = utils_ldap.find_user(user.username)
         if result == 200:
-            pass
+            if utils_ldap.set_password(data) != 200:
+                raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: set.'))
         elif result == 404:
-            raise ValidationError(dict(username='Unable to find username in old portal.'))
+            if utils_ldap.create_user(data) != 200:
+                raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: create.'))
         else:
             raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: find.'))
 
-        if utils_ldap.set_password(data) != 200:
-            raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: set.'))
 
     member.user = user
     member.first_name = data['first_name']
