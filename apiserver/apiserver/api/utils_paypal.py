@@ -184,6 +184,7 @@ def create_member_training_tx(data, member, training):
     return transactions.create(
         **build_tx(data),
         member_id=member.id,
+        category='OnAcct',
         memo=memo,
         user=user,
     )
@@ -196,7 +197,7 @@ def check_training(data, training_id, amount):
 
     training = trainings.get(id=training_id)
 
-    if training.attendance_status != 'waiting for payment':
+    if training.attendance_status != 'Waiting for payment':
         return False
 
     if not training.session:
@@ -213,7 +214,7 @@ def check_training(data, training_id, amount):
 
     member = training.user.member
 
-    training.attendance_status = 'confirmed'
+    training.attendance_status = 'Confirmed'
     training.paid_date = datetime.date.today()
     training.save()
 
@@ -277,7 +278,7 @@ def process_paypal_ipn(data):
         tx = check_training(data, custom_json['training'], amount)
         if tx:
             print('Training matched, adding hint and returning')
-            hints.objects.update_or_create(
+            hints.update_or_create(
                 account=data.get('payer_id', 'unknown'),
                 defaults=dict(member_id=tx.member_id),
             )
