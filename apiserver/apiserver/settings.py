@@ -31,7 +31,7 @@ DEBUG = DEBUG_ENV or False
 if DEBUG: print('Debug mode ON')
 
 
-PRODUCTION_HOST = 'my.dns.t0.vc'
+PRODUCTION_HOST = 'my.protospace.ca'
 
 
 # production hosts
@@ -46,6 +46,7 @@ if DEBUG:
         'spaceport-api.dns.t0.vc',
         'api.spaceport.dns.t0.vc',
         'api.my.dns.t0.vc',
+        'api.my.protospace.ca',
     ]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
