@@ -30,8 +30,17 @@ export function LoginForm(props) {
 	};
 
 	return (
-		<Form onSubmit={handleSubmit}>
+		<Form
+			onSubmit={handleSubmit}
+			warning={error.non_field_errors && error.non_field_errors[0] === 'Unable to log in with provided credentials.'}
+		>
 			<Header size='medium'>Log In to Spaceport</Header>
+
+			<Message warning>
+				<Message.Header>First time at the new portal?</Message.Header>
+				<p>Sign up below from Protospace Wi-Fi / computers.</p>
+			</Message>
+
 			<Form.Input
 				label='Username'
 				name='username'
