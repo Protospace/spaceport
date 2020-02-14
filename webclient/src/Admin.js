@@ -413,7 +413,8 @@ export function AdminMemberForm(props) {
 		if (loading) return;
 		setLoading(true);
 		setSuccess(false);
-		requester('/members/' + id + '/', 'PATCH', token, input)
+		const data = { ...input, email: input.email.toLowerCase() };
+		requester('/members/' + id + '/', 'PATCH', token, data)
 		.then(res => {
 			setLoading(false);
 			setSuccess(true);

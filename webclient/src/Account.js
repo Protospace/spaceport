@@ -126,7 +126,8 @@ export function AccountForm(props) {
 	const handleSubmit = (e) => {
 		if (loading) return;
 		setLoading(true);
-		requester('/members/' + member.id + '/', 'PATCH', token, input)
+		const data = { ...input, email: input.email.toLowerCase() };
+		requester('/members/' + member.id + '/', 'PATCH', token, data)
 		.then(res => {
 			setError({});
 			refreshUser();

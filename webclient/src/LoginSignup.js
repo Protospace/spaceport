@@ -54,7 +54,7 @@ export function LoginForm(props) {
 };
 
 export function SignupForm(props) {
-	const [input, setInput] = useState({});
+	const [input, setInput] = useState({ email: '' });
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
 
@@ -72,7 +72,8 @@ export function SignupForm(props) {
 		if (loading) return;
 		setLoading(true);
 		input.username = genUsername();
-		requester('/registration/', 'POST', '', input)
+		const data = { ...input, email: input.email.toLowerCase() };
+		requester('/registration/', 'POST', '', data)
 		.then(res => {
 			setError({});
 			props.setTokenCache(res.key);
