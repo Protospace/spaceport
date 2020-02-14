@@ -17,7 +17,7 @@ if SANDBOX:
     OUR_CURRENCY = 'USD'
 else:
     VERIFY_URL = 'https://ipnpb.paypal.com/cgi-bin/webscr'
-    OUR_EMAIL = 'info@protospace.ca'
+    OUR_EMAIL = 'paypal@protospace.ca'
     OUR_CURRENCY = 'CAD'
 
 def parse_paypal_date(string):
@@ -258,7 +258,12 @@ def process_paypal_ipn(data):
     members = models.Member.objects
     hints = models.PayPalHint.objects
 
-    if transactions.filter(paypal_txn_id=data.get('txn_id', 'unknown')).exists():
+    if 'txn_id' not in data:
+        print('Missing transaction ID, ignoring')
+        update_ipn(ipn, 'Missing ID')
+        return False
+
+    if transactions.filter(paypal_txn_id=data['txn_id']).exists():
         print('Duplicate transaction, ignoring')
         update_ipn(ipn, 'Duplicate')
         return False
