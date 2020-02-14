@@ -154,6 +154,11 @@ class MemberSerializer(serializers.ModelSerializer):
 
 # admin viewing member details
 class AdminMemberSerializer(MemberSerializer):
+    phone = serializers.CharField(required=False)
+    street_address = serializers.CharField(required=False)
+    city = serializers.CharField(required=False)
+    postal_code = serializers.CharField(required=False)
+
     class Meta:
         model = models.Member
         fields = '__all__'
