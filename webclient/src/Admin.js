@@ -41,6 +41,7 @@ export function Admin(props) {
 						Automate with wget (keep secret, that's <b>your</b> login token):
 						<pre>
 							wget \
+							<br />  --content-disposition \
 							<br />  --header="Authorization: Token {token}" \
 							<br />  {apiUrl}/backup/
 						</pre>
