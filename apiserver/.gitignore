@@ -111,4 +111,5 @@ data/
 old_photos/
 old_paypal/
 missing_paypal/
+backups/
 secrets.py
