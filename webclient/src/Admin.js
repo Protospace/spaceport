@@ -9,6 +9,7 @@ import { NotFound } from './Misc.js';
 export function Admin(props) {
 	const { token, user } = props;
 	const [backup, setBackup] = useState(false);
+	const [reveal, setReveal] = useState(false);
 	const [error, setError] = useState(false);
 
 	useEffect(() => {
@@ -39,12 +40,16 @@ export function Admin(props) {
 
 					<p>
 						Automate with wget (keep secret, that's <b>your</b> login token):
-						<pre>
-							wget \
-							<br />  --content-disposition \
-							<br />  --header="Authorization: Token {token}" \
-							<br />  {apiUrl}/backup/
-						</pre>
+						{reveal ?
+							<pre>
+								wget \
+								<br />  --content-disposition \
+								<br />  --header="Authorization: Token {token}" \
+								<br />  {apiUrl}/backup/
+							</pre>
+						:
+							<div><Button onClick={() => setReveal(true)}>Show Secret</Button></div>
+						}
 					</p>
 				</div>
 			:
