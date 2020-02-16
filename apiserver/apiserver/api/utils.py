@@ -217,14 +217,12 @@ def link_old_member(data, user):
     if not old_models:
         raise ValidationError(dict(email='Unable to link, old DB wasn\'t imported.'))
 
-    old_members = old_models.Members.objects.using('old_portal')
-
     try:
-        old_member = old_members.get(email=data['email'])
-    except old_models.Members.DoesNotExist:
+        member = models.Member.objects.get(old_email=data['email'])
+    except models.Member.DoesNotExist:
         raise ValidationError(dict(email='Unable to find email in old portal.'))
-
-    member = models.Member.objects.get(id=old_member.id)
+    except models.Member.MultipleObjectsReturned:
+        raise ValidationError(dict(email='Duplicate emails found. Talk to Tanner.'))
 
     if member.user:
         raise ValidationError(dict(email='Old member already claimed.'))
