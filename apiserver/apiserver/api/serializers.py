@@ -263,7 +263,7 @@ class TrainingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Training
         fields = '__all__'
-        read_only_fields = ['user', 'sign_up_date', 'paid_date', 'member_id']
+        read_only_fields = ['user', 'sign_up_date', 'paid_date']
 
     def get_student_name(self, obj):
         if obj.user:

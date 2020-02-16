@@ -196,20 +196,37 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             return serializers.StudentTrainingSerializer
 
     # TODO: turn these into @actions
-    # TODO: check if full
+    # TODO: check if full, but not for instructors
     # TODO: if already paid, skip to confirmed
     def perform_create(self, serializer):
-        session_id = self.request.data['session']
-        status = self.request.data['attendance_status']
+        user = self.request.user
+        data = self.request.data
+        session_id = data['session']
+        status = data['attendance_status']
         session = get_object_or_404(models.Session, id=session_id)
-        training = models.Training.objects.filter(user=self.request.user, session=session)
-        if training.exists():
-            raise exceptions.ValidationError('You have already registered')
-        if self.request.user == session.instructor:
-            raise exceptions.ValidationError('You are teaching this session')
-        if status == 'Waiting for payment' and session.cost == 0:
-            status = 'Confirmed'
-        serializer.save(user=self.request.user, attendance_status=status)
+
+        if data.get('member_id', None):
+            if not (is_admin_director(user) or session.instructor == user):
+                raise exceptions.ValidationError('Not allowed to register others')
+
+            member = get_object_or_404(models.Member, id=data['member_id'])
+            user = getattr(member, 'user', None)
+
+            training1 = models.Training.objects.filter(user=user, session=session)
+            training2 = models.Training.objects.filter(member_id=member.id, session=session)
+            if (user and training1.exists()) or training2.exists():
+                raise exceptions.ValidationError(dict(non_field_errors='Already registered.'))
+
+            serializer.save(user=user, member_id=member.id, attendance_status=status)
+        else:
+            training = models.Training.objects.filter(user=user, session=session)
+            if training.exists():
+                raise exceptions.ValidationError('Already registered')
+            if user == session.instructor:
+                raise exceptions.ValidationError('You are teaching this session')
+            if status == 'Waiting for payment' and session.cost == 0:
+                status = 'Confirmed'
+            serializer.save(user=user, attendance_status=status)
 
     def perform_update(self, serializer):
         session_id = self.request.data['session']
