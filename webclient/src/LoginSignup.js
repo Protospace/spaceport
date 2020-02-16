@@ -13,20 +13,24 @@ export function LoginForm(props) {
 	const handleChange = (e) => handleValues(e, e.currentTarget);
 
 	const handleSubmit = (e) => {
-		if (loading) return;
-		setLoading(true);
-		const data = { ...input, username: input.username.toLowerCase() };
-		requester('/rest-auth/login/', 'POST', '', data)
-		.then(res => {
-			setError({});
-			props.setTokenCache(res.key);
-			window.scrollTo(0, 0);
-		})
-		.catch(err => {
-			setLoading(false);
-			console.log(err);
-			setError(err.data);
-		});
+		if (input.username.includes('@')) {
+			setError({ username: 'Username, not email.' });
+		} else {
+			if (loading) return;
+			setLoading(true);
+			const data = { ...input, username: input.username.toLowerCase() };
+			requester('/rest-auth/login/', 'POST', '', data)
+			.then(res => {
+				setError({});
+				props.setTokenCache(res.key);
+				window.scrollTo(0, 0);
+			})
+			.catch(err => {
+				setLoading(false);
+				console.log(err);
+				setError(err.data);
+			});
+		}
 	};
 
 	return (
