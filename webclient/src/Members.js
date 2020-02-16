@@ -4,7 +4,8 @@ import './light.css';
 import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Input, Item, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { statusColor, isAdmin, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
-import { AdminMemberInfo, AdminMemberPause, AdminMemberForm, AdminMemberCards, AdminTransactions } from './Admin.js';
+import { AdminMemberInfo, AdminMemberPause, AdminMemberForm, AdminMemberCards } from './AdminMembers.js';
+import { AdminTransactions } from './AdminTransactions.js';
 
 export function MembersDropdown(props) {
 	const { token, name, onChange, value, initial } = props;
