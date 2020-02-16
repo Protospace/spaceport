@@ -138,9 +138,11 @@ export function ClassDetail(props) {
 					<div>
 						<Header size='large'>Class Details</Header>
 
-						{isInstructor(user) && <Segment padded>
-							<InstructorClassDetail clazz={clazz} setClass={setClass} {...props} />
-						</Segment>}
+						{(isAdmin(user) || clazz.instructor === user.id) &&
+							<Segment padded>
+								<InstructorClassDetail clazz={clazz} setClass={setClass} {...props} />
+							</Segment>
+						}
 
 						<BasicTable>
 							<Table.Body>

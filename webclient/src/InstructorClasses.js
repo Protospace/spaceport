@@ -6,6 +6,7 @@ import moment from 'moment';
 import './light.css';
 import { Button, Container, Checkbox, Divider, Dropdown, Form, Grid, Header, Icon, Image, Label, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { BasicTable, staticUrl, requester } from './utils.js';
+import { MembersDropdown } from './Members.js';
 
 function AttendanceRow(props) {
 	const { student, token, refreshClass } = props;
@@ -61,8 +62,29 @@ function AttendanceRow(props) {
 }
 
 export function InstructorClassAttendance(props) {
-	const { clazz, token } = props;
+	const { clazz, token, refreshClass } = props;
+	const [input, setInput] = useState({});
 	const [error, setError] = useState(false);
+	const [loading, setLoading] = useState(false);
+
+	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
+
+	const handleSubmit = (e) => {
+		if (loading) return;
+		setLoading(true);
+		const data = { ...input, attendance_status: 'Attended', session: clazz.id };
+		requester('/training/', 'POST', token, data)
+		.then(res => {
+			setLoading(false);
+			setError(false);
+			refreshClass();
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+			setError(err.data);
+		});
+	};
 
 	return (
 		<div>
@@ -77,6 +99,24 @@ export function InstructorClassAttendance(props) {
 			:
 				<p>No students yet.</p>
 			}
+
+			<Header size='small'>Add Student</Header>
+
+			<Form onSubmit={handleSubmit}>
+				<Form.Field error={error.member_id}>
+					<MembersDropdown
+						name='member_id'
+						value={input.member_id}
+						token={token}
+						onChange={handleValues}
+						initial='Find a member'
+					/>
+				</Form.Field>
+
+				<Form.Button loading={loading} error={error.non_field_errors}>
+					Submit
+				</Form.Button>
+			</Form>
 		</div>
 	);
 };
