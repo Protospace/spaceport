@@ -140,7 +140,14 @@ export function Home(props) {
 						user.member.set_details ?
 							<MemberInfo user={user} />
 						:
-							<AccountForm {...props} />
+							<div>
+								<Message warning>
+									<Message.Header>Please submit your member details</Message.Header>
+									<p>Press submit at the bottom if everything's correct.</p>
+								</Message>
+
+								<AccountForm {...props} />
+							</div>
 					:
 						<div>
 							<LoginForm {...props} />
