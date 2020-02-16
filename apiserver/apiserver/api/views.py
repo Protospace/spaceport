@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Max
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.core.files.base import File
 from django.core.cache import cache
 from rest_framework import viewsets, views, mixins, generics, exceptions
@@ -26,6 +26,7 @@ from .permissions import (
     IsAdminOrReadOnly,
     IsInstructorOrReadOnly
 )
+from .. import settings
 
 # define some shortcuts
 Base = viewsets.GenericViewSet
@@ -329,6 +330,26 @@ class StatsView(views.APIView):
         stats = utils_stats.DEFAULTS.copy()
         stats.update(cached_stats)
         return Response(stats)
+
+
+class BackupView(views.APIView):
+    def get(self, request):
+        if not is_admin_director(self.request.user):
+            raise exceptions.PermissionDenied()
+
+        backup_path = cache.get('backup_path')
+        backup_url = 'https://static.{}/backups/{}'.format(
+            settings.PRODUCTION_HOST,
+            backup_path,
+        )
+
+        if not backup_path:
+            raise Http404
+
+        if request.META['HTTP_USER_AGENT'].lower().startswith('wget'):
+            return redirect(backup_url)
+        else:
+            return Response(dict(url=backup_url))
 
 
 

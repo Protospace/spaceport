@@ -5,7 +5,16 @@ class AllowMetadata(BasePermission):
         return request.method in ['OPTIONS', 'HEAD']
 
 def is_admin_director(user):
-    return bool(user.is_staff or user.member.is_director or user.member.is_staff)
+    if user.is_staff:
+        return True
+
+    if hasattr(user, 'member'):
+        if user.member.is_director:
+            return True
+        if user.member.is_staff:
+            return True
+
+    return False
 
 class IsObjOwnerOrAdmin(BasePermission):
     def has_object_permission(self, request, view, obj):
