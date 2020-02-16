@@ -237,7 +237,6 @@ function ReportTransaction(props) {
 			<Form onSubmit={handleSubmit}>
 				<Form.TextArea
 					label='Reason'
-					fluid
 					{...makeProps('report_memo')}
 				/>
 
@@ -376,11 +375,11 @@ export function TransactionDetail(props) {
 											<Table.Cell>{transaction.memo}</Table.Cell>
 										</Table.Row>
 
-										{transaction.report_type && <Table.Row>
+										{!!transaction.report_type && <Table.Row>
 											<Table.Cell>Report Type:</Table.Cell>
 											<Table.Cell>{transaction.report_type}</Table.Cell>
 										</Table.Row>}
-										{transaction.report_memo && <Table.Row>
+										{!!transaction.report_memo && <Table.Row>
 											<Table.Cell>Report Memo:</Table.Cell>
 											<Table.Cell>{transaction.report_memo}</Table.Cell>
 										</Table.Row>}
