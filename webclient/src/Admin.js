@@ -38,19 +38,17 @@ export function Admin(props) {
 						</a>
 					</p>
 
-					<p>
-						Automate with wget (keep secret, that's <b>your</b> login token):
-						{reveal ?
-							<pre>
-								wget \
-								<br />  --content-disposition \
-								<br />  --header="Authorization: Token {token}" \
-								<br />  {apiUrl}/backup/
-							</pre>
-						:
-							<div><Button onClick={() => setReveal(true)}>Show Secret</Button></div>
-						}
-					</p>
+					Automate with wget (keep secret, that's <b>your</b> login token): <br />
+					{reveal ?
+						<pre>
+							wget \
+							<br />  --content-disposition \
+							<br />  --header="Authorization: Token {token}" \
+							<br />  {apiUrl}/backup/
+						</pre>
+					:
+						<Button onClick={() => setReveal(true)}>Show Secret</Button>
+					}
 				</div>
 			:
 				<p>Loading...</p>

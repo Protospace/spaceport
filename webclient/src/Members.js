@@ -49,13 +49,16 @@ export function MembersDropdown(props) {
 	);
 };
 
+let searchCache = '';
+
 export function Members(props) {
 	const [response, setResponse] = useState(false);
-	const searchDefault = {seq: 0, q: ''};
+	const searchDefault = {seq: 0, q: searchCache};
 	const [search, setSearch] = useState(searchDefault);
 	const { token } = props;
 
 	useEffect(() => {
+		searchCache = search.q;
 		requester('/search/', 'POST', token, search)
 		.then(res => {
 			if (!search.seq || res.seq > response.seq) {
@@ -82,7 +85,7 @@ export function Members(props) {
 			{search.q.length ?
 				<Button
 					content='Clear'
-					onClick={() => setSearch(searchDefault)}
+					onClick={() => setSearch({seq: 0, q: ''})}
 				/> : ''
 			}
 
@@ -118,17 +121,20 @@ export function Members(props) {
 	);
 };
 
+let resultCache = {};
+
 export function MemberDetail(props) {
-	const [result, setResult] = useState(false);
+	const { id } = useParams();
+	const [result, setResult] = useState(resultCache[id] || false);
 	const [refreshCount, refreshResult] = useReducer(x => x + 1, 0);
 	const [error, setError] = useState(false);
 	const { token, user } = props;
-	const { id } = useParams();
 
 	useEffect(() => {
 		requester('/search/'+id+'/', 'GET', token)
 		.then(res => {
 			setResult(res);
+			resultCache[id] = res;
 		})
 		.catch(err => {
 			console.log(err);

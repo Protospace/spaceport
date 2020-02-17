@@ -4,6 +4,7 @@ import './semantic-ui/semantic.min.css';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { isAdmin, requester } from './utils.js';
+import { ManageScroll } from './ManageScroll.js';
 import { Home } from './Home.js';
 import { Account } from './Account.js';
 import { Transactions, TransactionDetail } from './Transactions.js';
@@ -71,6 +72,8 @@ function App() {
 
 	return (
 		<div>
+			<ManageScroll />
+
 			<div className='content-wrap'>
 			<div className='content-wrap-inside'>
 

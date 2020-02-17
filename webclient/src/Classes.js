@@ -48,14 +48,17 @@ function ClassTable(props) {
 	);
 };
 
+let classesCache = false;
+
 export function Classes(props) {
-	const [classes, setClasses] = useState(false);
+	const [classes, setClasses] = useState(classesCache);
 	const { token } = props;
 
 	useEffect(() => {
 		requester('/sessions/', 'GET', token)
 		.then(res => {
 			setClasses(res.results);
+			classesCache = res.results;
 		})
 		.catch(err => {
 			console.log(err);

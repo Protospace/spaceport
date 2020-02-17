@@ -8,14 +8,17 @@ import { NotFound, PleaseLogin } from './Misc.js';
 import { InstructorCourseList, InstructorCourseDetail } from './InstructorCourses.js';
 import { InstructorClassList } from './InstructorClasses.js';
 
+let courseCache = false;
+
 export function Courses(props) {
-	const [courses, setCourses] = useState(false);
+	const [courses, setCourses] = useState(courseCache);
 	const { token, user } = props;
 
 	useEffect(() => {
 		requester('/courses/', 'GET', token)
 		.then(res => {
 			setCourses(res.results);
+			courseCache = res.results;
 		})
 		.catch(err => {
 			console.log(err);
