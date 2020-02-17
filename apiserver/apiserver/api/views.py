@@ -6,7 +6,7 @@ from django.core.files.base import File
 from django.core.cache import cache
 from rest_framework import viewsets, views, mixins, generics, exceptions
 from rest_framework.decorators import action
-from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
+from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_auth.views import PasswordChangeView
 from rest_auth.registration.views import RegisterView
@@ -303,7 +303,6 @@ class PingView(views.APIView):
         return Response(200)
 
 
-
 class DoorViewSet(viewsets.ViewSet, List):
     def list(self, request):
         cards = models.Card.objects.filter(active_status='card_active')
@@ -328,7 +327,6 @@ class DoorViewSet(viewsets.ViewSet, List):
         return Response(200)
 
 
-
 class IpnView(views.APIView):
     def post(self, request):
         try:
@@ -337,7 +335,6 @@ class IpnView(views.APIView):
             print('Problem processing IPN: {} - {}'.format(e.__class__.__name__, str(e)))
         finally:
             return Response(200)
-
 
 
 class StatsView(views.APIView):
@@ -368,6 +365,19 @@ class BackupView(views.APIView):
         else:
             return Response(dict(url=backup_url))
 
+
+class PasteView(views.APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request):
+        return Response(dict(paste=cache.get('paste', '')))
+
+    def post(self, request):
+        if 'paste' in request.data:
+            cache.set('paste', request.data['paste'][:20000])
+            return Response(dict(paste=cache.get('paste', '')))
+        else:
+            raise exceptions.ValidationError(dict(paste='This field is required.'))
 
 
 class RegistrationView(RegisterView):

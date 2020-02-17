@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^user/', views.UserView.as_view(), name='user'),
     url(r'^ping/', views.PingView.as_view(), name='ping'),
     url(r'^stats/', views.StatsView.as_view(), name='stats'),
+    url(r'^paste/', views.PasteView.as_view(), name='paste'),
     url(r'^backup/', views.BackupView.as_view(), name='backup'),
     url(IPN_ROUTE, views.IpnView.as_view(), name='ipn'),
 ]
