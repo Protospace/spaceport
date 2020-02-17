@@ -12,6 +12,7 @@ import { Cards } from './Cards.js';
 import { Training } from './Training.js';
 import { AdminReportedTransactions } from './AdminTransactions.js';
 import { Admin } from './Admin.js';
+import { Paste } from './Paste.js';
 import { Courses, CourseDetail } from './Courses.js';
 import { Classes, ClassDetail } from './Classes.js';
 import { Members, MemberDetail } from './Members.js';
@@ -135,6 +136,11 @@ function App() {
 								as={Link}
 								to='/classes'
 							/>
+							<Dropdown.Item
+								content='Transporter'
+								as={Link}
+								to='/paste'
+							/>
 
 							{user && isAdmin(user) && <Dropdown.Item
 								content='Admin'
@@ -143,7 +149,7 @@ function App() {
 							/>}
 
 							{user && isAdmin(user) && <Dropdown.Item
-								content='Admin Trans.'
+								content='Admin Txs'
 								as={Link}
 								to='/admintrans'
 							/>}
@@ -166,69 +172,75 @@ function App() {
 			</Route>
 
 			<div className='topPadding'>
-				{user && user.member.set_details ?
-					<Switch>
-						<Route path='/account'>
-							<Account token={token} user={user} refreshUser={refreshUser} />
-						</Route>
-
-						<Route path='/transactions/:id'>
-							<TransactionDetail token={token} user={user} refreshUser={refreshUser} />
-						</Route>
-						<Route path='/transactions'>
-							<Transactions user={user} />
-						</Route>
-
-						<Route path='/cards'>
-							<Cards user={user} />
-						</Route>
-
-						<Route path='/training'>
-							<Training user={user} />
-						</Route>
-
-						<Route path='/courses/:id'>
-							<CourseDetail token={token} user={user} />
-						</Route>
-						<Route path='/courses'>
-							<Courses token={token} user={user} />
-						</Route>
-
-						<Route path='/classes/:id'>
-							<ClassDetail token={token} user={user} refreshUser={refreshUser} />
-						</Route>
-						<Route path='/classes'>
-							<Classes token={token} />
-						</Route>
-
-						<Route path='/members/:id'>
-							<MemberDetail token={token} user={user} />
-						</Route>
-						<Route path='/members'>
-							<Members token={token} />
-						</Route>
-
-						{user && isAdmin(user) &&
-							<Route path='/admin'>
-								<Admin token={token} user={user} />
-							</Route>
-						}
-
-						{user && isAdmin(user) &&
-							<Route path='/admintrans'>
-								<AdminReportedTransactions token={token} user={user} />
-							</Route>
-						}
-
-						<Route path='/:page'>
-							<NotFound />
-						</Route>
-					</Switch>
-				:
-					<Route path='/:page'>
-						<PleaseLogin />
+				<Switch>
+					<Route path='/paste'>
+						<Paste token={token} />
 					</Route>
-				}
+
+					{user && user.member.set_details ?
+						<Switch>
+							<Route path='/account'>
+								<Account token={token} user={user} refreshUser={refreshUser} />
+							</Route>
+
+							<Route path='/transactions/:id'>
+								<TransactionDetail token={token} user={user} refreshUser={refreshUser} />
+							</Route>
+							<Route path='/transactions'>
+								<Transactions user={user} />
+							</Route>
+
+							<Route path='/cards'>
+								<Cards user={user} />
+							</Route>
+
+							<Route path='/training'>
+								<Training user={user} />
+							</Route>
+
+							<Route path='/courses/:id'>
+								<CourseDetail token={token} user={user} />
+							</Route>
+							<Route path='/courses'>
+								<Courses token={token} user={user} />
+							</Route>
+
+							<Route path='/classes/:id'>
+								<ClassDetail token={token} user={user} refreshUser={refreshUser} />
+							</Route>
+							<Route path='/classes'>
+								<Classes token={token} />
+							</Route>
+
+							<Route path='/members/:id'>
+								<MemberDetail token={token} user={user} />
+							</Route>
+							<Route path='/members'>
+								<Members token={token} />
+							</Route>
+
+							{user && isAdmin(user) &&
+								<Route path='/admin'>
+									<Admin token={token} user={user} />
+								</Route>
+							}
+
+							{user && isAdmin(user) &&
+								<Route path='/admintrans'>
+									<AdminReportedTransactions token={token} user={user} />
+								</Route>
+							}
+
+							<Route path='/:page'>
+								<NotFound />
+							</Route>
+						</Switch>
+					:
+						<Route path='/:page'>
+							<PleaseLogin />
+						</Route>
+					}
+				</Switch>
 			</div>
 
 			</div>
