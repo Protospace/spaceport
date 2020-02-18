@@ -20,5 +20,5 @@ class Command(BaseCommand):
         self.stdout.write('Generated stats')
 
         self.stdout.write('Completed tasks in {} s'.format(
-            str(time.time() - start)
+            str(time.time() - start)[:4]
         ))

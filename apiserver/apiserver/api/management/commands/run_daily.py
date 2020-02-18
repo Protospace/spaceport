@@ -28,5 +28,5 @@ class Command(BaseCommand):
         self.stdout.write('Updated card change time')
 
         self.stdout.write('Completed tasks in {} s'.format(
-            str(time.time() - start)
+            str(time.time() - start)[:4]
         ))
