@@ -337,13 +337,33 @@ class IpnView(views.APIView):
             return Response(200)
 
 
-class StatsView(views.APIView):
-    def get(self, request):
+class StatsViewSet(viewsets.ViewSet, List):
+    def list(self, request):
         stats_keys = utils_stats.DEFAULTS.keys()
         cached_stats = cache.get_many(stats_keys)
         stats = utils_stats.DEFAULTS.copy()
         stats.update(cached_stats)
         return Response(stats)
+
+    @action(detail=False, methods=['post'])
+    def bay_108_temp(self, request):
+        try:
+            cache.set('bay_108_temp', round(float(request.data['data']), 1))
+            return Response(200)
+        except ValueError:
+            raise exceptions.ValidationError(dict(data='Invalid float.'))
+        except KeyError:
+            raise exceptions.ValidationError(dict(data='This field is required.'))
+
+    @action(detail=False, methods=['post'])
+    def bay_110_temp(self, request):
+        try:
+            cache.set('bay_110_temp', round(float(request.data['data']), 1))
+            return Response(200)
+        except ValueError:
+            raise exceptions.ValidationError(dict(data='Invalid float.'))
+        except KeyError:
+            raise exceptions.ValidationError(dict(data='This field is required.'))
 
 
 class BackupView(views.APIView):
