@@ -122,3 +122,6 @@ class Training(models.Model):
     paid_date = models.DateField(blank=True, null=True)
 
     history = HistoricalRecords()
+
+class MetaInfo(models.Model):
+    backup_id = models.TextField()

@@ -26,7 +26,7 @@ from .permissions import (
     IsAdminOrReadOnly,
     IsInstructorOrReadOnly
 )
-from .. import settings
+from .. import settings, secrets
 
 # define some shortcuts
 Base = viewsets.GenericViewSet
@@ -368,22 +368,24 @@ class StatsViewSet(viewsets.ViewSet, List):
 
 class BackupView(views.APIView):
     def get(self, request):
-        if not is_admin_director(self.request.user):
+        auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+
+        backup_user = secrets.BACKUP_TOKENS.get(auth_token, None)
+
+        if not backup_user:
             raise exceptions.PermissionDenied()
 
-        backup_path = cache.get('backup_path')
+        backup_path = cache.get(backup_user['cache_key'], None)
+
+        if not backup_path:
+            raise Http404
+
         backup_url = 'https://static.{}/backups/{}'.format(
             settings.PRODUCTION_HOST,
             backup_path,
         )
 
-        if not backup_path:
-            raise Http404
-
-        if request.META['HTTP_USER_AGENT'].lower().startswith('wget'):
-            return redirect(backup_url)
-        else:
-            return Response(dict(url=backup_url))
+        return redirect(backup_url)
 
 
 class PasteView(views.APIView):
