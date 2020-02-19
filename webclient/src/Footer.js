@@ -34,6 +34,9 @@ export function Footer() {
 					<a href='https://github.com/Protospace' target='_blank' rel='noopener noreferrer' aria-label='link to our github'>
 						<Icon name='github' size='large' />
 					</a>
+					<a href='https://docs.my.protospace.ca' target='_blank' rel='noopener noreferrer' aria-label='link to our docs'>
+						<Icon name='book' size='large' />
+					</a>
 				</p>
 
 				<p>© 2020 Calgary Protospace Ltd.</p>
