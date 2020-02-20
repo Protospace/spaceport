@@ -50,7 +50,7 @@ function MemberInfo(props) {
 				<p>
 					<a href={staticUrl + '/' + member.member_forms} target='_blank'>
 						Click here
-					</a> to view your appliction forms.
+					</a> to view your application forms.
 				</p>
 			</Message>}
 
