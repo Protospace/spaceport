@@ -97,7 +97,8 @@ function AdminCardDetail(props) {
 						</Form.Group>
 					</Form.Group>
 
-					Notes: {input.notes || 'None'}
+					Notes: {input.notes || 'None'},
+					Last Seen: {input.last_seen_at || 'Unknown'}
 				</Form>
 			</Segment>
 		:
