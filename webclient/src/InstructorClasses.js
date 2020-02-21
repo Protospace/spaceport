@@ -62,7 +62,8 @@ function AttendanceRow(props) {
 }
 
 export function InstructorClassAttendance(props) {
-	const { clazz, token, refreshClass } = props;
+	const { clazz, token, refreshClass, user } = props;
+	const [open, setOpen] = useState(false);
 	const [input, setInput] = useState({});
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -90,45 +91,52 @@ export function InstructorClassAttendance(props) {
 		<div>
 			<Header size='medium'>Instructor Panel</Header>
 
-			<Header size='small'>Student Emails</Header>
+			{open || clazz.instructor === user.id ?
+				<div>
+					<Header size='small'>Student Emails</Header>
 
+					{clazz.students.length ?
+						clazz.students
+							.filter(x => x.attendance_status !== 'Withdrawn')
+							.map(x => x.student_email)
+							.join('; ')
+					:
+						<p>No students yet.</p>
+					}
 
-			{clazz.students.length ?
-				clazz.students
-					.filter(x => x.attendance_status !== 'Withdrawn')
-					.map(x => x.student_email)
-					.join('; ')
+					<Header size='small'>Mark Attendance</Header>
+
+					{clazz.students.length ?
+						clazz.students.map(x =>
+							<AttendanceRow key={x.id} student={x} {...props} />
+						)
+					:
+						<p>No students yet.</p>
+					}
+
+					<Header size='small'>Add Student</Header>
+
+					<Form onSubmit={handleSubmit}>
+						<Form.Field error={error.member_id}>
+							<MembersDropdown
+								name='member_id'
+								value={input.member_id}
+								token={token}
+								onChange={handleValues}
+								initial='Find a member'
+							/>
+						</Form.Field>
+
+						<Form.Button loading={loading} error={error.non_field_errors}>
+							Submit
+						</Form.Button>
+					</Form>
+				</div>
 			:
-				<p>No students yet.</p>
+				<Button onClick={() => setOpen(true)}>
+					Edit Class
+				</Button>
 			}
-
-			<Header size='small'>Mark Attendance</Header>
-
-			{clazz.students.length ?
-				clazz.students.map(x =>
-					<AttendanceRow key={x.id} student={x} {...props} />
-				)
-			:
-				<p>No students yet.</p>
-			}
-
-			<Header size='small'>Add Student</Header>
-
-			<Form onSubmit={handleSubmit}>
-				<Form.Field error={error.member_id}>
-					<MembersDropdown
-						name='member_id'
-						value={input.member_id}
-						token={token}
-						onChange={handleValues}
-						initial='Find a member'
-					/>
-				</Form.Field>
-
-				<Form.Button loading={loading} error={error.non_field_errors}>
-					Submit
-				</Form.Button>
-			</Form>
 		</div>
 	);
 };
