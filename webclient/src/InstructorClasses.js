@@ -90,6 +90,18 @@ export function InstructorClassAttendance(props) {
 		<div>
 			<Header size='medium'>Instructor Panel</Header>
 
+			<Header size='small'>Student Emails</Header>
+
+
+			{clazz.students.length ?
+				clazz.students
+					.filter(x => x.attendance_status !== 'Withdrawn')
+					.map(x => x.student_email)
+					.join('; ')
+			:
+				<p>No students yet.</p>
+			}
+
 			<Header size='small'>Mark Attendance</Header>
 
 			{clazz.students.length ?
