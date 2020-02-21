@@ -8,6 +8,7 @@ import { ManageScroll } from './ManageScroll.js';
 import { Home } from './Home.js';
 import { Account } from './Account.js';
 import { Transactions, TransactionDetail } from './Transactions.js';
+import { Paymaster } from './Paymaster.js';
 import { Cards } from './Cards.js';
 import { Training } from './Training.js';
 import { AdminReportedTransactions } from './AdminTransactions.js';
@@ -107,6 +108,11 @@ function App() {
 								to='/transactions'
 							/>
 							<Dropdown.Item
+								content='Paymaster'
+								as={Link}
+								to='/paymaster'
+							/>
+							<Dropdown.Item
 								content='Training'
 								as={Link}
 								to='/training'
@@ -188,6 +194,10 @@ function App() {
 							</Route>
 							<Route path='/transactions'>
 								<Transactions user={user} />
+							</Route>
+
+							<Route path='/paymaster'>
+								<Paymaster user={user} />
 							</Route>
 
 							<Route path='/cards'>
