@@ -6,6 +6,7 @@ import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Me
 import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 import { AccountForm } from './Account.js';
+import { PayPalSubscribeDeal } from './PayPal.js';
 
 function MemberInfo(props) {
 	const user = props.user;
@@ -54,10 +55,20 @@ function MemberInfo(props) {
 				</p>
 			</Message>}
 
-			{!member.photo_medium && <Message warning>
+			{!!lastTrans.length && !member.photo_medium && <Message warning>
 				<Message.Header>Please set a member photo!</Message.Header>
 				<p>Visit the <Link to='/account'>account settings</Link> page to set one.</p>
 			</Message>}
+
+			{!lastTrans.length && <div>
+				<Header size='medium'>PayPal</Header>
+				<p>Create a ${user.member.monthly_fees} / month subscription, get your first three months for the price of two:</p>
+				<PayPalSubscribeDeal
+					amount={user.member.monthly_fees}
+					name='Protospace Membership'
+					custom={JSON.stringify({ deal: 3, member: user.member.id })}
+				/>
+			</div>}
 
 			<Header size='medium'>Details</Header>
 			<BasicTable>

@@ -6,7 +6,7 @@ import moment from 'moment';
 import { isAdmin, isInstructor, BasicTable, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { InstructorClassDetail, InstructorClassAttendance } from './InstructorClasses.js';
-import { PayPal } from './PayPal.js';
+import { PayPalPayNow } from './PayPal.js';
 
 function ClassTable(props) {
 	const { classes } = props;
@@ -211,7 +211,7 @@ export function ClassDetail(props) {
 									{userTraining.attendance_status === 'Waiting for payment' &&
 										<div>
 											<p>Please pay the course fee of ${clazz.cost} to confirm your attendance.</p>
-											<PayPal
+											<PayPalPayNow
 												amount={clazz.cost}
 												name={clazz.course_name}
 												custom={JSON.stringify({ training: userTraining.id })}
