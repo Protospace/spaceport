@@ -259,6 +259,7 @@ class TrainingSerializer(serializers.ModelSerializer):
     ])
     session = serializers.PrimaryKeyRelatedField(queryset=models.Session.objects.all())
     student_name = serializers.SerializerMethodField()
+    student_email = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Training
@@ -271,6 +272,13 @@ class TrainingSerializer(serializers.ModelSerializer):
         else:
             member = models.Member.objects.get(id=obj.member_id)
         return member.preferred_name + ' ' + member.last_name
+
+    def get_student_email(self, obj):
+        if obj.user:
+            return obj.user.email
+        else:
+            member = models.Member.objects.get(id=obj.member_id)
+            return member.old_email
 
 
 class StudentTrainingSerializer(TrainingSerializer):
