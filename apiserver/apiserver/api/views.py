@@ -243,10 +243,21 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
 
     def get_queryset(self):
         queryset = models.Transaction.objects
-        if self.action == 'list':
+        month = self.request.query_params.get('month', '')
+
+        if self.action == 'list' and month:
+            try:
+                dt = datetime.datetime.strptime(month, '%Y-%m')
+            except ValueError:
+                raise exceptions.ValidationError(dict(month='Should be YYYY-MM.'))
+            queryset = queryset.filter(date__year=dt.year)
+            queryset = queryset.filter(date__month=dt.month)
+            queryset = queryset.exclude(category='Memberships:Fake Months')
+            return queryset.order_by('date', 'id')
+        elif self.action == 'list':
             queryset = queryset.exclude(report_type__isnull=True)
             queryset = queryset.exclude(report_type='')
-            return queryset.order_by('-id', '-date')
+            return queryset.order_by('-date', '-id')
         else:
             return queryset.all()
 
