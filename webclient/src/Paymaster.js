@@ -116,7 +116,7 @@ export function Paymaster(props) {
 					<PayPalPayNow
 						amount={5}
 						name='Protospace Donation'
-						custom={JSON.stringify({ reason: 'Donation', member: user.member.id })}
+						custom={JSON.stringify({ category: 'Donation', member: user.member.id })}
 					/>
 				</Grid.Column>
 
@@ -125,7 +125,7 @@ export function Paymaster(props) {
 					<PayPalPayNow
 						amount={10}
 						name='Protospace Donation'
-						custom={JSON.stringify({ reason: 'Donation', member: user.member.id })}
+						custom={JSON.stringify({ category: 'Donation', member: user.member.id })}
 					/>
 				</Grid.Column>
 
@@ -134,7 +134,7 @@ export function Paymaster(props) {
 					<PayPalPayNow
 						amount={20}
 						name='Protospace Donation'
-						custom={JSON.stringify({ reason: 'Donation', member: user.member.id })}
+						custom={JSON.stringify({ category: 'Donation', member: user.member.id })}
 					/>
 				</Grid.Column>
 			</Grid>
