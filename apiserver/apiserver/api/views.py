@@ -253,7 +253,7 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
             queryset = queryset.filter(date__year=dt.year)
             queryset = queryset.filter(date__month=dt.month)
             queryset = queryset.exclude(category='Memberships:Fake Months')
-            return queryset.order_by('date', 'id')
+            return queryset.order_by('-date', '-id')
         elif self.action == 'list':
             queryset = queryset.exclude(report_type__isnull=True)
             queryset = queryset.exclude(report_type='')

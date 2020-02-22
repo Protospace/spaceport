@@ -143,6 +143,7 @@ def create_member_dues_tx(data, member, num_months):
         **build_tx(data),
         member_id=member.id,
         memo=memo,
+        category='Membership',
         number_of_membership_months=num_months,
         user=user,
     )
