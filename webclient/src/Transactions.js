@@ -49,12 +49,12 @@ export function TransactionEditor(props) {
 
 	const categoryOptions = [
 		{ key: '0', text: 'Membership Dues', value: 'Membership' },
-		{ key: '1', text: 'Payment On Account or Prepayment', value: 'OnAcct' },
+		{ key: '1', text: 'Payment On Account (ie. Course Fee)', value: 'OnAcct' },
 		{ key: '2', text: 'Snack / Pop / Coffee', value: 'Snacks' },
 		{ key: '3', text: 'Donations', value: 'Donation' },
 		{ key: '4', text: 'Consumables (Specify which in memo)', value: 'Consumables' },
-		{ key: '5', text: 'Purchases of Goods or Parts or Stock', value: 'Purchases' },
-		{ key: '6', text: 'Auction, Garage Sale, Nearly Free Shelf, Etc.', value: 'Garage Sale' },
+		{ key: '5', text: 'Purchase of Locker / Goods / Merch / Stock', value: 'Purchases' },
+		{ key: '6', text: 'Auction, Garage Sale, Nearly Free Shelf', value: 'Garage Sale' },
 		{ key: '7', text: 'Reimbursement (Enter a negative value)', value: 'Reimburse' },
 		{ key: '8', text: 'Other (Explain in memo)', value: 'Other' },
 	];
@@ -250,15 +250,17 @@ function ReportTransaction(props) {
 };
 
 export function TransactionList(props) {
-	const { transactions } = props;
+	const { transactions, noMember, noCategory } = props;
 
 	return (
 		<Table basic='very'>
 			<Table.Header>
 				<Table.Row>
 					<Table.HeaderCell>Date</Table.HeaderCell>
+					{!noMember && <Table.HeaderCell>Member</Table.HeaderCell>}
 					<Table.HeaderCell>Amount</Table.HeaderCell>
 					<Table.HeaderCell>Account</Table.HeaderCell>
+					{!noCategory && <Table.HeaderCell>Category</Table.HeaderCell>}
 					<Table.HeaderCell>Memo</Table.HeaderCell>
 				</Table.Row>
 			</Table.Header>
@@ -270,8 +272,18 @@ export function TransactionList(props) {
 							<Table.Cell>
 								<Link to={'/transactions/'+x.id}>{x.date}</Link>
 							</Table.Cell>
+							{!noMember && <Table.Cell>
+								{x.member_id ?
+									<Link to={'/members/'+x.member_id}>
+										{x.member_name}
+									</Link>
+								:
+									x.member_name
+								}
+							</Table.Cell>}
 							<Table.Cell>${x.amount}</Table.Cell>
 							<Table.Cell>{x.account_type}</Table.Cell>
+							{!noCategory && <Table.Cell>{x.category}</Table.Cell>}
 							<Table.Cell>{x.memo || x.report_memo}</Table.Cell>
 						</Table.Row>
 					)
@@ -290,7 +302,7 @@ export function Transactions(props) {
 		<Container>
 			<Header size='large'>Transactions</Header>
 
-			<TransactionList transactions={user.transactions} />
+			<TransactionList noMember noCategory transactions={user.transactions} />
 
 		</Container>
 	);

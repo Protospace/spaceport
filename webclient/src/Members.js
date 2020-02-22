@@ -5,7 +5,7 @@ import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, 
 import { statusColor, isAdmin, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { AdminMemberInfo, AdminMemberPause, AdminMemberForm, AdminMemberCards } from './AdminMembers.js';
-import { AdminTransactions } from './AdminTransactions.js';
+import { AdminMemberTransactions } from './AdminTransactions.js';
 
 export function MembersDropdown(props) {
 	const { token, name, onChange, value, initial } = props;
@@ -194,7 +194,7 @@ export function MemberDetail(props) {
 						</Segment>}
 
 						{isAdmin(user) && <Segment padded>
-							<AdminTransactions result={result} refreshResult={refreshResult} {...props} />
+							<AdminMemberTransactions result={result} refreshResult={refreshResult} {...props} />
 						</Segment>}
 
 					</div>

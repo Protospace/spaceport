@@ -11,7 +11,7 @@ import { Transactions, TransactionDetail } from './Transactions.js';
 import { Paymaster } from './Paymaster.js';
 import { Cards } from './Cards.js';
 import { Training } from './Training.js';
-import { AdminReportedTransactions } from './AdminTransactions.js';
+import { AdminTransactions } from './AdminTransactions.js';
 import { Admin } from './Admin.js';
 import { Paste } from './Paste.js';
 import { Courses, CourseDetail } from './Courses.js';
@@ -237,7 +237,7 @@ function App() {
 
 							{user && isAdmin(user) &&
 								<Route path='/admintrans'>
-									<AdminReportedTransactions token={token} user={user} />
+									<AdminTransactions token={token} user={user} />
 								</Route>
 							}
 

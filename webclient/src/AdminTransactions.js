@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import * as Datetime from 'react-datetime';
+import 'react-datetime/css/react-datetime.css';
 import moment from 'moment';
 import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { TransactionList, TransactionEditor } from './Transactions.js';
@@ -25,9 +27,7 @@ export function AdminReportedTransactions(props) {
 	}, []);
 
 	return (
-		<Container>
-			<Header size='large'>Reported Transactions</Header>
-
+		<div>
 			{!error ?
 				transactions ?
 					<div>
@@ -36,14 +36,91 @@ export function AdminReportedTransactions(props) {
 				:
 					<p>Loading...</p>
 			:
-				<NotFound />
+				<p>Error loading.</p>
 			}
+		</div>
+	);
+};
 
-		</Container>
+let transactionsCache = false;
+
+export function AdminHistoricalTransactions(props) {
+	const { token, user } = props;
+	const [input, setInput] = useState({ month: moment() });
+	const [transactions, setTransactions] = useState(transactionsCache);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(false);
+
+	const handleDatetime = (v) => setInput({ ...input, month: v });
+
+	const handleSubmit = (e) => {
+		if (loading) return;
+		setLoading(true);
+		const month = input.month.format('YYYY-MM');
+		requester('/transactions/?month=' + month, 'GET', token)
+		.then(res => {
+			setLoading(false);
+			setError(false);
+			setTransactions(res.results);
+			transactionsCache = res.results;
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+			setError(true);
+		});
+	};
+
+	return (
+		<div>
+			<Form onSubmit={handleSubmit}>
+				<label>Month</label>
+				<Form.Group>
+					<Form.Field>
+						<Datetime
+							dateFormat='YYYY-MM'
+							timeFormat={false}
+							value={input.month}
+							onChange={handleDatetime}
+						/>
+					</Form.Field>
+
+					<Form.Button loading={loading}>
+						Submit
+					</Form.Button>
+				</Form.Group>
+			</Form>
+
+			{!error ?
+				transactions && <div>
+					<p>Found {transactions.length} transactions.</p>
+					{!!transactions.length &&
+						<Header size='small'>{moment(transactions[0].date, 'YYYY-MM-DD').format('MMMM YYYY')} Transactions</Header>
+					}
+					<TransactionList transactions={transactions} />
+				</div>
+			:
+				<p>Error loading transactions.</p>
+			}
+		</div>
 	);
 };
 
 export function AdminTransactions(props) {
+	return (
+		<Container>
+			<Header size='large'>Admin Transactions</Header>
+
+			<Header size='medium'>Reported</Header>
+			<AdminReportedTransactions {...props} />
+
+			<Header size='medium'>Historical</Header>
+			<AdminHistoricalTransactions {...props} />
+		</Container>
+	);
+}
+
+export function AdminMemberTransactions(props) {
 	const { token, result, refreshResult } = props;
 	const transactions = result.transactions;
 	const [open, setOpen] = useState(false);
@@ -92,7 +169,7 @@ export function AdminTransactions(props) {
 
 			{transactions.length ?
 				open ?
-					<TransactionList transactions={transactions} />
+					<TransactionList noMember transactions={transactions} />
 				:
 					<Button onClick={() => setOpen(true)}>
 						View / Edit Transactions
