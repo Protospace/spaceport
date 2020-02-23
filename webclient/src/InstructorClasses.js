@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
+import ReactToPrint from 'react-to-print';
 import * as Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
 import moment from 'moment';
@@ -7,6 +8,62 @@ import './light.css';
 import { Button, Container, Checkbox, Divider, Dropdown, Form, Grid, Header, Icon, Image, Label, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { BasicTable, staticUrl, requester } from './utils.js';
 import { MembersDropdown } from './Members.js';
+
+class AttendanceSheet extends React.Component {
+	render() {
+		const clazz = this.props.clazz;
+		const num = clazz.students.length;
+
+		return (
+			<div style={{ padding: '3rem' }}>
+				<Header size='medium'>{clazz.course_name} Attendance</Header>
+				<p>
+					{moment.utc(clazz.datetime).local().format('llll')}
+					{num >= 2 ? ', '+num+' students sorted by registration time.' : '.'}
+				</p>
+
+				<Grid stackable padded columns={2}>
+					<Grid.Column>
+						<Table collapsing unstackable basic='very'>
+							{clazz.students
+								.filter(x => x.attendance_status !== 'Withdrawn')
+								.slice(0, 15)
+								.map(x =>
+									<Table.Row key={x.id}>
+										<Table.Cell>
+											<Icon name='square outline' size='large' />
+										</Table.Cell>
+										<Table.Cell>
+											{x.student_name}
+										</Table.Cell>
+									</Table.Row>
+								)
+							}
+						</Table>
+					</Grid.Column>
+					<Grid.Column>
+						<Table collapsing unstackable basic='very'>
+							{clazz.students
+								.filter(x => x.attendance_status !== 'Withdrawn')
+								.slice(15)
+								.map(x =>
+									<Table.Row key={x.id}>
+										<Table.Cell>
+											<Icon name='square outline' size='large' />
+										</Table.Cell>
+										<Table.Cell>
+											{x.student_name}
+										</Table.Cell>
+									</Table.Row>
+								)
+							}
+						</Table>
+					</Grid.Column>
+				</Grid>
+			</div>
+		);
+	}
+}
 
 function AttendanceRow(props) {
 	const { student, token, refreshClass } = props;
@@ -67,6 +124,7 @@ export function InstructorClassAttendance(props) {
 	const [input, setInput] = useState({});
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const printRef = useRef();
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 
@@ -105,6 +163,16 @@ export function InstructorClassAttendance(props) {
 					}
 
 					<Header size='small'>Mark Attendance</Header>
+
+					{!!clazz.students.length && <div>
+						<div style={{ display: 'none' }}>
+							<AttendanceSheet clazz={clazz} ref={printRef} />
+						</div>
+						<ReactToPrint
+							trigger={() => <Button>Print Attendance Sheet</Button>}
+							content={() => printRef.current}
+						/>
+					</div>}
 
 					{clazz.students.length ?
 						clazz.students.map(x =>
