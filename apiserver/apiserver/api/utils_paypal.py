@@ -256,7 +256,7 @@ def process_paypal_ipn(data):
     '''
     ipn = record_ipn(data)
 
-    if True or verify_paypal_ipn(data):
+    if verify_paypal_ipn(data):
         print('IPN verified')
     else:
         print('IPN verification failed')
