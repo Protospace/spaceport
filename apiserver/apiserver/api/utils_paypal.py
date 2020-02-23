@@ -121,19 +121,22 @@ def create_unmatched_member_tx(data):
         report_type='Unmatched Member',
     )
 
-def create_member_dues_tx(data, member, num_months):
+def create_member_dues_tx(data, member, num_months, deal):
     transactions = models.Transaction.objects
 
     # new member 3 for 2 will have to be manual anyway
-    if num_months == 11:
+    if deal == 12 and num_months == 11:
         num_months = 12
-        deal = '12 for 11, '
+        deal_str = '12 for 11, '
+    elif deal == 3 and num_months == 2:
+        num_months = 3
+        deal_str = '3 for 2, '
     else:
-        deal = ''
+        deal_str = ''
 
     user = getattr(member, 'user', None)
     memo = '{}{} {} - Protospace Membership, {}'.format(
-        deal,
+        deal_str,
         data.get('first_name', 'unknown'),
         data.get('last_name', 'unknown'),
         data.get('payer_email', 'unknown'),
@@ -222,6 +225,26 @@ def check_training(data, training_id, amount):
     print('Amount valid for training cost, id:', training.id)
     return create_member_training_tx(data, member, training)
 
+def create_category_tx(data, member, custom_json):
+    transactions = models.Transaction.objects
+
+    user = getattr(member, 'user', None)
+    memo = '{} {} - {}, email: {}, note: {}'.format(
+        data.get('first_name', 'unknown'),
+        data.get('last_name', 'unknown'),
+        custom_json['category'],
+        data.get('payer_email', 'unknown'),
+        custom_json.get('memo', 'none'),
+    )
+
+    return transactions.create(
+        **build_tx(data),
+        member_id=member.id,
+        category=custom_json['category'],
+        memo=memo,
+        user=user,
+    )
+
 
 def process_paypal_ipn(data):
     '''
@@ -233,9 +256,10 @@ def process_paypal_ipn(data):
     '''
     ipn = record_ipn(data)
 
-    if verify_paypal_ipn(data):
+    if True or verify_paypal_ipn(data):
         print('IPN verified')
     else:
+        print('IPN verification failed')
         update_ipn(ipn, 'Verification Failed')
         return False
 
@@ -273,25 +297,43 @@ def process_paypal_ipn(data):
     try:
         custom_json = json.loads(data.get('custom', ''))
     except (KeyError, ValueError):
-        custom_json = False
+        custom_json = {}
 
-    if custom_json and 'training' in custom_json:
+    if 'training' in custom_json:
         tx = check_training(data, custom_json['training'], amount)
         if tx:
             print('Training matched, adding hint and returning')
+            update_ipn(ipn, 'Accepted, training')
             hints.update_or_create(
                 account=data.get('payer_id', 'unknown'),
                 defaults=dict(member_id=tx.member_id),
             )
             return tx
 
-    if 'payer_id' in data and not hints.filter(account=data['payer_id']).exists():
+    member_id = False
+
+    if not member_id and hints.filter(account=data.get('payer_id', False)).exists():
+        member_id = hints.get(account=data['payer_id']).member_id
+
+    if not member_id and 'member' in custom_json:
+        member_id = custom_json['member']
+        hints.update_or_create(
+            account=data.get('payer_id', 'unknown'),
+            defaults=dict(member_id=member_id),
+        )
+
+    if not members.filter(id=member_id).exists():
         print('Unable to associate with member, reporting')
         update_ipn(ipn, 'Accepted, Unmatched Member')
         return create_unmatched_member_tx(data)
 
-    member_id = hints.get(account=data['payer_id']).member_id
     member = members.get(id=member_id)
+
+    if custom_json.get('category', False) in ['Snacks', 'OnAcct', 'Donation']:
+        print('Category matched')
+        update_ipn(ipn, 'Accepted, category')
+        return create_category_tx(data, member, custom_json)
+
     monthly_fees = member.monthly_fees
 
     if amount.is_integer() and monthly_fees and amount % monthly_fees == 0:
@@ -300,9 +342,10 @@ def process_paypal_ipn(data):
         num_months = 0
 
     if num_months:
-        print('Amount valid for membership dues, adding months:', num_months)
+        print('Amount valid for membership dues, adding months')
         update_ipn(ipn, 'Accepted, Member Dues')
-        return create_member_dues_tx(data, member, num_months)
+        deal = custom_json.get('deal', False)
+        return create_member_dues_tx(data, member, num_months, deal)
 
     print('Unable to find a reason for payment, reporting')
     update_ipn(ipn, 'Accepted, Unmatched Purchase')
