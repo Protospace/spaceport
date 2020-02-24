@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { isInstructor, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { InstructorCourseList, InstructorCourseDetail } from './InstructorCourses.js';
@@ -122,10 +122,10 @@ export function CourseDetail(props) {
 										<Table.Row key={x.id}>
 											<Table.Cell>
 												<Link to={'/classes/'+x.id}>
-													{moment.utc(x.datetime).local().format('ll')}
+													{moment.utc(x.datetime).tz('America/Edmonton').format('ll')}
 												</Link>
 											</Table.Cell>
-											<Table.Cell>{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).local().format('LT')}</Table.Cell>
+											<Table.Cell>{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}</Table.Cell>
 											<Table.Cell>{x.instructor_name}</Table.Cell>
 											<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
 										</Table.Row>

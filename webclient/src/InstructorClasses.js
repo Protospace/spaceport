@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } f
 import ReactToPrint from 'react-to-print';
 import * as Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import './light.css';
 import { Button, Container, Checkbox, Divider, Dropdown, Form, Grid, Header, Icon, Image, Label, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { BasicTable, staticUrl, requester } from './utils.js';
@@ -18,7 +18,7 @@ class AttendanceSheet extends React.Component {
 			<div style={{ padding: '3rem' }}>
 				<Header size='medium'>{clazz.course_name} Attendance</Header>
 				<p>
-					{moment.utc(clazz.datetime).local().format('llll')}
+					{moment.utc(clazz.datetime).tz('America/Edmonton').format('llll')}
 					{num >= 2 ? ', '+num+' students sorted by registration time.' : '.'}
 				</p>
 
@@ -241,7 +241,7 @@ function InstructorClassEditor(props) {
 				<label>Time and Date</label>
 				<Datetime
 					timeConstraints={{ minutes: { step: 15 } }}
-					value={ input.datetime ? moment.utc(input.datetime).local() : (new Date()).setMinutes(0) }
+					value={ input.datetime ? moment.utc(input.datetime).tz('America/Edmonton') : (new Date()).setMinutes(0) }
 					onChange={handleDatetime}
 				/>
 				{error.datetime &&

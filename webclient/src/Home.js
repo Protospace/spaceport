@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
@@ -141,7 +141,7 @@ export function Home(props) {
 	}, []);
 
 	const getStat = (x) => stats && stats[x] ? stats[x] : '?';
-	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).local().format('ll') : '?';
+	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz('America/Edmonton').format('ll') : '?';
 
 	return (
 		<Container>
