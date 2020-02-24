@@ -5,6 +5,9 @@ class AllowMetadata(BasePermission):
         return request.method in ['OPTIONS', 'HEAD']
 
 def is_admin_director(user):
+    if not user:
+        return False
+
     if user.is_staff:
         return True
 

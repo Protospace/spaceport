@@ -1,6 +1,8 @@
 from datetime import date, datetime
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.utils.timezone import now, pytz
 from simple_history.models import HistoricalRecords
 from simple_history import register
@@ -125,3 +127,25 @@ class Training(models.Model):
 
 class MetaInfo(models.Model):
     backup_id = models.TextField()
+
+class HistoryIndex(models.Model):
+    content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    owner_id = models.PositiveIntegerField()
+    owner_name = models.TextField()
+    history_user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    history_date = models.DateTimeField()
+    history_type = models.TextField()
+    revert_url = models.TextField()
+
+    is_system = models.BooleanField()
+    is_admin = models.BooleanField()
+
+class HistoryChange(models.Model):
+    index = models.ForeignKey(HistoryIndex, related_name='changes', null=True, on_delete=models.SET_NULL)
+
+    field = models.TextField()
+    old = models.TextField()
+    new = models.TextField()
