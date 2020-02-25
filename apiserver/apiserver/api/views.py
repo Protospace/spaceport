@@ -23,6 +23,7 @@ from .permissions import (
     IsObjOwnerOrAdmin,
     IsSessionInstructorOrAdmin,
     ReadOnly,
+    IsAdmin,
     IsAdminOrReadOnly,
     IsInstructorOrReadOnly
 )
@@ -411,6 +412,12 @@ class PasteView(views.APIView):
             return Response(dict(paste=cache.get('paste', '')))
         else:
             raise exceptions.ValidationError(dict(paste='This field is required.'))
+
+
+class HistoryViewSet(Base, List, Retrieve):
+    permission_classes = [AllowMetadata | IsAdmin]
+    serializer_class = serializers.HistorySerializer
+    queryset = models.HistoryIndex.objects.order_by('-history_date')
 
 
 class RegistrationView(RegisterView):

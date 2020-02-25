@@ -41,6 +41,13 @@ class ReadOnly(BasePermission):
     def has_object_permission(self, request, view, obj):
         return bool(request.method in SAFE_METHODS)
 
+class IsAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return bool(
+            request.user
+            and is_admin_director(request.user)
+        )
+
 class IsAdminOrReadOnly(BasePermission):
     def has_permission(self, request, view):
         return bool(

@@ -131,10 +131,11 @@ class MetaInfo(models.Model):
 class HistoryIndex(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
+    history = GenericForeignKey('content_type', 'object_id')
 
     owner_id = models.PositiveIntegerField()
     owner_name = models.TextField()
+    object_name = models.TextField()
     history_user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     history_date = models.DateTimeField()
     history_type = models.TextField()

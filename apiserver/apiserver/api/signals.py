@@ -10,6 +10,9 @@ from .permissions import is_admin_director
 def get_object_owner(obj):
     full_name = lambda member: member.first_name + ' ' + member.last_name
 
+    if obj.__class__.__name__ == 'Member':
+        return full_name(obj), obj.id
+
     if getattr(obj, 'user', False):
         return full_name(obj.user.member), obj.user.member.id
 
@@ -35,27 +38,45 @@ def post_create_historical_record_callback(
         using,
         **kwargs):
 
-    changes = history_instance.diff_against(history_instance.prev_record).changes
+    history_type = history_instance.get_history_type_display()
+    object_name = instance.__class__.__name__
 
-    if changes:
+    if object_name in ['User']: return
+
+    if history_type == 'Changed':
+        changes = history_instance.diff_against(history_instance.prev_record).changes
+    else:
+        changes = []
+
+    # it's possible for changes to be empty if model saved with no diff
+    if changes or history_type in ['Created', 'Deleted']:
         owner = get_object_owner(instance)
 
         index = models.HistoryIndex.objects.create(
-            content_object=history_instance,
-            owner_name=owner[0],
+            history=history_instance,
             owner_id=owner[1],
+            owner_name=owner[0],
+            object_name=object_name,
             history_user=history_user,
             history_date=history_instance.history_date,
-            history_type=history_instance.get_history_type_display(),
+            history_type=history_type,
             revert_url=history_instance.revert_url(),
             is_system=bool(history_user == None),
             is_admin=is_admin_director(history_user),
         )
 
+        change_old = change.old or ''
+        change_new = change.new or ''
+
+        if len(change_old) > 200:
+            change_old = change_old[:200] + '... [truncated]'
+        if len(change_new) > 200:
+            change_new = change_new[:200] + '... [truncated]'
+
         for change in changes:
             models.HistoryChange.objects.create(
                 index=index,
                 field=change.field,
-                old=change.old,
-                new=change.new,
+                old=change_old,
+                new=change_new,
             )

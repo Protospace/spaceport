@@ -396,3 +396,17 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
                 raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: set.'))
 
         super().save()
+
+
+class HistoryChangeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.HistoryChange
+        fields = ['field', 'old', 'new']
+
+class HistorySerializer(serializers.ModelSerializer):
+    changes = HistoryChangeSerializer(many=True)
+    history_user = serializers.StringRelatedField()
+
+    class Meta:
+        model = models.HistoryIndex
+        fields = '__all__'
