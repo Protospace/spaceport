@@ -376,9 +376,7 @@ class MyRegisterSerializer(RegisterSerializer):
     def custom_signup(self, request, user):
         data = request.data
 
-        is_test_signup = bool(data['last_name'] == 'tester')
-
-        if not utils.is_request_from_protospace(request) and not is_test_signup:
+        if not utils.is_request_from_protospace(request):
             user.delete()
             raise ValidationError(dict(non_field_errors='Can only register from Protospace.'))
 
