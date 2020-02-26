@@ -122,7 +122,7 @@ class MemberViewSet(Base, Retrieve, Update):
         if not is_admin_director(self.request.user):
             raise exceptions.PermissionDenied()
         member = self.get_object()
-        member.paused_date = datetime.date.today()
+        member.paused_date = utils.today_alberta_tz()
         member.save()
         return Response(200)
 
@@ -131,7 +131,7 @@ class MemberViewSet(Base, Retrieve, Update):
         if not is_admin_director(self.request.user):
             raise exceptions.PermissionDenied()
         member = self.get_object()
-        member.current_start_date = datetime.date.today()
+        member.current_start_date = utils.today_alberta_tz()
         member.paused_date = None
         member.save()
         utils.tally_membership_months(member)
