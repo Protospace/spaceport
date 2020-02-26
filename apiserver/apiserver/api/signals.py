@@ -38,45 +38,53 @@ def post_create_historical_record_callback(
         using,
         **kwargs):
 
-    history_type = history_instance.get_history_type_display()
-    object_name = instance.__class__.__name__
+    try:
+        history_type = history_instance.get_history_type_display()
+        object_name = instance.__class__.__name__
 
-    if object_name in ['User']: return
+        if object_name in ['User', 'IPN']: return
 
-    if history_type == 'Changed':
-        changes = history_instance.diff_against(history_instance.prev_record).changes
-    else:
-        changes = []
+        if history_type == 'Changed':
+            changes = history_instance.diff_against(history_instance.prev_record).changes
+        else:
+            changes = []
 
-    # it's possible for changes to be empty if model saved with no diff
-    if len(changes) or history_type in ['Created', 'Deleted']:
-        owner = get_object_owner(instance)
+        # it's possible for changes to be empty if model saved with no diff
+        if len(changes) or history_type in ['Created', 'Deleted']:
+            owner = get_object_owner(instance)
 
-        index = models.HistoryIndex.objects.create(
-            history=history_instance,
-            owner_id=owner[1],
-            owner_name=owner[0],
-            object_name=object_name,
-            history_user=history_user,
-            history_date=history_instance.history_date,
-            history_type=history_type,
-            revert_url=history_instance.revert_url(),
-            is_system=bool(history_user == None),
-            is_admin=is_admin_director(history_user),
-        )
-
-        for change in changes:
-            change_old = str(change.old)
-            change_new = str(change.new)
-
-            if len(change_old) > 200:
-                change_old = change_old[:200] + '... [truncated]'
-            if len(change_new) > 200:
-                change_new = change_new[:200] + '... [truncated]'
-
-            models.HistoryChange.objects.create(
-                index=index,
-                field=change.field,
-                old=change_old,
-                new=change_new,
+            index = models.HistoryIndex.objects.create(
+                history=history_instance,
+                owner_id=owner[1],
+                owner_name=owner[0],
+                object_name=object_name,
+                history_user=history_user,
+                history_date=history_instance.history_date,
+                history_type=history_type,
+                revert_url=history_instance.revert_url(),
+                is_system=bool(history_user == None),
+                is_admin=is_admin_director(history_user),
             )
+
+            for change in changes:
+                change_old = str(change.old)
+                change_new = str(change.new)
+
+                if len(change_old) > 200:
+                    change_old = change_old[:200] + '... [truncated]'
+                if len(change_new) > 200:
+                    change_new = change_new[:200] + '... [truncated]'
+
+                models.HistoryChange.objects.create(
+                    index=index,
+                    field=change.field,
+                    old=change_old,
+                    new=change_new,
+                )
+    except BaseException as e:
+        print('Problem creating history index: {} - {}'.format(e.__class__.__name__, e))
+        print('sender', sender)
+        print('instance', instance)
+        print('history_instance', history_instance)
+        print('history_user', history_user)
+        print('using', using)
