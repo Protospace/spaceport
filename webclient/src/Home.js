@@ -190,8 +190,8 @@ export function Home(props) {
 							<p>Member count: {getStat('member_count')}</p>
 							<p>Green members: {getStat('green_count')}</p>
 							<p>Old members: {getStat('paused_count')}</p>
-							<p>Bay 108 temperature: {getStat('bay_108_temp')} °C</p>
-							<p>Bay 110 temperature: {getStat('bay_110_temp')} °C</p>
+							<p>Bay 108 (metal) temp: {getStat('bay_108_temp')} °C</p>
+							<p>Bay 110 (wood) temp: {getStat('bay_110_temp')} °C</p>
 						</div>
 
 					</Segment>
