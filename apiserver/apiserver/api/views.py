@@ -37,7 +37,7 @@ Create = mixins.CreateModelMixin
 Update = mixins.UpdateModelMixin
 Destroy = mixins.DestroyModelMixin
 
-NUM_SEARCH_RESULTS = 10
+NUM_SEARCH_RESULTS = 20
 
 
 class SearchViewSet(Base, Retrieve):

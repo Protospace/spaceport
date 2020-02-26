@@ -136,7 +136,7 @@ def gen_search_strings():
     Generate a cache dict of names to member ids for rapid string matching
     '''
     search_strings = {}
-    for m in models.Member.objects.all():
+    for m in models.Member.objects.order_by('-expire_date'):
         string = '{} {}'.format(
             m.preferred_name,
             m.last_name,
