@@ -47,7 +47,7 @@ class Member(models.Model):
     paused_date = models.DateField(blank=True, null=True)
     monthly_fees = models.IntegerField(default=55, blank=True, null=True)
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(excluded_fields=['member_forms'])
 
 class Transaction(models.Model):
     user = models.ForeignKey(User, related_name='transactions', blank=True, null=True, on_delete=models.SET_NULL)

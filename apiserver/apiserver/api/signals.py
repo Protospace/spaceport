@@ -49,7 +49,7 @@ def post_create_historical_record_callback(
         changes = []
 
     # it's possible for changes to be empty if model saved with no diff
-    if changes or history_type in ['Created', 'Deleted']:
+    if len(changes) or history_type in ['Created', 'Deleted']:
         owner = get_object_owner(instance)
 
         index = models.HistoryIndex.objects.create(
@@ -65,15 +65,15 @@ def post_create_historical_record_callback(
             is_admin=is_admin_director(history_user),
         )
 
-        change_old = change.old or ''
-        change_new = change.new or ''
-
-        if len(change_old) > 200:
-            change_old = change_old[:200] + '... [truncated]'
-        if len(change_new) > 200:
-            change_new = change_new[:200] + '... [truncated]'
-
         for change in changes:
+            change_old = str(change.old)
+            change_new = str(change.new)
+
+            if len(change_old) > 200:
+                change_old = change_old[:200] + '... [truncated]'
+            if len(change_new) > 200:
+                change_new = change_new[:200] + '... [truncated]'
+
             models.HistoryChange.objects.create(
                 index=index,
                 field=change.field,
