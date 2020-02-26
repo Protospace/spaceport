@@ -245,20 +245,9 @@ def link_old_member(data, user):
     member.preferred_name = data['first_name']
     member.save()
 
-    transactions = models.Transaction.objects.filter(member_id=member.id)
-    for t in transactions:
-        t.user = user
-        t.save()
-
-    cards = models.Card.objects.filter(member_id=member.id)
-    for c in cards:
-        c.user = user
-        c.save()
-
-    training = models.Training.objects.filter(member_id=member.id)
-    for t in training:
-        t.user = user
-        t.save()
+    models.Transaction.objects.filter(member_id=member.id).update(user=user)
+    models.Card.objects.filter(member_id=member.id).update(user=user)
+    models.Training.objects.filter(member_id=member.id).update(user=user)
 
 def create_new_member(data, user):
     if old_models:
