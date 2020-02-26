@@ -45,6 +45,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         'Unmatched Purchase',
         'User Flagged',
     ], allow_null=True, required=False)
+    number_of_membership_months = serializers.IntegerField(max_value=36, min_value=-36)
 
     class Meta:
         model = models.Transaction
