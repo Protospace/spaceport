@@ -318,7 +318,7 @@ class PingView(views.APIView):
 class DoorViewSet(viewsets.ViewSet, List):
     def list(self, request):
         auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-        if auth_token != secrets.DOOR_API_TOKEN:
+        if auth_token != 'Bearer ' + secrets.DOOR_API_TOKEN:
             raise exceptions.PermissionDenied()
 
         cards = models.Card.objects.filter(active_status='card_active')
@@ -385,6 +385,7 @@ class StatsViewSet(viewsets.ViewSet, List):
 class BackupView(views.APIView):
     def get(self, request):
         auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        auth_token = auth_token.replace('Bearer ', '')
 
         backup_user = secrets.BACKUP_TOKENS.get(auth_token, None)
 
