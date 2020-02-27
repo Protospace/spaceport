@@ -141,7 +141,7 @@ class MemberViewSet(Base, Retrieve, Update):
 
 
 class CardViewSet(Base, Create, Retrieve, Update, Destroy):
-    permission_classes = [AllowMetadata | IsAuthenticated, IsObjOwnerOrAdmin]
+    permission_classes = [AllowMetadata | IsAuthenticated, IsAdmin]
     queryset = models.Card.objects.all()
     serializer_class = serializers.CardSerializer
 
@@ -417,7 +417,7 @@ class PasteView(views.APIView):
 class HistoryViewSet(Base, List, Retrieve):
     permission_classes = [AllowMetadata | IsAdmin]
     serializer_class = serializers.HistorySerializer
-    queryset = models.HistoryIndex.objects.order_by('-history_date')
+    queryset = models.HistoryIndex.objects.order_by('-history_date')[:100]
 
 
 class RegistrationView(RegisterView):
