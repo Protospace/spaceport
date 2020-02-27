@@ -317,6 +317,10 @@ class PingView(views.APIView):
 
 class DoorViewSet(viewsets.ViewSet, List):
     def list(self, request):
+        auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if auth_token != secrets.DOOR_API_TOKEN:
+            raise exceptions.PermissionDenied()
+
         cards = models.Card.objects.filter(active_status='card_active')
         active_member_cards = {}
 
