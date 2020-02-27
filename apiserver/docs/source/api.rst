@@ -846,14 +846,18 @@ Cards
 Door
 ----
 
-    Public route that the door controllers should poll for a list of cards
+    Private route that the door controllers should poll for a list of cards
     allowed to scan into the building.
 
 .. http:get:: /door/
 
     List all active cards of unpaused members.
 
-    No authentication required.
+    Authorization with the door API token set in secrets.py is required.
+
+    Use "Bearer" instead of "Token" like in the other routes.
+
+    :requestheader Authorization: ``Bearer <door API token>``
 
     **Example response**
 
