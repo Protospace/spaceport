@@ -388,20 +388,34 @@ class BackupView(views.APIView):
 
         backup_user = secrets.BACKUP_TOKENS.get(auth_token, None)
 
-        if not backup_user:
-            raise exceptions.PermissionDenied()
+        if backup_user:
+            backup_path = cache.get(backup_user['cache_key'], None)
 
-        backup_path = cache.get(backup_user['cache_key'], None)
+            if not backup_path:
+                raise Http404
 
-        if not backup_path:
-            raise Http404
+            backup_url = 'https://static.{}/backups/{}'.format(
+                settings.PRODUCTION_HOST,
+                backup_path,
+            )
+            cache.set(backup_user['name'], datetime.datetime.now())
 
-        backup_url = 'https://static.{}/backups/{}'.format(
-            settings.PRODUCTION_HOST,
-            backup_path,
-        )
-
-        return redirect(backup_url)
+            return redirect(backup_url)
+        else:
+            backup_stats = []
+            for backup_user in secrets.BACKUP_TOKENS.values():
+                download_time = cache.get(backup_user['name'], None)
+                if download_time:
+                    time_delta = datetime.datetime.now() - download_time
+                    less_than_24h = bool(time_delta.days == 0)
+                else:
+                    less_than_24h = False
+                backup_stats.append(dict(
+                    backup_user=backup_user['name'],
+                    download_time=download_time,
+                    less_than_24h=less_than_24h,
+                ))
+            return Response(backup_stats)
 
 
 class PasteView(views.APIView):
