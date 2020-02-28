@@ -76,7 +76,7 @@ export function SignupForm(props) {
 
 	const genUsername = () => (
 		input.first_name && input.last_name ?
-			(input.first_name + '.' + input.last_name).toLowerCase()
+			(input.first_name + '.' + input.last_name).toLowerCase().replace(/ /g, '.')
 		:
 			''
 	);
