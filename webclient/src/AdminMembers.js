@@ -361,6 +361,11 @@ export function AdminMemberForm(props) {
 				</Form.Group>
 
 				<Form.Input
+					label='Preferred Name'
+					{...makeProps('preferred_name')}
+				/>
+
+				<Form.Input
 					label='Email'
 					{...makeProps('email')}
 				/>
