@@ -14,3 +14,4 @@ Spaceport Documentation
    dev
    apioverview
    api
+   ldap
