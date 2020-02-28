@@ -91,7 +91,10 @@ function MemberInfo(props) {
 					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Card Number:</Table.Cell>
-						<Table.Cell>{lastCard && lastCard.card_number || 'None'}</Table.Cell>
+						<Table.Cell>
+							{lastCard && lastCard.card_number || 'None'}
+							{user.cards.length > 1 && <Link to='/cards'> [more]</Link>}
+						</Table.Cell>
 					</Table.Row>
 				</Table.Body>
 			</BasicTable>
