@@ -43,15 +43,22 @@ export function AdminReportedTransactions(props) {
 };
 
 let transactionsCache = false;
+let excludePayPalCache = false;
 
 export function AdminHistoricalTransactions(props) {
 	const { token, user } = props;
 	const [input, setInput] = useState({ month: moment() });
 	const [transactions, setTransactions] = useState(transactionsCache);
+	const [excludePayPal, setExcludePayPal] = useState(excludePayPalCache);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(false);
 
 	const handleDatetime = (v) => setInput({ ...input, month: v });
+
+	const handleExcludePayPal = (e, v) => {
+		setExcludePayPal(v.checked);
+		excludePayPalCache = v.checked;
+	};
 
 	const handleSubmit = (e) => {
 		if (loading) return;
@@ -97,7 +104,14 @@ export function AdminHistoricalTransactions(props) {
 					{!!transactions.length &&
 						<Header size='small'>{moment(transactions[0].date, 'YYYY-MM-DD').format('MMMM YYYY')} Transactions</Header>
 					}
-					<TransactionList transactions={transactions} />
+
+					<Checkbox
+						label='Exclude PayPal'
+						onChange={handleExcludePayPal}
+						checked={excludePayPal}
+					/>
+
+					<TransactionList transactions={transactions.filter(x => !excludePayPal || x.account_type !== 'PayPal')} />
 				</div>
 			:
 				<p>Error loading transactions.</p>
