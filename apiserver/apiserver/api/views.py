@@ -141,7 +141,7 @@ class MemberViewSet(Base, Retrieve, Update):
 
 
 class CardViewSet(Base, Create, Retrieve, Update, Destroy):
-    permission_classes = [AllowMetadata | IsAuthenticated, IsAdmin]
+    permission_classes = [AllowMetadata | IsAdmin]
     queryset = models.Card.objects.all()
     serializer_class = serializers.CardSerializer
 
