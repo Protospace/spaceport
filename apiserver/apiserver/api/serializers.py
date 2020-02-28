@@ -372,6 +372,10 @@ class MyRegisterSerializer(RegisterSerializer):
     def validate_username(self, username):
         if re.search(r'[^a-z.]', username):
             raise ValidationError('Invalid characters.')
+        if '..' in username:
+            raise ValidationError('Can\'t have double periods.')
+        if username.startswith('.') or username.endswith('.'):
+            raise ValidationError('Can\'t start or end with periods.')
         return super().validate_username(username)
 
     def custom_signup(self, request, user):

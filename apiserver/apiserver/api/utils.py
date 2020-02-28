@@ -240,9 +240,9 @@ def link_old_member(data, user):
 
 
     member.user = user
-    member.first_name = data['first_name']
-    member.last_name = data['last_name']
-    member.preferred_name = data['first_name']
+    member.first_name = data['first_name'].title()
+    member.last_name = data['last_name'].title()
+    member.preferred_name = data['first_name'].title()
     member.save()
 
     models.Transaction.objects.filter(member_id=member.id).update(user=user)
@@ -269,9 +269,9 @@ def create_new_member(data, user):
 
     models.Member.objects.create(
         user=user,
-        first_name=data['first_name'],
-        last_name=data['last_name'],
-        preferred_name=data['first_name'],
+        first_name=data['first_name'].title(),
+        last_name=data['last_name'].title(),
+        preferred_name=data['first_name'].title(),
     )
 
 def register_user(data, user):
