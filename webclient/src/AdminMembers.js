@@ -12,6 +12,7 @@ function AdminCardDetail(props) {
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
+	const [yousure, setYousure] = useState(false);
 	const id = card.id;
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
@@ -41,13 +42,17 @@ function AdminCardDetail(props) {
 	const handleDelete = (e) => {
 		e.preventDefault();
 
-		requester('/cards/'+id+'/', 'DELETE', token)
-		.then(res => {
-			setInput(false);
-		})
-		.catch(err => {
-			console.log(err);
-		});
+		if (yousure) {
+			requester('/cards/'+id+'/', 'DELETE', token)
+			.then(res => {
+				setInput(false);
+			})
+			.catch(err => {
+				console.log(err);
+			});
+		} else {
+			setYousure(true);
+		}
 	};
 
 	const makeProps = (name) => ({
@@ -92,7 +97,7 @@ function AdminCardDetail(props) {
 								color='red'
 								onClick={handleDelete}
 							>
-								Delete
+								{yousure ? 'You Sure?' : 'Delete'}
 							</Form.Button>
 						</Form.Group>
 					</Form.Group>
