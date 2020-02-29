@@ -93,7 +93,7 @@ class Card(models.Model):
     last_seen_at = models.DateField(default=today_alberta_tz, blank=True, null=True)
     active_status = models.CharField(max_length=32, blank=True, null=True)
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(excluded_fields=['last_seen_at'])
 
 class Course(models.Model):
     name = models.TextField(blank=True, null=True)
