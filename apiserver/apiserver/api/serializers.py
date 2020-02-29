@@ -9,7 +9,7 @@ from rest_auth.serializers import UserDetailsSerializer
 import re
 
 from . import models, fields, utils, utils_ldap
-from .. import settings
+from .. import settings, secrets
 
 class TransactionSerializer(serializers.ModelSerializer):
     # fields directly from old portal. replace with slugs we want
@@ -341,6 +341,8 @@ class UserSerializer(serializers.ModelSerializer):
     training = UserTrainingSerializer(many=True)
     member = MemberSerializer()
     transactions = serializers.SerializerMethodField()
+    door_code = serializers.SerializerMethodField()
+    wifi_pass = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -351,7 +353,9 @@ class UserSerializer(serializers.ModelSerializer):
             'transactions',
             'cards',
             'training',
-            'is_staff'
+            'is_staff',
+            'door_code',
+            'wifi_pass',
         ]
         depth = 1
 
@@ -362,6 +366,18 @@ class UserSerializer(serializers.ModelSerializer):
         serializer = TransactionSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
+
+    def get_door_code(self, obj):
+        if not obj.member.paused_date and obj.cards.count():
+            return secrets.DOOR_CODE
+        else:
+            return None
+
+    def get_wifi_pass(self, obj):
+        if not obj.member.paused_date:
+            return secrets.WIFI_PASS
+        else:
+            return None
 
 
 class MyRegisterSerializer(RegisterSerializer):
