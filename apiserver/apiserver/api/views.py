@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Max
@@ -348,7 +351,7 @@ class IpnView(views.APIView):
         try:
             utils_paypal.process_paypal_ipn(request.data)
         except BaseException as e:
-            print('Problem processing IPN: {} - {}'.format(e.__class__.__name__, str(e)))
+            logger.error('IPN route - {} - {}'.format(e.__class__.__name__, str(e)))
         finally:
             return Response(200)
 

@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 from django.dispatch import receiver
 from simple_history.signals import (
     pre_create_historical_record,
@@ -82,9 +85,9 @@ def post_create_historical_record_callback(
                     new=change_new,
                 )
     except BaseException as e:
-        print('Problem creating history index: {} - {}'.format(e.__class__.__name__, e))
-        print('sender', sender)
-        print('instance', instance)
-        print('history_instance', history_instance)
-        print('history_user', history_user)
-        print('using', using)
+        logger.error('History Signal - {} - {}'.format(e.__class__.__name__, e))
+        logger.info(str(sender))
+        logger.info(str(instance))
+        logger.info(str(history_instance))
+        logger.info(str(history_change_reason))
+        logger.info(str(history_user))

@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 import datetime
 import json
 import requests
@@ -87,7 +90,7 @@ def verify_paypal_ipn(data):
         if r.text != 'VERIFIED':
             return False
     except BaseException as e:
-        print('Problem verifying IPN: {} - {}'.format(e.__class__.__name__, str(e)))
+        logger.error('IPN verify - {} - {}'.format(e.__class__.__name__, str(e)))
         return False
 
     return True
@@ -222,7 +225,7 @@ def check_training(data, training_id, amount):
     training.paid_date = datetime.date.today()
     training.save()
 
-    print('Amount valid for training cost, id:', training.id)
+    logger.info('IPN - Amount valid for training cost, id: ' + str(training.id))
     return create_member_training_tx(data, member, training)
 
 def create_category_tx(data, member, custom_json):
@@ -257,26 +260,26 @@ def process_paypal_ipn(data):
     ipn = record_ipn(data)
 
     if verify_paypal_ipn(data):
-        print('IPN verified')
+        logger.info('IPN - verified')
     else:
-        print('IPN verification failed')
+        logger.error('IPN - verification failed')
         update_ipn(ipn, 'Verification Failed')
         return False
 
     amount = float(data.get('mc_gross', '0'))
 
     if data.get('payment_status', 'unknown') != 'Completed':
-        print('Payment not yet completed, ignoring')
+        logger.info('IPN - Payment not yet completed, ignoring')
         update_ipn(ipn, 'Payment Incomplete')
         return False
 
     if data.get('receiver_email', 'unknown') != OUR_EMAIL:
-        print('Payment not for us, ignoring')
+        logger.info('IPN - Payment not for us, ignoring')
         update_ipn(ipn, 'Invalid Receiver')
         return False
 
     if data.get('mc_currency', 'unknown') != OUR_CURRENCY:
-        print('Payment currency invalid, ignoring')
+        logger.info('IPN - Payment currency invalid, ignoring')
         update_ipn(ipn, 'Invalid Currency')
         return False
 
@@ -285,12 +288,12 @@ def process_paypal_ipn(data):
     hints = models.PayPalHint.objects
 
     if 'txn_id' not in data:
-        print('Missing transaction ID, ignoring')
+        logger.info('IPN - Missing transaction ID, ignoring')
         update_ipn(ipn, 'Missing ID')
         return False
 
     if transactions.filter(paypal_txn_id=data['txn_id']).exists():
-        print('Duplicate transaction, ignoring')
+        logger.info('IPN - Duplicate transaction, ignoring')
         update_ipn(ipn, 'Duplicate')
         return False
 
@@ -302,7 +305,7 @@ def process_paypal_ipn(data):
     if 'training' in custom_json:
         tx = check_training(data, custom_json['training'], amount)
         if tx:
-            print('Training matched, adding hint and returning')
+            logger.info('IPN - Training matched, adding hint and returning')
             update_ipn(ipn, 'Accepted, training')
             hints.update_or_create(
                 account=data.get('payer_id', 'unknown'),
@@ -323,14 +326,14 @@ def process_paypal_ipn(data):
         )
 
     if not members.filter(id=member_id).exists():
-        print('Unable to associate with member, reporting')
+        logger.info('IPN - Unable to associate with member, reporting')
         update_ipn(ipn, 'Accepted, Unmatched Member')
         return create_unmatched_member_tx(data)
 
     member = members.get(id=member_id)
 
     if custom_json.get('category', False) in ['Snacks', 'OnAcct', 'Donation']:
-        print('Category matched')
+        logger.info('IPN - Category matched')
         update_ipn(ipn, 'Accepted, category')
         return create_category_tx(data, member, custom_json)
 
@@ -342,11 +345,11 @@ def process_paypal_ipn(data):
         num_months = 0
 
     if num_months:
-        print('Amount valid for membership dues, adding months')
+        logger.info('IPN - Amount valid for membership dues, adding months')
         update_ipn(ipn, 'Accepted, Member Dues')
         deal = custom_json.get('deal', False)
         return create_member_dues_tx(data, member, num_months, deal)
 
-    print('Unable to find a reason for payment, reporting')
+    logger.info('IPN - Unable to find a reason for payment, reporting')
     update_ipn(ipn, 'Accepted, Unmatched Purchase')
     return create_unmatched_purchase_tx(data, member)

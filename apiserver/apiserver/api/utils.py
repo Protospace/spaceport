@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 import io
 import requests
 from datetime import datetime, timedelta
@@ -18,7 +21,7 @@ from . import models, serializers, utils_ldap
 try:
     from . import old_models
 except ImportError:
-    print('Running without old portal data...')
+    logger.info('Running without old portal data...')
     old_models = None
 
 STATIC_FOLDER = 'data/static/'

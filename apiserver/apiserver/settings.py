@@ -30,7 +30,6 @@ SECRET_KEY = secrets.DJANGO_SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG_ENV = os.environ.get('DEBUG', False)
 DEBUG = DEBUG_ENV or False
-if DEBUG: print('Debug mode ON')
 
 
 PRODUCTION_HOST = 'my.protospace.ca'
@@ -258,6 +257,7 @@ OLD_PASSWORD_FIELD_ENABLED = True
 LOGOUT_ON_PASSWORD_CHANGE = False
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 
+if DEBUG: logger.info('Debug mode ON')
 logger.info('Test logging for each thread')
 
 #import logging_tree

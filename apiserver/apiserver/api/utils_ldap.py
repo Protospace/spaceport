@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 import requests
 
 from apiserver import secrets
@@ -13,7 +16,7 @@ def ldap_api(route, data):
         r = requests.post(url, data=data, headers=headers, timeout=3)
         return r.status_code
     except BaseException as e:
-        print('Problem GETting {}: {} - {}'.format(url, e.__class__.__name__, str(e)))
+        logger.error('LDAP {} - {} - {}'.format(url, e.__class__.__name__, str(e)))
         return None
 
 def find_user(username):
