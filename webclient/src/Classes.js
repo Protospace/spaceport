@@ -220,12 +220,16 @@ export function ClassDetail(props) {
 									}
 								</div>
 							:
-								((clazz.max_students && clazz.student_count >= clazz.max_students) ?
-									<p>The course is full.</p>
+								(clazz.is_cancelled ?
+									<p>The class is cancelled.</p>
 								:
-									<Button onClick={handleSignup}>
-										Sign me up!
-									</Button>
+									((clazz.max_students && clazz.student_count >= clazz.max_students) ?
+										<p>The class is full.</p>
+									:
+										<Button onClick={handleSignup}>
+											Sign me up!
+										</Button>
+									)
 								)
 							)
 						}
