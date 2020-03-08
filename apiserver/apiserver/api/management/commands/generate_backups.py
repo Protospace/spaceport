@@ -2,17 +2,21 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils.timezone import now
 from django.core.cache import cache
 
-from apiserver import secrets
+from apiserver import secrets, settings
 from apiserver.api import models
 
 from uuid import uuid4
 import subprocess
 import time
 
-
-API_FOLDER = '/opt/spaceport/apiserver'
-DATA_FOLDER = '/opt/spaceport/apiserver/data'
-BACKUP_FOLDER = '/opt/spaceport/apiserver/backups'
+if settings.DEBUG:
+    API_FOLDER = '.'
+    DATA_FOLDER = './data'
+    BACKUP_FOLDER = './backups'
+else:
+    API_FOLDER = '/opt/spaceport/apiserver'
+    DATA_FOLDER = '/opt/spaceport/apiserver/data'
+    BACKUP_FOLDER = '/opt/spaceport/apiserver/backups'
 
 backup_id_string = lambda x: '{}\t{}\t{}'.format(
     str(now()), x['name'], x['backup_id'],
