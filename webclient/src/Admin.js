@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { apiUrl, statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound } from './Misc.js';
 
@@ -62,6 +62,55 @@ export function AdminHistory(props) {
 	);
 };
 
+let backupsCache = false;
+
+export function AdminBackups(props) {
+	const [backups, setBackups] = useState(backupsCache);
+	const [error, setError] = useState(false);
+
+	useEffect(() => {
+		requester('/backup/', 'GET')
+		.then(res => {
+			setBackups(res);
+			backupsCache = res;
+		})
+		.catch(err => {
+			console.log(err);
+		});
+	}, []);
+
+	return (
+		<div>
+			{!error ?
+				backups ?
+					<Table collapsing basic='very'>
+						<Table.Header>
+							<Table.Row>
+								<Table.HeaderCell>Username</Table.HeaderCell>
+								<Table.HeaderCell>Last Downloaded</Table.HeaderCell>
+								<Table.HeaderCell>Less than 24 hours ago?</Table.HeaderCell>
+							</Table.Row>
+						</Table.Header>
+
+						<Table.Body>
+							{backups.filter(x => x.download_time).map(x =>
+								<Table.Row key={x.backup_user}>
+									<Table.Cell>{x.backup_user}</Table.Cell>
+									<Table.Cell>{moment.utc(x.download_time).tz('America/Edmonton').format('LLLL')}</Table.Cell>
+									<Table.Cell>{x.less_than_24h ? 'Yes' : 'No - please investigate'}</Table.Cell>
+								</Table.Row>
+							)}
+						</Table.Body>
+					</Table>
+				:
+					<p>Loading...</p>
+			:
+				<p>Error loading.</p>
+			}
+		</div>
+	);
+};
+
 export function Admin(props) {
 	return (
 		<Container>
@@ -69,8 +118,9 @@ export function Admin(props) {
 
 			<Header size='medium'>Member Data Backup</Header>
 			<p>Spaceport backups are created daily. 14 days are kept on the server.</p>
-			<p>Backups contain the complete member data and must be kept secure.</p>
-			<p>Talk to Tanner to learn how to get backups.</p>
+
+			<Header size='small'>Backup Downloads</Header>
+			<AdminBackups />
 
 			<Header size='medium'>History (Experimental)</Header>
 			<p>Last 100 database changes:</p>
