@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-import logging
+import logging.config
+logger = logging.getLogger(__name__)
+
 
 from . import secrets
 
@@ -206,22 +208,24 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': DEFAULT_AUTHENTICATION_CLASSES,
 }
 
+#DEFAULT_LOGGING = None
 LOGGING = {
     'version': 1,
+    'disable_existing_loggers': False,
     'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
-        },
         'medium': {
-            'format': '[%(asctime)s] [%(levelname)s] %(message)s'
+            'format': '[%(asctime)s] [%(process)d] [%(levelname)7s] %(message)s'
         },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
+    },
+    'filters': {
+        'ignore_stats': {
+            '()': 'apiserver.filters.IgnoreStats',
         },
     },
     'handlers': {
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
+            'filters': ['ignore_stats'],
             'class': 'logging.StreamHandler',
             'formatter': 'medium'
         },
@@ -229,21 +233,21 @@ LOGGING = {
     'loggers': {
         'gunicorn': {
             'handlers': ['console'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': True,
+            'level': 'DEBUG',
+            'propagate': False,
         },
         '': {
             'handlers': ['console'],
-            'level': 'INFO',
+            'level': 'DEBUG',
             'propagate': True,
         },
-    }
+    },
+    'root': {
+        'level': 'INFO',
+        'handlers': ['console'],
+    },
 }
+logging.config.dictConfig(LOGGING)
 
 SITE_ID = 1
 ACCOUNT_EMAIL_REQUIRED = True
@@ -253,3 +257,8 @@ ACCOUNT_AUTHENTICATION_METHOD = 'username'
 OLD_PASSWORD_FIELD_ENABLED = True
 LOGOUT_ON_PASSWORD_CHANGE = False
 ACCOUNT_PRESERVE_USERNAME_CASING = False
+
+logger.info('Test logging for each thread')
+
+#import logging_tree
+#logging_tree.printout()
