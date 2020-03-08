@@ -13,7 +13,9 @@ export function Cards(props) {
 
 	return (
 		<Container>
-			<Header size='large'>Member Cards</Header>
+			<Header size='large'>Cards / Access</Header>
+
+			<Header size='medium'>Member Cards</Header>
 
 			{user.cards.length ?
 				user.cards.length > 1 ?
@@ -63,6 +65,22 @@ export function Cards(props) {
 				<p>No cards yet! Ask a director for one after you are vetted.</p>
 			}
 
+			{!!user.door_code && <div>
+				<Header size='medium'>Door Alarm Code</Header>
+
+				<p>Only share this with vetted Protospace members:</p>
+
+				<p>{user.door_code}</p>
+			</div>}
+
+			{!!user.wifi_pass && <div>
+				<p />
+				<Header size='medium'>Wi-Fi Password</Header>
+
+				<p>Only share this with Protospace members and guests:</p>
+
+				<p>{user.wifi_pass}</p>
+			</div>}
 		</Container>
 	);
 };

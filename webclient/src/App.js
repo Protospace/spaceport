@@ -118,7 +118,7 @@ function App() {
 								to='/training'
 							/>
 							<Dropdown.Item
-								content='Cards'
+								content='Cards / Access'
 								as={Link}
 								to='/cards'
 							/>
