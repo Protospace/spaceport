@@ -113,6 +113,11 @@ body {
 	margin-bottom: 4px;
 }
 
+.pay-custom {
+	margin-bottom: 1rem;
+	width: 10rem;
+}
+
 .footer {
 	margin-top: -20rem;
 

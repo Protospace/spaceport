@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
-import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Input, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment';
 import { apiUrl, statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound } from './Misc.js';
@@ -9,6 +9,8 @@ import { PayPalPayNow, PayPalSubscribe } from './PayPal.js';
 
 export function Paymaster(props) {
 	const { user } = props;
+	const [pop, setPop] = useState('20.00');
+	const [donate, setDonate] = useState('20.00');
 
 	return (
 		<Container>
@@ -36,11 +38,22 @@ export function Paymaster(props) {
 				</Grid.Column>
 
 				<Grid.Column>
-					<p>Pay $20.00:</p>
+					Custom amount:
+
+					<div className='pay-custom'>
+						<Input
+							fluid
+							label={{ basic: true, content: '$' }}
+							labelPosition='left'
+							value={pop}
+							onChange={(e, v) => setPop(v.value)}
+						/>
+					</div>
+
 					<PayPalPayNow
-						amount={20}
-						name='Protospace Snacks / Pop'
-						custom={JSON.stringify({ category: 'Snacks', member: user.member.id })}
+						amount={pop}
+						name='Protospace Donation'
+						custom={JSON.stringify({ category: 'Donation', member: user.member.id })}
 					/>
 				</Grid.Column>
 			</Grid>
@@ -130,9 +143,20 @@ export function Paymaster(props) {
 				</Grid.Column>
 
 				<Grid.Column>
-					<p>Donate $20.00:</p>
+					Custom amount:
+
+					<div className='pay-custom'>
+						<Input
+							fluid
+							label={{ basic: true, content: '$' }}
+							labelPosition='left'
+							value={donate}
+							onChange={(e, v) => setDonate(v.value)}
+						/>
+					</div>
+
 					<PayPalPayNow
-						amount={20}
+						amount={donate}
 						name='Protospace Donation'
 						custom={JSON.stringify({ category: 'Donation', member: user.member.id })}
 					/>
