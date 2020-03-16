@@ -362,7 +362,7 @@ export function InstructorClassList(props) {
 	useEffect(() => {
 		setSameClasses(classes.filter(x =>
 			moment.utc(x.datetime).tz('America/Edmonton').isSame(input.datetime, 'day')
-		));
+		).sort((a, b) => a.datetime > b.datetime ? 1 : -1));
 	}, [input.datetime]);
 
 	return (
