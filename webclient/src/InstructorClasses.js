@@ -202,7 +202,7 @@ export function InstructorClassAttendance(props) {
 				</div>
 			:
 				<Button onClick={() => setOpen(true)}>
-					Edit Class
+					Edit Attendance
 				</Button>
 			}
 		</div>
@@ -325,6 +325,8 @@ export function InstructorClassList(props) {
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
+	const [classes, setClasses] = useState([]);
+	const [sameClasses, setSameClasses] = useState(false);
 
 	const handleSubmit = (e) => {
 		if (loading) return;
@@ -347,6 +349,22 @@ export function InstructorClassList(props) {
 		});
 	};
 
+	useEffect(() => {
+		requester('/sessions/', 'GET', token)
+		.then(res => {
+			setClasses(res.results.filter(x => !x.is_cancelled));
+		})
+		.catch(err => {
+			console.log(err);
+		});
+	}, []);
+
+	useEffect(() => {
+		setSameClasses(classes.filter(x =>
+			moment.utc(x.datetime).tz('America/Edmonton').isSame(input.datetime, 'day')
+		));
+	}, [input.datetime]);
+
 	return (
 		<div>
 			<Header size='medium'>Instructor Panel</Header>
@@ -354,15 +372,36 @@ export function InstructorClassList(props) {
 			{!open && success && <p>Added! <Link to={'/classes/'+success}>View the class.</Link></p>}
 
 			{open ?
-				<Form onSubmit={handleSubmit}>
-					<Header size='small'>Add a Class</Header>
+				<Grid stackable padded columns={2}>
+					<Grid.Column>
+						<Form onSubmit={handleSubmit}>
+							<Header size='small'>Add a Class</Header>
 
-					<InstructorClassEditor input={input} setInput={setInput} error={error} />
+							<InstructorClassEditor input={input} setInput={setInput} error={error} />
 
-					<Form.Button loading={loading} error={error.non_field_errors}>
-						Submit
-					</Form.Button>
-				</Form>
+							<Form.Button loading={loading} error={error.non_field_errors}>
+								Submit
+							</Form.Button>
+						</Form>
+					</Grid.Column>
+					<Grid.Column>
+						{!!input.datetime &&
+							<div>
+								<Header size='small'>Upcoming Classes That Day</Header>
+
+								{sameClasses.length ?
+									sameClasses.map(x =>
+										<p>
+											{moment.utc(x.datetime).tz('America/Edmonton').format('LT')} — {x.course_name}
+										</p>
+									)
+								:
+									<p>None</p>
+								}
+							</div>
+						}
+					</Grid.Column>
+				</Grid>
 			:
 				<Button onClick={() => setOpen(true)}>
 					Add a Class
