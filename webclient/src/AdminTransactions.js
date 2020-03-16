@@ -120,10 +120,53 @@ export function AdminHistoricalTransactions(props) {
 	);
 };
 
+export function AdminAddTransaction(props) {
+	const { token } = props;
+	const [open, setOpen] = useState(false);
+	const [input, setInput] = useState({ date: moment().format('YYYY-MM-DD'), info_source: 'Web' });
+	const [error, setError] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const [success, setSuccess] = useState(false);
+
+	const handleSubmit = (e) => {
+		if (loading) return;
+		setLoading(true);
+		setSuccess(false);
+		requester('/transactions/', 'POST', token, input)
+		.then(res => {
+			setSuccess(res.id);
+			setInput({});
+			setLoading(false);
+			setError(false);
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+			setError(err.data);
+		});
+	};
+
+	return (
+		<Form onSubmit={handleSubmit}>
+			<TransactionEditor {...props} input={input} setInput={setInput} error={error} />
+
+			<Form.Button loading={loading} error={error.non_field_errors}>
+				Submit
+			</Form.Button>
+			{success && <p>Added! <Link to={'/transactions/'+success}>View the transaction.</Link></p>}
+		</Form>
+	);
+};
+
 export function AdminTransactions(props) {
 	return (
 		<Container>
 			<Header size='large'>Admin Transactions</Header>
+
+			<Segment padded>
+				<Header size='medium'>Add a Transaction</Header>
+				<AdminAddTransaction {...props} />
+			</Segment>
 
 			<Header size='medium'>Reported</Header>
 			<AdminReportedTransactions {...props} />
