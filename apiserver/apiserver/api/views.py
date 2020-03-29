@@ -69,8 +69,8 @@ class SearchViewSet(Base, Retrieve):
             # then get exact substring matches
             results += [x for x in choices if search in x]
 
-            if len(results) == 0 and len(search) >= 3:
-                # then get fuzzy matches
+            if len(results) == 0 and len(search) >= 3 and '@' not in search:
+                # then get fuzzy matches, but not for emails
                 fuzzy_results = process.extract(search, choices, limit=NUM_SEARCH_RESULTS, scorer=fuzz.token_set_ratio)
                 results += [x[0] for x in fuzzy_results]
 

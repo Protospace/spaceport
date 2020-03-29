@@ -143,7 +143,14 @@ def gen_search_strings():
         string = '{} {}'.format(
             m.preferred_name,
             m.last_name,
-        ).lower()
+        )
+
+        if m.old_email:
+            string += '  ' + m.old_email
+        if m.user:
+            string += '  ' + m.user.email
+
+        string = string.lower()
         search_strings[string] = m.id
     cache.set('search_strings', search_strings)
 
