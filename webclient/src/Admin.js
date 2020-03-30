@@ -43,7 +43,7 @@ export function AdminHistory(props) {
 						<Table.Body>
 							{history.map(x =>
 								<Table.Row key={x.id}>
-									<Table.Cell>{moment().utc(x.history_date).format('YYYY-MM-DD')}</Table.Cell>
+									<Table.Cell>{moment.utc(x.history_date).format('YYYY-MM-DD')}</Table.Cell>
 									<Table.Cell>{x.history_user || 'System'}</Table.Cell>
 									<Table.Cell>{x.history_type}</Table.Cell>
 									<Table.Cell>{x.owner_name}</Table.Cell>
