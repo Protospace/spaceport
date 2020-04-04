@@ -14,7 +14,7 @@ a 301 redirect if you forget it.
 Authentication
 --------------
 
-All API routes except for ``/door/`` require authentication with a token. The
+All API routes require authentication with a token. The
 token is returned on registration and login. The token needs to be placed in the
 ``Authorization`` request header like this: ``Token <token>``.
 
