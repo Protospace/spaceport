@@ -47,16 +47,6 @@ body {
 	min-height: 45rem;
 }
 
-.photo-small {
-	max-width: 80px;
-	max-height: 80px;
-}
-
-.photo-medium {
-	max-width: 150px;
-	max-height: 1500px;
-}
-
 .photo-404 {
 	max-width: 100%;
 	height: auto;
@@ -118,10 +108,6 @@ body {
 	width: 10rem;
 }
 
-.darkmode--activated .footer {
-	mix-blend-mode: difference;
-}
-
 .footer {
 	margin-top: -20rem;
 
@@ -159,6 +145,22 @@ body {
 	margin-right: 0.5em;
 }
 
+
 .darkmode-layer, .darkmode-toggle {
 	z-index: 500;
+}
+
+.darkmode--activated .ui.image {
+	mix-blend-mode: difference;
+	filter: brightness(50%);
+}
+
+.darkmode--activated i.green.circle.icon,
+.darkmode--activated i.yellow.circle.icon,
+.darkmode--activated i.red.circle.icon {
+	mix-blend-mode: difference;
+}
+
+.darkmode--activated .footer {
+	mix-blend-mode: difference;
 }
