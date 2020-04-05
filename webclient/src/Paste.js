@@ -40,7 +40,7 @@ function PasteForm(props) {
 	return (
 		<Form onSubmit={handleSubmit}>
 			<Form.TextArea
-				maxlength={20000}
+				maxLength={20000}
 				rows={20}
 				{...makeProps('paste')}
 			/>

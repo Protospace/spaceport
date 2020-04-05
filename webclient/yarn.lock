@@ -3275,6 +3275,11 @@ damerau-levenshtein@^1.0.4:
   resolved "https://registry.yarnpkg.com/damerau-levenshtein/-/damerau-levenshtein-1.0.5.tgz#780cf7144eb2e8dbd1c3bb83ae31100ccc31a414"
   integrity sha512-CBCRqFnpu715iPmw1KrdOrzRqbdFwQTwAWyyyYS42+iAgHCuXZ+/TdMgQkUENPomxEz9z1BEzuQU2Xw0kUuAgA==
 
+darkmode-js@^1.5.5:
+  version "1.5.5"
+  resolved "https://registry.yarnpkg.com/darkmode-js/-/darkmode-js-1.5.5.tgz#6e0180a5dc98038c4b96fbdcc482fb230966ff14"
+  integrity sha512-loXmLt2rJ2PYg7Z4lD8drIKG+LEk0ai7ay4JTV0bS5ZWpXmH7s9dShCu6tQ0mwWgETIn2yZ5BURK/fZoPXgZxQ==
+
 dashdash@^1.12.0:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/dashdash/-/dashdash-1.14.1.tgz#853cfa0f7cbe2fed5de20326b8dd581035f6e2f0"

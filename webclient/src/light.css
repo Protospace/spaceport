@@ -118,6 +118,10 @@ body {
 	width: 10rem;
 }
 
+.darkmode--activated .footer {
+	mix-blend-mode: difference;
+}
+
 .footer {
 	margin-top: -20rem;
 
@@ -153,4 +157,8 @@ body {
 	margin-top: 3px;
 	margin-left: -3.5px;
 	margin-right: 0.5em;
+}
+
+.darkmode-layer, .darkmode-toggle {
+	z-index: 500;
 }

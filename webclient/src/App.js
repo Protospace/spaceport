@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } f
 import './semantic-ui/semantic.min.css';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import Darkmode from 'darkmode-js';
 import { isAdmin, requester } from './utils.js';
 import { ManageScroll } from './ManageScroll.js';
 import { Home } from './Home.js';
@@ -71,6 +72,17 @@ function App() {
 			}
 		});
 	}, [history.location]);
+
+	useEffect(() => {
+		const options = {
+			bottom: '16px',
+			right: '16px',
+			buttonColorDark: '#333',
+			buttonColorLight: '#ddd',
+		}
+		const darkmode = new Darkmode(options);
+		darkmode.showWidget();
+	}, []);
 
 	return (
 		<div>
