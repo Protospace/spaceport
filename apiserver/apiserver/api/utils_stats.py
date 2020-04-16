@@ -30,8 +30,13 @@ def calc_next_events():
 
     if member_meeting:
         cache.set('next_meeting', member_meeting.datetime)
+    else:
+        cache.set('next_meeting', None)
+
     if monthly_clean:
         cache.set('next_clean', monthly_clean.datetime)
+    else:
+        cache.set('next_clean', None)
 
 def calc_member_counts():
     members = models.Member.objects
