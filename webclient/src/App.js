@@ -77,8 +77,9 @@ function App() {
 		const options = {
 			bottom: '16px',
 			right: '16px',
-			buttonColorDark: '#333',
-			buttonColorLight: '#ddd',
+			buttonColorDark: '#666',
+			buttonColorLight: '#aaa',
+			label: '🌙',
 		}
 		const darkmode = new Darkmode(options);
 		darkmode.showWidget();
