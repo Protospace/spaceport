@@ -13,7 +13,7 @@ from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_MET
 from rest_framework.response import Response
 from rest_auth.views import PasswordChangeView
 from rest_auth.registration.views import RegisterView
-from fuzzywuzzy import fuzz, process
+from rapidfuzz import fuzz, process
 from collections import OrderedDict
 import datetime
 
