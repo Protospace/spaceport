@@ -1,8 +1,13 @@
+import logging
+logger = logging.getLogger(__name__)
+
 import time
 import datetime
+import requests
 from django.core.cache import cache
 from django.utils.timezone import now
 from apiserver.api import models
+from apiserver import secrets
 
 DEFAULTS = {
     'last_card_change': time.time(),
@@ -13,6 +18,7 @@ DEFAULTS = {
     'green_count': None,
     'bay_108_temp': None,
     'bay_110_temp': None,
+    'minecraft_players': [],
 }
 
 def changed_card():
@@ -49,3 +55,19 @@ def calc_member_counts():
     cache.set('member_count', num_not_paused)
     cache.set('paused_count', num_paused)
     cache.set('green_count', num_current + num_prepaid)
+
+def check_minecraft_server():
+    if secrets.MINECRAFT:
+        url = 'https://api.minetools.eu/ping/' + secrets.MINECRAFT
+
+        try:
+            r = requests.get(url, timeout=5)
+            r.raise_for_status()
+            players = [x['name'] for x in r.json()['players']['sample']]
+            cache.set('minecraft_players', players)
+            return players
+        except BaseException as e:
+            cache.set('minecraft_players', [])
+            logger.error('Problem checking Minecraft: {} - {}'.format(e.__class__.__name__, str(e)))
+
+    return []
