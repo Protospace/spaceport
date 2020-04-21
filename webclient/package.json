@@ -16,6 +16,7 @@
 		"react-router-dom": "^5.1.2",
 		"react-scripts": "3.3.0",
 		"react-to-print": "^2.5.1",
+		"recharts": "^1.8.5",
 		"semantic-ui-react": "^0.88.2",
 		"serialize-javascript": "^2.1.2"
 	},

@@ -192,7 +192,7 @@ export function Home(props) {
 							<Header size='medium'>Protospace Stats</Header>
 							<p>Next member meeting: {getDateStat('next_meeting')}</p>
 							<p>Next monthly clean: {getDateStat('next_clean')}</p>
-							<p>Member count: {getStat('member_count')}</p>
+							<p>Member count: {getStat('member_count')} <Link to='/charts'>[more]</Link></p>
 							<p>Green members: {getStat('green_count')}</p>
 							<p>Old members: {getStat('paused_count')}</p>
 							<p>Bay 108 (metal) temp: {getStat('bay_108_temp')} °C</p>
