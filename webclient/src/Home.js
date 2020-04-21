@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import moment from 'moment-timezone';
 import './light.css';
-import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Popup, Segment, Table } from 'semantic-ui-react';
 import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 import { AccountForm } from './Account.js';
@@ -146,6 +146,8 @@ export function Home(props) {
 	const getStat = (x) => stats && stats[x] ? stats[x] : '?';
 	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz('America/Edmonton').format('ll') : '?';
 
+	const mcPlayers = stats && stats['minecraft_players'] ? stats['minecraft_players'] : [];
+
 	return (
 		<Container>
 			<Grid stackable padded columns={2}>
@@ -195,6 +197,21 @@ export function Home(props) {
 							<p>Old members: {getStat('paused_count')}</p>
 							<p>Bay 108 (metal) temp: {getStat('bay_108_temp')} °C</p>
 							<p>Bay 110 (wood) temp: {getStat('bay_110_temp')} °C</p>
+
+							<p>
+								Minecraft players: {mcPlayers.length} <Popup content={
+									<React.Fragment>
+										<p>
+											Server IP:<br />
+											games.protospace.ca
+										</p>
+										<p>
+											Players:<br />
+											{mcPlayers.length ? mcPlayers.map(x => <React.Fragment>{x}<br /></React.Fragment>) : 'None'}
+										</p>
+									</React.Fragment>
+								} trigger={<a>[more]</a>} />
+							</p>
 						</div>
 
 					</Segment>
