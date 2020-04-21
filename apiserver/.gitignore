@@ -113,3 +113,4 @@ old_paypal/
 missing_paypal/
 backups/
 secrets.py
+old_counts.csv
