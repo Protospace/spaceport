@@ -53,12 +53,15 @@ def calc_member_counts():
     num_due = not_paused.filter(status='Due').count()
     num_overdue = not_paused.filter(status='Overdue').count()
 
-    num_active = num_current + num_prepaid + num_due + num_overdue
-    num_former = members.count() - num_active
+    member_count = num_current + num_prepaid + num_due + num_overdue
+    paused_count = members.count() - member_count
+    green_count = num_current + num_prepaid
 
-    cache.set('member_count', num_active)
-    cache.set('paused_count', num_former)
-    cache.set('green_count', num_current + num_prepaid)
+    cache.set('member_count', member_count)
+    cache.set('paused_count', paused_count)
+    cache.set('green_count', green_count)
+
+    return member_count, green_count
 
 def check_minecraft_server():
     if secrets.MINECRAFT:
