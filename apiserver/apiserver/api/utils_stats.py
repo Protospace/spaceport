@@ -46,14 +46,18 @@ def calc_next_events():
 
 def calc_member_counts():
     members = models.Member.objects
+    not_paused = members.filter(paused_date__isnull=True)
 
-    num_not_paused = members.filter(paused_date__isnull=True).count()
-    num_paused = members.filter(paused_date__isnull=False).count()
-    num_current = members.filter(status='Current').count()
-    num_prepaid = members.filter(status='Prepaid').count()
+    num_current = not_paused.filter(status='Current').count()
+    num_prepaid = not_paused.filter(status='Prepaid').count()
+    num_due = not_paused.filter(status='Due').count()
+    num_overdue = not_paused.filter(status='Overdue').count()
 
-    cache.set('member_count', num_not_paused)
-    cache.set('paused_count', num_paused)
+    num_active = num_current + num_prepaid + num_due + num_overdue
+    num_former = members.count() - num_active
+
+    cache.set('member_count', num_active)
+    cache.set('paused_count', num_former)
     cache.set('green_count', num_current + num_prepaid)
 
 def check_minecraft_server():
