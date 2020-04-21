@@ -417,6 +417,12 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
         super().save()
 
 
+class MemberCountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.StatsMemberCount
+        fields = '__all__'
+
+
 class HistoryChangeSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.HistoryChange

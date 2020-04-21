@@ -385,6 +385,12 @@ class StatsViewSet(viewsets.ViewSet, List):
             raise exceptions.ValidationError(dict(data='This field is required.'))
 
 
+class MemberCountViewSet(Base, List):
+    pagination_class = None
+    queryset = models.StatsMemberCount.objects.all()
+    serializer_class = serializers.MemberCountSerializer
+
+
 class BackupView(views.APIView):
     def get(self, request):
         auth_token = request.META.get('HTTP_AUTHORIZATION', '')
