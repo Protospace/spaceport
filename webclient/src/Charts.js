@@ -29,38 +29,44 @@ export function Charts(props) {
 
 			<p>Daily since March 2nd, 2020.</p>
 
-			{memberCount &&
-				<ResponsiveContainer width='100%' height={300}>
-					<LineChart data={memberCount}>
-						<XAxis dataKey='date' minTickGap={10} />
-						<YAxis />
-						<CartesianGrid strokeDasharray='3 3'/>
-						<Tooltip />
-						<Legend />
+			<p>
+				{memberCount &&
+					<ResponsiveContainer width='100%' height={300}>
+						<LineChart data={memberCount}>
+							<XAxis dataKey='date' minTickGap={10} />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip />
+							<Legend />
 
-						<ReferenceLine x='2020-03-25' stroke='red' label='Space Locked' strokeDasharray='3 3' />
+							<ReferenceLine x='2020-03-25' stroke='red' label='Space Locked' strokeDasharray='3 3' />
 
-						<Line
-							type='monotone'
-							dataKey='member_count'
-							name='Member Count'
-							stroke='#8884d8'
-							strokeWidth={2}
-							dot={false}
-							animationDuration={1000}
-						/>
-						<Line
-							type='monotone'
-							dataKey='green_count'
-							name='Green Count'
-							stroke='#82ca9d'
-							strokeWidth={2}
-							dot={false}
-							animationDuration={1500}
-						/>
-					</LineChart>
-				</ResponsiveContainer>
-			}
+							<Line
+								type='monotone'
+								dataKey='member_count'
+								name='Member Count'
+								stroke='#8884d8'
+								strokeWidth={2}
+								dot={false}
+								animationDuration={1000}
+							/>
+							<Line
+								type='monotone'
+								dataKey='green_count'
+								name='Green Count'
+								stroke='#82ca9d'
+								strokeWidth={2}
+								dot={false}
+								animationDuration={1500}
+							/>
+						</LineChart>
+					</ResponsiveContainer>
+				}
+			</p>
+
+			<p>The Member Count is the amount of Prepaid, Current, Due, and Overdue members on Spaceport.</p>
+
+			<p>The Green Count is the amount of Prepaid and Current members.</p>
 
 		</Container>
 	);
