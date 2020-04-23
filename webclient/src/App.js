@@ -219,7 +219,7 @@ function App() {
 							</Route>
 
 							<Route path='/cards'>
-								<Cards user={user} />
+								<Cards token={token} user={user} />
 							</Route>
 
 							<Route path='/training'>
