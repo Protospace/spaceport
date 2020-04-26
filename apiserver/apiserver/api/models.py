@@ -133,7 +133,7 @@ class StatsMemberCount(models.Model):
     member_count = models.IntegerField()
     green_count = models.IntegerField()
 
-class StatsMemberSignup(models.Model):
+class StatsSignupCount(models.Model):
     month = models.DateField()
     signup_count = models.IntegerField()
 

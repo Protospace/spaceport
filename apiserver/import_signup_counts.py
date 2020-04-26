@@ -14,7 +14,7 @@ with open('old_counts.csv', newline='') as csvfile:
     for row in reader:
         print('Adding', row['month'], row['signup_count'])
 
-        models.StatsMemberSignup.objects.update_or_create(
+        models.StatsSignupCount.objects.update_or_create(
             month=row['month']+'-01',
             defaults=dict(signup_count=row['signup_count']),
         )
