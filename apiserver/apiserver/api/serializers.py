@@ -422,6 +422,16 @@ class MemberCountSerializer(serializers.ModelSerializer):
         model = models.StatsMemberCount
         fields = '__all__'
 
+class SignupCountSerializer(serializers.ModelSerializer):
+    month = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.StatsSignupCount
+        fields = '__all__'
+
+    def get_month(self, obj):
+        return str(obj.month)[:7]
+
 
 class HistoryChangeSerializer(serializers.ModelSerializer):
     class Meta:

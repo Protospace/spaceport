@@ -390,6 +390,11 @@ class MemberCountViewSet(Base, List):
     queryset = models.StatsMemberCount.objects.all()
     serializer_class = serializers.MemberCountSerializer
 
+class SignupCountViewSet(Base, List):
+    pagination_class = None
+    queryset = models.StatsSignupCount.objects.order_by('-month')[:16][::-1]
+    serializer_class = serializers.SignupCountSerializer
+
 
 class BackupView(views.APIView):
     def get(self, request):
