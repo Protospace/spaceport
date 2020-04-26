@@ -133,6 +133,10 @@ class StatsMemberCount(models.Model):
     member_count = models.IntegerField()
     green_count = models.IntegerField()
 
+class StatsMemberSignup(models.Model):
+    month = models.DateField()
+    signup_count = models.IntegerField()
+
 class HistoryIndex(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField()
