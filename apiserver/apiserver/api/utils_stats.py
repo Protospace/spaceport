@@ -2,12 +2,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 import time
-import datetime
+from datetime import date, datetime
 import requests
 from django.core.cache import cache
-from django.utils.timezone import now
+from django.utils.timezone import now, pytz
 from apiserver.api import models
 from apiserver import secrets
+
+def today_alberta_tz():
+    return datetime.now(pytz.timezone('America/Edmonton')).date()
 
 DEFAULTS = {
     'last_card_change': time.time(),
@@ -62,6 +65,15 @@ def calc_member_counts():
     cache.set('green_count', green_count)
 
     return member_count, green_count
+
+def calc_signup_counts():
+    month_beginning = today_alberta_tz().replace(day=1)
+
+    members = models.Member.objects
+    new_members = members.filter(application_date__gte=month_beginning)
+    num_new_members = new_members.count()
+
+    return num_new_members
 
 def check_minecraft_server():
     if secrets.MINECRAFT:

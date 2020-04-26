@@ -1,12 +1,8 @@
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.timezone import now, pytz
+from django.utils.timezone import now
 from apiserver.api import models, utils, utils_stats
 
-from datetime import datetime
 import time
-
-def today_alberta_tz():
-    return datetime.now(pytz.timezone('America/Edmonton')).date()
 
 class Command(BaseCommand):
     help = 'Tasks to run on the portal hourly.'
@@ -14,11 +10,17 @@ class Command(BaseCommand):
     def generate_stats(self):
         utils_stats.calc_next_events()
         member_count, green_count = utils_stats.calc_member_counts()
+        signup_count = utils_stats.calc_signup_counts()
 
         # do this hourly in case an admin causes a change
         models.StatsMemberCount.objects.update_or_create(
-            date=today_alberta_tz(),
+            date=utils.today_alberta_tz(),
             defaults=dict(member_count=member_count, green_count=green_count),
+        )
+
+        models.StatsSignupCount.objects.update_or_create(
+            month=utils.today_alberta_tz().replace(day=1),
+            defaults=dict(signup_count=signup_count),
         )
 
 
