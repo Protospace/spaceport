@@ -35,6 +35,8 @@ class Member(models.Model):
     street_address = models.CharField(default='', max_length=32, null=True)
     city = models.CharField(default='Calgary, AB', max_length=32)
     postal_code = models.CharField(max_length=16, null=True)
+    public_bio = models.CharField(max_length=512, blank=True)
+    private_notes = models.CharField(max_length=512, blank=True)
 
     is_director = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)

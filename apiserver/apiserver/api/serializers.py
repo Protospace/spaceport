@@ -93,7 +93,8 @@ class OtherMemberSerializer(serializers.ModelSerializer):
             'status',
             'current_start_date',
             'photo_small',
-            'photo_large'
+            'photo_large',
+            'public_bio',
         ]
 
     def get_status(self, obj):
