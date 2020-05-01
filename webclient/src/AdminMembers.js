@@ -400,6 +400,11 @@ export function AdminMemberForm(props) {
 					/>
 				</Form.Field>
 
+				<Form.TextArea
+					label={'Private Notes (shared with ' + input.preferred_name + ')'}
+					{...makeProps('private_notes')}
+				/>
+
 				<Form.Button loading={loading} error={error.non_field_errors}>
 					Submit
 				</Form.Button>
@@ -478,8 +483,15 @@ export function AdminMemberInfo(props) {
 						<Table.Cell>Emergency Contact Phone:</Table.Cell>
 						<Table.Cell>{member.emergency_contact_phone || 'None'}</Table.Cell>
 					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Public Bio:</Table.Cell>
+					</Table.Row>
 				</Table.Body>
 			</BasicTable>
+
+			<p className='bio-paragraph'>
+				{member.public_bio || 'None yet.'}
+			</p>
 
 			{member.member_forms && <p>
 				<a href={staticUrl + '/' + member.member_forms} target='_blank'>

@@ -162,21 +162,30 @@ export function MemberDetail(props) {
 								{isAdmin(user) ?
 									<AdminMemberInfo result={result} refreshResult={refreshResult} {...props} />
 								:
-									<BasicTable>
-										<Table.Body>
-											<Table.Row>
-												<Table.Cell>Status:</Table.Cell>
-												<Table.Cell>
-													<Icon name='circle' color={statusColor[member.status]} />
-													{member.status || 'Unknown'}
-												</Table.Cell>
-											</Table.Row>
-											<Table.Row>
-												<Table.Cell>Joined:</Table.Cell>
-												<Table.Cell>{member.current_start_date || 'Unknown'}</Table.Cell>
-											</Table.Row>
-										</Table.Body>
-									</BasicTable>
+									<React.Fragment>
+										<BasicTable>
+											<Table.Body>
+												<Table.Row>
+													<Table.Cell>Status:</Table.Cell>
+													<Table.Cell>
+														<Icon name='circle' color={statusColor[member.status]} />
+														{member.status || 'Unknown'}
+													</Table.Cell>
+												</Table.Row>
+												<Table.Row>
+													<Table.Cell>Joined:</Table.Cell>
+													<Table.Cell>{member.current_start_date || 'Unknown'}</Table.Cell>
+												</Table.Row>
+												<Table.Row>
+													<Table.Cell>Public Bio:</Table.Cell>
+												</Table.Row>
+											</Table.Body>
+										</BasicTable>
+
+										<p className='bio-paragraph'>
+											{member.public_bio || 'None yet.'}
+										</p>
+									</React.Fragment>
 								}
 							</Grid.Column>
 

@@ -108,6 +108,12 @@ body {
 	width: 10rem;
 }
 
+.bio-paragraph {
+	white-space: pre-line;
+	margin-top: -1rem;
+	margin-left: 1rem;
+}
+
 .footer {
 	margin-top: -20rem;
 
