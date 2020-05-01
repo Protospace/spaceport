@@ -7,6 +7,7 @@ from django.db.models import Max
 from django.http import HttpResponse, Http404
 from django.core.files.base import File
 from django.core.cache import cache
+from django.utils.timezone import now
 from rest_framework import viewsets, views, mixins, generics, exceptions
 from rest_framework.decorators import action
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS, IsAuthenticatedOrReadOnly
@@ -408,6 +409,10 @@ class BackupView(views.APIView):
 
             if not backup_path:
                 raise Http404
+
+            if str(now().date()) not in backup_path:
+                # sanity check - make sure it's actually today's backup
+                raise Http404()
 
             backup_url = 'https://static.{}/backups/{}'.format(
                 settings.PRODUCTION_HOST,
