@@ -103,6 +103,8 @@ Full User
                 "birthdate": null,
                 "is_minor": false,
                 "guardian_name": "",
+                "public_bio": "",
+                "private_notes": "",
                 "is_director": false,
                 "is_staff": true,
                 "is_instructor": false,
@@ -237,6 +239,8 @@ Member Details
             "birthdate": null,
             "is_minor": false,
             "guardian_name": "",
+            "public_bio": "",
+            "private_notes": "",
             "is_director": false,
             "is_staff": false,
             "is_instructor": false,
@@ -298,6 +302,8 @@ Edit Member Details
     :json birthdate: optional, YYYY-MM-DD
     :json boolean is_minor:
     :json guardian_name: optional
+    :json public_bio: optional
+    :json private_notes: optional
 
     **Admins**
 
@@ -310,7 +316,7 @@ Edit Member Details
     :json current_start_date: When to start counting their membership dues from.
         Would only differ from application_date for accounting reasons, YYYY-MM-DD.
     :json vetted_date: YYYY-MM-DD
-    :json monthly_fees: for display only
+    :json monthly_fees: used to match PayPal transactions
 
     :requestheader Authorization: ``Token <token>``
 
