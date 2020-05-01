@@ -229,6 +229,67 @@ export function AccountForm(props) {
 	);
 };
 
+export function BioNotesForm(props) {
+	const { token, user, refreshUser } = props;
+	const member = user.member;
+	const [input, setInput] = useState({ ...member, set_details: true });
+	const [error, setError] = useState({});
+	const [loading, setLoading] = useState(false);
+	const history = useHistory();
+
+	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
+	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
+	const handleChange = (e) => handleValues(e, e.currentTarget);
+	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
+
+	const handleSubmit = (e) => {
+		if (loading) return;
+		setLoading(true);
+		requester('/members/' + member.id + '/', 'PATCH', token, input)
+		.then(res => {
+			setError({});
+			refreshUser();
+			history.push('/');
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+			setError(err.data);
+		});
+	};
+
+	const makeProps = (name) => ({
+		name: name,
+		onChange: handleChange,
+		value: input[name] || '',
+		error: error[name],
+	});
+
+	return (
+		<Form onSubmit={handleSubmit}>
+			<Header size='medium'>Bio / Notes</Header>
+
+			<Form.TextArea
+				label={'Public Bio' + (input.public_bio && input.public_bio.length > 400 ? ' — ' + input.public_bio.length + ' / 512' : '')}
+				{...makeProps('public_bio')}
+			/>
+
+			<p>Bio shared with members. Example: contact info, allergies, hobbies, etc.</p>
+
+			<Form.TextArea
+				label={'Private Notes' + (input.private_notes && input.private_notes.length > 400 ? ' — ' + input.private_notes.length + ' / 512' : '')}
+				{...makeProps('private_notes')}
+			/>
+
+			<p>Notes visible only to directors and admins.</p>
+
+			<Form.Button loading={loading} error={error.non_field_errors}>
+				Submit
+			</Form.Button>
+		</Form>
+	);
+};
+
 export function Account(props) {
 	return (
 		<Container>
@@ -238,6 +299,7 @@ export function Account(props) {
 					<Segment padded><AccountForm {...props} /></Segment>
 				</Grid.Column>
 				<Grid.Column>
+					<Segment padded><BioNotesForm {...props} /></Segment>
 					<Segment padded><ChangePasswordForm {...props} /></Segment>
 					<Segment padded><LogoutEverywhere {...props} /></Segment>
 				</Grid.Column>
