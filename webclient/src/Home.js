@@ -60,7 +60,7 @@ function MemberInfo(props) {
 				<p>Visit the <Link to='/account'>account settings</Link> page to set one.</p>
 			</Message>}
 
-			{!lastTrans.length && <div>
+			{!lastTrans.length && <React.Fragment>
 				<Header size='medium'>PayPal</Header>
 				<p>Create a ${user.member.monthly_fees} / month subscription, get your first three months for the price of two:</p>
 				<PayPalSubscribeDeal
@@ -68,7 +68,7 @@ function MemberInfo(props) {
 					name='Protospace Membership'
 					custom={JSON.stringify({ deal: 3, member: user.member.id })}
 				/>
-			</div>}
+			</React.Fragment>}
 
 			<Header size='medium'>Details</Header>
 			<BasicTable>
