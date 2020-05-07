@@ -86,7 +86,6 @@ def check_minecraft_server():
             cache.set('minecraft_players', players)
             return players
         except BaseException as e:
-            cache.set('minecraft_players', [])
             logger.error('Problem checking Minecraft: {} - {}'.format(e.__class__.__name__, str(e)))
 
     return []
