@@ -7,6 +7,7 @@ from .api import views
 from . import secrets
 
 IPN_ROUTE = r'^ipn/{}/'.format(secrets.IPN_RANDOM)
+ADMIN_ROUTE = '{}/admin/'.format(secrets.ADMIN_RANDOM)
 
 router = routers.DefaultRouter()
 router.register(r'door', views.DoorViewSet, basename='door')
@@ -26,7 +27,7 @@ router.register(r'charts/signupcount', views.SignupCountViewSet, basename='signu
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('admin/', admin.site.urls),
+    path(ADMIN_ROUTE, admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     url(r'^rest-auth/', include('rest_auth.urls')),
     url(r'^registration/', views.RegistrationView.as_view(), name='rest_name_register'),
