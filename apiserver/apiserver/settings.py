@@ -53,6 +53,7 @@ if DEBUG:
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+SECURE_REFERRER_POLICY = 'same-origin'
 
 
 # Application definition
