@@ -455,7 +455,14 @@ class PasteView(views.APIView):
 class HistoryViewSet(Base, List, Retrieve):
     permission_classes = [AllowMetadata | IsAdmin]
     serializer_class = serializers.HistorySerializer
-    queryset = models.HistoryIndex.objects.order_by('-history_date')[:100]
+
+    def get_queryset(self):
+        queryset = models.HistoryIndex.objects
+
+        if 'exclude_system' in self.request.query_params:
+            queryset = queryset.filter(is_system=False)
+
+        return queryset.order_by('-history_date')[:50]
 
 
 class RegistrationView(RegisterView):
