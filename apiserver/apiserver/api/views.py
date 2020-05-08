@@ -412,7 +412,7 @@ class BackupView(views.APIView):
 
             if str(now().date()) not in backup_path:
                 # sanity check - make sure it's actually today's backup
-                raise Http404()
+                return Response('Today\'s backup not ready yet', status=400)
 
             backup_url = 'https://static.{}/backups/{}'.format(
                 settings.PRODUCTION_HOST,
