@@ -7,14 +7,24 @@ import { apiUrl, statusColor, BasicTable, staticUrl, requester } from './utils.j
 import { NotFound } from './Misc.js';
 
 let historyCache = false;
+let excludeSystemCache = true;
+let focusCache = false;
 
 export function AdminHistory(props) {
 	const { token, user } = props;
 	const [history, setHistory] = useState(historyCache);
+	const [excludeSystem, setExcludeSystem] = useState(excludeSystemCache);
+	const [focus, setFocus] = useState(focusCache);
 	const [error, setError] = useState(false);
 
+	const handleExcludeSystem = (e, v) => {
+		setExcludeSystem(v.checked);
+		excludeSystemCache = v.checked;
+	};
+
 	useEffect(() => {
-		requester('/history/', 'GET', token)
+		const extra = excludeSystem ? '?exclude_system' : '';
+		requester('/history/'+extra, 'GET', token)
 		.then(res => {
 			setHistory(res.results);
 			historyCache = res.results;
@@ -22,37 +32,77 @@ export function AdminHistory(props) {
 		.catch(err => {
 			console.log(err);
 		});
-	}, []);
+	}, [excludeSystem]);
 
 	return (
 		<div>
 			{!error ?
 				history ?
-					<Table basic='very'>
-						<Table.Header>
-							<Table.Row>
-								<Table.HeaderCell>Date</Table.HeaderCell>
-								<Table.HeaderCell>Username</Table.HeaderCell>
-								<Table.HeaderCell>Type</Table.HeaderCell>
-								<Table.HeaderCell>Owner</Table.HeaderCell>
-								<Table.HeaderCell>Object</Table.HeaderCell>
-								<Table.HeaderCell>Changed Fields</Table.HeaderCell>
-							</Table.Row>
-						</Table.Header>
+					<>
+						<Checkbox
+							label='Exclude System'
+							onChange={handleExcludeSystem}
+							checked={excludeSystem}
+						/>
 
-						<Table.Body>
-							{history.map(x =>
-								<Table.Row key={x.id}>
-									<Table.Cell>{moment.utc(x.history_date).format('YYYY-MM-DD')}</Table.Cell>
-									<Table.Cell>{x.history_user || 'System'}</Table.Cell>
-									<Table.Cell>{x.history_type}</Table.Cell>
-									<Table.Cell>{x.owner_name}</Table.Cell>
-									<Table.Cell>{x.object_name}</Table.Cell>
-									<Table.Cell>{x.changes.map(x => x.field).join(', ')}</Table.Cell>
+						<Table basic='very'>
+							<Table.Header>
+								<Table.Row>
+									<Table.HeaderCell>Date</Table.HeaderCell>
+									<Table.HeaderCell>Username</Table.HeaderCell>
+									<Table.HeaderCell>Type</Table.HeaderCell>
+									<Table.HeaderCell>Owner</Table.HeaderCell>
+									<Table.HeaderCell>Object</Table.HeaderCell>
+									<Table.HeaderCell>Changed Fields</Table.HeaderCell>
 								</Table.Row>
-							)}
-						</Table.Body>
-					</Table>
+							</Table.Header>
+
+							<Table.Body>
+								{history.map(x =>
+									<React.Fragment key={x.id}>
+										<Table.Row>
+											<Table.Cell>
+												<a href='javascript:;' onClick={() => setFocus(x.id)}>
+													{moment.utc(x.history_date).format('YYYY-MM-DD')}
+												</a>
+											</Table.Cell>
+											<Table.Cell>{x.is_system ? 'System' : (x.history_user || 'Deleted User')}</Table.Cell>
+											<Table.Cell>{x.history_type}</Table.Cell>
+											<Table.Cell>{x.owner_name}</Table.Cell>
+											<Table.Cell>{x.object_name}</Table.Cell>
+											<Table.Cell>{x.changes.map(x => x.field).join(', ')}</Table.Cell>
+										</Table.Row>
+
+										{focus == x.id &&
+											<tr><td colSpan={6}>
+												<p>Object ID: {x.object_id}, <a href={apiUrl+x.revert_url} target='_blank'>Database Revert</a></p>
+												{!!x.changes.length &&
+													<Table basic='very'>
+														<Table.Header>
+															<Table.Row>
+																<Table.HeaderCell>Change</Table.HeaderCell>
+																<Table.HeaderCell>Before</Table.HeaderCell>
+																<Table.HeaderCell>After</Table.HeaderCell>
+															</Table.Row>
+														</Table.Header>
+														<Table.Body>
+															{x.changes.map(y =>
+																<Table.Row key={y.field}>
+																	<Table.Cell>{y.field}</Table.Cell>
+																	<Table.Cell>{y.old}</Table.Cell>
+																	<Table.Cell>{y.new}</Table.Cell>
+																</Table.Row>
+															)}
+														</Table.Body>
+													</Table>
+												}
+											</td></tr>
+										}
+									</React.Fragment>
+								)}
+							</Table.Body>
+						</Table>
+					</>
 				:
 					<p>Loading...</p>
 			:
@@ -122,8 +172,8 @@ export function Admin(props) {
 			<Header size='small'>Backup Downloads</Header>
 			<AdminBackups />
 
-			<Header size='medium'>History (Experimental)</Header>
-			<p>Last 100 database changes:</p>
+			<Header size='medium'>History</Header>
+			<p>Last 50 database changes:</p>
 
 			<AdminHistory {...props} />
 
