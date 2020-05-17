@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import moment from 'moment-timezone';
 import './light.css';
@@ -130,6 +130,7 @@ function MemberInfo(props) {
 export function Home(props) {
 	const { user } = props;
 	const [stats, setStats] = useState(JSON.parse(localStorage.getItem('stats', 'false')));
+	const [refreshCount, refreshStats] = useReducer(x => x + 1, 0);
 
 	useEffect(() => {
 		requester('/stats/', 'GET')
@@ -141,7 +142,7 @@ export function Home(props) {
 			console.log(err);
 			setStats(false);
 		});
-	}, []);
+	}, [refreshCount]);
 
 	const getStat = (x) => stats && stats[x] ? stats[x] : '?';
 	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz('America/Edmonton').format('ll') : '?';
@@ -186,7 +187,7 @@ export function Home(props) {
 						<p><a href='https://groups.google.com/forum/#!forum/protospace-administration' target='_blank' rel='noopener noreferrer'>Admin Google Group</a></p>
 						{!!user && <p><a href='https://drive.google.com/open?id=0By-vvp6fxFekfmU1cmdxaVRlaldiYXVyTE9rRnNVNjhkc3FjdkFIbjBwQkZ3MVVQX2Ezc3M' target='_blank' rel='noopener noreferrer'>Google Drive</a></p>}
 
-						<img className='swordfish' src='/swordfish.png' />
+						<img className='swordfish' src='/swordfish.png' onClick={() => refreshStats()} />
 
 						<div>
 							<Header size='medium'>Protospace Stats</Header>
