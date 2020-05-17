@@ -75,6 +75,28 @@ def calc_signup_counts():
 
     return num_new_members
 
+def calc_retain_counts():
+    signup_counts = models.StatsSignupCount.objects.all()
+
+    all_members = models.Member.objects
+    active_members = all_members.filter(paused_date__isnull=True)
+    vetted_members = all_members.filter(vetted_date__isnull=False)
+
+    for entry in signup_counts:
+        date = entry.month
+        active_new_members = active_members.filter(
+            application_date__month=date.month, application_date__year=date.year
+        )
+        vetted_new_members = vetted_members.filter(
+            application_date__month=date.month, application_date__year=date.year
+        )
+
+        entry.retain_count = active_new_members.count()
+        entry.vetted_count = vetted_new_members.count()
+        entry.save()
+
+    return active_members.count()
+
 def check_minecraft_server():
     if secrets.MINECRAFT:
         url = 'https://api.minetools.eu/ping/' + secrets.MINECRAFT

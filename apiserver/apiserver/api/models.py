@@ -138,6 +138,8 @@ class StatsMemberCount(models.Model):
 class StatsSignupCount(models.Model):
     month = models.DateField()
     signup_count = models.IntegerField()
+    retain_count = models.IntegerField(default=0)
+    vetted_count = models.IntegerField(default=0)
 
 class HistoryIndex(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)

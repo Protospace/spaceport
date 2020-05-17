@@ -24,6 +24,9 @@ class Command(BaseCommand):
         count = self.tally_active_members()
         self.stdout.write('Tallied {} active members'.format(count))
 
+        count = utils_stats.calc_retain_counts()
+        self.stdout.write('Tallied {} retained members'.format(count))
+
         utils_stats.changed_card()
         self.stdout.write('Updated card change time')
 
