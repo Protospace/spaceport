@@ -149,6 +149,7 @@ def gen_search_strings():
             string += '  ' + m.old_email
         if m.user:
             string += '  ' + m.user.email
+        string += ' ' + str(m.id)
 
         string = string.lower()
         search_strings[string] = m.id
