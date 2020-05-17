@@ -98,15 +98,35 @@ export function Charts(props) {
 								dataKey='signup_count'
 								name='Signup Count'
 								fill='#8884d8'
-								maxBarSize={30}
+								maxBarSize={20}
 								animationDuration={1000}
+							/>
+							<Bar
+								type='monotone'
+								dataKey='vetted_count'
+								fill='#80b3d3'
+								name='Vetted Count'
+								maxBarSize={20}
+								animationDuration={1200}
+							/>
+							<Bar
+								type='monotone'
+								dataKey='retain_count'
+								name='Retain Count'
+								fill='#82ca9d'
+								maxBarSize={20}
+								animationDuration={1400}
 							/>
 						</BarChart>
 					</ResponsiveContainer>
 				}
 			</p>
 
-			<p>The Signup Count is the number of brand new account registrations per month.</p>
+			<p>The Signup Count is the number of brand new account registrations that month.</p>
+
+			<p>The Vetted Count is the number of those signups who eventually got vetted (at a later date).</p>
+
+			<p>The Retain Count is the number of those signups who are still a member currently.</p>
 
 		</Container>
 	);
