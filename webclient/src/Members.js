@@ -74,7 +74,7 @@ export function Members(props) {
 		<Container>
 			<Header size='large'>Member List</Header>
 
-			<p>Search by name or email:</p>
+			<p>Search by name, email, or member ID:</p>
 
 			<Input autoFocus focus icon='search'
 				placeholder='Search...'
