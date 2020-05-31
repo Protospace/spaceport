@@ -53,10 +53,11 @@ Now setup Django and run it:
 
 Django will now be running on port 8002, connect to localhost:8002 to test it.
 
-Import Old Portal Data
-++++++++++++++++++++++
+Import Old Portal Data (optional)
++++++++++++++++++++++++++++++++++
 
-Place ``old_portal.sqlite3`` in the same directory as ``manage.py``.
+Place ``old_portal.sqlite3`` in the same directory as ``manage.py``. If you
+don't have the old portal data, ignore this section.
 
 Place old member photo folders in ``old_photos/``, for example: ``old_photos/1685/photo.jpg``.
 
