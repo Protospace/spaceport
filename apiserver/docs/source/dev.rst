@@ -13,7 +13,7 @@ Install dependencies:
     $ sudo apt install memcached
 
     # Python:
-    $ sudo apt install python3 python3-pip python-virtualenv python3-virtualenv
+    $ sudo apt install build-essential python3 python3-dev python3-pip python-virtualenv python3-virtualenv
 
     # Yarn / nodejs:
     # from https://yarnpkg.com/lang/en/docs/install/#debian-stable
