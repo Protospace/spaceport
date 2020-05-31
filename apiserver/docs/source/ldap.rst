@@ -10,7 +10,7 @@ Install dependencies:
 .. sourcecode:: bash
 
     $ sudo apt update
-    $ sudo apt install python3 python3-pip python-virtualenv python3-virtualenv supervisor
+    $ sudo apt install build-essential python3 python3-dev python3-pip python-virtualenv python3-virtualenv supervisor
 
 Clone the repo:
 

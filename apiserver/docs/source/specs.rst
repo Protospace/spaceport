@@ -27,12 +27,16 @@ Web Client
     - Details
     - Application forms
     - Latest transactions
+    - Public bio
+    - Private notes
   - Quick links
   - Stats
 
     - Next meetings
     - Member counts
-    - **Bay temperatures**
+    - Graphs of member counts
+    - Bay temperatures
+    - Minecraft server players
 - Account settings
 
   - Edit member details
@@ -45,6 +49,12 @@ Web Client
   - View transaction details
   - Report an error in transaction
   - Admins can edit transactions
+- Paymaster
+
+  - Buy snacks, pop, coffee
+  - Pay member dues
+  - Pay for locker storage
+  - Donate
 
 - Training
 
@@ -52,9 +62,11 @@ Web Client
 - Cards
 
   - View list of access cards
+  - View door alarm code + wifi pass
+  - View API key
 - Member list
 
-  - Search for members by name
+  - Search for members by name, email, or ID
   - View member photo, status, and joined date
 - Admin member details
 
@@ -91,9 +103,18 @@ Web Client
   - Edit class details
   - **Add a custom note for a class**
   - Mark off students' attendance
+  - View students' emails
+  - Print attendance sheet
+- Transporter
+
+  - Public paste bin to share text
+- Admin Page
+
+  - View recent backup times
+  - View all database changes
 - Admin Transaction list
 
   - View reported transactions
   - Correct reported transactions
-  - **View all transactions by month**
+  - View all transactions by month
 
