@@ -6,11 +6,22 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'apiserver.settings'
 django.setup()
 
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
 from apiserver.api import models
 from django.utils.timezone import now, pytz
 
+def today_alberta_tz():
+    return datetime.now(pytz.timezone('America/Edmonton')).date()
+
 days = {}
+
+date = datetime(2020, 3, 7).date()
+while date <= today_alberta_tz():
+    days[str(date)] = set()
+    date += timedelta(days=1)
+
+print('Initialized with:')
+print(days)
 
 with open('scans.csv', newline='') as csvfile:
     reader = csv.DictReader(csvfile)
