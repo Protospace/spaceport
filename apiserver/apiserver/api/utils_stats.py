@@ -111,3 +111,8 @@ def check_minecraft_server():
             logger.error('Problem checking Minecraft: {} - {}'.format(e.__class__.__name__, str(e)))
 
     return []
+
+def calc_card_scans():
+    date = today_alberta_tz()
+    cards = models.Card.objects
+    return cards.filter(last_seen_at=date).count()

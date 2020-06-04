@@ -11,6 +11,7 @@ class Command(BaseCommand):
         utils_stats.calc_next_events()
         member_count, green_count = utils_stats.calc_member_counts()
         signup_count = utils_stats.calc_signup_counts()
+        card_scans = utils_stats.calc_card_scans()
 
         # do this hourly in case an admin causes a change
         models.StatsMemberCount.objects.update_or_create(
@@ -21,6 +22,11 @@ class Command(BaseCommand):
         models.StatsSignupCount.objects.update_or_create(
             month=utils.today_alberta_tz().replace(day=1),
             defaults=dict(signup_count=signup_count),
+        )
+
+        models.StatsSpaceActivity.objects.update_or_create(
+            date=utils.today_alberta_tz(),
+            defaults=dict(card_scans=card_scans),
         )
 
 
