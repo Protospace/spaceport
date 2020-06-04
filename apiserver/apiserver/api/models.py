@@ -141,6 +141,10 @@ class StatsSignupCount(models.Model):
     retain_count = models.IntegerField(default=0)
     vetted_count = models.IntegerField(default=0)
 
+class StatsSpaceActivity(models.Model):
+    date = models.DateField(default=today_alberta_tz)
+    card_scans = models.IntegerField()
+
 class HistoryIndex(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField()
