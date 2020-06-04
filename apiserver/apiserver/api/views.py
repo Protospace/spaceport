@@ -342,7 +342,7 @@ class DoorViewSet(viewsets.ViewSet, List):
     @action(detail=True, methods=['post'])
     def seen(self, request, pk=None):
         card = get_object_or_404(models.Card, card_number=pk)
-        card.last_seen_at = datetime.date.today()
+        card.last_seen_at = utils.today_alberta_tz()
         card.save()
         return Response(200)
 
