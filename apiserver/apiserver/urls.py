@@ -22,6 +22,7 @@ router.register(r'training', views.TrainingViewSet, basename='training')
 router.register(r'transactions', views.TransactionViewSet, basename='transaction')
 router.register(r'charts/membercount', views.MemberCountViewSet, basename='membercount')
 router.register(r'charts/signupcount', views.SignupCountViewSet, basename='signupcount')
+router.register(r'charts/spaceactivity', views.SpaceActivityViewSet, basename='spaceactivity')
 #router.register(r'me', views.FullMemberView, basename='fullmember')
 #router.register(r'registration', views.RegistrationViewSet, basename='register')
 

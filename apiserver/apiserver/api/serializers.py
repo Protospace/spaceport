@@ -433,6 +433,11 @@ class SignupCountSerializer(serializers.ModelSerializer):
     def get_month(self, obj):
         return str(obj.month)[:7]
 
+class SpaceActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.StatsSpaceActivity
+        fields = '__all__'
+
 
 class HistoryChangeSerializer(serializers.ModelSerializer):
     class Meta:

@@ -399,6 +399,11 @@ class SignupCountViewSet(Base, List):
         # have to use method as slicing breaks makemigrations
         return models.StatsSignupCount.objects.order_by('-month')[:16][::-1]
 
+class SpaceActivityViewSet(Base, List):
+    pagination_class = None
+    queryset = models.StatsSpaceActivity.objects.all()
+    serializer_class = serializers.SpaceActivitySerializer
+
 
 class BackupView(views.APIView):
     def get(self, request):
