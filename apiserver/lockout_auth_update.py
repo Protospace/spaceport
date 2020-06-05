@@ -10,11 +10,20 @@ from apiserver.api import models, utils
 print("Updating member orientation dates")
 sessions = models.Session.objects.filter(course = 249)
 
+def get_member(obj):
+    # same as in serialzers.py -> get_cards for example
+    if obj.user:
+        member = obj.user.member
+    else:
+        member = models.Member.objects.get(id=obj.member_id)
+    return member
+
+
 for session in sessions:
     students = models.Training.objects.filter(session = session)
     for student in students:
-        if student.member_id and student.attendance_status == "Attended":
-            member = models.Member.objects.get(pk=student.member_id)
+        if student.attendance_status == "Attended":
+            member = get_member(student)
             if not member.orientation_date:
                 member.orientation_date = session.datetime
                 member.save()
@@ -26,8 +35,8 @@ sessions = models.Session.objects.filter(course = 281)
 for session in sessions:
     students = models.Training.objects.filter(session = session)
     for student in students:
-        if student.member_id and student.attendance_status == "Attended":
-            member = models.Member.objects.get(pk=student.member_id)
+        if student.attendance_status == "Attended":
+            member = get_member(student)
             if not member.lathe_cert_date:
                 member.lathe_cert_date = session.datetime
                 member.save()
@@ -39,8 +48,8 @@ sessions = models.Session.objects.filter(course = 283)
 for session in sessions:
     students = models.Training.objects.filter(session = session)
     for student in students:
-        if student.member_id and student.attendance_status == "Attended":
-            member = models.Member.objects.get(pk=student.member_id)
+        if student.attendance_status == "Attended":
+            member = get_member(student)
             if not member.mill_cert_date:
                 member.mill_cert_date = session.datetime
                 member.save()
@@ -53,8 +62,8 @@ sessions = models.Session.objects.filter(course = 261)
 for session in sessions:
     students = models.Training.objects.filter(session = session)
     for student in students:
-        if student.member_id and student.attendance_status == "Attended":
-            member = models.Member.objects.get(pk=student.member_id)
+        if student.attendance_status == "Attended":
+            member = get_member(student)
             if not member.wood_cert_date:
                 member.wood_cert_date = session.datetime
                 member.save()
