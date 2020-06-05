@@ -347,6 +347,45 @@ class DoorViewSet(viewsets.ViewSet, List):
         return Response(200)
 
 
+class LockoutViewSet(viewsets.ViewSet, List):
+    def list(self, request):
+        auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if auth_token != 'Bearer ' + secrets.DOOR_API_TOKEN:
+            raise exceptions.PermissionDenied()
+
+        cards = models.Card.objects.filter(active_status='card_active')
+        active_member_cards = {}
+
+        for card in cards:
+            member = get_object_or_404(models.Member, id=card.member_id)
+            if member.paused_date: continue
+
+            authorization = {}
+            if member.orientation_date or member.vetted_date:
+                authorization['common'] = 1
+            else:
+                authorization['common'] = 0
+
+            if member.lathe_cert_date:
+                authorization['lathe'] = 1
+            else:
+                authorization['lathe'] = 0
+
+            if member.mill_cert_date:
+                authorization['mill'] = 1
+            else:
+                authorization['mill'] = 0
+
+            if member.wood_cert_date:
+                authorization['wood'] = 1
+            else:
+                authorization['wood'] = 0
+
+            active_member_cards[card.card_number] = authorization
+
+        return Response(active_member_cards)
+
+
 class IpnView(views.APIView):
     def post(self, request):
         try:
