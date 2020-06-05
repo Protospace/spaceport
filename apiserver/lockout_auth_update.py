@@ -4,6 +4,7 @@ django.setup()
 
 import datetime
 import json
+from django.utils.timezone import now, pytz
 from apiserver.api import models, utils
 
 # Member orientation
@@ -25,7 +26,7 @@ for session in sessions:
         if student.attendance_status == "Attended":
             member = get_member(student)
             if not member.orientation_date:
-                member.orientation_date = session.datetime
+                member.orientation_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
                 member.save()
 
 # Lathe
@@ -38,7 +39,7 @@ for session in sessions:
         if student.attendance_status == "Attended":
             member = get_member(student)
             if not member.lathe_cert_date:
-                member.lathe_cert_date = session.datetime
+                member.lathe_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
                 member.save()
 
 # Manual Mill
@@ -51,7 +52,7 @@ for session in sessions:
         if student.attendance_status == "Attended":
             member = get_member(student)
             if not member.mill_cert_date:
-                member.mill_cert_date = session.datetime
+                member.mill_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
                 member.save()
 
 
@@ -65,7 +66,7 @@ for session in sessions:
         if student.attendance_status == "Attended":
             member = get_member(student)
             if not member.wood_cert_date:
-                member.wood_cert_date = session.datetime
+                member.wood_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
                 member.save()
 
 print('Done.')
