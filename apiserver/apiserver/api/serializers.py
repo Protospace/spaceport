@@ -133,6 +133,10 @@ class MemberSerializer(serializers.ModelSerializer):
             'member_forms',
             'user',
             'old_email',
+            'orientation_date',
+            'lathe_cert_date',
+            'mill_cert_date',
+            'wood_cert_date',
         ]
 
     def get_status(self, obj):
