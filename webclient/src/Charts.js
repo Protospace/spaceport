@@ -7,10 +7,12 @@ import { NotFound } from './Misc.js';
 
 let memberCountCache = false;
 let signupCountCache = false;
+let spaceActivityCache = false;
 
 export function Charts(props) {
 	const [memberCount, setMemberCount] = useState(memberCountCache);
 	const [signupCount, setSignupCount] = useState(signupCountCache);
+	const [spaceActivity, setSpaceActivity] = useState(spaceActivityCache);
 
 	useEffect(() => {
 		requester('/charts/membercount/', 'GET')
@@ -26,6 +28,15 @@ export function Charts(props) {
 		.then(res => {
 			setSignupCount(res);
 			signupCountCache = res;
+		})
+		.catch(err => {
+			console.log(err);
+		});
+
+		requester('/charts/spaceactivity/', 'GET')
+		.then(res => {
+			setSpaceActivity(res);
+			spaceActivityCache = res;
 		})
 		.catch(err => {
 			console.log(err);
@@ -78,6 +89,35 @@ export function Charts(props) {
 			<p>The Member Count is the amount of Prepaid, Current, Due, and Overdue members on Spaceport.</p>
 
 			<p>The Green Count is the amount of Prepaid and Current members.</p>
+
+			<Header size='medium'>Space Activity</Header>
+
+			<p>Daily since March 7th, 2020.</p>
+
+			<p>
+				{spaceActivity &&
+					<ResponsiveContainer width='100%' height={300}>
+						<BarChart data={spaceActivity}>
+							<XAxis dataKey='date' minTickGap={10} />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip />
+							<Legend />
+
+							<Bar
+								type='monotone'
+								dataKey='card_scans'
+								name='Card Scans'
+								fill='#8884d8'
+								maxBarSize={20}
+								animationDuration={1000}
+							/>
+						</BarChart>
+					</ResponsiveContainer>
+				}
+			</p>
+
+			<p>Cards Scans is the number of individual members who have scanned to enter the space.</p>
 
 			<Header size='medium'>Signup Count</Header>
 
