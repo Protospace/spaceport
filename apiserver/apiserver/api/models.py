@@ -46,6 +46,10 @@ class Member(models.Model):
     current_start_date = models.DateField(default=today_alberta_tz, null=True)
     application_date = models.DateField(default=today_alberta_tz, null=True)
     vetted_date = models.DateField(blank=True, null=True)
+    orientation_date = models.DateField(blank=True, null=True, default=None)
+    lathe_cert_date = models.DateField(blank=True, null=True, default=None)
+    mill_cert_date = models.DateField(blank=True, null=True, default=None)
+    wood_cert_date = models.DateField(blank=True, null=True, default=None)
     paused_date = models.DateField(blank=True, null=True)
     monthly_fees = models.IntegerField(default=55, blank=True, null=True)
 
