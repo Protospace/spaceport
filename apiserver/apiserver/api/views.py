@@ -329,7 +329,10 @@ class DoorViewSet(viewsets.ViewSet, List):
         active_member_cards = {}
 
         for card in cards:
-            member = get_object_or_404(models.Member, id=card.member_id)
+            if card.user:
+                member = card.user.member
+            else:
+                member = models.Member.objects.get(id=card.member_id)
             if member.paused_date: continue
 
             active_member_cards[card.card_number] = '{} ({})'.format(
@@ -344,6 +347,13 @@ class DoorViewSet(viewsets.ViewSet, List):
         card = get_object_or_404(models.Card, card_number=pk)
         card.last_seen_at = utils.today_alberta_tz()
         card.save()
+
+        if card.user:
+            member = card.user.member
+        else:
+            member = models.Member.objects.get(id=card.member_id)
+        logger.info('Name: {} {} ({})'.format(member.first_name, member.last_name, member.id))
+
         return Response(200)
 
 
