@@ -92,7 +92,7 @@ export function Charts(props) {
 
 			<Header size='medium'>Space Activity</Header>
 
-			<p>Daily since March 7th, 2020.</p>
+			<p>Daily since March 7th, 2020, updates hourly.</p>
 
 			<p>
 				{spaceActivity &&
