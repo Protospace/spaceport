@@ -209,7 +209,6 @@ clean = Cleaner(tags=ALLOWED_TAGS).clean
 
 
 def is_request_from_protospace(request):
-    return True
     whitelist = ['24.66.110.96', '205.233.15.76', '205.233.15.69']
 
     # set (not appended) directly by nginx so we can trust it
