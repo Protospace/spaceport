@@ -209,6 +209,7 @@ clean = Cleaner(tags=ALLOWED_TAGS).clean
 
 
 def is_request_from_protospace(request):
+    return True
     whitelist = ['24.66.110.96', '205.233.15.76', '205.233.15.69']
 
     # set (not appended) directly by nginx so we can trust it
@@ -226,28 +227,42 @@ def link_old_member(data, user):
     failures or else the username will be taken when they try again
     '''
     if not old_models:
-        raise ValidationError(dict(email='Unable to link, old DB wasn\'t imported.'))
+        msg = 'Unable to link, old DB wasn\'t imported.'
+        logger.info(msg)
+        raise ValidationError(dict(email=msg))
 
     try:
         member = models.Member.objects.get(old_email=data['email'])
     except models.Member.DoesNotExist:
-        raise ValidationError(dict(email='Unable to find email in old portal.'))
+        msg = 'Unable to find email in old portal.'
+        logger.info(msg)
+        raise ValidationError(dict(email=msg))
     except models.Member.MultipleObjectsReturned:
-        raise ValidationError(dict(email='Duplicate emails found. Talk to Tanner.'))
+        msg = 'Duplicate emails found. Talk to Tanner.'
+        logger.info(msg)
+        raise ValidationError(dict(email=msg))
 
     if member.user:
-        raise ValidationError(dict(email='Old member already claimed.'))
+        msg = 'Old member already claimed.'
+        logger.info(msg)
+        raise ValidationError(dict(email=msg))
 
     if utils_ldap.is_configured():
         result = utils_ldap.find_user(user.username)
         if result == 200:
             if utils_ldap.set_password(data) != 200:
-                raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: set.'))
+                msg = 'Problem connecting to LDAP server: set.'
+                logger.info(msg)
+                raise ValidationError(dict(non_field_errors=msg))
         elif result == 404:
             if utils_ldap.create_user(data) != 200:
-                raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: create.'))
+                msg = 'Problem connecting to LDAP server: create.'
+                logger.info(msg)
+                raise ValidationError(dict(non_field_errors=msg))
         else:
-            raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: find.'))
+            msg = 'Problem connecting to LDAP server: find.'
+            logger.info(msg)
+            raise ValidationError(dict(non_field_errors=msg))
 
 
     member.user = user
@@ -264,19 +279,27 @@ def create_new_member(data, user):
     if old_models:
         old_members = old_models.Members.objects.using('old_portal')
         if old_members.filter(email=data['email']).exists():
-            raise ValidationError(dict(email='Account was found in old portal.'))
+            msg = 'Account was found in old portal.'
+            logger.info(msg)
+            raise ValidationError(dict(email=msg))
 
     if utils_ldap.is_configured():
         result = utils_ldap.find_user(user.username)
         if result == 200:
-            raise ValidationError(dict(username='Username was found in old portal.'))
+            msg = 'Username was found in old portal.'
+            logger.info(msg)
+            raise ValidationError(dict(username=msg))
         elif result == 404:
             pass
         else:
-            raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server.'))
+            msg = 'Problem connecting to LDAP server.'
+            logger.info(msg)
+            raise ValidationError(dict(non_field_errors=msg))
 
         if utils_ldap.create_user(data) != 200:
-            raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: create.'))
+            msg = 'Problem connecting to LDAP server: create.'
+            logger.info(msg)
+            raise ValidationError(dict(non_field_errors=msg))
 
     models.Member.objects.create(
         user=user,
@@ -288,8 +311,10 @@ def create_new_member(data, user):
 def register_user(data, user):
     try:
         if data['existing_member'] == 'true':
+            logger.info('Linking old member...')
             link_old_member(data, user)
         else:
+            logger.info('Creating new member...')
             create_new_member(data, user)
     except:
         user.delete()

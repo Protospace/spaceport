@@ -500,6 +500,14 @@ class HistoryViewSet(Base, List, Retrieve):
 class RegistrationView(RegisterView):
     serializer_class = serializers.MyRegisterSerializer
 
+    def post(self, request):
+        data = request.data.copy()
+        data.pop('password1', None)
+        data.pop('password2', None)
+        logger.info(dict(data))
+
+        return super().post(request)
+
 
 class PasswordChangeView(PasswordChangeView):
     permission_classes = [AllowMetadata | IsAuthenticated]

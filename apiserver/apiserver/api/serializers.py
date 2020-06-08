@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
@@ -403,6 +406,7 @@ class MyRegisterSerializer(RegisterSerializer):
         data = request.data
 
         if not utils.is_request_from_protospace(request):
+            logger.info('Request not from protospace')
             user.delete()
             raise ValidationError(dict(non_field_errors='Can only register from Protospace.'))
 
