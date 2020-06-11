@@ -21,6 +21,7 @@ Registration
     :json email:
     :json boolean existing_member: If ``true``, will link old portal objects based
         on email match.
+    :json bypass_code: allows them to register from outside Protospace
 
     **Example response**:
 
