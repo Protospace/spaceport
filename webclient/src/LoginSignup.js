@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Link, useParams, useLocation } from 'react-router-dom';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { requester } from './utils.js';
@@ -70,6 +70,9 @@ export function SignupForm(props) {
 	const [input, setInput] = useState({ email: '' });
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
+	const location = useLocation();
+
+	const bypass_code = location.hash.replace('#', '');
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
@@ -85,7 +88,7 @@ export function SignupForm(props) {
 		if (loading) return;
 		setLoading(true);
 		input.username = genUsername();
-		const data = { ...input, email: input.email.toLowerCase() };
+		const data = { ...input, email: input.email.toLowerCase(), bypass_code: bypass_code };
 		requester('/registration/', 'POST', '', data)
 		.then(res => {
 			setError({});
