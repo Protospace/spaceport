@@ -96,7 +96,7 @@ class Card(models.Model):
     member_id = models.IntegerField(blank=True, null=True)
     card_number = models.CharField(unique=True, max_length=16, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
-    last_seen_at = models.DateField(default=today_alberta_tz, blank=True, null=True)
+    last_seen_at = models.DateField(blank=True, null=True)
     active_status = models.CharField(max_length=32, blank=True, null=True)
 
     history = HistoricalRecords(excluded_fields=['last_seen_at'])
