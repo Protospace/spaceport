@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-r
 import moment from 'moment-timezone';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Popup, Segment, Table } from 'semantic-ui-react';
-import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
+import { statusColor, BasicTable, staticUrl, requester, isAdmin } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 import { AccountForm } from './Account.js';
 import { PayPalSubscribeDeal } from './PayPal.js';
@@ -186,6 +186,7 @@ export function Home(props) {
 						<p><a href='https://groups.google.com/forum/#!forum/protospace-discuss' target='_blank' rel='noopener noreferrer'>Discussion Google Group</a></p>
 						<p><a href='https://groups.google.com/forum/#!forum/protospace-administration' target='_blank' rel='noopener noreferrer'>Admin Google Group</a></p>
 						{!!user && <p><a href='https://drive.google.com/open?id=0By-vvp6fxFekfmU1cmdxaVRlaldiYXVyTE9rRnNVNjhkc3FjdkFIbjBwQkZ3MVVQX2Ezc3M' target='_blank' rel='noopener noreferrer'>Google Drive</a></p>}
+						{!!user && isAdmin(user) && <p><a href='https://estancia.hippocmms.ca/' target='_blank' rel='noopener noreferrer'>Property Management Portal</a></p>}
 
 						<img className='swordfish' src='/swordfish.png' onClick={() => refreshStats()} />
 
