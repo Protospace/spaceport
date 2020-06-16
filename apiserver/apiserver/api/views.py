@@ -354,6 +354,8 @@ class DoorViewSet(viewsets.ViewSet, List):
             member = models.Member.objects.get(id=card.member_id)
         logger.info('Name: {} {} ({})'.format(member.first_name, member.last_name, member.id))
 
+        utils_stats.calc_card_scans()
+
         return Response(200)
 
 

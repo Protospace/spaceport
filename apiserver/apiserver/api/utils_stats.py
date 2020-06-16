@@ -22,6 +22,7 @@ DEFAULTS = {
     'bay_108_temp': None,
     'bay_110_temp': None,
     'minecraft_players': [],
+    'card_scans': 0,
 }
 
 def changed_card():
@@ -115,4 +116,11 @@ def check_minecraft_server():
 def calc_card_scans():
     date = today_alberta_tz()
     cards = models.Card.objects
-    return cards.filter(last_seen_at=date).count()
+    count = cards.filter(last_seen_at=date).count()
+
+    cache.set('card_scans', count)
+
+    models.StatsSpaceActivity.objects.update_or_create(
+        date=today_alberta_tz(),
+        defaults=dict(card_scans=count),
+    )
