@@ -10,6 +10,7 @@ import { PayPalPayNow, PayPalSubscribe } from './PayPal.js';
 export function Paymaster(props) {
 	const { user } = props;
 	const [pop, setPop] = useState('20.00');
+	const [locker, setLocker] = useState('5.00');
 	const [donate, setDonate] = useState('20.00');
 
 	return (
@@ -89,39 +90,6 @@ export function Paymaster(props) {
 				</Grid.Column>
 			</Grid>
 
-			<Header size='medium'>Locker Storage</Header>
-
-			<p>Confirm location and availability with Scott Y before subscribing.</p>
-
-			<Grid stackable padded columns={3}>
-				<Grid.Column>
-					<p>Small $3.00 / month:</p>
-					<PayPalSubscribe
-						amount={3}
-						name='Protospace Locker'
-						custom={JSON.stringify({ memo: 'Small Locker', category: 'OnAcct', member: user.member.id })}
-					/>
-				</Grid.Column>
-
-				<Grid.Column>
-					<p>Medium $5.00 / month:</p>
-					<PayPalSubscribe
-						amount={5}
-						name='Protospace Locker'
-						custom={JSON.stringify({ memo: 'Medium Locker', category: 'OnAcct', member: user.member.id })}
-					/>
-				</Grid.Column>
-
-				<Grid.Column>
-					<p>Large $10.00 / month:</p>
-					<PayPalSubscribe
-						amount={10}
-						name='Protospace Locker'
-						custom={JSON.stringify({ memo: 'Large Locker', category: 'OnAcct', member: user.member.id })}
-					/>
-				</Grid.Column>
-			</Grid>
-
 			<Header size='medium'>Donate</Header>
 			<Grid stackable padded columns={3}>
 				<Grid.Column>
@@ -159,6 +127,32 @@ export function Paymaster(props) {
 						amount={donate}
 						name='Protospace Donation'
 						custom={JSON.stringify({ category: 'Donation', member: user.member.id })}
+					/>
+				</Grid.Column>
+			</Grid>
+
+			<Header size='medium'>Locker Storage</Header>
+
+			<p>Confirm location and availability with <Link to='/members/392'>Scott Young</Link> before subscribing.</p>
+
+			<Grid stackable padded columns={1}>
+				<Grid.Column>
+					Custom amount:
+
+					<div className='pay-custom'>
+						<Input
+							fluid
+							label={{ basic: true, content: '$' }}
+							labelPosition='left'
+							value={locker}
+							onChange={(e, v) => setLocker(v.value)}
+						/>
+					</div>
+
+					<PayPalSubscribe
+						amount={locker}
+						name='Protospace Locker'
+						custom={JSON.stringify({ memo: 'Locker Rental', category: 'OnAcct', member: user.member.id })}
 					/>
 				</Grid.Column>
 			</Grid>
