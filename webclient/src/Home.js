@@ -197,8 +197,7 @@ export function Home(props) {
 							<p>Member count: {getStat('member_count')} <Link to='/charts'>[more]</Link></p>
 							<p>Green members: {getStat('green_count')}</p>
 							<p>Old members: {getStat('paused_count')}</p>
-							<p>Bay 108 (metal) temp: {getStat('bay_108_temp')} °C</p>
-							<p>Bay 110 (wood) temp: {getStat('bay_110_temp')} °C</p>
+							<p>Card scans today: {getStat('card_scans')}</p>
 
 							<p>
 								Minecraft players: {mcPlayers.length} <Popup content={
