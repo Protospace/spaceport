@@ -258,6 +258,14 @@ OLD_PASSWORD_FIELD_ENABLED = True
 LOGOUT_ON_PASSWORD_CHANGE = False
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp-relay.gmail.com'
+EMAIL_PORT = '587'
+EMAIL_HOST_USER = secrets.EMAIL_USER
+EMAIL_HOST_PASSWORD = secrets.EMAIL_PASS
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
 if DEBUG: logger.info('Debug mode ON')
 logger.info('Test logging for each thread')
 
