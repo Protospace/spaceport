@@ -62,6 +62,7 @@ export function Charts(props) {
 							<Legend />
 
 							<ReferenceLine x='2020-03-25' stroke='red' label='Space Locked' strokeDasharray='3 3' />
+							<ReferenceLine x='2020-06-01' stroke='red' label='Space Opened' strokeDasharray='3 3' />
 
 							<Line
 								type='monotone'
