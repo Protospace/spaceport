@@ -326,11 +326,7 @@ def gen_member_forms(member):
 
     packet = io.BytesIO()
     can = canvas.Canvas(packet, pagesize=letter)
-    can.drawRightString(580, 770, '{} {} ({})'.format(
-        data['first_name'],
-        data['last_name'],
-        data['id'],
-    ))
+    can.drawString(75, 775, '[  ] Paid    [  ] Sponsored & Approved    [  ] Vetted    [  ] Got Card')
     can.drawString(34, 683, data['first_name'])
     can.drawString(218, 683, data['last_name'])
     can.drawString(403, 683, data['preferred_name'])
@@ -342,17 +338,31 @@ def gen_member_forms(member):
     can.drawString(34, 570, data['emergency_contact_name'])
     can.drawString(332, 570, data['emergency_contact_phone'])
     can.save()
-
     packet.seek(0)
-    new_pdf = PdfFileReader(packet)
+    info_pdf = PdfFileReader(packet)
+
+    packet = io.BytesIO()
+    can = canvas.Canvas(packet, pagesize=letter)
+    can.drawRightString(600, 775, '{} {} ({})'.format(
+        data['first_name'],
+        data['last_name'],
+        data['id'],
+    ))
+    can.save()
+    packet.seek(0)
+    topright_pdf = PdfFileReader(packet)
+
     existing_pdf = PdfFileReader(open(BLANK_FORM, 'rb'))
     output = PdfFileWriter()
     page = existing_pdf.getPage(0)
-    page.mergePage(new_pdf.getPage(0))
+    page.mergePage(info_pdf.getPage(0))
+    page.mergePage(topright_pdf.getPage(0))
     output.addPage(page)
     page = existing_pdf.getPage(1)
+    page.mergePage(topright_pdf.getPage(0))
     output.addPage(page)
     page = existing_pdf.getPage(2)
+    page.mergePage(topright_pdf.getPage(0))
     output.addPage(page)
 
     file_name = str(uuid4()) + '.pdf'
