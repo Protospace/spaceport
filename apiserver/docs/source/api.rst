@@ -194,7 +194,7 @@ Change Password
 Reset Password
 ++++++++++++++
 
-.. http:post:: /rest-auth/password/reset/
+.. http:post:: /password/reset/
 
     :json email:
 
