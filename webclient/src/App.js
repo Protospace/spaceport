@@ -19,6 +19,7 @@ import { Courses, CourseDetail } from './Courses.js';
 import { Classes, ClassDetail } from './Classes.js';
 import { Members, MemberDetail } from './Members.js';
 import { Charts } from './Charts.js';
+import { PasswordReset, ConfirmReset } from './PasswordReset.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { Footer } from './Footer.js';
 
@@ -193,6 +194,13 @@ function App() {
 
 			<div className='topPadding'>
 				<Switch>
+					<Route path='/password-reset/confirm/:uid/:token'>
+						<ConfirmReset />
+					</Route>
+					<Route path='/password-reset'>
+						<PasswordReset />
+					</Route>
+
 					<Route path='/paste'>
 						<Paste token={token} />
 					</Route>

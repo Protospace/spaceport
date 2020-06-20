@@ -62,6 +62,11 @@ export function LoginForm(props) {
 			<Form.Button loading={loading} error={error.non_field_errors}>
 				Log In
 			</Form.Button>
+
+			<Message basic warning>
+				<Message.Header>Forgot your password?</Message.Header>
+				<p><Link to='/password-reset/'>Click here</Link> to reset it.</p>
+			</Message>
 		</Form>
 	);
 };
