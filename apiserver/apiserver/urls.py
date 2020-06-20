@@ -31,6 +31,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path(ADMIN_ROUTE, admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
+    url(r'^password/reset/$', views.PasswordResetView.as_view(), name='rest_password_reset'),
     url(r'^password-reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', views.null_view, name='password_reset_confirm'),
     url(r'^rest-auth/', include('rest_auth.urls')),
     url(r'^registration/', views.RegistrationView.as_view(), name='rest_name_register'),

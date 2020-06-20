@@ -258,7 +258,12 @@ OLD_PASSWORD_FIELD_ENABLED = True
 LOGOUT_ON_PASSWORD_CHANGE = False
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+if not secrets.EMAIL_USER or not secrets.EMAIL_PASS:
+    logger.info('Logging outgoing emails to console')
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
 EMAIL_HOST = 'smtp-relay.gmail.com'
 EMAIL_PORT = '587'
 EMAIL_HOST_USER = secrets.EMAIL_USER
