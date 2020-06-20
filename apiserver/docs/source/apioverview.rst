@@ -40,6 +40,8 @@ Quick Reference
 .. http:post:: /rest-auth/login/
 .. http:get:: /user/
 .. http:post:: /password/change/
+.. http:post:: /rest-auth/password/reset/
+.. http:post:: /rest-auth/password/reset/confirm/
 .. http:get:: /members/(id)/
 .. http:post:: /members/
 .. http:patch:: /members/(id)/

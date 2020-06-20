@@ -191,6 +191,41 @@ Change Password
         {"detail":"New password has been saved."}
 
 
+Reset Password
+++++++++++++++
+
+.. http:post:: /rest-auth/password/reset/
+
+    :json email:
+
+    **Example response**:
+
+    .. sourcecode:: json
+
+        {"detail":"Password reset e-mail has been sent."}
+
+
+Confirm Reset
++++++++++++++
+
+.. http:post:: /rest-auth/password/reset/confirm/
+
+    The uid and token are found in the email sent:
+
+    ``/password-reset/confirm/{uid}/{token}/``
+
+    :json uid:
+    :json token:
+    :json new_password1:
+    :json new_password2:
+
+    **Example response**:
+
+    .. sourcecode:: json
+
+        {"detail":"Password has been reset with the new password."}
+
+
 Members
 -------
 
