@@ -265,6 +265,7 @@ EMAIL_HOST_USER = secrets.EMAIL_USER
 EMAIL_HOST_PASSWORD = secrets.EMAIL_PASS
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = 'Protospace Portal <portal@protospace.ca>'
 
 if DEBUG: logger.info('Debug mode ON')
 logger.info('Test logging for each thread')

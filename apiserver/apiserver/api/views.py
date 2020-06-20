@@ -9,7 +9,7 @@ from django.core.files.base import File
 from django.core.cache import cache
 from django.utils.timezone import now
 from rest_framework import viewsets, views, mixins, generics, exceptions
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_auth.views import PasswordChangeView
@@ -524,3 +524,8 @@ class RegistrationView(RegisterView):
 class PasswordChangeView(PasswordChangeView):
     permission_classes = [AllowMetadata | IsAuthenticated]
     serializer_class = serializers.MyPasswordChangeSerializer
+
+
+@api_view()
+def null_view(request):
+    return Response(status=status.HTTP_400_BAD_REQUEST)
