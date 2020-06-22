@@ -145,6 +145,7 @@ export function Home(props) {
 	}, [refreshCount]);
 
 	const getStat = (x) => stats && stats[x] ? stats[x] : '?';
+	const getZeroStat = (x) => stats && stats[x] ? stats[x] : '0';
 	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz('America/Edmonton').format('ll') : '?';
 
 	const mcPlayers = stats && stats['minecraft_players'] ? stats['minecraft_players'] : [];
@@ -197,7 +198,7 @@ export function Home(props) {
 							<p>Member count: {getStat('member_count')} <Link to='/charts'>[more]</Link></p>
 							<p>Green members: {getStat('green_count')}</p>
 							<p>Old members: {getStat('paused_count')}</p>
-							<p>Card scans today: {getStat('card_scans')}</p>
+							<p>Card scans today: {getZeroStat('card_scans')}</p>
 
 							<p>
 								Minecraft players: {mcPlayers.length} <Popup content={
