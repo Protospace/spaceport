@@ -194,10 +194,10 @@ function App() {
 
 			<div className='topPadding'>
 				<Switch>
-					<Route path='/password-reset/confirm/:uid/:token'>
+					<Route path='/password/reset/confirm/:uid/:token'>
 						<ConfirmReset />
 					</Route>
-					<Route path='/password-reset'>
+					<Route path='/password/reset'>
 						<PasswordReset />
 					</Route>
 

@@ -65,7 +65,7 @@ export function LoginForm(props) {
 
 			<Message basic warning>
 				<Message.Header>Forgot your password?</Message.Header>
-				<p><Link to='/password-reset/'>Click here</Link> to reset it.</p>
+				<p><Link to='/password/reset/'>Click here</Link> to reset it.</p>
 			</Message>
 		</Form>
 	);

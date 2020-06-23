@@ -67,7 +67,7 @@ function ConfirmForm() {
 	const handleSubmit = (e) => {
 		if (loading) return;
 		setLoading(true);
-		requester('/rest-auth/password/reset/confirm/', 'POST', '', input)
+		requester('/password/reset/confirm/', 'POST', '', input)
 		.then(res => {
 			setLoading(false);
 			setSuccess(true);
