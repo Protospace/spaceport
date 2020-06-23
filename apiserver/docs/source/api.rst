@@ -208,11 +208,11 @@ Reset Password
 Confirm Reset
 +++++++++++++
 
-.. http:post:: /rest-auth/password/reset/confirm/
+.. http:post:: /password/reset/confirm/
 
-    The uid and token are found in the email sent:
+    The uid and token are found in the email message:
 
-    ``/password-reset/confirm/{uid}/{token}/``
+    ``/password/reset/confirm/{uid}/{token}/``
 
     :json uid:
     :json token:

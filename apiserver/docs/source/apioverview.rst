@@ -41,7 +41,7 @@ Quick Reference
 .. http:get:: /user/
 .. http:post:: /password/change/
 .. http:post:: /password/reset/
-.. http:post:: /rest-auth/password/reset/confirm/
+.. http:post:: /password/reset/confirm/
 .. http:get:: /members/(id)/
 .. http:post:: /members/
 .. http:patch:: /members/(id)/
