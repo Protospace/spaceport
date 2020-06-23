@@ -7,7 +7,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
 from rest_auth.registration.serializers import RegisterSerializer
-from rest_auth.serializers import PasswordChangeSerializer, PasswordResetSerializer
+from rest_auth.serializers import PasswordChangeSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer
 from rest_auth.serializers import UserDetailsSerializer
 import re
 
@@ -436,6 +436,19 @@ class MyPasswordResetSerializer(PasswordResetSerializer):
         if not User.objects.filter(email=email).exists():
             raise ValidationError('Not found.')
         return super().validate_email(email)
+
+class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
+    def save(self):
+        data = dict(
+            username=self.user.username,
+            password1=self.data['new_password1'],
+        )
+
+        if utils_ldap.is_configured():
+            if utils_ldap.set_password(data) != 200:
+                raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: set.'))
+
+        super().save()
 
 
 class MemberCountSerializer(serializers.ModelSerializer):

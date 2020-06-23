@@ -12,7 +12,7 @@ from rest_framework import viewsets, views, mixins, generics, exceptions
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_auth.views import PasswordChangeView, PasswordResetView
+from rest_auth.views import PasswordChangeView, PasswordResetView, PasswordResetConfirmView
 from rest_auth.registration.views import RegisterView
 from fuzzywuzzy import fuzz, process
 from collections import OrderedDict
@@ -528,7 +528,10 @@ class PasswordChangeView(PasswordChangeView):
 class PasswordResetView(PasswordResetView):
     serializer_class = serializers.MyPasswordResetSerializer
 
+class PasswordResetConfirmView(PasswordResetConfirmView):
+    serializer_class = serializers.MyPasswordResetConfirmSerializer
+
 
 @api_view()
-def null_view(request):
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+def null_view(request, *args, **kwargs):
+    raise Http404
