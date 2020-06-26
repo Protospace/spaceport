@@ -433,7 +433,7 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
 
 class MyPasswordResetSerializer(PasswordResetSerializer):
     def validate_email(self, email):
-        if not User.objects.filter(email=email).exists():
+        if not User.objects.filter(email__iexact=email).exists():
             raise ValidationError('Not found.')
         return super().validate_email(email)
 

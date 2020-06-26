@@ -231,7 +231,7 @@ def link_old_member(data, user):
         raise ValidationError(dict(email=msg))
 
     try:
-        member = models.Member.objects.get(old_email=data['email'])
+        member = models.Member.objects.get(old_email__iexact=data['email'])
     except models.Member.DoesNotExist:
         msg = 'Unable to find email in old portal.'
         logger.info(msg)
@@ -277,7 +277,7 @@ def link_old_member(data, user):
 def create_new_member(data, user):
     if old_models:
         old_members = old_models.Members.objects.using('old_portal')
-        if old_members.filter(email=data['email']).exists():
+        if old_members.filter(email__iexact=data['email']).exists():
             msg = 'Account was found in old portal.'
             logger.info(msg)
             raise ValidationError(dict(email=msg))
