@@ -63,7 +63,7 @@ export function AdminHistory(props) {
 										<Table.Row>
 											<Table.Cell>
 												<a href='javascript:;' onClick={() => setFocus(x.id)}>
-													{moment.utc(x.history_date).format('YYYY-MM-DD')}
+													{moment.utc(x.history_date).tz('America/Edmonton').format('YYYY-MM-DD')}
 												</a>
 											</Table.Cell>
 											<Table.Cell>{x.is_system ? 'System' : (x.history_user || 'Deleted User')}</Table.Cell>

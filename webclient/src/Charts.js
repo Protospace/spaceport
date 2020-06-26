@@ -122,7 +122,7 @@ export function Charts(props) {
 
 			<Header size='medium'>Signup Count</Header>
 
-			<p>Monthly for the last sixteen months.</p>
+			<p>Monthly for the last sixteen months, updates daily.</p>
 
 			<p>
 				{signupCount &&
