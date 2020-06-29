@@ -2,9 +2,10 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
+from rest_auth.views import LoginView, LogoutView
 
 from .api import views
-from . import secrets
+from . import secrets, settings
 
 IPN_ROUTE = r'^ipn/{}/'.format(secrets.IPN_RANDOM)
 ADMIN_ROUTE = '{}/admin/'.format(secrets.ADMIN_RANDOM)
@@ -30,12 +31,12 @@ router.register(r'charts/spaceactivity', views.SpaceActivityViewSet, basename='s
 urlpatterns = [
     path('', include(router.urls)),
     path(ADMIN_ROUTE, admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),
+    url(r'^rest-auth/login/$', LoginView.as_view(), name='rest_login'),
+    url(r'^rest-auth/logout/$', LogoutView.as_view(), name='rest_logout'),
     url(r'^password/reset/$', views.PasswordResetView.as_view(), name='rest_password_reset'),
     url(r'^password/reset/confirm/$', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     url(r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', views.null_view, name='password_reset_confirm'),
     url(r'^password/change/', views.PasswordChangeView.as_view(), name='rest_password_change'),
-    url(r'^rest-auth/', include('rest_auth.urls')),
     url(r'^registration/', views.RegistrationView.as_view(), name='rest_name_register'),
     url(r'^user/', views.UserView.as_view(), name='user'),
     url(r'^ping/', views.PingView.as_view(), name='ping'),
@@ -43,3 +44,8 @@ urlpatterns = [
     url(r'^backup/', views.BackupView.as_view(), name='backup'),
     url(IPN_ROUTE, views.IpnView.as_view(), name='ipn'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        path('api-auth/', include('rest_framework.urls')),
+    ]
