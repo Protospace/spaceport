@@ -102,6 +102,8 @@ def verify_paypal_ipn(data):
     except BaseException as e:
         logger.error('IPN verify - {} - {}'.format(e.__class__.__name__, str(e)))
 
+    utils.alert_tanner('IPN failed to verify:\n\n' + str(data.dict()))
+
     return False
 
 def build_tx(data):

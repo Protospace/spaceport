@@ -30,6 +30,14 @@ STATIC_FOLDER = 'data/static/'
 def today_alberta_tz():
     return datetime.now(pytz.timezone('America/Edmonton')).date()
 
+def alert_tanner(message):
+    try:
+        logger.info('Alerting Tanner: ' + message)
+        params = dict(spaceport=message)
+        requests.get('https://tbot.tannercollin.com/message', params=params, timeout=4)
+    except BaseException as e:
+        logger.error('Problem alerting Tanner: ' + str(e))
+
 def num_months_spanned(d1, d2):
     '''
     Return number of month thresholds two dates span.
