@@ -85,15 +85,24 @@ def verify_paypal_ipn(data):
     }
 
     try:
-        r = requests.post(VERIFY_URL, params=params, headers=headers, timeout=2)
+        r = requests.post(VERIFY_URL, params=params, headers=headers, timeout=4)
         r.raise_for_status()
-        if r.text != 'VERIFIED':
-            return False
+        if r.text == 'VERIFIED':
+            return True
     except BaseException as e:
         logger.error('IPN verify - {} - {}'.format(e.__class__.__name__, str(e)))
-        return False
 
-    return True
+    logger.info('IPN - verification failed, retrying...')
+
+    try:
+        r = requests.post(VERIFY_URL, params=params, headers=headers, timeout=4)
+        r.raise_for_status()
+        if r.text == 'VERIFIED':
+            return True
+    except BaseException as e:
+        logger.error('IPN verify - {} - {}'.format(e.__class__.__name__, str(e)))
+
+    return False
 
 def build_tx(data):
     amount = float(data.get('mc_gross', 0))
