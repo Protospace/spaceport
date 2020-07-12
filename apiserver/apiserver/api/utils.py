@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from rest_framework.exceptions import ValidationError
 from dateutil import relativedelta
 from uuid import uuid4
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 from bleach.sanitizer import Cleaner
 from PyPDF2 import PdfFileWriter, PdfFileReader
 from reportlab.pdfgen import canvas
@@ -203,12 +203,14 @@ CARD_TEMPLATE_FILE = 'misc/member_card_template.jpg'
 CARD_PHOTO_SIZE = 500
 CARD_PHOTO_MARGIN_TOP = 100
 CARD_PHOTO_MARGIN_SIDE = 30
+CARD_TEXT_SIZE_LIMIT = 550
 
 def gen_card_photo(member):
     card_template = Image.open(CARD_TEMPLATE_FILE)
 
     member_photo = Image.open(STATIC_FOLDER + member.photo_large)
     member_photo.thumbnail([CARD_PHOTO_SIZE, CARD_PHOTO_SIZE], Image.ANTIALIAS)
+    member_photo = ImageOps.expand(member_photo, border=10)
 
     tx, ty = card_template.size
     mx, my = member_photo.size
@@ -218,16 +220,23 @@ def gen_card_photo(member):
 
     draw = ImageDraw.Draw(card_template)
 
-    font = ImageFont.truetype('DejaVuSans.ttf', 60)
+    # check font size
+    font_sizes = (60, 72)
+    font = ImageFont.truetype('DejaVuSans-Bold.ttf', font_sizes[1])
+    size = draw.textsize(member.last_name, font=font)
+    if size[0] > CARD_TEXT_SIZE_LIMIT:
+        font_sizes = (36, 48)
+
+    font = ImageFont.truetype('DejaVuSans.ttf', font_sizes[0])
     dx, dy = draw.textsize(member.first_name, font=font)
     x = tx - dx - CARD_PHOTO_MARGIN_SIDE
     y = my + CARD_PHOTO_MARGIN_TOP + CARD_PHOTO_MARGIN_SIDE
     draw.text((x, y), member.first_name, (0,0,0), font=font)
 
-    font = ImageFont.truetype('DejaVuSans-Bold.ttf', 72)
+    font = ImageFont.truetype('DejaVuSans-Bold.ttf', font_sizes[1])
     dx, dy = draw.textsize(member.last_name, font=font)
     x = tx - dx - CARD_PHOTO_MARGIN_SIDE
-    y = my + CARD_PHOTO_MARGIN_TOP + CARD_PHOTO_MARGIN_SIDE + 70
+    y = my + CARD_PHOTO_MARGIN_TOP + CARD_PHOTO_MARGIN_SIDE + font_sizes[1]
     draw.text((x, y), member.last_name, (0,0,0), font=font)
 
     file_name = str(uuid4()) + '.jpg'
