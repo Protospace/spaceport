@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from rest_framework.exceptions import ValidationError
 from dateutil import relativedelta
 from uuid import uuid4
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 from bleach.sanitizer import Cleaner
 from PyPDF2 import PdfFileWriter, PdfFileReader
 from reportlab.pdfgen import canvas
@@ -197,6 +197,43 @@ def process_image_upload(upload):
     pic.save(STATIC_FOLDER + small)
 
     return small, medium, large
+
+
+CARD_TEMPLATE_FILE = 'misc/member_card_template.jpg'
+CARD_PHOTO_SIZE = 500
+CARD_PHOTO_MARGIN_TOP = 100
+CARD_PHOTO_MARGIN_SIDE = 30
+
+def gen_card_photo(member):
+    card_template = Image.open(CARD_TEMPLATE_FILE)
+
+    member_photo = Image.open(STATIC_FOLDER + member.photo_large)
+    member_photo.thumbnail([CARD_PHOTO_SIZE, CARD_PHOTO_SIZE], Image.ANTIALIAS)
+
+    tx, ty = card_template.size
+    mx, my = member_photo.size
+    x = tx - mx - CARD_PHOTO_MARGIN_SIDE
+    y = CARD_PHOTO_MARGIN_TOP
+    card_template.paste(member_photo, (x, y))
+
+    draw = ImageDraw.Draw(card_template)
+
+    font = ImageFont.truetype('DejaVuSans.ttf', 60)
+    dx, dy = draw.textsize(member.first_name, font=font)
+    x = tx - dx - CARD_PHOTO_MARGIN_SIDE
+    y = my + CARD_PHOTO_MARGIN_TOP + CARD_PHOTO_MARGIN_SIDE
+    draw.text((x, y), member.first_name, (0,0,0), font=font)
+
+    font = ImageFont.truetype('DejaVuSans-Bold.ttf', 72)
+    dx, dy = draw.textsize(member.last_name, font=font)
+    x = tx - dx - CARD_PHOTO_MARGIN_SIDE
+    y = my + CARD_PHOTO_MARGIN_TOP + CARD_PHOTO_MARGIN_SIDE + 70
+    draw.text((x, y), member.last_name, (0,0,0), font=font)
+
+    file_name = str(uuid4()) + '.jpg'
+    card_template.save(STATIC_FOLDER + file_name, quality=95)
+
+    return file_name
 
 
 ALLOWED_TAGS = [
