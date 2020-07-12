@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
@@ -6,9 +6,107 @@ import moment from 'moment-timezone';
 import { apiUrl, statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound } from './Misc.js';
 
+let vettingCache = false;
 let historyCache = false;
 let excludeSystemCache = true;
 let focusCache = false;
+
+
+export function AdminVet(props) {
+	const { token, user, member, refreshVetting } = props;
+	const [loading, setLoading] = useState(false);
+	const [yousure, setYousure] = useState(false);
+
+	const handleVet = (e) => {
+		e.preventDefault();
+
+		if (yousure) {
+			setLoading(true);
+			const data = {vetted_date: moment.utc().tz('America/Edmonton').format('YYYY-MM-DD')}
+			requester('/members/' + member.id + '/', 'PATCH', token, data)
+			.then(res => {
+				refreshVetting();
+			})
+			.catch(err => {
+				console.log(err);
+			});
+		} else {
+			setYousure(true);
+		}
+	};
+
+	return (
+		<Button
+			color='green'
+			onClick={handleVet}
+			loading={loading}
+		>
+			{yousure ? 'You Sure?' : 'Vet ' + member.first_name}
+		</Button>
+	);
+}
+
+export function AdminVetting(props) {
+	const { token, user } = props;
+	const [vetting, setVetting] = useState(vettingCache);
+	const [refreshCount, refreshVetting] = useReducer(x => x + 1, 0);
+	const [error, setError] = useState(false);
+
+	useEffect(() => {
+		requester('/vetting/', 'GET', token)
+		.then(res => {
+			setVetting(res.results);
+			vettingCache = res.results;
+		})
+		.catch(err => {
+			console.log(err);
+		});
+	}, [refreshCount]);
+
+	return (
+		<div>
+			{!error ?
+				vetting ?
+					<>
+						<Table collapsing basic='very'>
+							<Table.Header>
+								<Table.Row>
+									<Table.HeaderCell>Name</Table.HeaderCell>
+									<Table.HeaderCell></Table.HeaderCell>
+									<Table.HeaderCell>Status</Table.HeaderCell>
+									<Table.HeaderCell>Start Date</Table.HeaderCell>
+									<Table.HeaderCell></Table.HeaderCell>
+								</Table.Row>
+							</Table.Header>
+
+							<Table.Body>
+								{vetting.map(x =>
+									<Table.Row key={x.id}>
+										<Table.Cell><Link to={'/members/'+x.id}>{x.first_name} {x.last_name}</Link></Table.Cell>
+										<Table.Cell><a href={'mailto:'+x.email}>Email</a></Table.Cell>
+										<Table.Cell>
+											<Icon name='circle' color={statusColor[x.status]} />
+											{x.status || 'Unknown'}
+										</Table.Cell>
+										<Table.Cell>{x.current_start_date}</Table.Cell>
+										<Table.Cell><AdminVet {...props} member={x} refreshVetting={refreshVetting} /></Table.Cell>
+									</Table.Row>
+								)}
+							</Table.Body>
+						</Table>
+
+						<p>
+							&#8627; <a href={'mailto:'+vetting.map(x => x.email).join(',')}>Email All</a>
+						</p>
+					</>
+				:
+					<p>Loading...</p>
+			:
+				<p>Error loading.</p>
+			}
+		</div>
+	);
+}
 
 export function AdminHistory(props) {
 	const { token, user } = props;
@@ -165,6 +263,10 @@ export function Admin(props) {
 	return (
 		<Container>
 			<Header size='large'>Portal Admin</Header>
+
+			<Header size='medium'>Ready to Vet</Header>
+			<p>Members who are Current or Due, and past their probationary period.</p>
+			<AdminVetting {...props} />
 
 			<Header size='medium'>Member Data Backup</Header>
 			<p>Spaceport backups are created daily. 14 days are kept on the server.</p>
