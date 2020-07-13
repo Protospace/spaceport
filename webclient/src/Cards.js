@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { BasicTable, requester } from './utils.js';
+import { BasicTable, requester, staticUrl } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 
 export function Cards(props) {
@@ -17,6 +17,16 @@ export function Cards(props) {
 			<Header size='large'>Cards / Access</Header>
 
 			<Header size='medium'>Member Cards</Header>
+
+			{user.member.card_photo ?
+				<p>
+					<a href={staticUrl + '/' + user.member.card_photo} target='_blank'>
+						Click here
+					</a> to view your card image.
+				</p>
+			:
+				<p>Upload a photo to generate a card image.</p>
+			}
 
 			{user.cards.length ?
 				user.cards.length > 1 ?

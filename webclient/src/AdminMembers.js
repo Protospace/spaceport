@@ -170,8 +170,19 @@ export function AdminMemberCards(props) {
 	return (
 		<div>
 			<Header size='medium'>Edit Member Cards</Header>
+
 			<Form onSubmit={handleSubmit}>
 				<Header size='small'>Add a Card</Header>
+
+				{result.member.card_photo ?
+					<p>
+						<a href={staticUrl + '/' + result.member.card_photo} target='_blank'>
+							Print card image
+						</a>
+					</p>
+				:
+					<p>No card image, member photo missing!</p>
+				}
 
 				<Form.Group widths='equal'>
 					<Form.Input
