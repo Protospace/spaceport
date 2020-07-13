@@ -134,6 +134,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'photo_medium',
             'photo_small',
             'member_forms',
+            'card_photo',
             'user',
             'old_email',
             'orientation_date',
@@ -158,9 +159,7 @@ class MemberSerializer(serializers.ModelSerializer):
             instance.photo_small = small
             instance.photo_medium = medium
             instance.photo_large = large
-            card_photo = utils.gen_card_photo(instance)
-            print(card_photo)
-            logger.info(card_photo)
+            instance.card_photo = utils.gen_card_photo(instance)
 
         return super().update(instance, validated_data)
 
@@ -183,6 +182,7 @@ class AdminMemberSerializer(MemberSerializer):
             'photo_medium',
             'photo_small',
             'member_forms',
+            'card_photo',
             'user',
             'old_email',
             'is_director',
