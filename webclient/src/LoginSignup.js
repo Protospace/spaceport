@@ -51,6 +51,7 @@ export function LoginForm(props) {
 				placeholder='first.last'
 				onChange={handleChange}
 				error={error.username}
+				autoFocus
 			/>
 			<Form.Input
 				label='Password'
@@ -63,7 +64,7 @@ export function LoginForm(props) {
 				Log In
 			</Form.Button>
 
-			<Message basic warning>
+			<Message warning>
 				<Message.Header>Forgot your password?</Message.Header>
 				<p><Link to='/password/reset/'>Click here</Link> to reset it.</p>
 			</Message>
