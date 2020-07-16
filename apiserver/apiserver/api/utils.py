@@ -200,7 +200,7 @@ def process_image_upload(upload):
 
 
 CARD_TEMPLATE_FILE = 'misc/member_card_template.jpg'
-CARD_PHOTO_SIZE = 500
+CARD_PHOTO_SIZE = 425
 CARD_PHOTO_MARGIN_TOP = 100
 CARD_PHOTO_MARGIN_SIDE = 30
 CARD_TEXT_SIZE_LIMIT = 550
@@ -211,10 +211,9 @@ def gen_card_photo(member):
     member_photo = Image.open(STATIC_FOLDER + member.photo_large)
     member_photo.thumbnail([CARD_PHOTO_SIZE, CARD_PHOTO_SIZE], Image.ANTIALIAS)
     member_photo = ImageOps.expand(member_photo, border=10)
-
-    tx, ty = card_template.size
     mx, my = member_photo.size
-    x = tx - mx - CARD_PHOTO_MARGIN_SIDE
+
+    x = CARD_PHOTO_MARGIN_SIDE
     y = CARD_PHOTO_MARGIN_TOP
     card_template.paste(member_photo, (x, y))
 
@@ -228,16 +227,18 @@ def gen_card_photo(member):
         font_sizes = (36, 48)
 
     font = ImageFont.truetype('DejaVuSans.ttf', font_sizes[0])
-    dx, dy = draw.textsize(member.first_name, font=font)
-    x = tx - dx - CARD_PHOTO_MARGIN_SIDE
+    x = CARD_PHOTO_MARGIN_SIDE
     y = my + CARD_PHOTO_MARGIN_TOP + CARD_PHOTO_MARGIN_SIDE
     draw.text((x, y), member.first_name, (0,0,0), font=font)
 
     font = ImageFont.truetype('DejaVuSans-Bold.ttf', font_sizes[1])
-    dx, dy = draw.textsize(member.last_name, font=font)
-    x = tx - dx - CARD_PHOTO_MARGIN_SIDE
     y = my + CARD_PHOTO_MARGIN_TOP + CARD_PHOTO_MARGIN_SIDE + font_sizes[1]
     draw.text((x, y), member.last_name, (0,0,0), font=font)
+
+    font = ImageFont.truetype('DejaVuSans.ttf', 36)
+    draw.text((x, 800), 'Joined: ' + member.application_date, (0,0,0), font=font)
+    y = CARD_PHOTO_MARGIN_SIDE
+    draw.text((475, y), str(member.id), (0,0,0), font=font)
 
     file_name = str(uuid4()) + '.jpg'
     card_template.save(STATIC_FOLDER + file_name, quality=95)
