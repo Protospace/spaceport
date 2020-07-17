@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
+import ReactCrop from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 import './light.css';
 import { Button, Container, Checkbox, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { BasicTable, staticUrl, requester } from './utils.js';
@@ -110,12 +112,30 @@ function ChangePasswordForm(props) {
 	);
 };
 
+
+export function ImageCrop(props) {
+	const { file, crop, setCrop } = props;
+	const [src, setSrc] = useState(false);
+	const reader = new FileReader();
+	reader.onload = (e) => setSrc(e.target.result);
+	reader.readAsDataURL(file);
+	return (
+		src && <ReactCrop
+			src={src}
+			crop={crop}
+			locked
+			onChange={(crop, percentCrop) => setCrop(percentCrop)}
+		/>
+	);
+}
+
 export function AccountForm(props) {
 	const { token, user, refreshUser } = props;
 	const member = user.member;
 	const [input, setInput] = useState({ ...member, set_details: true });
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
+	const [crop, setCrop] = useState({ unit: '%', height: 100, aspect: 3/4 });
 	const history = useHistory();
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
@@ -126,7 +146,7 @@ export function AccountForm(props) {
 	const handleSubmit = (e) => {
 		if (loading) return;
 		setLoading(true);
-		const data = { ...input, email: input.email.toLowerCase() };
+		const data = { ...input, email: input.email.toLowerCase(), crop: JSON.stringify(crop) };
 		requester('/members/' + member.id + '/', 'PATCH', token, data)
 		.then(res => {
 			setError({});
@@ -221,6 +241,13 @@ export function AccountForm(props) {
 				accept='image/*'
 				onChange={handleUpload}
 			/>
+
+			{input.photo &&
+				<>
+					<ImageCrop file={input.photo} crop={crop} setCrop={setCrop} />
+					<p>Move the box above to crop your image.</p>
+				</>
+			}
 
 			<Form.Button loading={loading} error={error.non_field_errors}>
 				Submit
