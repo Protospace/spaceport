@@ -2,6 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import io
+import json
 import requests
 from datetime import datetime, timedelta
 from rest_framework.exceptions import ValidationError
@@ -168,7 +169,7 @@ LARGE_SIZE = 1080
 MEDIUM_SIZE = 220
 SMALL_SIZE = 110
 
-def process_image_upload(upload):
+def process_image_upload(upload, crop):
     '''
     Save an image upload in small, medium, large sizes and return filenames
     '''
@@ -183,6 +184,15 @@ def process_image_upload(upload):
         ext = '.jpg'
     else:
         raise serializers.ValidationError('Image must be a jpg or png.')
+
+    if crop:
+        crop = json.loads(crop)
+        pic_x, pic_y = pic.size
+        left = pic_x * crop['x']/100.0
+        top = pic_y * crop['y']/100.0
+        right = left + pic_x * crop['width']/100.0
+        bottom = top + pic_y * crop['height']/100.0
+        pic = pic.crop((left, top, right, bottom))
 
     large = str(uuid4()) + ext
     pic.thumbnail([LARGE_SIZE, LARGE_SIZE], Image.ANTIALIAS)
@@ -201,7 +211,7 @@ def process_image_upload(upload):
 
 CARD_TEMPLATE_FILE = 'misc/member_card_template.jpg'
 CARD_PHOTO_SIZE = 425
-CARD_PHOTO_MARGIN_TOP = 100
+CARD_PHOTO_MARGIN_TOP = 75
 CARD_PHOTO_MARGIN_SIDE = 30
 CARD_TEXT_SIZE_LIMIT = 550
 
@@ -236,7 +246,7 @@ def gen_card_photo(member):
     draw.text((x, y), member.last_name, (0,0,0), font=font)
 
     font = ImageFont.truetype('DejaVuSans.ttf', 36)
-    draw.text((x, 800), 'Joined: ' + member.application_date, (0,0,0), font=font)
+    draw.text((x, 800), 'Joined: ' + str(member.application_date), (0,0,0), font=font)
     y = CARD_PHOTO_MARGIN_SIDE
     draw.text((475, y), str(member.id), (0,0,0), font=font)
 

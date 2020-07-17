@@ -107,6 +107,7 @@ class OtherMemberSerializer(serializers.ModelSerializer):
 class MemberSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     photo = serializers.ImageField(write_only=True, required=False)
+    crop = serializers.CharField(write_only=True, required=False)
     email = fields.UserEmailField(serializers.EmailField)
     phone = serializers.CharField()
     street_address = serializers.CharField()
@@ -154,8 +155,9 @@ class MemberSerializer(serializers.ModelSerializer):
             instance.old_email = validated_data.get('email', instance.old_email)
 
         photo = validated_data.get('photo', None)
+        crop = validated_data.get('crop', None)
         if photo:
-            small, medium, large = utils.process_image_upload(photo)
+            small, medium, large = utils.process_image_upload(photo, crop)
             instance.photo_small = small
             instance.photo_medium = medium
             instance.photo_large = large
