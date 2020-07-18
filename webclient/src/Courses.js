@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-r
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
-import { isInstructor, requester } from './utils.js';
+import { isInstructor, getInstructor, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { InstructorCourseList, InstructorCourseDetail } from './InstructorCourses.js';
 import { InstructorClassList } from './InstructorClasses.js';
@@ -126,7 +126,7 @@ export function CourseDetail(props) {
 												</Link>
 											</Table.Cell>
 											<Table.Cell>{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}</Table.Cell>
-											<Table.Cell>{x.instructor_name}</Table.Cell>
+											<Table.Cell>{getInstructor(x)}</Table.Cell>
 											<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
 										</Table.Row>
 									)

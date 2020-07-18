@@ -8,6 +8,14 @@ export const staticUrl = window.location.protocol + '//static.' + window.locatio
 export const isAdmin = (user) => user.is_staff || user.member.is_director || user.member.is_staff;
 export const isInstructor = (user) => isAdmin(user) || user.member.is_instructor;
 
+export const getInstructor = (x) => {
+	if (x.course === 413 || x.course === 317 || x.course === 273) {
+		return 'Protospace';
+	} else {
+		return x.instructor_name;
+	}
+};
+
 export const statusColor = {
 	'Prepaid': 'green',
 	'Current': 'green',

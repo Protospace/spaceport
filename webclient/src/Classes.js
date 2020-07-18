@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-r
 import './light.css';
 import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
-import { isAdmin, isInstructor, BasicTable, requester } from './utils.js';
+import { isAdmin, isInstructor, getInstructor, BasicTable, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { InstructorClassDetail, InstructorClassAttendance } from './InstructorClasses.js';
 import { PayPalPayNow } from './PayPal.js';
@@ -35,7 +35,7 @@ function ClassTable(props) {
 								</Link>
 							</Table.Cell>
 							<Table.Cell>{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}</Table.Cell>
-							<Table.Cell>{x.instructor_name}</Table.Cell>
+							<Table.Cell>{getInstructor(x)}</Table.Cell>
 							<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
 							<Table.Cell>{x.student_count} {!!x.max_students && '/ '+x.max_students}</Table.Cell>
 						</Table.Row>
@@ -171,7 +171,7 @@ export function ClassDetail(props) {
 								</Table.Row>
 								<Table.Row>
 									<Table.Cell>Instructor:</Table.Cell>
-									<Table.Cell>{clazz.instructor_name}</Table.Cell>
+									<Table.Cell>{getInstructor(clazz)}</Table.Cell>
 								</Table.Row>
 								<Table.Row>
 									<Table.Cell>Cost:</Table.Cell>
