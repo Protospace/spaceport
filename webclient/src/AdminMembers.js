@@ -122,6 +122,7 @@ export function AdminMemberCards(props) {
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
+	const [viewCard, setViewCard] = useState(false);
 	const { id } = useParams();
 
 	useEffect(() => {
@@ -176,13 +177,27 @@ export function AdminMemberCards(props) {
 
 				{result.member.card_photo ?
 					<p>
-						<a href={staticUrl + '/' + result.member.card_photo} target='_blank'>
-							Print card image
-						</a>
+						<Button onClick={() => setViewCard(true)}>View card image</Button>
 					</p>
 				:
 					<p>No card image, member photo missing!</p>
 				}
+
+				{viewCard && <>
+					<p>
+						<Image rounded size='medium' src={staticUrl + '/' + result.member.card_photo} />
+					</p>
+
+					<Header size='small'>How to Print a Card</Header>
+					<ol>
+						<li>Right click on image > Save image as...</li>
+						<li>Right click on file > Print</li>
+						<li>Select Datacard Printer, Print</li>
+						<li>Plug card scanner in</li>
+						<li>Open "RfidReader" on desktop</li>
+						<li>Scan card, copy the number</li>
+					</ol>
+				</>}
 
 				<Form.Group widths='equal'>
 					<Form.Input
