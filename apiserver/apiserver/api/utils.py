@@ -185,6 +185,8 @@ def process_image_upload(upload, crop):
     else:
         raise serializers.ValidationError('Image must be a jpg or png.')
 
+    pic = ImageOps.exif_transpose(pic)
+
     if crop:
         crop = json.loads(crop)
         pic_x, pic_y = pic.size
