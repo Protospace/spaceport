@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
+import * as loadImage from 'blueimp-load-image';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import './light.css';
@@ -116,16 +117,35 @@ function ChangePasswordForm(props) {
 export function ImageCrop(props) {
 	const { file, crop, setCrop } = props;
 	const [src, setSrc] = useState(false);
-	const reader = new FileReader();
-	reader.onload = (e) => setSrc(e.target.result);
-	reader.readAsDataURL(file);
+
+	useEffect(() => {
+		setSrc(false);
+		setCrop({ unit: '%', height: 100, aspect: 3/4 });
+		loadImage(
+			file,
+			img => {
+				setSrc(img.toDataURL());
+			},
+			{
+				meta: true,
+				orientation: true,
+				canvas: true,
+				maxWidth: 300,
+				maxHeight: 300,
+			}
+		);
+	}, [file]);
+
 	return (
-		src && <ReactCrop
-			src={src}
-			crop={crop}
-			locked
-			onChange={(crop, percentCrop) => setCrop(percentCrop)}
-		/>
+		src ?
+			<ReactCrop
+				src={src}
+				crop={crop}
+				locked
+				onChange={(crop, percentCrop) => setCrop(percentCrop)}
+			/>
+		:
+			<p>Loading...</p>
 	);
 }
 
@@ -135,7 +155,7 @@ export function AccountForm(props) {
 	const [input, setInput] = useState({ ...member, set_details: true });
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
-	const [crop, setCrop] = useState({ unit: '%', height: 100, aspect: 3/4 });
+	const [crop, setCrop] = useState(false);
 	const history = useHistory();
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
@@ -245,7 +265,11 @@ export function AccountForm(props) {
 			{input.photo &&
 				<>
 					<ImageCrop file={input.photo} crop={crop} setCrop={setCrop} />
-					<p>Move the box above to crop your image.</p>
+					{crop && crop.width === crop.height ?
+						<p>It's the perfect size!</p>
+					:
+						<p>Move the box above to crop your image.</p>
+					}
 				</>
 			}
 

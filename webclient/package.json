@@ -6,6 +6,7 @@
 		"@testing-library/jest-dom": "^4.2.4",
 		"@testing-library/react": "^9.3.2",
 		"@testing-library/user-event": "^7.1.2",
+		"blueimp-load-image": "^5.13.0",
 		"darkmode-js": "~1.5.5",
 		"moment": "~2.24.0",
 		"moment-timezone": "~0.5.28",
