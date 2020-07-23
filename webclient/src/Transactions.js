@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
+import ReactToPrint from 'react-to-print';
 import './light.css';
-import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { MembersDropdown } from './Members.js';
 import { isAdmin, BasicTable, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
@@ -308,12 +309,101 @@ export function Transactions(props) {
 	);
 };
 
+class TransactionTable extends React.Component {
+	render() {
+		const transaction = this.props.transaction;
+		const user = this.props.user;
+
+		return (
+			<BasicTable>
+				<Table.Body>
+					<Table.Row>
+						<Table.Cell>Member:</Table.Cell>
+						{isAdmin(user) && transaction.member_id ?
+							<Table.Cell>
+								<Link to={'/members/'+transaction.member_id}>
+									{transaction.member_name}
+								</Link>
+							</Table.Cell>
+						:
+							<Table.Cell>{transaction.member_name}</Table.Cell>
+						}
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Number:</Table.Cell>
+						<Table.Cell>{transaction.id}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Date:</Table.Cell>
+						<Table.Cell>{transaction.date}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Amount:</Table.Cell>
+						<Table.Cell>${transaction.amount}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Category:</Table.Cell>
+						<Table.Cell>{transaction.category}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Account:</Table.Cell>
+						<Table.Cell>{transaction.account_type}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Payment Method:</Table.Cell>
+						<Table.Cell>{transaction.payment_method}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Info Source:</Table.Cell>
+						<Table.Cell>{transaction.info_source}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Reference:</Table.Cell>
+						<Table.Cell>{transaction.reference_number}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Memo:</Table.Cell>
+						<Table.Cell>{transaction.memo}</Table.Cell>
+					</Table.Row>
+
+					{!!transaction.report_type && <Table.Row>
+						<Table.Cell>Report Type:</Table.Cell>
+						<Table.Cell>{transaction.report_type}</Table.Cell>
+					</Table.Row>}
+					{!!transaction.report_memo && <Table.Row>
+						<Table.Cell>Report Memo:</Table.Cell>
+						<Table.Cell>{transaction.report_memo}</Table.Cell>
+					</Table.Row>}
+				</Table.Body>
+			</BasicTable>
+		);
+	}
+}
+
+class TransactionPrint extends React.Component {
+	render() {
+		const transaction = this.props.transaction;
+		const user = this.props.user;
+
+		return (
+			<div style={{padding: '1in'}}>
+				<Header size='large'>Protospace Transaction Receipt</Header>
+				<p>Calgary Protospace Ltd.</p>
+				<p>Bay 108, 1530 - 27th Ave NE<br />Calgary, AB  T2E 7S6<br />protospace.ca</p>
+				<TransactionTable user={user} transaction={transaction} />
+				<p>Thank you!</p>
+			</div>
+		);
+	}
+}
+
 export function TransactionDetail(props) {
 	const { token, user } = props;
 	const { id } = useParams();
 	const ownTransaction = user.transactions.find(x => x.id == id);
 	const [transaction, setTransaction] = useState(ownTransaction || false);
 	const [error, setError] = useState(false);
+	const printRef = useRef();
 
 	useEffect(() => {
 		requester('/transactions/'+id+'/', 'GET', token)
@@ -336,67 +426,15 @@ export function TransactionDetail(props) {
 
 						<Grid stackable columns={2}>
 							<Grid.Column>
-								<BasicTable>
-									<Table.Body>
-										<Table.Row>
-											<Table.Cell>Member:</Table.Cell>
-											{isAdmin(user) && transaction.member_id ?
-												<Table.Cell>
-													<Link to={'/members/'+transaction.member_id}>
-														{transaction.member_name}
-													</Link>
-												</Table.Cell>
-											:
-												<Table.Cell>{transaction.member_name}</Table.Cell>
-											}
-										</Table.Row>
-										<Table.Row>
-											<Table.Cell>ID:</Table.Cell>
-											<Table.Cell>{transaction.id}</Table.Cell>
-										</Table.Row>
-										<Table.Row>
-											<Table.Cell>Date:</Table.Cell>
-											<Table.Cell>{transaction.date}</Table.Cell>
-										</Table.Row>
-										<Table.Row>
-											<Table.Cell>Amount:</Table.Cell>
-											<Table.Cell>${transaction.amount}</Table.Cell>
-										</Table.Row>
-										<Table.Row>
-											<Table.Cell>Category:</Table.Cell>
-											<Table.Cell>{transaction.category}</Table.Cell>
-										</Table.Row>
-										<Table.Row>
-											<Table.Cell>Account:</Table.Cell>
-											<Table.Cell>{transaction.account_type}</Table.Cell>
-										</Table.Row>
-										<Table.Row>
-											<Table.Cell>Payment Method</Table.Cell>
-											<Table.Cell>{transaction.payment_method}</Table.Cell>
-										</Table.Row>
-										<Table.Row>
-											<Table.Cell>Info Source:</Table.Cell>
-											<Table.Cell>{transaction.info_source}</Table.Cell>
-										</Table.Row>
-										<Table.Row>
-											<Table.Cell>Reference:</Table.Cell>
-											<Table.Cell>{transaction.reference_number}</Table.Cell>
-										</Table.Row>
-										<Table.Row>
-											<Table.Cell>Memo:</Table.Cell>
-											<Table.Cell>{transaction.memo}</Table.Cell>
-										</Table.Row>
+								<TransactionTable user={user} transaction={transaction} />
 
-										{!!transaction.report_type && <Table.Row>
-											<Table.Cell>Report Type:</Table.Cell>
-											<Table.Cell>{transaction.report_type}</Table.Cell>
-										</Table.Row>}
-										{!!transaction.report_memo && <Table.Row>
-											<Table.Cell>Report Memo:</Table.Cell>
-											<Table.Cell>{transaction.report_memo}</Table.Cell>
-										</Table.Row>}
-									</Table.Body>
-								</BasicTable>
+								<div style={{ display: 'none' }}>
+									<TransactionPrint ref={printRef} user={user} transaction={transaction} />
+								</div>
+								<ReactToPrint
+									trigger={() => <Button>Print Receipt</Button>}
+									content={() => printRef.current}
+								/>
 							</Grid.Column>
 
 							<Grid.Column>
