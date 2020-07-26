@@ -87,6 +87,7 @@ def verify_paypal_ipn(data):
     try:
         r = requests.post(VERIFY_URL, params=params, headers=headers, timeout=4)
         r.raise_for_status()
+        logger.info('Result: ' + r.text)
         if r.text == 'VERIFIED':
             return True
     except BaseException as e:
@@ -97,6 +98,7 @@ def verify_paypal_ipn(data):
     try:
         r = requests.post(VERIFY_URL, params=params, headers=headers, timeout=4)
         r.raise_for_status()
+        logger.info('Result: ' + r.text)
         if r.text == 'VERIFIED':
             return True
     except BaseException as e:
