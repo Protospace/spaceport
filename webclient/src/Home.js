@@ -150,6 +150,8 @@ export function Home(props) {
 
 	const mcPlayers = stats && stats['minecraft_players'] ? stats['minecraft_players'] : [];
 
+	const getTrackStat = (x) => stats && stats.track && stats.track[x] && moment().unix() - stats.track[x] > 60 ? 'Free' : 'In Use';
+
 	return (
 		<Container>
 			<Grid stackable padded columns={2}>
@@ -214,6 +216,8 @@ export function Home(props) {
 									</React.Fragment>
 								} trigger={<a>[more]</a>} />
 							</p>
+
+							<p>Trotec availability: {getTrackStat('TROTECS300')}</p>
 						</div>
 
 					</Segment>
