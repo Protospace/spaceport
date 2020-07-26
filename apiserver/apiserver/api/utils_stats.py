@@ -23,6 +23,7 @@ DEFAULTS = {
     'bay_110_temp': None,
     'minecraft_players': [],
     'card_scans': 0,
+    'track': {},
 }
 
 def changed_card():

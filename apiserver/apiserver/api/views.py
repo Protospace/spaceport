@@ -16,7 +16,7 @@ from rest_auth.views import PasswordChangeView, PasswordResetView, PasswordReset
 from rest_auth.registration.views import RegisterView
 from fuzzywuzzy import fuzz, process
 from collections import OrderedDict
-import datetime
+import datetime, time
 
 import requests
 
@@ -420,6 +420,16 @@ class StatsViewSet(viewsets.ViewSet, List):
             raise exceptions.ValidationError(dict(data='Invalid float.'))
         except KeyError:
             raise exceptions.ValidationError(dict(data='This field is required.'))
+
+    @action(detail=False, methods=['post'])
+    def track(self, request):
+        if 'name' in request.data:
+            track = cache.get('track', {})
+            track[request.data['name']] = time.time()
+            cache.set('track', track)
+            return Response(200)
+        else:
+            raise exceptions.ValidationError(dict(paste='This field is required.'))
 
 
 class MemberCountViewSet(Base, List):
