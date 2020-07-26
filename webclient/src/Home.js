@@ -151,6 +151,8 @@ export function Home(props) {
 	const mcPlayers = stats && stats['minecraft_players'] ? stats['minecraft_players'] : [];
 
 	const getTrackStat = (x) => stats && stats.track && stats.track[x] && moment().unix() - stats.track[x] > 60 ? 'Free' : 'In Use';
+	const getTrackLast = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]).tz('America/Edmonton').format('llll') : 'Unknown';
+	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]).tz('America/Edmonton').fromNow() : '';
 
 	return (
 		<Container>
@@ -217,7 +219,17 @@ export function Home(props) {
 								} trigger={<a>[more]</a>} />
 							</p>
 
-							<p>Trotec availability: {getTrackStat('TROTECS300')}</p>
+							<p>
+								Trotec availability: {getTrackStat('TROTECS300')} <Popup content={
+									<React.Fragment>
+										<p>
+											Last use:<br />
+											{getTrackLast('TROTECS300')}<br />
+											{getTrackAgo('TROTECS300')}
+										</p>
+									</React.Fragment>
+								} trigger={<a>[more]</a>} />
+							</p>
 						</div>
 
 					</Segment>
