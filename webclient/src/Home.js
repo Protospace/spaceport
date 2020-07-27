@@ -230,6 +230,18 @@ export function Home(props) {
 									</React.Fragment>
 								} trigger={<a>[more]</a>} />
 							</p>
+
+							<p>
+								Rabbit availability: {getTrackStat('FRICKIN-LASER')} <Popup content={
+									<React.Fragment>
+										<p>
+											Last use:<br />
+											{getTrackLast('FRICKIN-LASER')}<br />
+											{getTrackAgo('FRICKIN-LASER')}
+										</p>
+									</React.Fragment>
+								} trigger={<a>[more]</a>} />
+							</p>
 						</div>
 
 					</Segment>
