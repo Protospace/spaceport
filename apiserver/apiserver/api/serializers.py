@@ -259,6 +259,9 @@ class CardSerializer(serializers.ModelSerializer):
         member = get_object_or_404(models.Member, id=validated_data['member_id'])
         if member.user:
             validated_data['user'] = member.user
+
+        if not member.vetted_date:
+            raise ValidationError(dict(non_field_errors='Member not vetted yet.'))
         return super().create(validated_data)
 
 
