@@ -316,6 +316,9 @@ class PingView(views.APIView):
     permission_classes = [AllowMetadata | IsAuthenticated]
 
     def post(self, request):
+        d = request.data.dict()
+        if d:
+            logger.info(str(d))
         return Response(200)
 
 
