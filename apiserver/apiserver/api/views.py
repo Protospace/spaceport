@@ -527,7 +527,7 @@ class VettingViewSet(Base, List):
         queryset = models.Member.objects
 
         four_weeks_ago = utils.today_alberta_tz() - datetime.timedelta(days=28)
-        queryset = queryset.filter(status__in=['Current', 'Due'])
+        queryset = queryset.filter(status__in=['Prepaid', 'Current', 'Due'])
         queryset = queryset.filter(paused_date__isnull=True)
         queryset = queryset.filter(vetted_date__isnull=True)
         queryset = queryset.filter(current_start_date__lte=four_weeks_ago)
