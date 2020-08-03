@@ -64,15 +64,22 @@ function App() {
 	}
 
 	useEffect(() => {
-		user && requester('/ping/', 'POST', token, {})
-		.then()
-		.catch(err => {
-			console.log(err);
-			if (err.data && err.data.detail === 'Invalid token.') {
-				logout(); // You Sure?
-				logout();
-			}
-		});
+		if (user) {
+			const data = {
+				id: user.member.id,
+				username: user.username,
+				path: history.location.pathname,
+			};
+			requester('/ping/', 'POST', token, data)
+			.then()
+			.catch(err => {
+				console.log(err);
+				if (err.data && err.data.detail === 'Invalid token.') {
+					logout(); // You Sure?
+					logout();
+				}
+			});
+		}
 	}, [history.location]);
 
 	useEffect(() => {
