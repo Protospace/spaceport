@@ -938,3 +938,57 @@ Ping
     **Response**
 
     :status 200:
+
+
+Stats
+-----
+
+    Public route that returns stats about Spaceport and Protospace.
+
+.. http:get:: /stats/
+
+    Retrieve the stats object. This is very inexpensive, so feel free to call frequently.
+
+    **Example response**
+
+    .. sourcecode:: json
+
+        {
+            "bay_108_temp": 22.1,
+            "bay_110_temp": 22.5,
+            "card_scans": 7,
+            "last_card_change": 1595844608.7921524,
+            "green_count": 153,
+            "member_count": 191,
+            "paused_count": 1071,
+            "minecraft_players": ["tanner6"],
+            "next_clean": "2020-08-08T16:00:30Z",
+            "next_meeting": "2020-08-20T01:00:20Z",
+            "track": {
+                "FRICKIN-LASER": 1595882018.228888,
+                "TROTECS300": 1595797812.8726459
+            }
+        }
+
+    :json bay_108_temp: Celsius temperature of bay 108.
+    :json bay_110_temp: Celsius temperature of bay 110.
+    :json card_scans: Number of unique card scans that day.
+    :json last_card_change: Time of last update to member cards.
+    :json green_count: Number of current and prepaid members.
+    :json member_count: Total number of Protospace members.
+    :json paused_count: Number of expired (old) members.
+    :json minecraft_players: A list of players currently on the Minecraft server.
+    :json next_clean: UTC datetime of next monthly clean.
+    :json next_meeting: UTC datetime of next member's meeting.
+    :json track: A dictionary of computer names and their last ping's epoch time.
+
+
+.. http:post:: /stats/track/
+
+    Update the time at which a computer was last seen.
+
+    Used to track when the lasers are in use.
+
+    :param name: The computer's hostname.
+
+    No authentication required.

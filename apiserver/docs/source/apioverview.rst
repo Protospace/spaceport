@@ -78,3 +78,5 @@ Quick Reference
 .. http:get:: /door/
 .. http:post:: /door/(card_number)/seen/
 .. http:post:: /ping/
+.. http:get:: /stats/
+.. http:post:: /stats/track/
