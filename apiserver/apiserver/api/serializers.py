@@ -206,6 +206,7 @@ class SearchSerializer(serializers.Serializer):
 class AdminSearchSerializer(serializers.Serializer):
     cards = serializers.SerializerMethodField()
     member = serializers.SerializerMethodField()
+    training = serializers.SerializerMethodField()
     transactions = serializers.SerializerMethodField()
 
     def get_member(self, obj):
@@ -219,6 +220,15 @@ class AdminSearchSerializer(serializers.Serializer):
             queryset = models.Card.objects.filter(member_id=obj.id)
         queryset = queryset.order_by('-last_seen_at')
         serializer = CardSerializer(data=queryset, many=True)
+        serializer.is_valid()
+        return serializer.data
+
+    def get_training(self, obj):
+        if obj.user:
+            queryset = obj.user.training
+        else:
+            queryset = models.Training.objects.filter(member_id=obj.id)
+        serializer = UserTrainingSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
 
