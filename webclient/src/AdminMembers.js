@@ -4,6 +4,7 @@ import './light.css';
 import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment';
 import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
+import { TrainingList } from './Training.js';
 import { NotFound } from './Misc.js';
 
 function AdminCardDetail(props) {
@@ -524,6 +525,23 @@ export function AdminMemberInfo(props) {
 					View application forms
 				</a>
 			</p>}
+		</div>
+	);
+};
+
+export function AdminMemberTraining(props) {
+	const training = props.result.training;
+
+	return (
+		<div>
+			<Header size='medium'>Member Training</Header>
+
+			{training.length ?
+				<TrainingList training={training} />
+			:
+				<p>None</p>
+			}
+
 		</div>
 	);
 };
