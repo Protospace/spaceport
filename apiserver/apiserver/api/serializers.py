@@ -110,9 +110,9 @@ class MemberSerializer(serializers.ModelSerializer):
     crop = serializers.CharField(write_only=True, required=False)
     email = fields.UserEmailField(serializers.EmailField)
     phone = serializers.CharField()
-    street_address = serializers.CharField()
-    city = serializers.CharField()
-    postal_code = serializers.CharField()
+    street_address = serializers.CharField(required=False)
+    city = serializers.CharField(required=False)
+    postal_code = serializers.CharField(required=False)
 
     class Meta:
         model = models.Member
