@@ -210,22 +210,6 @@ export function AccountForm(props) {
 				{...makeProps('phone')}
 			/>
 
-			<Form.Input
-				label='Street Address'
-				required
-				{...makeProps('street_address')}
-			/>
-			<Form.Input
-				label='City, Province'
-				required
-				{...makeProps('city')}
-			/>
-			<Form.Input
-				label='Postal Code'
-				required
-				{...makeProps('postal_code')}
-			/>
-
 			<Form.Field>
 				<label>Are you under 18 years old?</label>
 				<Checkbox
