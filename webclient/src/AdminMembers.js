@@ -477,19 +477,6 @@ export function AdminMemberInfo(props) {
 					</Table.Row>
 
 					<Table.Row>
-						<Table.Cell>Address:</Table.Cell>
-						<Table.Cell>{member.street_address}</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Cell>City:</Table.Cell>
-						<Table.Cell>{member.city}</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Cell>Postal:</Table.Cell>
-						<Table.Cell>{member.postal_code}</Table.Cell>
-					</Table.Row>
-
-					<Table.Row>
 						<Table.Cell>Minor:</Table.Cell>
 						<Table.Cell>{member.is_minor ? 'Yes' : 'No'}</Table.Cell>
 					</Table.Row>
