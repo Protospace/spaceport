@@ -377,7 +377,7 @@ class LockoutViewSet(viewsets.ViewSet, List):
 
             authorization = {}
             authorization['id'] = member.id
-            authorization['name'] = member.first_name + " " + member.last_name
+            authorization['name'] = member.first_name + ' ' + member.last_name
             authorization['common'] = bool(member.orientation_date or member.vetted_date)
             authorization['lathe'] = bool(member.lathe_cert_date)
             authorization['mill'] = bool(member.mill_cert_date)
