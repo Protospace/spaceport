@@ -142,6 +142,8 @@ class MemberSerializer(serializers.ModelSerializer):
             'lathe_cert_date',
             'mill_cert_date',
             'wood_cert_date',
+            'wood2_cert_date',
+            'cnc_cert_date',
         ]
 
     def get_status(self, obj):

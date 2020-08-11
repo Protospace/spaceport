@@ -51,6 +51,8 @@ class Member(models.Model):
     lathe_cert_date = models.DateField(blank=True, null=True, default=None)
     mill_cert_date = models.DateField(blank=True, null=True, default=None)
     wood_cert_date = models.DateField(blank=True, null=True, default=None)
+    wood2_cert_date = models.DateField(blank=True, null=True, default=None)
+    cnc_cert_date = models.DateField(blank=True, null=True, default=None)
     paused_date = models.DateField(blank=True, null=True)
     monthly_fees = models.IntegerField(default=55, blank=True, null=True)
 

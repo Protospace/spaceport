@@ -69,4 +69,29 @@ for session in sessions:
                 member.wood_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
                 member.save()
 
+# Woodworking-2 tools
+print("Updating woodworking-2 training dates")
+sessions = models.Session.objects.filter(course = 401)
+
+for session in sessions:
+    students = models.Training.objects.filter(session = session)
+    for student in students:
+        if student.attendance_status == "Attended":
+            member = get_member(student)
+            if not member.wood2_cert_date:
+                member.wood2_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
+                member.save()
+
+# CNC tools
+print("Updating CNC training dates")
+sessions = models.Session.objects.filter(course = 259)
+
+for session in sessions:
+    students = models.Training.objects.filter(session = session)
+    for student in students:
+        if student.attendance_status == "Attended":
+            member = get_member(student)
+            if not member.cnc_cert_date:
+                member.cnc_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
+                member.save()
 print('Done.')

@@ -376,10 +376,14 @@ class LockoutViewSet(viewsets.ViewSet, List):
             if member.paused_date: continue
 
             authorization = {}
+            authorization['id'] = member.id
+            authorization['name'] = member.first_name + " " + member.last_name
             authorization['common'] = bool(member.orientation_date or member.vetted_date)
             authorization['lathe'] = bool(member.lathe_cert_date)
             authorization['mill'] = bool(member.mill_cert_date)
             authorization['wood'] = bool(member.wood_cert_date)
+            authorization['wood2'] = bool(member.wood2_cert_date)
+            authorization['cnc'] = bool(member.cnc_cert_date)
 
             active_member_cards[card.card_number] = authorization
 
