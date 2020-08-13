@@ -613,6 +613,7 @@ export function AdminMemberCertifications(props) {
 						<Table.Cell>Common</Table.Cell>
 						<Table.Cell>{member.vetted_date || member.orientation_date ? 'Yes' : 'No'}</Table.Cell>
 						<Table.Cell><Link to='/courses/249'>New Members: Orientation and Basic Safety</Link></Table.Cell>
+						<Table.Cell><AdminCert name='Common' field='orientation_date' {...props} /></Table.Cell>
 					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Wood 1</Table.Cell>
