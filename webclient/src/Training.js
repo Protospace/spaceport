@@ -33,7 +33,7 @@ export function CertList(props) {
 					<Table.Cell><Link to='/courses/249'>New Members: Orientation and Basic Safety</Link></Table.Cell>
 				</Table.Row>
 				<Table.Row>
-					<Table.Cell>Wood 1 {MoreCert('Table saw, band saw.')}</Table.Cell>
+					<Table.Cell>Wood 1 {MoreCert('Table saw, band saw, chop saw, router.')}</Table.Cell>
 					<Table.Cell>{member.wood_cert_date ? 'Yes, ' + member.wood_cert_date : 'No'}</Table.Cell>
 					<Table.Cell><Link to='/courses/261'>Woodworking Tools 1: Intro to Saws</Link></Table.Cell>
 				</Table.Row>
