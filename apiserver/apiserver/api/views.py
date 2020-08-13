@@ -222,6 +222,20 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             if (user and training1.exists()) or training2.exists():
                 raise exceptions.ValidationError(dict(non_field_errors='Already registered.'))
 
+            if session.course.id == 249:
+                member.orientation_date = utils.today_alberta_tz() if status == 'Attended' else None
+            elif session.course.id == 261:
+                member.wood_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+            elif session.course.id == 401:
+                member.wood2_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+            elif session.course.id == 281:
+                member.lathe_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+            elif session.course.id == 283:
+                member.mill_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+            elif session.course.id == 259:
+                member.cnc_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+            member.save()
+
             serializer.save(user=user, member_id=member.id, attendance_status=status)
         else:
             training = models.Training.objects.filter(user=user, session=session)
@@ -239,7 +253,27 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         session = get_object_or_404(models.Session, id=session_id)
         if status == 'Waiting for payment' and session.cost == 0:
             status = 'Confirmed'
-        serializer.save(attendance_status=status)
+
+        training = serializer.save(attendance_status=status)
+
+        if training.user:
+            member = training.user.member
+        else:
+            member = models.Member.objects.get(id=training.member_id)
+
+        if session.course.id == 249:
+            member.orientation_date = utils.today_alberta_tz() if status == 'Attended' else None
+        elif session.course.id == 261:
+            member.wood_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+        elif session.course.id == 401:
+            member.wood2_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+        elif session.course.id == 281:
+            member.lathe_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+        elif session.course.id == 283:
+            member.mill_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+        elif session.course.id == 259:
+            member.cnc_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+        member.save()
 
 
 class TransactionViewSet(Base, List, Create, Retrieve, Update):
