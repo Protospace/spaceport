@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { TrainingList } from './Training.js';
 import { NotFound } from './Misc.js';
@@ -528,6 +528,124 @@ export function AdminMemberTraining(props) {
 			:
 				<p>None</p>
 			}
+
+		</div>
+	);
+};
+
+export function AdminCert(props) {
+	const { token, result, name, field, refreshResult } = props;
+	const member = result.member;
+	const [loading, setLoading] = useState(false);
+
+	const handleCert = (e) => {
+		e.preventDefault();
+		setLoading(true);
+		let data = Object();
+		data[field] = moment.utc().tz('America/Edmonton').format('YYYY-MM-DD');
+		requester('/members/' + member.id + '/', 'PATCH', token, data)
+		.then(res => {
+			refreshResult();
+		})
+		.catch(err => {
+			console.log(err);
+		});
+	};
+
+	const handleUncert = (e) => {
+		e.preventDefault();
+		setLoading(true);
+		let data = Object();
+		data[field] = null;
+		requester('/members/' + member.id + '/', 'PATCH', token, data)
+		.then(res => {
+			refreshResult();
+		})
+		.catch(err => {
+			console.log(err);
+		});
+	};
+
+	useEffect(() => {
+		setLoading(false);
+	}, [member[field]]);
+
+	return (
+		member[field] ?
+			<Button
+				onClick={handleUncert}
+				loading={loading}
+			>
+				Uncertify
+			</Button>
+		:
+			<Button
+				color='green'
+				onClick={handleCert}
+				loading={loading}
+			>
+				Certify {name}
+			</Button>
+	);
+}
+
+export function AdminMemberCertifications(props) {
+	const member = props.result.member;
+
+	return (
+		<div>
+			<Header size='medium'>Member Certifications</Header>
+
+			<p>These certifications control access to the lockouts.</p>
+
+			<Table basic='very'>
+				<Table.Header>
+					<Table.Row>
+						<Table.HeaderCell>Name</Table.HeaderCell>
+						<Table.HeaderCell>Certification</Table.HeaderCell>
+						<Table.HeaderCell>Course</Table.HeaderCell>
+						<Table.HeaderCell></Table.HeaderCell>
+					</Table.Row>
+				</Table.Header>
+
+				<Table.Body>
+					<Table.Row>
+						<Table.Cell>Common</Table.Cell>
+						<Table.Cell>{member.vetted_date || member.orientation_date ? 'Yes' : 'No'}</Table.Cell>
+						<Table.Cell><Link to='/courses/249'>New Members: Orientation and Basic Safety</Link></Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Wood 1</Table.Cell>
+						<Table.Cell>{member.wood_cert_date ? 'Yes, ' + member.wood_cert_date : 'No'}</Table.Cell>
+						<Table.Cell><Link to='/courses/261'>Woodworking Tools 1: Intro to Saws</Link></Table.Cell>
+						<Table.Cell><AdminCert name='Wood 1' field='wood_cert_date' {...props} /></Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Wood 2</Table.Cell>
+						<Table.Cell>{member.wood2_cert_date ? 'Yes, ' + member.wood2_cert_date : 'No'}</Table.Cell>
+						<Table.Cell><Link to='/courses/401'>Woodworking Tools 2: Jointer, Thickness Planer, Drum Sander</Link></Table.Cell>
+						<Table.Cell><AdminCert name='Wood 2' field='wood2_cert_date' {...props} /></Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Lathe</Table.Cell>
+						<Table.Cell>{member.lathe_cert_date ? 'Yes, ' + member.lathe_cert_date : 'No'}</Table.Cell>
+						<Table.Cell><Link to='/courses/281'>Metal: Metal Cutting & Manual Lathe</Link></Table.Cell>
+						<Table.Cell><AdminCert name='Lathe' field='lathe_cert_date' {...props} /></Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Mill</Table.Cell>
+						<Table.Cell>{member.mill_cert_date ? 'Yes, ' + member.mill_cert_date : 'No'}</Table.Cell>
+						<Table.Cell><Link to='/courses/283'>Metal: Manual Mill & Advanced Lathe</Link></Table.Cell>
+						<Table.Cell><AdminCert name='Mill' field='mill_cert_date' {...props} /></Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>CNC</Table.Cell>
+						<Table.Cell>{member.cnc_cert_date ? 'Yes, ' + member.cnc_cert_date : 'No'}</Table.Cell>
+						<Table.Cell><Link to='/courses/259'>Tormach: CAM and Tormach Intro</Link></Table.Cell>
+						<Table.Cell><AdminCert name='CNC' field='cnc_cert_date' {...props} /></Table.Cell>
+					</Table.Row>
+				</Table.Body>
+			</Table>
 
 		</div>
 	);
