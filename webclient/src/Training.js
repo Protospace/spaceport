@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-r
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Popup, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment';
-import { requester } from './utils.js';
+import { requester, getInstructor } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 
 export function CertList(props) {
@@ -84,7 +84,7 @@ export function TrainingList(props) {
 							<Link to={'/classes/'+x.session.id}>{moment(x.session.datetime).format('MMMM Do YYYY')}</Link>
 						</Table.Cell>
 						<Table.Cell>{x.attendance_status}</Table.Cell>
-						<Table.Cell>{x.session.instructor_name}</Table.Cell>
+						<Table.Cell>{getInstructor(x.session)}</Table.Cell>
 					</Table.Row>
 				)}
 			</Table.Body>
