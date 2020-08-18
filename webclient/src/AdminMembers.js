@@ -196,7 +196,8 @@ export function AdminMemberCards(props) {
 						<li>Select Datacard Printer, Print</li>
 						<li>Plug card scanner in</li>
 						<li>Open "RfidReader" on desktop</li>
-						<li>Scan card, copy the number</li>
+						<li>Scan card, add the number</li>
+						<li><b>Have them test their card</b></li>
 					</ol>
 				</>}
 
