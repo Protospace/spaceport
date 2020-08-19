@@ -150,7 +150,7 @@ export function Home(props) {
 
 	const mcPlayers = stats && stats['minecraft_players'] ? stats['minecraft_players'] : [];
 
-	const getTrackStat = (x) => stats && stats.track && stats.track[x] && moment().unix() - stats.track[x] > 60 ? 'Free' : 'In Use';
+	const getTrackStat = (x) => stats && stats.track && stats.track[x] ? moment().unix() - stats.track[x] > 60 ? 'Free' : 'In Use' : '?';
 	const getTrackLast = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]).tz('America/Edmonton').format('llll') : 'Unknown';
 	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]).tz('America/Edmonton').fromNow() : '';
 
