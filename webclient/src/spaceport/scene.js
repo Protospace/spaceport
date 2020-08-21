@@ -2,6 +2,10 @@ import * as THREE from 'three/build/three.module';
 import { Ship } from './Ship';
 
 export const scene = ({ ref }) => {
+	// TODO: add waves of ships
+	// TODO: add stars
+	// TODO: use aspect ratio to determine space docking point
+
 	let t = 0.01;
 	const shipInterval = 2;
 	let nextShip = shipInterval;
@@ -13,14 +17,23 @@ export const scene = ({ ref }) => {
 	renderer.setSize(width, height);
 
 	const camera = new THREE.PerspectiveCamera(65, width / height, 0.01, 1000);
+
 	camera.position.set(3, 0.5, 5);
 	camera.lookAt(new THREE.Vector3(-9, 0, 3));
 	scene.add(camera);
 
 	ref.current.appendChild(renderer.domElement);
 
+	const light = new THREE.DirectionalLight('#fff', 1);
+	light.position.x = 3;
+	light.position.z = 1;
+	scene.add(light);
+
 	var sphere = new THREE.SphereBufferGeometry(1);
-	var object = new THREE.Mesh(sphere, new THREE.MeshBasicMaterial(0xff0000));
+	var object = new THREE.Mesh(
+		sphere,
+		new THREE.MeshStandardMaterial(0xff0000, { flatShading: true })
+	);
 	var boxHelp = new THREE.BoxHelper(object, 0xffff00);
 	// scene.add(boxHelp);
 

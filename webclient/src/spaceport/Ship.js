@@ -14,14 +14,14 @@ export class Ship {
 		);
 		this.mesh = new THREE.Mesh(
 			shipGeo,
-			new THREE.MeshBasicMaterial(0xff0000)
+			new THREE.MeshStandardMaterial(0xff0000, { flatShading: true })
 		);
 		this.y = (Math.random() - 0.5) * 2;
 
 		this.hue = Math.floor(Math.random() * 360);
 
 		this.mesh.material.color.set(
-			new THREE.Color(`hsl(${this.hue},70%,80%)`)
+			new THREE.Color(`hsl(${this.hue},10%,40%)`)
 		);
 		this.mesh.position.x = (Math.random() - 0.5) * 2;
 		this.mesh.position.y = this.y;
