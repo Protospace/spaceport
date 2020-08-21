@@ -20,7 +20,8 @@
 		"react-scripts": "3.4.1",
 		"react-to-print": "~2.5.1",
 		"recharts": "~1.8.5",
-		"semantic-ui-react": "~0.88.2"
+		"semantic-ui-react": "~0.88.2",
+		"three": "^0.119.1"
 	},
 	"scripts": {
 		"start": "react-scripts start",
