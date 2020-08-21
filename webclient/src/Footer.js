@@ -1,69 +1,14 @@
 import React, { useRef, useEffect } from 'react';
 import { Container, Icon } from 'semantic-ui-react';
-import * as THREE from 'three/build/three.module';
-import { Ship } from './spaceport/Ship';
+
+import { scene } from './spaceport/scene';
 
 export const Footer = () => {
 	const footerRef = useRef();
 
 	useEffect(() => {
 		if (!footerRef.current) return;
-
-		let t = 0.01;
-		const shipInterval = 2;
-		let nextShip = shipInterval;
-
-		var scene = new THREE.Scene();
-		const renderer = new THREE.WebGLRenderer({ antialias: true });
-		renderer.setSize(
-			footerRef.current.clientWidth,
-			footerRef.current.clientHeight
-		);
-
-		const camera = new THREE.PerspectiveCamera(65, 1, 0.01, 1000);
-		camera.position.set(4, 1, 4);
-		camera.lookAt(new THREE.Vector3(-8, 0, -2));
-
-		scene.add(camera);
-
-		footerRef.current.appendChild(renderer.domElement);
-
-		let ships = [];
-		const ship = new Ship();
-		scene.add(ship.mesh);
-		ships.push(ship);
-
-		const animate = () => {
-			const deltaTime = 0.075;
-			t += deltaTime;
-
-			// get mouse
-
-			if (t > nextShip) {
-				console.log('bing');
-				const ship = new Ship();
-				scene.add(ship.mesh);
-				ships.push(ship);
-				nextShip += shipInterval + (Math.random() - 0.5) * 2;
-			}
-
-			for (const ship of ships) {
-				ship.update({ deltaTime });
-				if (ship.kill) {
-					console.log('killing ship');
-					scene.remove(ship.mesh);
-				}
-			}
-
-			ships = ships.filter((s) => !s.kill);
-
-			requestAnimationFrame(animate);
-			renderer.render(scene, camera);
-		};
-
-		animate();
-
-		renderer.render(scene, camera);
+		scene({ ref: footerRef });
 	}, [footerRef]);
 
 	return (

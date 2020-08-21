@@ -4,12 +4,12 @@ const SHIP_SIZE = 1;
 
 export class Ship {
 	constructor() {
-		this.life = Math.random() * 5 + 3;
+		this.life = Math.random() * 5 + 7;
 		this.flyIn = true;
 
 		const shipGeo = new THREE.BoxGeometry(
-			SHIP_SIZE * 0.3,
-			SHIP_SIZE * 0.3,
+			SHIP_SIZE * 0.1,
+			SHIP_SIZE * 0.1,
 			SHIP_SIZE
 		);
 		this.mesh = new THREE.Mesh(
@@ -39,7 +39,7 @@ export class Ship {
 				this.flyIn = false;
 				this.mesh.scale.z = 0.5;
 				this.mesh.material.color.set(
-					new THREE.Color(`hsl(${this.hue},70%,100%)`)
+					new THREE.Color(`hsl(${this.hue},0%,30%)`)
 				);
 			}
 		} else {
@@ -58,7 +58,7 @@ export class Ship {
 			// accelerate away
 		}
 
-		if (this.mesh.position.z > 5) {
+		if (this.mesh.position.z > 55) {
 			this.kill = true;
 		}
 	}
