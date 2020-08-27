@@ -13,6 +13,8 @@ export function Paymaster(props) {
 	const [locker, setLocker] = useState('5.00');
 	const [donate, setDonate] = useState('20.00');
 
+	const monthly_fees = user.member.monthly_fees || 55;
+
 	return (
 		<Container>
 			<Header size='large'>Paymaster</Header>
@@ -62,27 +64,27 @@ export function Paymaster(props) {
 			<Header size='medium'>Member Dues</Header>
 			<Grid stackable padded columns={3}>
 				<Grid.Column>
-					<p>Pay ${user.member.monthly_fees}.00 once:</p>
+					<p>Pay ${monthly_fees}.00 once:</p>
 					<PayPalPayNow
-						amount={user.member.monthly_fees}
+						amount={monthly_fees}
 						name='Protospace Membership'
 						custom={JSON.stringify({ member: user.member.id })}
 					/>
 				</Grid.Column>
 
 				<Grid.Column>
-					<p>Subscribe ${user.member.monthly_fees}.00 / month:</p>
+					<p>Subscribe ${monthly_fees}.00 / month:</p>
 					<PayPalSubscribe
-						amount={user.member.monthly_fees}
+						amount={monthly_fees}
 						name='Protospace Membership'
 						custom={JSON.stringify({ member: user.member.id })}
 					/>
 				</Grid.Column>
 
 				<Grid.Column>
-					<p>Pay ${user.member.monthly_fees * 11}.00 for a year:</p>
+					<p>Pay ${monthly_fees * 11}.00 for a year:</p>
 					<PayPalPayNow
-						amount={user.member.monthly_fees * 11}
+						amount={monthly_fees * 11}
 						name='Protospace Membership'
 						custom={JSON.stringify({ deal: 12, member: user.member.id })}
 					/>
