@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Link, useParams, useLocation } from 'react-router-dom';
 import moment from 'moment-timezone';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Popup, Segment, Table } from 'semantic-ui-react';
@@ -131,6 +131,9 @@ export function Home(props) {
 	const { user } = props;
 	const [stats, setStats] = useState(JSON.parse(localStorage.getItem('stats', 'false')));
 	const [refreshCount, refreshStats] = useReducer(x => x + 1, 0);
+	const location = useLocation();
+
+	const bypass_code = location.hash.replace('#', '');
 
 	useEffect(() => {
 		requester('/stats/', 'GET')
@@ -172,9 +175,18 @@ export function Home(props) {
 							</div>
 					:
 						<div>
-							<LoginForm {...props} />
+							{bypass_code ?
+								<Message warning>
+									<Message.Header>Outside Registration</Message.Header>
+									<p>This page allows you to sign up from outside of Protospace.</p>
+								</Message>
+							:
+								<>
+									<LoginForm {...props} />
 
-							<Divider section horizontal>Or</Divider>
+									<Divider section horizontal>Or</Divider>
+								</>
+							}
 
 							<SignupForm {...props} />
 						</div>
