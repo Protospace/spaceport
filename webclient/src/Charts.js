@@ -87,9 +87,9 @@ export function Charts(props) {
 				}
 			</p>
 
-			<p>The Member Count is the amount of Prepaid, Current, Due, and Overdue members on Spaceport.</p>
+			<p>Member Count: number of Prepaid, Current, Due, and Overdue members on Spaceport.</p>
 
-			<p>The Green Count is the amount of Prepaid and Current members.</p>
+			<p>Green Count: number of Prepaid and Current members.</p>
 
 			<Header size='medium'>Space Activity</Header>
 
@@ -118,7 +118,7 @@ export function Charts(props) {
 				}
 			</p>
 
-			<p>Cards Scans is the number of individual members who have scanned to enter the space.</p>
+			<p>Cards Scans: number of individual members who have scanned to enter the space.</p>
 
 			<Header size='medium'>Signup Count</Header>
 
@@ -146,14 +146,14 @@ export function Charts(props) {
 								type='monotone'
 								dataKey='vetted_count'
 								fill='#80b3d3'
-								name='Vetted Count'
+								name='Later Vetted Count'
 								maxBarSize={20}
 								animationDuration={1200}
 							/>
 							<Bar
 								type='monotone'
 								dataKey='retain_count'
-								name='Retain Count'
+								name='Retained Count'
 								fill='#82ca9d'
 								maxBarSize={20}
 								animationDuration={1400}
@@ -163,11 +163,11 @@ export function Charts(props) {
 				}
 			</p>
 
-			<p>The Signup Count is the number of brand new account registrations that month.</p>
+			<p>Signup Count: number of brand new account registrations that month.</p>
 
-			<p>The Vetted Count is the number of those signups who eventually got vetted (at a later date).</p>
+			<p>Later Vetted Count: number of those signups who eventually got vetted (at a later date).</p>
 
-			<p>The Retain Count is the number of those signups who are still a member currently.</p>
+			<p>Retained Count: number of those signups who are still a member currently.</p>
 
 		</Container>
 	);
