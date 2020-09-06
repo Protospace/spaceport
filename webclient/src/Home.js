@@ -229,7 +229,7 @@ export function Home(props) {
 										</p>
 									</React.Fragment>
 								} trigger={<a>[more]</a>} />
-							{' '}<a href='http://games.protospace.ca:8123' target='_blank'>[map]</a>
+							{' '}<a href='http://games.protospace.ca:8123/?worldname=world&mapname=flat&zoom=3&x=74&y=64&z=354' target='_blank'>[map]</a>
 							</p>
 
 							<p>
