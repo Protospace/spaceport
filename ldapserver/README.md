@@ -17,3 +17,11 @@ That means you have the right to study, change, and distribute the software and 
 ## Acknowledgements
 
 Thanks to Pat S for all his help integrating with Active Directory.
+
+## Changes in this branch
+
+Added 4 functions for managing groups:
+- Add Group
+- list Group (Lists members of the group)
+- Add_to_group (Add a user to a group)
+- is_member (Checks to see if a user is a member of a group.)
