@@ -100,7 +100,7 @@ def set_password(username, password):
 
 def find_group(groupname):
     '''
-    Search for a group by name or sAMAccountname.  Retrun the DN
+    Search for a group by name or sAMAccountname
     '''
     ldap_conn = init_ldap()
     try:
@@ -112,7 +112,6 @@ def find_group(groupname):
             abort(HTTP_NOTFOUND)
 
         return results[0][0]
-        
     finally:
         ldap_conn.unbind()
 
@@ -134,6 +133,26 @@ def create_group(groupname,description):
         ]
 
         rcode = ldap_conn.add_s(dn, ldif)
+        return rcode
+
+    finally:
+        ldap_conn.unbind()
+
+def add_to_group(groupname,username):
+    '''
+    Add a user to a Group;  required data is GroupName, Username
+    '''
+    ldap_conn = init_ldap()
+    try:
+        ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
+        group_dn = find_group(groupname)
+        user_dn = find_user(username)
+        
+        # -- TODO: Check to see if user is already a member, skip if not needed (Done)
+        if not is_member(groupname,username):
+            mod_acct = [(ldap.MOD_ADD, 'member', user_dn.encode())]
+            ldap_conn.modify_s(group_dn, mod_acct)
+        return(True)
 
     finally:
         ldap_conn.unbind()
@@ -153,57 +172,51 @@ def list_group(groupname):
         members_tmp = results[0][1]['member']
         for m in members_tmp:
              members.append(m)
-#             print("m = {}".format(m)) #Debug
         
         return(members)
 
     finally:
         ldap_conn.unbind()
 
-def add_to_group(groupname,username):
+def is_member(groupname,username):
+    ''' 
+    Checks to see if a user is a member of a group
     '''
-    Add a user to a Group;  required data is GroupName, Username
-    '''
-    print("== Enter add_to_group ==")
     ldap_conn = init_ldap()
     try:
-        print(' --- Enter add_to_group with {0}, {1}---'.format(groupname,username))
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
-        # get DN of the groupname
-        group_dn = find_group(groupname) 
-        
-        #get DN of the username
+        group_dn = find_group(groupname)
         user_dn = find_user(username)
+        memflag = False
+        criteria = '(&(objectClass=group)(sAMAccountName={}))'.format(groupname)
+        results = ldap_conn.search_s(BASE_GROUPS, ldap.SCOPE_SUBTREE, criteria, ['member'] )
+        members_tmp = results[0][1]['member']
         
-        # -- TODO: Check to see if user is already a member, skip if not needed
+        for m in members_tmp:
+             if m == user_dn:
+                memflag = True
         
-        mod_acct = [(ldap.MOD_ADD, 'member', user_dn.encode())]
-        result = ldap_conn.modify_s(group_dn, mod_acct)
-
+        return memflag
+        
     finally:
         ldap_conn.unbind()
 
+def abort(message):
+    print(message)
+    exit()
+    
 
-
+# ===========================================================================
 if __name__ == '__main__':
     #print(find_user('tanner.collin'))
-    #print(set_password('dsaftanner.collin', 'Supersecret@@'))
-    
-    # create a new group
-    create_group("testgroup")
-    print(find_group("testgroup")
-    
-    # List Group members
-    print("-- Members of {}".format("Laser Trainers"))
-    group_members = list_group("Laser Trainers")
-    for member in group_members:
-        print('{}'.format(member))
-    
-    # add users to test group
-    add_to_group("testgroup","pat.spencer")
-    add_to_group("testgroup","Tanner.Collin")
-    # List Group members
-    print("-- Members of {}".format("testgroup"))
-    group_members = list_group("testgroup")
-    for member in group_members:
-        print('{}'.format(member))
+    #print(set_password('tanner.collin', 'Supersecret@@'))
+    print("============================================================")
+    print(create_group("newgroup","new group"))
+    print("   ==============  ")
+    print(list_group("newgroup"))
+    print("   ==============  ")
+    print(is_member('newgroup','tanner.collin'))
+    print("   ==============  ")
+    print(add_to_group('newgroup','tanner.collin'))
+    print("   ==============  ")
+    print(list_group("newgroup"))
