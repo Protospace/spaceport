@@ -147,7 +147,7 @@ def add_to_group(groupname,username):
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
         group_dn = find_group(groupname)
         user_dn = find_user(username)
-        
+
         # -- TODO: Check to see if user is already a member, skip if not needed (Done)
         if not is_member(groupname,username):
             mod_acct = [(ldap.MOD_ADD, 'member', user_dn.encode())]
@@ -179,7 +179,7 @@ def list_group(groupname):
         ldap_conn.unbind()
 
 def is_member(groupname,username):
-    ''' 
+    '''
     Checks to see if a user is a member of a group
     '''
     ldap_conn = init_ldap()
@@ -195,7 +195,7 @@ def is_member(groupname,username):
         for m in members_tmp:
              if m == user_dn:
                 memflag = True
-        
+
         return memflag
         
     finally:
@@ -204,7 +204,7 @@ def is_member(groupname,username):
 def abort(message):
     print(message)
     exit()
-    
+
 
 # ===========================================================================
 if __name__ == '__main__':
