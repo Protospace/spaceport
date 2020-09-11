@@ -36,14 +36,14 @@ def convert(data):
     else:
         return data
 
-def find_user(username):
+def find_user(query):
     '''
-    Search for a user by sAMAccountname
+    Search for a user by sAMAccountname or email
     '''
     ldap_conn = init_ldap()
     try:
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
-        criteria = '(&(objectClass=user)(sAMAccountName={})(!(objectClass=computer)))'.format(username)
+        criteria = '(&(objectClass=user)(|(mail={})(sAMAccountName={}))(!(objectClass=computer)))'.format(query, query)
         results = ldap_conn.search_s(BASE_MEMBERS, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName','email'])
 
         if len(results) != 1:
@@ -267,6 +267,7 @@ def dump_users():
 
 
 # ===========================================================================
+
         #guid = '\\b4\\51\\1adce6709c449bd21a812c423e82'
         #guid = ''.join(['\\%s' % guid[i:i+2] for i in range(0, len(guid), 2)])
         #print(guid)
@@ -275,6 +276,7 @@ def dump_users():
 if __name__ == '__main__':
     pass
     #print(find_user('tanner.collin'))
+    #print(find_user('mail@tannercollin.com'))
     #print(set_password('tanner.collin', 'Supersecret@@'))
     #print(find_dn('CN=Tanner Collin,OU=MembersOU,DC=ps,DC=protospace,DC=ca'))
     #print("============================================================")
@@ -292,3 +294,7 @@ if __name__ == '__main__':
     #print("   ==============  ")
     #print(list_group("newgroup"))
     #print(dump_users())
+
+    #users = list_group('Laser Users')
+    #import json
+    #print(json.dumps(users, indent=4))
