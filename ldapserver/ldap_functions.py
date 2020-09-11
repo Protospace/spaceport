@@ -23,6 +23,19 @@ def init_ldap():
 
     return ldap_conn
 
+def convert(data):
+    if isinstance(data, dict):
+        return {convert(key): convert(value) for key, value in data.items()}
+    elif isinstance(data, (list, tuple)):
+        if len(data) == 1:
+            return convert(data[0])
+        else:
+            return [convert(element) for element in data]
+    elif isinstance(data, (bytes, bytearray)):
+        return data.decode()
+    else:
+        return data
+
 def find_user(username):
     '''
     Search for a user by sAMAccountname
@@ -31,12 +44,26 @@ def find_user(username):
     try:
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
         criteria = '(&(objectClass=user)(sAMAccountName={})(!(objectClass=computer)))'.format(username)
-        results = ldap_conn.search_s(BASE_MEMBERS, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName','email'] )
+        results = ldap_conn.search_s(BASE_MEMBERS, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName','email'])
 
         if len(results) != 1:
             abort(HTTP_NOTFOUND)
 
         return results[0][0]
+    finally:
+        ldap_conn.unbind()
+
+def find_dn(dn):
+    '''
+    Search for a user by dn
+    '''
+    ldap_conn = init_ldap()
+    try:
+        ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
+        criteria = '(&(objectClass=user)(!(objectClass=computer)))'
+        results = ldap_conn.search_s(dn, ldap.SCOPE_SUBTREE, criteria, ['sAMAccountName'])
+
+        return results[0][1]['sAMAccountName'][0].decode()
     finally:
         ldap_conn.unbind()
 
@@ -188,9 +215,11 @@ def list_group(groupname):
         group_dn = find_group(groupname)
         
         criteria = '(&(objectClass=group)(sAMAccountName={}))'.format(groupname)
-        results = ldap_conn.search_s(BASE_GROUPS, ldap.SCOPE_SUBTREE, criteria, ['member'] )
+        results = ldap_conn.search_s(BASE_GROUPS, ldap.SCOPE_SUBTREE, criteria, ['member'])
         members_tmp = results[0][1]
-        return members_tmp.get('member', [])
+        members = members_tmp.get('member', [])
+        return [find_dn(dn.decode()) for dn in members]
+
     finally:
         ldap_conn.unbind()
 
@@ -212,16 +241,46 @@ def is_member(groupname, username):
     finally:
         ldap_conn.unbind()
 
+def dump_users():
+    '''
+    Dump all AD users
+    '''
+    ldap_conn = init_ldap()
+    try:
+        ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
+        criteria = '(&(objectClass=user)(sAMAccountName=*))'
+        attributes = ['cn', 'sAMAccountName', 'mail', 'displayName', 'givenName', 'name', 'sn', 'logonCount']
+        results = ldap_conn.search_s(BASE_MEMBERS, ldap.SCOPE_SUBTREE, criteria, attributes)
+        results = convert(results)
+
+        output = {}
+        for r in results:
+            tmp = r[1]
+            tmp['dn'] = r[0]
+            output[r[1]['sAMAccountName']] = tmp
+
+        import json
+        return json.dumps(output, indent=4)
+
+    finally:
+        ldap_conn.unbind()
+
 
 # ===========================================================================
+        #guid = '\\b4\\51\\1adce6709c449bd21a812c423e82'
+        #guid = ''.join(['\\%s' % guid[i:i+2] for i in range(0, len(guid), 2)])
+        #print(guid)
+        #criteria = '(&(objectClass=user)(objectGUID={}))'.format(guid)
+
 if __name__ == '__main__':
     pass
     #print(find_user('tanner.collin'))
     #print(set_password('tanner.collin', 'Supersecret@@'))
+    #print(find_dn('CN=Tanner Collin,OU=MembersOU,DC=ps,DC=protospace,DC=ca'))
     #print("============================================================")
     #print(create_group("newgroup", "new group"))
     #print("   ==============  ")
-    #print(list_group("newgroup"))
+    #print(list_group("Laser Users"))
     #print("   ==============  ")
     #print(is_member('newgroup','tanner.collin'))
     #print("   ==============  ")
@@ -232,3 +291,4 @@ if __name__ == '__main__':
     #print(remove_from_group('newgroup','tanner.collin'))
     #print("   ==============  ")
     #print(list_group("newgroup"))
+    #print(dump_users())
