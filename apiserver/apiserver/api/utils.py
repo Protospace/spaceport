@@ -19,11 +19,6 @@ from django.core.cache import cache
 from django.utils.timezone import now, pytz
 
 from . import models, serializers, utils_ldap
-try:
-    from . import old_models
-except ImportError:
-    logger.info('Running without old portal data...')
-    old_models = None
 
 STATIC_FOLDER = 'data/static/'
 
@@ -292,10 +287,6 @@ def link_old_member(data, user):
     Since this runs AFTER registration, we need to delete the user on any
     failures or else the username will be taken when they try again
     '''
-    if not old_models:
-        msg = 'Unable to link, old DB wasn\'t imported.'
-        logger.info(msg)
-        raise ValidationError(dict(email=msg))
 
     try:
         member = models.Member.objects.get(old_email__iexact=data['email'])
@@ -342,12 +333,11 @@ def link_old_member(data, user):
     models.Training.objects.filter(member_id=member.id).update(user=user)
 
 def create_new_member(data, user):
-    if old_models:
-        old_members = old_models.Members.objects.using('old_portal')
-        if old_members.filter(email__iexact=data['email']).exists():
-            msg = 'Account was found in old portal.'
-            logger.info(msg)
-            raise ValidationError(dict(email=msg))
+    members = models.Member.objects
+    if members.filter(old_email__iexact=data['email']).exists():
+        msg = 'Account was found in old portal.'
+        logger.info(msg)
+        raise ValidationError(dict(email=msg))
 
     if utils_ldap.is_configured():
         result = utils_ldap.find_user(user.username)
