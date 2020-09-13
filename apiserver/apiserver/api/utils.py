@@ -309,15 +309,18 @@ def link_old_member(data, user):
         if result == 200:
             if utils_ldap.set_password(data) != 200:
                 msg = 'Problem connecting to LDAP server: set.'
+                alert_tanner(msg)
                 logger.info(msg)
                 raise ValidationError(dict(non_field_errors=msg))
         elif result == 404:
             if utils_ldap.create_user(data) != 200:
                 msg = 'Problem connecting to LDAP server: create.'
+                alert_tanner(msg)
                 logger.info(msg)
                 raise ValidationError(dict(non_field_errors=msg))
         else:
             msg = 'Problem connecting to LDAP server: find.'
+            alert_tanner(msg)
             logger.info(msg)
             raise ValidationError(dict(non_field_errors=msg))
 
@@ -349,11 +352,13 @@ def create_new_member(data, user):
             pass
         else:
             msg = 'Problem connecting to LDAP server.'
+            alert_tanner(msg)
             logger.info(msg)
             raise ValidationError(dict(non_field_errors=msg))
 
         if utils_ldap.create_user(data) != 200:
             msg = 'Problem connecting to LDAP server: create.'
+            alert_tanner(msg)
             logger.info(msg)
             raise ValidationError(dict(non_field_errors=msg))
 

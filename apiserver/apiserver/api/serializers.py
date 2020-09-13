@@ -447,7 +447,10 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
 
         if utils_ldap.is_configured():
             if utils_ldap.set_password(data) != 200:
-                raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: set.'))
+                msg = 'Problem connecting to LDAP server: set.'
+                utils.alert_tanner(msg)
+                logger.info(msg)
+                raise ValidationError(dict(non_field_errors=msg))
 
         super().save()
 
