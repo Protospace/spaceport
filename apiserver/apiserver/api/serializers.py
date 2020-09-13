@@ -144,6 +144,8 @@ class MemberSerializer(serializers.ModelSerializer):
             'wood_cert_date',
             'wood2_cert_date',
             'cnc_cert_date',
+            'rabbit_cert_date',
+            'trotec_cert_date',
         ]
 
     def get_status(self, obj):
