@@ -1,6 +1,24 @@
 from flask import Flask, abort, request
 app = Flask(__name__)
 
+from logging.config import dictConfig
+
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] [%(process)d] [%(levelname)7s] %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://flask.logging.wsgi_errors_stream',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
+
 import ldap_functions
 import secrets
 
@@ -50,8 +68,8 @@ def set_password():
 def add_to_group():
     check_auth()
 
-    groupname = request.form['groupname']
-    username = request.form['username']
+    groupname = request.form['group']
+    username = request.form.get('username', None) or request.form.get('email', None)
 
     ldap_functions.add_to_group(groupname, username)
     return ''
@@ -60,8 +78,8 @@ def add_to_group():
 def remove_from_group():
     check_auth()
 
-    groupname = request.form['groupname']
-    username = request.form['username']
+    groupname = request.form['group']
+    username = request.form.get('username', None) or request.form.get('email', None)
 
     ldap_functions.remove_from_group(groupname, username)
     return ''
