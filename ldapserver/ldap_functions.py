@@ -194,6 +194,7 @@ def add_to_group(groupname, username):
             ldap_conn.modify_s(group_dn, mod_acct)
             return True
         else:
+            logger.info('Already a member, skipping')
             return False
 
     finally:
@@ -214,6 +215,7 @@ def remove_from_group(groupname, username):
             ldap_conn.modify_s(group_dn, mod_acct)
             return True
         else:
+            logger.info('Not a member, skipping')
             return False
 
     finally:
@@ -243,6 +245,7 @@ def is_member(groupname, username):
     '''
     ldap_conn = init_ldap()
     try:
+        logger.info('Checking group membership...')
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
         group_dn = find_group(groupname)
         user_dn = find_user(username).encode()
@@ -308,6 +311,6 @@ if __name__ == '__main__':
     #print(list_group("newgroup"))
     #print(dump_users())
 
-    users = list_group('Laser Users')
-    import json
-    print(json.dumps(users, indent=4))
+    #users = list_group('Laser Users')
+    #import json
+    #print(json.dumps(users, indent=4))
