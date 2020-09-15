@@ -68,8 +68,10 @@ class AttendanceSheet extends React.Component {
 function AttendanceRow(props) {
 	const { student, token, refreshClass } = props;
 	const [error, setError] = useState(false);
+	const [loading, setLoading] = useState(false);
 
 	const handleMark = (newStatus) => {
+		setLoading(newStatus);
 		const data = { ...student, attendance_status: newStatus };
 		requester('/training/'+student.id+'/', 'PATCH', token, data)
 		.then(res => {
@@ -86,7 +88,12 @@ function AttendanceRow(props) {
 		onClick: () => handleMark(name),
 		toggle: true,
 		active: student.attendance_status === name,
+		loading: loading === name,
 	});
+
+	useEffect(() => {
+		setLoading(false);
+	}, [student.attendance_status]);
 
 	return (
 		<div className='attendance-row'>
