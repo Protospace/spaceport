@@ -1,8 +1,4 @@
-import logging
-logger = logging.getLogger(__name__)
-
-logging.info('Logging enabled.')
-
+from log import logger
 import time
 import ldap
 import ldap.modlist as modlist
@@ -12,14 +8,12 @@ import base64
 from flask import abort
 
 HTTP_NOTFOUND = 404
-BASE_MEMBERS = 'OU=MembersOU,DC=lab39,DC=lab' # prod
-BASE_GROUPS = 'OU=MembersOU,DC=lab39,DC=lab' # prod
 
 ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
-ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, './lab39-dc1.cer')
+ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, secrets.LDAP_CERTFILE)
 
 def init_ldap():
-    ldap_conn = ldap.initialize('ldaps://ldap.lab39.lab:636')
+    ldap_conn = ldap.initialize(secrets.LDAP_URL)
     ldap_conn.set_option(ldap.OPT_REFERRALS, 0)
     ldap_conn.set_option(ldap.OPT_PROTOCOL_VERSION, 3)
     ldap_conn.set_option(ldap.OPT_X_TLS,ldap.OPT_X_TLS_DEMAND)
@@ -50,10 +44,10 @@ def find_user(query):
     '''
     ldap_conn = init_ldap()
     try:
-        logger.info('Looking up user', query)
+        logger.info('Looking up user ' + query)
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
         criteria = '(&(objectClass=user)(|(mail={})(sAMAccountName={}))(!(objectClass=computer)))'.format(query, query)
-        results = ldap_conn.search_s(BASE_MEMBERS, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName','email'])
+        results = ldap_conn.search_s(secrets.BASE_MEMBERS, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName','email'])
 
         logger.info(results)
 
@@ -86,7 +80,7 @@ def create_user(first, last, username, email, password):
     ldap_conn = init_ldap()
     try:
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
-        dn = 'CN={} {},{}'.format(first, last, BASE_MEMBERS)
+        dn = 'CN={} {},{}'.format(first, last, secrets.BASE_MEMBERS)
         full_name = '{} {}'.format(first, last)
 
         ldif = [
@@ -127,7 +121,7 @@ def set_password(username, password):
     try:
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
         criteria = '(&(objectClass=user)(sAMAccountName={})(!(objectClass=computer)))'.format(username)
-        results = ldap_conn.search_s(BASE_MEMBERS, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName','email'] )
+        results = ldap_conn.search_s(secrets.BASE_MEMBERS, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName','email'] )
 
         if len(results) != 1:
             abort(HTTP_NOTFOUND)
@@ -148,10 +142,10 @@ def find_group(groupname):
     '''
     ldap_conn = init_ldap()
     try:
-        logger.info('Looking up group', groupname)
+        logger.info('Looking up group ' + groupname)
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
         criteria = '(&(objectClass=group)(sAMAccountName={}))'.format(groupname)
-        results = ldap_conn.search_s(BASE_GROUPS, ldap.SCOPE_SUBTREE, criteria, ['name','groupType'] )
+        results = ldap_conn.search_s(secrets.BASE_GROUPS, ldap.SCOPE_SUBTREE, criteria, ['name','groupType'] )
 
         logger.info(results)
 
@@ -169,7 +163,7 @@ def create_group(groupname, description):
     ldap_conn = init_ldap()
     try:
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
-        dn = 'CN={},{}'.format(groupname, BASE_GROUPS)
+        dn = 'CN={},{}'.format(groupname, secrets.BASE_GROUPS)
 
         ldif = [
             ('objectClass', [b'top', b'group']),
@@ -235,7 +229,7 @@ def list_group(groupname):
         group_dn = find_group(groupname)
         
         criteria = '(&(objectClass=group)(sAMAccountName={}))'.format(groupname)
-        results = ldap_conn.search_s(BASE_GROUPS, ldap.SCOPE_SUBTREE, criteria, ['member'])
+        results = ldap_conn.search_s(secrets.BASE_GROUPS, ldap.SCOPE_SUBTREE, criteria, ['member'])
         members_tmp = results[0][1]
         members = members_tmp.get('member', [])
         return [find_dn(dn.decode()) for dn in members]
@@ -254,7 +248,7 @@ def is_member(groupname, username):
         user_dn = find_user(username).encode()
         memflag = False
         criteria = '(&(objectClass=group)(sAMAccountName={}))'.format(groupname)
-        results = ldap_conn.search_s(BASE_GROUPS, ldap.SCOPE_SUBTREE, criteria, ['member'] )
+        results = ldap_conn.search_s(secrets.BASE_GROUPS, ldap.SCOPE_SUBTREE, criteria, ['member'] )
         members_tmp = results[0][1]
         members = members_tmp.get('member', [])
         return user_dn in members
@@ -270,7 +264,7 @@ def dump_users():
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
         criteria = '(&(objectClass=user)(objectGUID=*))'
         attributes = ['cn', 'sAMAccountName', 'mail', 'displayName', 'givenName', 'name', 'sn', 'logonCount', 'objectGUID']
-        results = ldap_conn.search_s(BASE_MEMBERS, ldap.SCOPE_SUBTREE, criteria, attributes)
+        results = ldap_conn.search_s(secrets.BASE_MEMBERS, ldap.SCOPE_SUBTREE, criteria, attributes)
         results = convert(results)
 
         output = {}
@@ -295,7 +289,7 @@ def dump_users():
 if __name__ == '__main__':
     pass
     #print(create_user('Elon', 'Tusk', 'elon.tusk', 'elont@example.com', 'protospace*&^g87g6'))
-    print(find_user('test.testerb'))
+    #print(find_user('test.testerb'))
     #print(set_password('tanner.collin', 'Supersecret@@'))
     #print(find_dn('CN=Tanner Collin,OU=MembersOU,DC=ps,DC=protospace,DC=ca'))
     #print("============================================================")
@@ -314,6 +308,6 @@ if __name__ == '__main__':
     #print(list_group("newgroup"))
     #print(dump_users())
 
-    #users = list_group('Laser Users')
-    #import json
-    #print(json.dumps(users, indent=4))
+    users = list_group('Laser Users')
+    import json
+    print(json.dumps(users, indent=4))
