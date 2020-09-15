@@ -646,6 +646,18 @@ export function AdminMemberCertifications(props) {
 						<Table.Cell><Link to='/courses/259'>Tormach: CAM and Tormach Intro</Link></Table.Cell>
 						<Table.Cell><AdminCert name='CNC' field='cnc_cert_date' {...props} /></Table.Cell>
 					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Rabbit Laser</Table.Cell>
+						<Table.Cell>{member.rabbit_cert_date ? 'Yes, ' + member.rabbit_cert_date : 'No'}</Table.Cell>
+						<Table.Cell><Link to='/courses/247'>Laser: Cutting and Engraving</Link></Table.Cell>
+						<Table.Cell><AdminCert name='Rabbit' field='rabbit_cert_date' {...props} /></Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Trotec Laser</Table.Cell>
+						<Table.Cell>{member.trotec_cert_date ? 'Yes, ' + member.trotec_cert_date : 'No'}</Table.Cell>
+						<Table.Cell><Link to='/courses/321'>Laser: Trotec Course</Link></Table.Cell>
+						<Table.Cell><AdminCert name='Trotec' field='trotec_cert_date' {...props} /></Table.Cell>
+					</Table.Row>
 				</Table.Body>
 			</Table>
 
