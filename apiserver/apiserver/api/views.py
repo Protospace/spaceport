@@ -200,81 +200,8 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         else:
             return serializers.StudentTrainingSerializer
 
-    # TODO: turn these into @actions
-    # TODO: check if full, but not for instructors
-    # TODO: if already paid, skip to confirmed
-    def perform_create(self, serializer):
-        user = self.request.user
-        data = self.request.data
-        session_id = data['session']
-        status = data['attendance_status']
-        session = get_object_or_404(models.Session, id=session_id)
-
-        if data.get('member_id', None):
-            if not (is_admin_director(user) or session.instructor == user):
-                raise exceptions.ValidationError('Not allowed to register others')
-
-            member = get_object_or_404(models.Member, id=data['member_id'])
-            user = getattr(member, 'user', None)
-
-            training1 = models.Training.objects.filter(user=user, session=session)
-            training2 = models.Training.objects.filter(member_id=member.id, session=session)
-            if (user and training1.exists()) or training2.exists():
-                raise exceptions.ValidationError(dict(non_field_errors='Already registered.'))
-
-            if session.course.id == 249:
-                member.orientation_date = utils.today_alberta_tz() if status == 'Attended' else None
-            elif session.course.id == 261:
-                member.wood_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-            elif session.course.id == 401:
-                member.wood2_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-            elif session.course.id == 281:
-                member.lathe_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-            elif session.course.id == 283:
-                member.mill_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-            elif session.course.id == 259:
-                member.cnc_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-            elif session.course.id == 247:
-                member.rabbit_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-
-                if status == 'Attended':
-                    utils_ldap.add_to_group(member, 'Laser Users')
-                else:
-                    utils_ldap.remove_from_group(member, 'Laser Users')
-            elif session.course.id == 321:
-                member.trotec_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-
-                if status == 'Attended':
-                    utils_ldap.add_to_group(member, 'Trotec Users')
-                else:
-                    utils_ldap.remove_from_group(member, 'Trotec Users')
-            member.save()
-
-            serializer.save(user=user, member_id=member.id, attendance_status=status)
-        else:
-            training = models.Training.objects.filter(user=user, session=session)
-            if training.exists():
-                raise exceptions.ValidationError('Already registered')
-            if user == session.instructor:
-                raise exceptions.ValidationError('You are teaching this session')
-            if status == 'Waiting for payment' and session.cost == 0:
-                status = 'Confirmed'
-            serializer.save(user=user, attendance_status=status)
-
-    def perform_update(self, serializer):
-        session_id = self.request.data['session']
-        status = self.request.data['attendance_status']
-        session = get_object_or_404(models.Session, id=session_id)
-        if status == 'Waiting for payment' and session.cost == 0:
-            status = 'Confirmed'
-
-        training = serializer.save(attendance_status=status)
-
-        if training.user:
-            member = training.user.member
-        else:
-            member = models.Member.objects.get(id=training.member_id)
-
+    def update_cert(self, session, member, status):
+        # always update cert date incase member is returning and gets recertified
         if session.course.id == 249:
             member.orientation_date = utils.today_alberta_tz() if status == 'Attended' else None
         elif session.course.id == 261:
@@ -302,6 +229,57 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             else:
                 utils_ldap.remove_from_group(member, 'Trotec Users')
         member.save()
+
+    # TODO: turn these into @actions
+    # TODO: check if full, but not for instructors
+    # TODO: if already paid, skip to confirmed
+    def perform_create(self, serializer):
+        user = self.request.user
+        data = self.request.data
+        session_id = data['session']
+        status = data['attendance_status']
+        session = get_object_or_404(models.Session, id=session_id)
+
+        if data.get('member_id', None):
+            if not (is_admin_director(user) or session.instructor == user):
+                raise exceptions.ValidationError('Not allowed to register others')
+
+            member = get_object_or_404(models.Member, id=data['member_id'])
+            user = getattr(member, 'user', None)
+
+            training1 = models.Training.objects.filter(user=user, session=session)
+            training2 = models.Training.objects.filter(member_id=member.id, session=session)
+            if (user and training1.exists()) or training2.exists():
+                raise exceptions.ValidationError(dict(non_field_errors='Already registered.'))
+
+            self.update_cert(session, member, status)
+
+            serializer.save(user=user, member_id=member.id, attendance_status=status)
+        else:
+            training = models.Training.objects.filter(user=user, session=session)
+            if training.exists():
+                raise exceptions.ValidationError('Already registered')
+            if user == session.instructor:
+                raise exceptions.ValidationError('You are teaching this session')
+            if status == 'Waiting for payment' and session.cost == 0:
+                status = 'Confirmed'
+            serializer.save(user=user, attendance_status=status)
+
+    def perform_update(self, serializer):
+        session_id = self.request.data['session']
+        status = self.request.data['attendance_status']
+        session = get_object_or_404(models.Session, id=session_id)
+        if status == 'Waiting for payment' and session.cost == 0:
+            status = 'Confirmed'
+
+        training = serializer.save(attendance_status=status)
+
+        if training.user:
+            member = training.user.member
+        else:
+            member = models.Member.objects.get(id=training.member_id)
+
+        self.update_cert(session, member, status)
 
 
 class TransactionViewSet(Base, List, Create, Retrieve, Update):

@@ -71,6 +71,6 @@ def remove_from_group(member, group):
     except BaseException as e:
         logger.error('LDAP Group - {} - {}'.format(e.__class__.__name__, str(e)))
         m = '{} {} ({})'.format(member.first_name, member.last_name, member.id)
-        msg = 'Problem adding {} to group {}!'.format(m, group)
+        msg = 'Problem removing {} from group {}!'.format(m, group)
         utils.alert_tanner(msg)
         logger.info(msg)
