@@ -50,8 +50,8 @@ def set_password():
 def add_to_group():
     check_auth()
 
-    groupname = request.form['groupname']
-    username = request.form['username']
+    groupname = request.form['group']
+    username = request.form.get('username', None) or request.form.get('email', None)
 
     ldap_functions.add_to_group(groupname, username)
     return ''
@@ -60,8 +60,8 @@ def add_to_group():
 def remove_from_group():
     check_auth()
 
-    groupname = request.form['groupname']
-    username = request.form['username']
+    groupname = request.form['group']
+    username = request.form.get('username', None) or request.form.get('email', None)
 
     ldap_functions.remove_from_group(groupname, username)
     return ''
