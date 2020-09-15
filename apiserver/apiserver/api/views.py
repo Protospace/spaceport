@@ -20,7 +20,7 @@ import datetime, time
 
 import requests
 
-from . import models, serializers, utils, utils_paypal, utils_stats
+from . import models, serializers, utils, utils_paypal, utils_stats, utils_ldap
 from .permissions import (
     is_admin_director,
     AllowMetadata,
@@ -234,6 +234,20 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
                 member.mill_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
             elif session.course.id == 259:
                 member.cnc_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+            elif session.course.id == 247:
+                member.rabbit_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+
+                if status == 'Attended':
+                    utils_ldap.add_to_group(member, 'Laser Users')
+                else:
+                    utils_ldap.remove_from_group(member, 'Laser Users')
+            elif session.course.id == 321:
+                member.trotec_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+
+                if status == 'Attended':
+                    utils_ldap.add_to_group(member, 'Trotec Users')
+                else:
+                    utils_ldap.remove_from_group(member, 'Trotec Users')
             member.save()
 
             serializer.save(user=user, member_id=member.id, attendance_status=status)
@@ -273,6 +287,20 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             member.mill_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
         elif session.course.id == 259:
             member.cnc_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+        elif session.course.id == 247:
+            member.rabbit_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+
+            if status == 'Attended':
+                utils_ldap.add_to_group(member, 'Laser Users')
+            else:
+                utils_ldap.remove_from_group(member, 'Laser Users')
+        elif session.course.id == 321:
+            member.trotec_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+
+            if status == 'Attended':
+                utils_ldap.add_to_group(member, 'Trotec Users')
+            else:
+                utils_ldap.remove_from_group(member, 'Trotec Users')
         member.save()
 
 

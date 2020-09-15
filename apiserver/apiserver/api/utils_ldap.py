@@ -4,6 +4,7 @@ logger = logging.getLogger(__name__)
 import requests
 
 from apiserver import secrets
+from apiserver.api import utils
 
 def is_configured():
     return bool(secrets.LDAP_API_URL and secrets.LDAP_API_KEY)
@@ -39,3 +40,37 @@ def set_password(data):
         password=data['password1'],
     )
     return ldap_api('set-password', ldap_data)
+
+def add_to_group(member, group):
+    try:
+        ldap_data = dict(group=group)
+
+        if member.user:
+            ldap_data['username'] = member.user.username
+        else:
+            ldap_data['email'] = member.old_email
+
+        if ldap_api('add-to-group', ldap_data) != 200: raise
+    except BaseException as e:
+        logger.error('LDAP Group - {} - {}'.format(e.__class__.__name__, str(e)))
+        m = '{} {} ({})'.format(member.first_name, member.last_name, member.id)
+        msg = 'Problem adding {} to group {}!'.format(m, group)
+        utils.alert_tanner(msg)
+        logger.info(msg)
+
+def remove_from_group(member, group):
+    try:
+        ldap_data = dict(group=group)
+
+        if member.user:
+            ldap_data['username'] = member.user.username
+        else:
+            ldap_data['email'] = member.old_email
+
+        if ldap_api('remove-from-group', ldap_data) != 200: raise
+    except BaseException as e:
+        logger.error('LDAP Group - {} - {}'.format(e.__class__.__name__, str(e)))
+        m = '{} {} ({})'.format(member.first_name, member.last_name, member.id)
+        msg = 'Problem adding {} to group {}!'.format(m, group)
+        utils.alert_tanner(msg)
+        logger.info(msg)

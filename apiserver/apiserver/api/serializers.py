@@ -195,6 +195,21 @@ class AdminMemberSerializer(MemberSerializer):
             'is_staff',
         ]
 
+    def update(self, instance, validated_data):
+        if 'rabbit_cert_date' in validated_data:
+            if validated_data['rabbit_cert_date']:
+                utils_ldap.add_to_group(instance, 'Laser Users')
+            else:
+                utils_ldap.remove_from_group(instance, 'Laser Users')
+
+        if 'trotec_cert_date' in validated_data:
+            if validated_data['trotec_cert_date']:
+                utils_ldap.add_to_group(instance, 'Trotec Users')
+            else:
+                utils_ldap.remove_from_group(instance, 'Trotec Users')
+
+        return super().update(instance, validated_data)
+
 
 # member viewing member list or search result
 class SearchSerializer(serializers.Serializer):
