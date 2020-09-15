@@ -541,6 +541,7 @@ export function AdminCert(props) {
 
 	const handleCert = (e) => {
 		e.preventDefault();
+		if (loading) return;
 		setLoading(true);
 		let data = Object();
 		data[field] = moment.utc().tz('America/Edmonton').format('YYYY-MM-DD');
@@ -555,6 +556,7 @@ export function AdminCert(props) {
 
 	const handleUncert = (e) => {
 		e.preventDefault();
+		if (loading) return;
 		setLoading(true);
 		let data = Object();
 		data[field] = null;

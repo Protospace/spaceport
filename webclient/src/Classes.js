@@ -109,6 +109,7 @@ export function ClassDetail(props) {
 	}, [refreshCount]);
 
 	const handleSignup = () => {
+		if (loading) return;
 		setLoading(true);
 		const data = { attendance_status: 'Waiting for payment', session: id };
 		requester('/training/', 'POST', token, data)
@@ -122,6 +123,7 @@ export function ClassDetail(props) {
 	};
 
 	const handleToggle = (newStatus) => {
+		if (loading) return;
 		setLoading(true);
 		const data = { attendance_status: newStatus, session: id };
 		requester('/training/'+userTraining.id+'/', 'PUT', token, data)
