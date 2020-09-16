@@ -22,7 +22,7 @@ def set_password():
     username = request.form['username']
     password = request.form['password']
 
-    auth_functions.set_password(username, password)
+    auth_functions.set_wiki_password(username, password)
     return ''
 
 if __name__ == '__main__':
