@@ -72,6 +72,7 @@ function AttendanceRow(props) {
 
 	const handleMark = (newStatus) => {
 		if (loading) return;
+		if (student.attendance_status == newStatus) return;
 		setLoading(newStatus);
 		const data = { ...student, attendance_status: newStatus };
 		requester('/training/'+student.id+'/', 'PATCH', token, data)
