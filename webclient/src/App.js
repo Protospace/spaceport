@@ -19,6 +19,7 @@ import { Courses, CourseDetail } from './Courses.js';
 import { Classes, ClassDetail } from './Classes.js';
 import { Members, MemberDetail } from './Members.js';
 import { Charts } from './Charts.js';
+import { Auth } from './Auth.js';
 import { PasswordReset, ConfirmReset } from './PasswordReset.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { Footer } from './Footer.js';
@@ -214,6 +215,10 @@ function App() {
 
 					<Route path='/charts'>
 						<Charts />
+					</Route>
+
+					<Route path='/auth'>
+						<Auth user={user} />
 					</Route>
 
 					{user && user.member.set_details ?
