@@ -12,7 +12,7 @@ from rest_framework import viewsets, views, mixins, generics, exceptions
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_auth.views import PasswordChangeView, PasswordResetView, PasswordResetConfirmView
+from rest_auth.views import PasswordChangeView, PasswordResetView, PasswordResetConfirmView, LoginView
 from rest_auth.registration.views import RegisterView
 from fuzzywuzzy import fuzz, process
 from collections import OrderedDict
@@ -603,6 +603,9 @@ class PasswordResetView(PasswordResetView):
 
 class PasswordResetConfirmView(PasswordResetConfirmView):
     serializer_class = serializers.MyPasswordResetConfirmSerializer
+
+class SpaceportAuthView(LoginView):
+    serializer_class = serializers.SpaceportAuthSerializer
 
 
 @api_view()

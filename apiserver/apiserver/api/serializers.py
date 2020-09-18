@@ -7,7 +7,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
 from rest_auth.registration.serializers import RegisterSerializer
-from rest_auth.serializers import PasswordChangeSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer
+from rest_auth.serializers import PasswordChangeSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer, LoginSerializer
 from rest_auth.serializers import UserDetailsSerializer
 import re
 
@@ -545,3 +545,10 @@ class HistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.HistoryIndex
         fields = '__all__'
+
+class SpaceportAuthSerializer(LoginSerializer):
+    def authenticate(self, **kwargs):
+        result = super().authenticate(**kwargs)
+        print(result)
+        print(self.context['request'].data)
+        return result
