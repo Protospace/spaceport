@@ -23,6 +23,6 @@ def auth_api(route, data):
 def set_password(data):
     auth_data = dict(
         username=data['username'],
-        password=data['password1'],
+        password=data['password'],
     )
     return auth_api('set-password', auth_data)

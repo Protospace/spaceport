@@ -11,7 +11,7 @@ from rest_auth.serializers import PasswordChangeSerializer, PasswordResetSeriali
 from rest_auth.serializers import UserDetailsSerializer
 import re
 
-from . import models, fields, utils, utils_ldap
+from . import models, fields, utils, utils_ldap, utils_auth
 from .. import settings, secrets
 
 class TransactionSerializer(serializers.ModelSerializer):
@@ -549,6 +549,9 @@ class HistorySerializer(serializers.ModelSerializer):
 class SpaceportAuthSerializer(LoginSerializer):
     def authenticate(self, **kwargs):
         result = super().authenticate(**kwargs)
-        print(result)
-        print(self.context['request'].data)
+
+        if result:
+            data = self.context['request'].data
+            utils_auth.set_password(data)
+
         return result
