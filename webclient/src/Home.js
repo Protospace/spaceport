@@ -153,9 +153,10 @@ export function Home(props) {
 
 	const mcPlayers = stats && stats['minecraft_players'] ? stats['minecraft_players'] : [];
 
-	const getTrackStat = (x) => stats && stats.track && stats.track[x] ? moment().unix() - stats.track[x] > 60 ? 'Free' : 'In Use' : '?';
-	const getTrackLast = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]).tz('America/Edmonton').format('llll') : 'Unknown';
-	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]).tz('America/Edmonton').fromNow() : '';
+	const getTrackStat = (x) => stats && stats.track && stats.track[x] ? moment().unix() - stats.track[x]['time'] > 60 ? 'Free' : 'In Use' : '?';
+	const getTrackLast = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').format('llll') : 'Unknown';
+	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').fromNow() : '';
+	const getTrackName = (x) => stats && stats.track && stats.track[x] && stats.track[x]['username'] ? stats.track[x]['username'] : 'Unknown';
 
 	return (
 		<Container>
@@ -238,7 +239,8 @@ export function Home(props) {
 										<p>
 											Last use:<br />
 											{getTrackLast('TROTECS300')}<br />
-											{getTrackAgo('TROTECS300')}
+											{getTrackAgo('TROTECS300')}<br />
+											by {getTrackName('TROTECS300')}
 										</p>
 									</React.Fragment>
 								} trigger={<a>[more]</a>} />
@@ -250,7 +252,8 @@ export function Home(props) {
 										<p>
 											Last use:<br />
 											{getTrackLast('FRICKIN-LASER')}<br />
-											{getTrackAgo('FRICKIN-LASER')}
+											{getTrackAgo('FRICKIN-LASER')}<br />
+											by {getTrackName('TROTECS300')}
 										</p>
 									</React.Fragment>
 								} trigger={<a>[more]</a>} />

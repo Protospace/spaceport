@@ -472,7 +472,12 @@ class StatsViewSet(viewsets.ViewSet, List):
     def track(self, request):
         if 'name' in request.data:
             track = cache.get('track', {})
-            track[request.data['name']] = time.time()
+
+            name = request.data['name']
+            username = request.data.get('username', '')
+            username = username.split('.')[0]
+
+            track[name] = dict(time=time.time(), username=username)
             cache.set('track', track)
             return Response(200)
         else:
