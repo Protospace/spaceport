@@ -72,13 +72,19 @@ export function Classes(props) {
 			<Header size='large'>Class List</Header>
 
 			<Header size='medium'>Upcoming</Header>
+
+			<p>Ordered by nearest date.</p>
+
 			{classes ?
-				<ClassTable classes={classes.filter(x => x.datetime > now)} />
+				<ClassTable classes={classes.filter(x => x.datetime > now).sort((a, b) => a.datetime > b.datetime ? 1 : -1)} />
 			:
 				<p>Loading...</p>
 			}
 
 			<Header size='medium'>Recent</Header>
+
+			<p>Ordered by nearest date.</p>
+
 			{classes ?
 				<ClassTable classes={classes.filter(x => x.datetime < now)} />
 			:
