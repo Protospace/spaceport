@@ -253,7 +253,7 @@ export function Home(props) {
 											Last use:<br />
 											{getTrackLast('FRICKIN-LASER')}<br />
 											{getTrackAgo('FRICKIN-LASER')}<br />
-											by {getTrackName('TROTECS300')}
+											by {getTrackName('FRICKIN-LASER')}
 										</p>
 									</React.Fragment>
 								} trigger={<a>[more]</a>} />
