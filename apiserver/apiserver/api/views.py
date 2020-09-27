@@ -217,17 +217,19 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         elif session.course.id == 247:
             member.rabbit_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
 
-            if status == 'Attended':
-                utils_ldap.add_to_group(member, 'Laser Users')
-            else:
-                utils_ldap.remove_from_group(member, 'Laser Users')
+            if utils_ldap.is_configured():
+                if status == 'Attended':
+                    utils_ldap.add_to_group(member, 'Laser Users')
+                else:
+                    utils_ldap.remove_from_group(member, 'Laser Users')
         elif session.course.id == 321:
             member.trotec_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
 
-            if status == 'Attended':
-                utils_ldap.add_to_group(member, 'Trotec Users')
-            else:
-                utils_ldap.remove_from_group(member, 'Trotec Users')
+            if utils_ldap.is_configured():
+                if status == 'Attended':
+                    utils_ldap.add_to_group(member, 'Trotec Users')
+                else:
+                    utils_ldap.remove_from_group(member, 'Trotec Users')
         member.save()
 
     # TODO: turn these into @actions
