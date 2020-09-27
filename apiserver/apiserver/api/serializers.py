@@ -473,6 +473,11 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
                 logger.info(msg)
                 raise ValidationError(dict(non_field_errors=msg))
 
+        data = dict(
+            username=self.user.username,
+            password=self.data['new_password1'],
+        )
+
         if utils_auth.is_configured():
             if utils_auth.set_password(data) != 200:
                 msg = 'Problem connecting to Auth server: set.'
@@ -501,6 +506,11 @@ class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
                 utils.alert_tanner(msg)
                 logger.info(msg)
                 raise ValidationError(dict(non_field_errors=msg))
+
+        data = dict(
+            username=self.user.username,
+            password=self.data['new_password1'],
+        )
 
         if utils_auth.is_configured():
             if utils_auth.set_password(data) != 200:
