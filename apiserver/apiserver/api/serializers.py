@@ -24,7 +24,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         'Square Pmt',
         'Member',
         'Clearing',
-        'Cash'
+        'Cash',
     ])
     info_source = serializers.ChoiceField([
         'Web',
@@ -38,7 +38,18 @@ class TransactionSerializer(serializers.ModelSerializer):
         'IPN Trigger',
         'Intranet Receipt',
         'Automatic',
-        'Manual'
+        'Manual',
+    ])
+    category = serializers.ChoiceField([
+        'Membership',
+        'OnAcct',
+        'Snacks',
+        'Donation',
+        'Consumables',
+        'Purchases',
+        'Garage Sale',
+        'Reimburse',
+        'Other',
     ])
     member_id = serializers.IntegerField()
     member_name = serializers.SerializerMethodField()
