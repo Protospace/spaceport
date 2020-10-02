@@ -48,7 +48,7 @@ function ResetForm() {
 			<Form.Button loading={loading} error={error.non_field_errors}>
 				Submit
 			</Form.Button>
-			{success && <div>Success!</div>}
+			{success && <div>Success! Be sure to check your spam folder.</div>}
 		</Form>
 	);
 };

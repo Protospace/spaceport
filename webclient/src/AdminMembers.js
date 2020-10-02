@@ -498,6 +498,12 @@ export function AdminMemberInfo(props) {
 						<Table.Cell>Emergency Contact Phone:</Table.Cell>
 						<Table.Cell>{member.emergency_contact_phone || 'None'}</Table.Cell>
 					</Table.Row>
+
+					<Table.Row>
+						<Table.Cell>On Spaceport:</Table.Cell>
+						<Table.Cell>{member.user ? 'Yes' : 'No'}</Table.Cell>
+					</Table.Row>
+
 					<Table.Row>
 						<Table.Cell>Public Bio:</Table.Cell>
 					</Table.Row>
