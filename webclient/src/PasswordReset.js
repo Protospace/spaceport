@@ -37,12 +37,18 @@ function ResetForm() {
 	});
 
 	return (
-		<Form onSubmit={handleSubmit}>
+		<Form onSubmit={handleSubmit} error={error.email == 'Not found.'}>
 			<Form.Input
 				label='Email'
 				name='email'
 				onChange={handleChange}
 				error={error.email}
+			/>
+
+			<Message
+				error
+				header='Email not found in Spaceport'
+				content='You can only use this form if you have an account with this new member portal.'
 			/>
 
 			<Form.Button loading={loading} error={error.non_field_errors}>
