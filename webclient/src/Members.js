@@ -107,7 +107,7 @@ export function Members(props) {
 										{x.member.preferred_name} {x.member.last_name}
 									</Item.Header>
 									<Item.Description>Status: {x.member.status || 'Unknown'}</Item.Description>
-									<Item.Description>Joined: {x.member.current_start_date || 'Unknown'}</Item.Description>
+									<Item.Description>Joined: {x.member.application_date || 'Unknown'}</Item.Description>
 								</Item.Content>
 							</Item>
 						)
@@ -174,7 +174,7 @@ export function MemberDetail(props) {
 												</Table.Row>
 												<Table.Row>
 													<Table.Cell>Joined:</Table.Cell>
-													<Table.Cell>{member.current_start_date || 'Unknown'}</Table.Cell>
+													<Table.Cell>{member.application_date || 'Unknown'}</Table.Cell>
 												</Table.Row>
 												<Table.Row>
 													<Table.Cell>Public Bio:</Table.Cell>

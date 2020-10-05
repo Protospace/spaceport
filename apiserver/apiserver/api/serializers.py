@@ -106,6 +106,7 @@ class OtherMemberSerializer(serializers.ModelSerializer):
             'last_name',
             'status',
             'current_start_date',
+            'application_date',
             'photo_small',
             'photo_large',
             'public_bio',
