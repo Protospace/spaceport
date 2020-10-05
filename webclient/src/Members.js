@@ -2,7 +2,7 @@ import React, { useState, useEffect, useReducer } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Input, Item, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { statusColor, isAdmin, BasicTable, staticUrl, requester } from './utils.js';
+import { statusColor, isAdmin, isInstructor, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { AdminMemberInfo, AdminMemberPause, AdminMemberForm, AdminMemberCards, AdminMemberTraining, AdminMemberCertifications } from './AdminMembers.js';
 import { AdminMemberTransactions } from './AdminTransactions.js';
@@ -154,7 +154,7 @@ export function MemberDetail(props) {
 						<Header size='large'>{member.preferred_name} {member.last_name}</Header>
 
 						<Grid stackable columns={2}>
-							<Grid.Column>
+							<Grid.Column width={isAdmin(user) ? 8 : 5}>
 								<p>
 									<Image rounded size='medium' src={member.photo_large ? staticUrl + '/' + member.photo_large : '/nophoto.png'} />
 								</p>
@@ -189,7 +189,11 @@ export function MemberDetail(props) {
 								}
 							</Grid.Column>
 
-							<Grid.Column>
+							<Grid.Column width={isAdmin(user) ? 8 : 11}>
+								{isInstructor(user) && !isAdmin(user) && <Segment padded>
+									<AdminMemberTraining result={result} refreshResult={refreshResult} {...props} />
+								</Segment>}
+
 								{isAdmin(user) && <Segment padded>
 									<AdminMemberForm result={result} refreshResult={refreshResult} {...props} />
 								</Segment>}
