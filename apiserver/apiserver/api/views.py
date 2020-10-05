@@ -477,7 +477,7 @@ class StatsViewSet(viewsets.ViewSet, List):
 
             name = request.data['name']
             username = request.data.get('username', '')
-            username = username.split('.')[0]
+            username = username.split('.')[0].title()
 
             track[name] = dict(time=time.time(), username=username)
             cache.set('track', track)
