@@ -99,7 +99,10 @@ function AttendanceRow(props) {
 
 	return (
 		<div className='attendance-row'>
-			<p>{student.student_name}{student.attendance_status === 'Waiting for payment' && ' (Waiting for payment)'}:</p>
+			<p>
+				<Link to={'/members/'+student.student_id}>{student.student_name}</Link>
+				{student.attendance_status === 'Waiting for payment' && ' (Waiting for payment)'}:
+			</p>
 
 			<Button {...makeProps('Withdrawn')}>
 				Withdrawn
