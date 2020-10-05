@@ -513,14 +513,18 @@ class BackupView(views.APIView):
         backup_user = secrets.BACKUP_TOKENS.get(auth_token, None)
 
         if backup_user:
+            logger.info('Backup user: ' + backup_user['name'])
             backup_path = cache.get(backup_user['cache_key'], None)
 
             if not backup_path:
+                logger.error('Backup not found')
                 raise Http404
 
             if str(now().date()) not in backup_path:
                 # sanity check - make sure it's actually today's backup
-                return Response('Today\'s backup not ready yet', status=400)
+                msg = 'Today\'s backup not ready yet'
+                logger.error(msg)
+                return Response(msg, status=503)
 
             backup_url = 'https://static.{}/backups/{}'.format(
                 settings.PRODUCTION_HOST,
