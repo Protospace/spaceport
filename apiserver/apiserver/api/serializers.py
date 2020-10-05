@@ -114,6 +114,7 @@ class OtherMemberSerializer(serializers.ModelSerializer):
     def get_status(self, obj):
         return 'Former Member' if obj.paused_date else obj.status
 
+
 # member viewing his own details
 class MemberSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
@@ -234,6 +235,24 @@ class SearchSerializer(serializers.Serializer):
 
     def get_member(self, obj):
         serializer = OtherMemberSerializer(obj)
+        return serializer.data
+
+# instructor viewing search result
+class InstructorSearchSerializer(serializers.Serializer):
+    member = serializers.SerializerMethodField()
+    training = serializers.SerializerMethodField()
+
+    def get_member(self, obj):
+        serializer = OtherMemberSerializer(obj)
+        return serializer.data
+
+    def get_training(self, obj):
+        if obj.user:
+            queryset = obj.user.training
+        else:
+            queryset = models.Training.objects.filter(member_id=obj.id)
+        serializer = UserTrainingSerializer(data=queryset, many=True)
+        serializer.is_valid()
         return serializer.data
 
 # admin viewing search result

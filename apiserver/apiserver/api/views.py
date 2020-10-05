@@ -50,6 +50,8 @@ class SearchViewSet(Base, Retrieve):
     def get_serializer_class(self):
         if is_admin_director(self.request.user) and self.action == 'retrieve':
             return serializers.AdminSearchSerializer
+        elif self.request.user.member.is_instructor and self.action == 'retrieve':
+            return serializers.InstructorSearchSerializer
         else:
             return serializers.SearchSerializer
 
