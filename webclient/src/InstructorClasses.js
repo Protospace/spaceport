@@ -130,9 +130,11 @@ function AttendanceRow(props) {
 	);
 }
 
+let attendanceOpenCache = false;
+
 export function InstructorClassAttendance(props) {
 	const { clazz, token, refreshClass, user } = props;
-	const [open, setOpen] = useState(false);
+	const [open, setOpen] = useState(attendanceOpenCache);
 	const [input, setInput] = useState({});
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -213,7 +215,7 @@ export function InstructorClassAttendance(props) {
 					</Form>
 				</div>
 			:
-				<Button onClick={() => setOpen(true)}>
+				<Button onClick={() => {setOpen(true); attendanceOpenCache = true;}}>
 					Edit Attendance
 				</Button>
 			}
