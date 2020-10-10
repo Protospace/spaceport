@@ -1,0 +1,57 @@
+.darkmode-layer, .darkmode-toggle {
+	z-index: 500;
+}
+
+.darkmode--activated .ui.image {
+	mix-blend-mode: difference;
+	filter: brightness(75%);
+}
+
+.darkmode--activated i.green.circle.icon {
+	mix-blend-mode: difference;
+	color: #21ba4582 !important;
+
+}
+
+.darkmode--activated i.yellow.circle.icon {
+	mix-blend-mode: difference;
+	color: #fbbd0882 !important;
+}
+
+.darkmode--activated i.red.circle.icon {
+	mix-blend-mode: difference;
+	color: #db282882 !important;
+}
+
+.darkmode--activated .footer {
+	mix-blend-mode: difference;
+}
+
+.darkmode--activated .ql-toolbar.ql-snow,
+.darkmode--activated .ql-container.ql-snow,
+.darkmode--activated .ui.segment,
+.darkmode--activated .ui.form .field input,
+.darkmode--activated .ui.form .field .selection.dropdown,
+.darkmode--activated .ui.form .field .ui.checkbox label::before,
+.darkmode--activated .ui.form .field textarea {
+	border: 1px solid rgba(34,36,38,.50) !important;
+}
+
+.darkmode--activated .ui.basic.table tbody tr {
+	border-bottom: 1px solid rgba(34,36,38,.50) !important;
+}
+
+.darkmode--activated .ui.button {
+	background: #c9c9c9 !important;
+}
+
+.darkmode--activated .ui.red.button {
+	mix-blend-mode: difference;
+	background: #db282882 !important;
+}
+
+.darkmode--activated .ui.green.button,
+.darkmode--activated .ui.button.toggle.active {
+	mix-blend-mode: difference;
+	background: #21ba4582 !important;
+}
