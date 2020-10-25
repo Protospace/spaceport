@@ -218,7 +218,7 @@ export function Home(props) {
 							<p>Card scans today: {getZeroStat('card_scans')}</p>
 
 							<p>
-								Minecraft players: {mcPlayers.length} <Popup content={
+								Minecraft players: {mcPlayers.length} {mcPlayers.length > 5 && '🔥'} <Popup content={
 									<React.Fragment>
 										<p>
 											Server IP:<br />
