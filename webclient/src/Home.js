@@ -152,6 +152,7 @@ export function Home(props) {
 	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz('America/Edmonton').format('ll') : '?';
 
 	const mcPlayers = stats && stats['minecraft_players'] ? stats['minecraft_players'] : [];
+	const mumbleUsers = stats && stats['mumble_users'] ? stats['mumble_users'] : [];
 
 	const getTrackStat = (x) => stats && stats.track && stats.track[x] ? moment().unix() - stats.track[x]['time'] > 60 ? 'Free' : 'In Use' : '?';
 	const getTrackLast = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').format('llll') : 'Unknown';
@@ -214,7 +215,6 @@ export function Home(props) {
 							<p>Next monthly clean: {getDateStat('next_clean')}</p>
 							<p>Member count: {getStat('member_count')} <Link to='/charts'>[more]</Link></p>
 							<p>Green members: {getStat('green_count')}</p>
-							<p>Old members: {getStat('paused_count')}</p>
 							<p>Card scans today: {getZeroStat('card_scans')}</p>
 
 							<p>
@@ -231,6 +231,21 @@ export function Home(props) {
 									</React.Fragment>
 								} trigger={<a>[more]</a>} />
 							{' '}<a href='http://games.protospace.ca:8123/?worldname=world&mapname=flat&zoom=3&x=74&y=64&z=354' target='_blank'>[map]</a>
+							</p>
+
+							<p>
+								Mumble users: {mumbleUsers.length} <Popup content={
+									<React.Fragment>
+										<p>
+											Server IP:<br />
+											mumble.protospace.ca
+										</p>
+										<p>
+											Users:<br />
+											{mumbleUsers.length ? mumbleUsers.map(x => <React.Fragment>{x}<br /></React.Fragment>) : 'None'}
+										</p>
+									</React.Fragment>
+								} trigger={<a>[more]</a>} />
 							</p>
 
 							<p>
