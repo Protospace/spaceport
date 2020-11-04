@@ -102,7 +102,7 @@ def create_user(first, last, username, email, password):
 
         result = ldap_conn.add_s(dn, ldif)
 
-        logger.info('  Result: ' + result)
+        logger.info('  Result: ' + str(result))
 
         # set password
         pass_quotes = '"{}"'.format(password)
@@ -110,13 +110,13 @@ def create_user(first, last, username, email, password):
         change_des = [(ldap.MOD_REPLACE, 'unicodePwd', [pass_uni])]
         result = ldap_conn.modify_s(dn, change_des)
 
-        logger.info('  Result: ' + result)
+        logger.info('  Result: ' + str(result))
 
         # 512 will set user account to enabled
         mod_acct = [(ldap.MOD_REPLACE, 'userAccountControl', b'512')]
         result = ldap_conn.modify_s(dn, mod_acct)
 
-        logger.info('  Result: ' + result)
+        logger.info('  Result: ' + str(result))
     finally:
         ldap_conn.unbind()
 
