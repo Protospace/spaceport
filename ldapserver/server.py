@@ -1,3 +1,5 @@
+from log import logger
+
 from flask import Flask, abort, request
 app = Flask(__name__)
 
@@ -13,6 +15,8 @@ def check_auth():
 
 @app.route('/')
 def index():
+    logger.info('Index page requested')
+
     return '<i>SEE YOU SPACE SAMURAI...</i>'
 
 @app.route('/find-user', methods=['POST'])
