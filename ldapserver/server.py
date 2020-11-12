@@ -19,6 +19,10 @@ def index():
 
     return '<i>SEE YOU SPACE SAMURAI...</i>'
 
+@app.route('/ping')
+def ping():
+    return 'pong'
+
 @app.route('/find-user', methods=['POST'])
 def find_user():
     check_auth()
