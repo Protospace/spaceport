@@ -14,7 +14,7 @@ def ldap_api(route, data):
     try:
         headers = {'Authorization': 'Token ' + secrets.LDAP_API_KEY}
         url = secrets.LDAP_API_URL + route
-        r = requests.post(url, data=data, headers=headers, timeout=3)
+        r = requests.post(url, data=data, headers=headers, timeout=5)
         return r.status_code
     except BaseException as e:
         logger.error('LDAP {} - {} - {}'.format(url, e.__class__.__name__, str(e)))
