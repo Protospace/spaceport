@@ -150,23 +150,3 @@ body {
 	margin-left: -3.5px;
 	margin-right: 0.5em;
 }
-
-
-.darkmode-layer, .darkmode-toggle {
-	z-index: 500;
-}
-
-.darkmode--activated .ui.image {
-	mix-blend-mode: difference;
-	filter: brightness(50%);
-}
-
-.darkmode--activated i.green.circle.icon,
-.darkmode--activated i.yellow.circle.icon,
-.darkmode--activated i.red.circle.icon {
-	mix-blend-mode: difference;
-}
-
-.darkmode--activated .footer {
-	mix-blend-mode: difference;
-}

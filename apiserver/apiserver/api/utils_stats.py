@@ -22,6 +22,7 @@ DEFAULTS = {
     'bay_108_temp': None,
     'bay_110_temp': None,
     'minecraft_players': [],
+    'mumble_users': [],
     'card_scans': 0,
     'track': {},
 }
@@ -111,6 +112,21 @@ def check_minecraft_server():
             return players
         except BaseException as e:
             logger.error('Problem checking Minecraft: {} - {}'.format(e.__class__.__name__, str(e)))
+
+    return []
+
+def check_mumble_server():
+    if secrets.MUMBLE:
+        url = secrets.MUMBLE
+
+        try:
+            r = requests.get(url, timeout=5)
+            r.raise_for_status()
+            users = r.text.split()
+            cache.set('mumble_users', users)
+            return users
+        except BaseException as e:
+            logger.error('Problem checking Mumble: {} - {}'.format(e.__class__.__name__, str(e)))
 
     return []
 

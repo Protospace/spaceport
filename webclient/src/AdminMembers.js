@@ -221,7 +221,15 @@ export function AdminMemberCards(props) {
 					/>
 				</Form.Group>
 
-				<Form.Button loading={loading} error={error.non_field_errors}>
+				<Form.Checkbox
+					label='Confirmed that the member has been given a tour and knows the alarm code'
+					required
+					{...makeProps('given_tour')}
+					onChange={handleCheck}
+					checked={input.given_tour}
+				/>
+
+				<Form.Button disabled={!input.given_tour} loading={loading} error={error.non_field_errors}>
 					Submit
 				</Form.Button>
 				{success && <div>Success!</div>}

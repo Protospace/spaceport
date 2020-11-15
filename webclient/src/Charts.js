@@ -47,6 +47,25 @@ export function Charts(props) {
 		<Container>
 			<Header size='large'>Charts</Header>
 
+			<Header size='medium'>Summary</Header>
+
+			{memberCount && signupCount &&
+				<>
+					<p>
+						The total member count is {memberCount.slice().reverse()[0].member_count} members,
+						compared to {memberCount.slice().reverse()[30].member_count} members 30 days ago.
+					</p>
+					<p>
+						The green member count is {memberCount.slice().reverse()[0].green_count} members,
+						compared to {memberCount.slice().reverse()[30].green_count} members 30 days ago.
+					</p>
+					<p>
+						There were {signupCount.slice().reverse()[0].signup_count} signups so far this month,
+						and {signupCount.slice().reverse()[1].signup_count} signups last month.
+					</p>
+				</>
+			}
+
 			<Header size='medium'>Member Counts</Header>
 
 			<p>Daily since March 2nd, 2020.</p>
