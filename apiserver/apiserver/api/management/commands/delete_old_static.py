@@ -19,7 +19,7 @@ class Command(BaseCommand):
         members = models.Member.objects
 
         good_files = []
-        for static_field in ['photo_large', 'photo_medium', 'photo_small', 'member_forms', 'card_photo']:
+        for static_field in ['photo_large', 'photo_medium', 'photo_small', 'member_forms']:
             good_files.extend(members.values_list(static_field, flat=True))
 
         count = 0

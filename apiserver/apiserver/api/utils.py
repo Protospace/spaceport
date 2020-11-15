@@ -247,10 +247,11 @@ def gen_card_photo(member):
     y = CARD_PHOTO_MARGIN_SIDE
     draw.text((475, y), str(member.id), (0,0,0), font=font)
 
-    file_name = str(uuid4()) + '.jpg'
-    card_template.save(STATIC_FOLDER + file_name, quality=95)
+    bio = io.BytesIO()
+    card_template.save(bio, 'JPEG', quality=95)
+    bio.seek(0)
 
-    return file_name
+    return bio
 
 
 ALLOWED_TAGS = [

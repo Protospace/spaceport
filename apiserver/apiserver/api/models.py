@@ -21,7 +21,6 @@ class Member(models.Model):
     photo_medium = models.CharField(max_length=64, blank=True, null=True)
     photo_small = models.CharField(max_length=64, blank=True, null=True)
     member_forms = models.CharField(max_length=64, blank=True, null=True)
-    card_photo = models.CharField(max_length=64, blank=True, null=True)
 
     set_details = models.BooleanField(default=False)
     first_name = models.CharField(max_length=32)

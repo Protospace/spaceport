@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Max
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, FileResponse
 from django.core.files.base import File
 from django.core.cache import cache
 from django.utils.timezone import now
@@ -144,6 +144,14 @@ class MemberViewSet(Base, Retrieve, Update):
         utils.gen_member_forms(member)
         utils_stats.changed_card()
         return Response(200)
+
+    @action(detail=True, methods=['get'])
+    def card_photo(self, request, pk=None):
+        if not is_admin_director(self.request.user):
+            raise exceptions.PermissionDenied()
+        member = self.get_object()
+        card_photo = utils.gen_card_photo(member)
+        return FileResponse(card_photo, filename='card.jpg')
 
 
 class CardViewSet(Base, Create, Retrieve, Update, Destroy):
