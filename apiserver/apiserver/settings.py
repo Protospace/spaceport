@@ -221,11 +221,14 @@ LOGGING = {
         'ignore_stats': {
             '()': 'apiserver.filters.IgnoreStats',
         },
+        'ignore_lockout': {
+            '()': 'apiserver.filters.IgnoreLockout',
+        },
     },
     'handlers': {
         'console': {
             'level': 'DEBUG',
-            'filters': ['ignore_stats'],
+            'filters': ['ignore_stats', 'ignore_lockout'],
             'class': 'logging.StreamHandler',
             'formatter': 'medium'
         },
