@@ -109,6 +109,10 @@ function App() {
 						<img src='/logo-long.svg' className='logo-long' />
 					</Link>
 				</div>
+
+				{window.location.hostname !== 'my.protospace.ca' &&
+					<p style={{ background: 'yellow' }}>~~~~~ Development site ~~~~~</p>
+				}
 			</Container>
 
 			<Menu>
