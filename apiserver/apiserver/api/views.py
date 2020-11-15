@@ -152,6 +152,8 @@ class MemberViewSet(Base, Retrieve, Update):
         if not is_admin_director(self.request.user):
             raise exceptions.PermissionDenied()
         member = self.get_object()
+        if not member.photo_large:
+            raise Http404
         card_photo = utils.gen_card_photo(member)
         return FileResponse(card_photo, filename='card.jpg')
 

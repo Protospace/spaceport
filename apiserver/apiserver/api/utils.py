@@ -229,21 +229,21 @@ def gen_card_photo(member):
     # check font size
     font_sizes = (60, 72)
     font = ImageFont.truetype('DejaVuSans-Bold.ttf', font_sizes[1])
-    size = draw.textsize(member.last_name, font=font)
+    size = draw.textsize(str(member.last_name), font=font)
     if size[0] > CARD_TEXT_SIZE_LIMIT:
         font_sizes = (36, 48)
 
     font = ImageFont.truetype('DejaVuSans.ttf', font_sizes[0])
     x = CARD_PHOTO_MARGIN_SIDE
     y = my + CARD_PHOTO_MARGIN_TOP + CARD_PHOTO_MARGIN_SIDE
-    draw.text((x, y), member.first_name, (0,0,0), font=font)
+    draw.text((x, y), str(member.first_name), (0,0,0), font=font)
 
     font = ImageFont.truetype('DejaVuSans-Bold.ttf', font_sizes[1])
     y = my + CARD_PHOTO_MARGIN_TOP + CARD_PHOTO_MARGIN_SIDE + font_sizes[1]
-    draw.text((x, y), member.last_name, (0,0,0), font=font)
+    draw.text((x, y), str(member.last_name), (0,0,0), font=font)
 
     font = ImageFont.truetype('DejaVuSans.ttf', 36)
-    draw.text((x, 800), 'Joined: ' + str(member.application_date), (0,0,0), font=font)
+    draw.text((x, 800), 'Joined: ' + str(member.application_date or 'Unknown'), (0,0,0), font=font)
     y = CARD_PHOTO_MARGIN_SIDE
     draw.text((475, y), str(member.id), (0,0,0), font=font)
 
