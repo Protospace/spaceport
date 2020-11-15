@@ -139,6 +139,8 @@ class MemberViewSet(Base, Retrieve, Update):
         member = self.get_object()
         member.current_start_date = utils.today_alberta_tz()
         member.paused_date = None
+        if not member.monthly_fees:
+            member.monthly_fees = 55
         member.save()
         utils.tally_membership_months(member)
         utils.gen_member_forms(member)

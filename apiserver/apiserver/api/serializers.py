@@ -187,6 +187,7 @@ class AdminMemberSerializer(MemberSerializer):
     street_address = serializers.CharField(required=False)
     city = serializers.CharField(required=False)
     postal_code = serializers.CharField(required=False)
+    monthly_fees = serializers.ChoiceField([10, 30, 35, 50, 55])
 
     class Meta:
         model = models.Member
