@@ -70,7 +70,17 @@ export const requester = (route, method, token, data) => {
 		if (!response.ok) {
 			throw customError(response);
 		}
-		return method === 'DELETE' ? {} : response.json();
+
+		if (method === 'DELETE') {
+			return {};
+		}
+
+		const contentType = response.headers.get('content-type');
+		if (contentType && contentType.indexOf('application/json') !== -1) {
+			return response.json();
+		} else {
+			return response;
+		}
 	})
 	.catch(error => {
 		const code = error.data ? error.data.status : null;

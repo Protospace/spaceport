@@ -123,7 +123,7 @@ export function AdminMemberCards(props) {
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
-	const [viewCard, setViewCard] = useState(false);
+	const [cardPhoto, setCardPhoto] = useState(false);
 	const { id } = useParams();
 
 	useEffect(() => {
@@ -155,6 +155,18 @@ export function AdminMemberCards(props) {
 		});
 	};
 
+	const getCardPhoto = (e) => {
+		e.preventDefault();
+		requester('/members/' + id + '/card_photo/', 'GET', token)
+		.then(res => res.blob())
+		.then(res => {
+			setCardPhoto(URL.createObjectURL(res));
+		})
+		.catch(err => {
+			console.log(err);
+		});
+	};
+
 	const makeProps = (name) => ({
 		name: name,
 		onChange: handleChange,
@@ -176,17 +188,17 @@ export function AdminMemberCards(props) {
 			<Form onSubmit={handleSubmit}>
 				<Header size='small'>Add a Card</Header>
 
-				{result.member.card_photo ?
+				{result.member.photo_large ?
 					<p>
-						<Button onClick={() => setViewCard(true)}>View card image</Button>
+						<Button onClick={(e) => getCardPhoto(e)}>View card image</Button>
 					</p>
 				:
 					<p>No card image, member photo missing!</p>
 				}
 
-				{viewCard && <>
+				{cardPhoto && <>
 					<p>
-						<Image rounded size='medium' src={staticUrl + '/' + result.member.card_photo} />
+						<Image rounded size='medium' src={cardPhoto} />
 					</p>
 
 					<Header size='small'>How to Print a Card</Header>
