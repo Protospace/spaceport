@@ -178,7 +178,6 @@ class MemberSerializer(serializers.ModelSerializer):
             instance.photo_small = small
             instance.photo_medium = medium
             instance.photo_large = large
-            instance.card_photo = utils.gen_card_photo(instance)
 
         return super().update(instance, validated_data)
 
