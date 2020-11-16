@@ -22,4 +22,6 @@ That means you have the right to study, change, and distribute the software and 
 
 Thanks to the Protospace Portal Committee.
 
+Thanks to Emrah for lockout certification code, Pat for LDAP code, and Murray for the blank member form PDF.
+
 Thanks to all the devs behind Python, Django, DRF, Node, React, Quill, and Bleach.
