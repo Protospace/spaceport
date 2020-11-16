@@ -389,7 +389,6 @@ def gen_member_forms(member):
 
     packet = io.BytesIO()
     can = canvas.Canvas(packet, pagesize=letter)
-    can.drawString(75, 775, '[  ] Paid    [  ] Sponsored & Approved    [  ] Vetted    [  ] Got Card')
     can.drawString(34, 683, data['first_name'])
     can.drawString(218, 683, data['last_name'])
     can.drawString(403, 683, data['preferred_name'])
@@ -403,7 +402,7 @@ def gen_member_forms(member):
 
     packet = io.BytesIO()
     can = canvas.Canvas(packet, pagesize=letter)
-    can.drawRightString(600, 775, '{} {} ({})'.format(
+    can.drawRightString(600, 770, '{} {} ({})'.format(
         data['first_name'],
         data['last_name'],
         data['id'],
