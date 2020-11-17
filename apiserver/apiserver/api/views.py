@@ -462,6 +462,11 @@ class StatsViewSet(viewsets.ViewSet, List):
         cached_stats = cache.get_many(stats_keys)
         stats = utils_stats.DEFAULTS.copy()
         stats.update(cached_stats)
+
+        user = self.request.user
+        if not user.is_authenticated or not user.member.vetted_date:
+            stats.pop('alarm', None)
+
         return Response(stats)
 
     @action(detail=False, methods=['post'])
@@ -487,8 +492,8 @@ class StatsViewSet(viewsets.ViewSet, List):
     @action(detail=False, methods=['post'])
     def alarm(self, request):
         try:
-            logging.info('Alarm value: ' + str(request.data['data']))
-            #cache.set('alarm', int(request.data['data']))
+            alarm = dict(time=time.time(), data=int(request.data['data']))
+            cache.set('alarm', alarm)
             return Response(200)
         except ValueError:
             raise exceptions.ValidationError(dict(data='Invalid integer.'))

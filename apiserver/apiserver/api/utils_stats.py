@@ -25,6 +25,7 @@ DEFAULTS = {
     'mumble_users': [],
     'card_scans': 0,
     'track': {},
+    'alarm': {},
 }
 
 def changed_card():
