@@ -128,7 +128,7 @@ function MemberInfo(props) {
 };
 
 export function Home(props) {
-	const { user } = props;
+	const { user, token } = props;
 	const [stats, setStats] = useState(JSON.parse(localStorage.getItem('stats', 'false')));
 	const [refreshCount, refreshStats] = useReducer(x => x + 1, 0);
 	const location = useLocation();
@@ -136,7 +136,7 @@ export function Home(props) {
 	const bypass_code = location.hash.replace('#', '');
 
 	useEffect(() => {
-		requester('/stats/', 'GET')
+		requester('/stats/', 'GET', token)
 		.then(res => {
 			setStats(res);
 			localStorage.setItem('stats', JSON.stringify(res));
@@ -158,6 +158,8 @@ export function Home(props) {
 	const getTrackLast = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').format('llll') : 'Unknown';
 	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').fromNow() : '';
 	const getTrackName = (x) => stats && stats.track && stats.track[x] && stats.track[x]['username'] ? stats.track[x]['username'] : 'Unknown';
+
+	const alarmStat = () => stats && stats.alarm && moment().unix() - stats.alarm['time'] < 300 ? stats.alarm['data'] > 200 ? 'Armed' : 'Disarmed' : 'Unknown';
 
 	return (
 		<Container>
@@ -273,6 +275,8 @@ export function Home(props) {
 									</React.Fragment>
 								} trigger={<a>[more]</a>} />
 							</p>
+
+							{user && user.member.vetted_date && <p>Alarm status: {alarmStat()}</p>}
 						</div>
 
 					</Segment>
