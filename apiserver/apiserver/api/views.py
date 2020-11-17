@@ -485,6 +485,17 @@ class StatsViewSet(viewsets.ViewSet, List):
             raise exceptions.ValidationError(dict(data='This field is required.'))
 
     @action(detail=False, methods=['post'])
+    def alarm(self, request):
+        try:
+            logging.info('Alarm value: ' + str(request.data['data']))
+            #cache.set('alarm', int(request.data['data']))
+            return Response(200)
+        except ValueError:
+            raise exceptions.ValidationError(dict(data='Invalid integer.'))
+        except KeyError:
+            raise exceptions.ValidationError(dict(data='This field is required.'))
+
+    @action(detail=False, methods=['post'])
     def track(self, request):
         if 'name' in request.data:
             track = cache.get('track', {})
