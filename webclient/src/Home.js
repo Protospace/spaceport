@@ -145,7 +145,7 @@ export function Home(props) {
 			console.log(err);
 			setStats(false);
 		});
-	}, [refreshCount]);
+	}, [refreshCount, token]);
 
 	const getStat = (x) => stats && stats[x] ? stats[x] : '?';
 	const getZeroStat = (x) => stats && stats[x] ? stats[x] : '0';
