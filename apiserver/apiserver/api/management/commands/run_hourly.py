@@ -9,7 +9,7 @@ class Command(BaseCommand):
 
     def generate_stats(self):
         utils_stats.calc_next_events()
-        member_count, green_count, six_month_plus_count = utils_stats.calc_member_counts()
+        member_count, green_count, six_month_plus_count, vetted_count = utils_stats.calc_member_counts()
         signup_count = utils_stats.calc_signup_counts()
 
         # do this hourly in case an admin causes a change
@@ -19,6 +19,7 @@ class Command(BaseCommand):
                 member_count=member_count,
                 green_count=green_count,
                 six_month_plus_count=six_month_plus_count,
+                vetted_count=vetted_count,
             ),
         )
 

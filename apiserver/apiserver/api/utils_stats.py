@@ -67,11 +67,13 @@ def calc_member_counts():
     six_months_ago = today_alberta_tz() - timedelta(days=183)
     six_month_plus_count = not_paused.filter(application_date__lte=six_months_ago).count()
 
+    vetted_count = not_paused.filter(vetted_date__isnull=False).count()
+
     cache.set('member_count', member_count)
     cache.set('paused_count', paused_count)
     cache.set('green_count', green_count)
 
-    return member_count, green_count, six_month_plus_count
+    return member_count, green_count, six_month_plus_count, vetted_count
 
 def calc_signup_counts():
     month_beginning = today_alberta_tz().replace(day=1)
