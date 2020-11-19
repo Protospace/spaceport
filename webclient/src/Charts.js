@@ -60,6 +60,10 @@ export function Charts(props) {
 						compared to {memberCount.slice().reverse()[30].green_count} members 30 days ago.
 					</p>
 					<p>
+						The older than six months member count is {memberCount.slice().reverse()[0].six_month_plus_count} members,
+						compared to {memberCount.slice().reverse()[30].six_month_plus_count} members 30 days ago.
+					</p>
+					<p>
 						There were {signupCount.slice().reverse()[0].signup_count} signups so far this month,
 						and {signupCount.slice().reverse()[1].signup_count} signups last month.
 					</p>
@@ -106,9 +110,46 @@ export function Charts(props) {
 				}
 			</p>
 
-			<p>Member Count: number of Prepaid, Current, Due, and Overdue members on Spaceport.</p>
+			<p>Member Count: number of active paying members on Spaceport.</p>
 
 			<p>Green Count: number of Prepaid and Current members.</p>
+
+			<p>
+				{memberCount &&
+					<ResponsiveContainer width='100%' height={300}>
+						<LineChart data={memberCount}>
+							<XAxis dataKey='date' minTickGap={10} />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip />
+							<Legend />
+
+							<Line
+								type='monotone'
+								dataKey='member_count'
+								name='Member Count'
+								stroke='#8884d8'
+								strokeWidth={2}
+								dot={false}
+								animationDuration={1000}
+							/>
+							<Line
+								type='monotone'
+								dataKey='six_month_plus_count'
+								name='Six Months+'
+								stroke='red'
+								strokeWidth={2}
+								dot={false}
+								animationDuration={1500}
+							/>
+						</LineChart>
+					</ResponsiveContainer>
+				}
+			</p>
+
+			<p>Member Count: same as above.</p>
+
+			<p>Six Months+: number of memberships older than six months.</p>
 
 			<Header size='medium'>Space Activity</Header>
 
