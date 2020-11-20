@@ -335,7 +335,7 @@ export function InstructorClassDetail(props) {
 export function InstructorClassList(props) {
 	const { course, setCourse, token } = props;
 	const [open, setOpen] = useState(false);
-	const [input, setInput] = useState({});
+	const [input, setInput] = useState({ max_students: null });
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
