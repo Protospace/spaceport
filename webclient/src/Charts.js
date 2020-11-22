@@ -13,6 +13,7 @@ export function Charts(props) {
 	const [memberCount, setMemberCount] = useState(memberCountCache);
 	const [signupCount, setSignupCount] = useState(signupCountCache);
 	const [spaceActivity, setSpaceActivity] = useState(spaceActivityCache);
+	const [fullActivity, setFullActivity] = useState(false);
 
 	useEffect(() => {
 		requester('/charts/membercount/', 'GET')
@@ -194,12 +195,19 @@ export function Charts(props) {
 
 			<Header size='medium'>Space Activity</Header>
 
-			<p>Daily since March 7th, 2020, updates hourly.</p>
+			{fullActivity ?
+				<p>Daily since March 7th, 2020, updates hourly.</p>
+			:
+				<p>
+					Last four weeks, updates hourly.
+					{' '}<Button size='tiny' onClick={() => setFullActivity(true)} >View All</Button>
+				</p>
+			}
 
 			<p>
 				{spaceActivity &&
 					<ResponsiveContainer width='100%' height={300}>
-						<BarChart data={spaceActivity}>
+						<BarChart data={fullActivity ? spaceActivity : spaceActivity.slice(-28)}>
 							<XAxis dataKey='date' minTickGap={10} />
 							<YAxis />
 							<CartesianGrid strokeDasharray='3 3'/>
@@ -212,7 +220,7 @@ export function Charts(props) {
 								name='Card Scans'
 								fill='#8884d8'
 								maxBarSize={20}
-								animationDuration={1000}
+								isAnimationActive={false}
 							/>
 						</BarChart>
 					</ResponsiveContainer>
