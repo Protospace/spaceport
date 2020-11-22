@@ -13,7 +13,7 @@ def check_auth():
 
 @app.route('/')
 def index():
-    return '<i>SEE YOU SPACE SAMURAI...</i>'
+    return '<i>LIFE IS BUT A DREAM...</i>'
 
 @app.route('/set-password', methods=['POST'])
 def set_password():

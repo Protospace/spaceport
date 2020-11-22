@@ -27,6 +27,7 @@ def set_wiki_password(username, password):
             shell=False, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     output = result.stdout or result.stderr
+    output = output.strip()
 
     logger.info('Output: ' + output)
 
