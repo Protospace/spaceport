@@ -1,3 +1,5 @@
+from log import logger
+
 from flask import Flask, abort, request
 app = Flask(__name__)
 
@@ -13,7 +15,13 @@ def check_auth():
 
 @app.route('/')
 def index():
+    logger.info('Index page requested')
+
     return '<i>LIFE IS BUT A DREAM...</i>'
+
+@app.route('/ping')
+def ping():
+    return 'pong'
 
 @app.route('/set-password', methods=['POST'])
 def set_password():
