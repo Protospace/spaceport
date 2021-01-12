@@ -84,6 +84,7 @@ class SearchViewSet(Base, Retrieve):
             result_objects = [queryset.get(id=x) for x in result_ids]
 
             queryset = result_objects
+            logging.info('Search for: {}, results: {}'.format(search, len(queryset)))
         elif self.action == 'create':
             utils.gen_search_strings() # update cache
             queryset = queryset.order_by('-vetted_date')

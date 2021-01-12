@@ -530,8 +530,15 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
 class MyPasswordResetSerializer(PasswordResetSerializer):
     def validate_email(self, email):
         if not User.objects.filter(email__iexact=email).exists():
+            logging.info('Email not found: ' + email)
             raise ValidationError('Not found.')
         return super().validate_email(email)
+
+    def save(self):
+        email = self.data['email']
+        member = User.objects.get(email__iexact=email).member
+        logging.info('Password reset requested for: {} - {} {} ({})'.format(email, member.first_name, member.last_name, member.id))
+        super().save()
 
 class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
     def save(self):
@@ -558,6 +565,9 @@ class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
                 utils.alert_tanner(msg)
                 logger.info(msg)
                 raise ValidationError(dict(non_field_errors=msg))
+
+        member = self.user.member
+        logging.info('Password reset completed for: {} {} ({})'.format(member.first_name, member.last_name, member.id))
 
         super().save()
 
