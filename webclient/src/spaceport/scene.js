@@ -11,7 +11,9 @@ export const scene = ({ ref }) => {
 	let nextShip = shipInterval;
 
 	var scene = new THREE.Scene();
+
 	const renderer = new THREE.WebGLRenderer({ antialias: true });
+
 	const width = ref.current.clientWidth;
 	const height = ref.current.clientHeight;
 	renderer.setSize(width, height);
@@ -72,7 +74,15 @@ export const scene = ({ ref }) => {
 
 		ships = ships.filter((s) => !s.kill);
 
+		window.addEventListener('resize', onWindowResize, false);
+
+		function onWindowResize() {
+			camera.updateProjectionMatrix();
+			renderer.setSize(ref.current.clientWidth, ref.current.clientHeight);
+		}
+
 		requestAnimationFrame(animate);
+
 		renderer.render(scene, camera);
 	};
 
