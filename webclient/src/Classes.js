@@ -72,13 +72,19 @@ export function Classes(props) {
 			<Header size='large'>Class List</Header>
 
 			<Header size='medium'>Upcoming</Header>
+
+			<p>Ordered by nearest date.</p>
+
 			{classes ?
-				<ClassTable classes={classes.filter(x => x.datetime > now)} />
+				<ClassTable classes={classes.filter(x => x.datetime > now).sort((a, b) => a.datetime > b.datetime ? 1 : -1)} />
 			:
 				<p>Loading...</p>
 			}
 
 			<Header size='medium'>Recent</Header>
+
+			<p>Ordered by nearest date.</p>
+
 			{classes ?
 				<ClassTable classes={classes.filter(x => x.datetime < now)} />
 			:
@@ -92,6 +98,7 @@ export function ClassDetail(props) {
 	const [clazz, setClass] = useState(false);
 	const [refreshCount, refreshClass] = useReducer(x => x + 1, 0);
 	const [error, setError] = useState(false);
+	const [loading, setLoading] = useState(false);
 	const { token, user, refreshUser } = props;
 	const { id } = useParams();
 	const userTraining = clazz && clazz.students.find(x => x.user == user.id);
@@ -108,6 +115,8 @@ export function ClassDetail(props) {
 	}, [refreshCount]);
 
 	const handleSignup = () => {
+		if (loading) return;
+		setLoading(true);
 		const data = { attendance_status: 'Waiting for payment', session: id };
 		requester('/training/', 'POST', token, data)
 		.then(res => {
@@ -120,6 +129,8 @@ export function ClassDetail(props) {
 	};
 
 	const handleToggle = (newStatus) => {
+		if (loading) return;
+		setLoading(true);
 		const data = { attendance_status: newStatus, session: id };
 		requester('/training/'+userTraining.id+'/', 'PUT', token, data)
 		.then(res => {
@@ -131,6 +142,10 @@ export function ClassDetail(props) {
 			setError(true);
 		});
 	};
+
+	useEffect(() => {
+		setLoading(false);
+	}, [userTraining]);
 
 	// TODO: calculate yesterday and lock signups
 
@@ -198,11 +213,11 @@ export function ClassDetail(props) {
 									<p>Status: {userTraining.attendance_status}</p>
 									<p>
 										{userTraining.attendance_status === 'Withdrawn' ?
-											<Button onClick={() => handleToggle('Waiting for payment')}>
+											<Button loading={loading} onClick={() => handleToggle('Waiting for payment')}>
 												Sign back up
 											</Button>
 										:
-											<Button onClick={() => handleToggle('Withdrawn')}>
+											<Button loading={loading} onClick={() => handleToggle('Withdrawn')}>
 												Withdraw from Class
 											</Button>
 										}
@@ -226,7 +241,7 @@ export function ClassDetail(props) {
 									((clazz.max_students && clazz.student_count >= clazz.max_students) ?
 										<p>The class is full.</p>
 									:
-										<Button onClick={handleSignup}>
+										<Button loading={loading} onClick={handleSignup}>
 											Sign me up!
 										</Button>
 									)

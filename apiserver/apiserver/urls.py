@@ -33,6 +33,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path(ADMIN_ROUTE, admin.site.urls),
     url(r'^rest-auth/login/$', LoginView.as_view(), name='rest_login'),
+    url(r'^spaceport-auth/login/$', views.SpaceportAuthView.as_view(), name='spaceport_auth'),
     url(r'^rest-auth/logout/$', LogoutView.as_view(), name='rest_logout'),
     url(r'^password/reset/$', views.PasswordResetView.as_view(), name='rest_password_reset'),
     url(r'^password/reset/confirm/$', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),

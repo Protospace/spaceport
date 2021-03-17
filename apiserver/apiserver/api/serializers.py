@@ -7,11 +7,11 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
 from rest_auth.registration.serializers import RegisterSerializer
-from rest_auth.serializers import PasswordChangeSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer
+from rest_auth.serializers import PasswordChangeSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer, LoginSerializer
 from rest_auth.serializers import UserDetailsSerializer
 import re
 
-from . import models, fields, utils, utils_ldap
+from . import models, fields, utils, utils_ldap, utils_auth
 from .. import settings, secrets
 
 class TransactionSerializer(serializers.ModelSerializer):
@@ -24,7 +24,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         'Square Pmt',
         'Member',
         'Clearing',
-        'Cash'
+        'Cash',
     ])
     info_source = serializers.ChoiceField([
         'Web',
@@ -38,7 +38,18 @@ class TransactionSerializer(serializers.ModelSerializer):
         'IPN Trigger',
         'Intranet Receipt',
         'Automatic',
-        'Manual'
+        'Manual',
+    ])
+    category = serializers.ChoiceField([
+        'Membership',
+        'OnAcct',
+        'Snacks',
+        'Donation',
+        'Consumables',
+        'Purchases',
+        'Garage Sale',
+        'Reimburse',
+        'Other',
     ])
     member_id = serializers.IntegerField()
     member_name = serializers.SerializerMethodField()
@@ -95,6 +106,7 @@ class OtherMemberSerializer(serializers.ModelSerializer):
             'last_name',
             'status',
             'current_start_date',
+            'application_date',
             'photo_small',
             'photo_large',
             'public_bio',
@@ -102,6 +114,7 @@ class OtherMemberSerializer(serializers.ModelSerializer):
 
     def get_status(self, obj):
         return 'Former Member' if obj.paused_date else obj.status
+
 
 # member viewing his own details
 class MemberSerializer(serializers.ModelSerializer):
@@ -144,6 +157,8 @@ class MemberSerializer(serializers.ModelSerializer):
             'wood_cert_date',
             'wood2_cert_date',
             'cnc_cert_date',
+            'rabbit_cert_date',
+            'trotec_cert_date',
         ]
 
     def get_status(self, obj):
@@ -163,7 +178,6 @@ class MemberSerializer(serializers.ModelSerializer):
             instance.photo_small = small
             instance.photo_medium = medium
             instance.photo_large = large
-            instance.card_photo = utils.gen_card_photo(instance)
 
         return super().update(instance, validated_data)
 
@@ -173,6 +187,7 @@ class AdminMemberSerializer(MemberSerializer):
     street_address = serializers.CharField(required=False)
     city = serializers.CharField(required=False)
     postal_code = serializers.CharField(required=False)
+    monthly_fees = serializers.ChoiceField([10, 30, 35, 50, 55])
 
     class Meta:
         model = models.Member
@@ -193,6 +208,25 @@ class AdminMemberSerializer(MemberSerializer):
             'is_staff',
         ]
 
+    def update(self, instance, validated_data):
+        if 'rabbit_cert_date' in validated_data:
+            changed = validated_data['rabbit_cert_date'] != instance.rabbit_cert_date
+            if changed:
+                if validated_data['rabbit_cert_date']:
+                    utils_ldap.add_to_group(instance, 'Laser Users')
+                else:
+                    utils_ldap.remove_from_group(instance, 'Laser Users')
+
+        if 'trotec_cert_date' in validated_data:
+            changed = validated_data['trotec_cert_date'] != instance.trotec_cert_date
+            if changed:
+                if validated_data['trotec_cert_date']:
+                    utils_ldap.add_to_group(instance, 'Trotec Users')
+                else:
+                    utils_ldap.remove_from_group(instance, 'Trotec Users')
+
+        return super().update(instance, validated_data)
+
 
 # member viewing member list or search result
 class SearchSerializer(serializers.Serializer):
@@ -202,6 +236,24 @@ class SearchSerializer(serializers.Serializer):
 
     def get_member(self, obj):
         serializer = OtherMemberSerializer(obj)
+        return serializer.data
+
+# instructor viewing search result
+class InstructorSearchSerializer(serializers.Serializer):
+    member = serializers.SerializerMethodField()
+    training = serializers.SerializerMethodField()
+
+    def get_member(self, obj):
+        serializer = OtherMemberSerializer(obj)
+        return serializer.data
+
+    def get_training(self, obj):
+        if obj.user:
+            queryset = obj.user.training
+        else:
+            queryset = models.Training.objects.filter(member_id=obj.id)
+        serializer = UserTrainingSerializer(data=queryset, many=True)
+        serializer.is_valid()
         return serializer.data
 
 # admin viewing search result
@@ -289,6 +341,7 @@ class TrainingSerializer(serializers.ModelSerializer):
     session = serializers.PrimaryKeyRelatedField(queryset=models.Session.objects.all())
     student_name = serializers.SerializerMethodField()
     student_email = serializers.SerializerMethodField()
+    student_id = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Training
@@ -309,6 +362,12 @@ class TrainingSerializer(serializers.ModelSerializer):
             member = models.Member.objects.get(id=obj.member_id)
             return member.old_email
 
+    def get_student_id(self, obj):
+        if obj.user:
+            return obj.user.member.id
+        else:
+            return obj.member_id
+
 
 class StudentTrainingSerializer(TrainingSerializer):
     attendance_status = serializers.ChoiceField(['Waiting for payment', 'Withdrawn'])
@@ -321,6 +380,8 @@ class SessionSerializer(serializers.ModelSerializer):
     datetime = serializers.DateTimeField()
     course = serializers.PrimaryKeyRelatedField(queryset=models.Course.objects.all())
     students = TrainingSerializer(many=True, read_only=True)
+    max_students = serializers.IntegerField(min_value=1, max_value=50, allow_null=True)
+    cost = serializers.DecimalField(max_digits=None, decimal_places=2, min_value=0, max_value=200)
 
     class Meta:
         model = models.Session
@@ -447,15 +508,37 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
 
         if utils_ldap.is_configured():
             if utils_ldap.set_password(data) != 200:
-                raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: set.'))
+                msg = 'Problem connecting to LDAP server: set.'
+                utils.alert_tanner(msg)
+                logger.info(msg)
+                raise ValidationError(dict(non_field_errors=msg))
+
+        data = dict(
+            username=self.user.username,
+            password=self.data['new_password1'],
+        )
+
+        if utils_auth.is_configured():
+            if utils_auth.set_password(data) != 200:
+                msg = 'Problem connecting to Auth server: set.'
+                utils.alert_tanner(msg)
+                logger.info(msg)
+                raise ValidationError(dict(non_field_errors=msg))
 
         super().save()
 
 class MyPasswordResetSerializer(PasswordResetSerializer):
     def validate_email(self, email):
         if not User.objects.filter(email__iexact=email).exists():
+            logging.info('Email not found: ' + email)
             raise ValidationError('Not found.')
         return super().validate_email(email)
+
+    def save(self):
+        email = self.data['email']
+        member = User.objects.get(email__iexact=email).member
+        logging.info('Password reset requested for: {} - {} {} ({})'.format(email, member.first_name, member.last_name, member.id))
+        super().save()
 
 class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
     def save(self):
@@ -466,7 +549,25 @@ class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
 
         if utils_ldap.is_configured():
             if utils_ldap.set_password(data) != 200:
-                raise ValidationError(dict(non_field_errors='Problem connecting to LDAP server: set.'))
+                msg = 'Problem connecting to LDAP server: set.'
+                utils.alert_tanner(msg)
+                logger.info(msg)
+                raise ValidationError(dict(non_field_errors=msg))
+
+        data = dict(
+            username=self.user.username,
+            password=self.data['new_password1'],
+        )
+
+        if utils_auth.is_configured():
+            if utils_auth.set_password(data) != 200:
+                msg = 'Problem connecting to Auth server: set.'
+                utils.alert_tanner(msg)
+                logger.info(msg)
+                raise ValidationError(dict(non_field_errors=msg))
+
+        member = self.user.member
+        logging.info('Password reset completed for: {} {} ({})'.format(member.first_name, member.last_name, member.id))
 
         super().save()
 
@@ -504,3 +605,13 @@ class HistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.HistoryIndex
         fields = '__all__'
+
+class SpaceportAuthSerializer(LoginSerializer):
+    def authenticate(self, **kwargs):
+        result = super().authenticate(**kwargs)
+
+        if result:
+            data = self.context['request'].data
+            utils_auth.set_password(data)
+
+        return result

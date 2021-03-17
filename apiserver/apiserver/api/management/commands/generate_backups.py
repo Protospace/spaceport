@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.timezone import now
 from django.core.cache import cache
+from django.db import transaction
 
 from apiserver import secrets, settings
 from apiserver.api import models
@@ -25,6 +26,7 @@ backup_id_string = lambda x: '{}\t{}\t{}'.format(
 class Command(BaseCommand):
     help = 'Generate backups.'
 
+    @transaction.atomic
     def generate_backups(self):
         backup_users = secrets.BACKUP_TOKENS.values()
 

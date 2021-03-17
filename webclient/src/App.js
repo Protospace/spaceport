@@ -2,6 +2,7 @@ import React, { useState, useEffect, useReducer, useContext } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
 import './semantic-ui/semantic.min.css';
 import './light.css';
+import './dark.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import Darkmode from 'darkmode-js';
 import { isAdmin, requester } from './utils.js';
@@ -19,6 +20,7 @@ import { Courses, CourseDetail } from './Courses.js';
 import { Classes, ClassDetail } from './Classes.js';
 import { Members, MemberDetail } from './Members.js';
 import { Charts } from './Charts.js';
+import { Auth } from './Auth.js';
 import { PasswordReset, ConfirmReset } from './PasswordReset.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { Footer } from './Footer.js';
@@ -107,6 +109,10 @@ function App() {
 						<img src='/logo-long.svg' className='logo-long' />
 					</Link>
 				</div>
+
+				{window.location.hostname !== 'my.protospace.ca' &&
+					<p style={{ background: 'yellow' }}>~~~~~ Development site ~~~~~</p>
+				}
 			</Container>
 
 			<Menu>
@@ -214,6 +220,10 @@ function App() {
 
 					<Route path='/charts'>
 						<Charts />
+					</Route>
+
+					<Route path='/auth'>
+						<Auth user={user} />
 					</Route>
 
 					{user && user.member.set_details ?

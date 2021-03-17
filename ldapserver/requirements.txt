@@ -3,6 +3,7 @@ Flask==1.1.1
 gunicorn==20.0.4
 itsdangerous==1.1.0
 Jinja2==2.11.1
+logging-tree==1.8.1
 MarkupSafe==1.1.1
 pyasn1==0.4.8
 pyasn1-modules==0.2.8

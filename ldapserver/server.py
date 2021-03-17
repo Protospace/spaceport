@@ -1,3 +1,5 @@
+from log import logger
+
 from flask import Flask, abort, request
 app = Flask(__name__)
 
@@ -13,7 +15,13 @@ def check_auth():
 
 @app.route('/')
 def index():
+    logger.info('Index page requested')
+
     return '<i>SEE YOU SPACE SAMURAI...</i>'
+
+@app.route('/ping')
+def ping():
+    return 'pong'
 
 @app.route('/find-user', methods=['POST'])
 def find_user():
@@ -44,6 +52,26 @@ def set_password():
     password = request.form['password']
 
     ldap_functions.set_password(username, password)
+    return ''
+
+@app.route('/add-to-group', methods=['POST'])
+def add_to_group():
+    check_auth()
+
+    groupname = request.form['group']
+    username = request.form.get('username', None) or request.form.get('email', None)
+
+    ldap_functions.add_to_group(groupname, username)
+    return ''
+
+@app.route('/remove-from-group', methods=['POST'])
+def remove_from_group():
+    check_auth()
+
+    groupname = request.form['group']
+    username = request.form.get('username', None) or request.form.get('email', None)
+
+    ldap_functions.remove_from_group(groupname, username)
     return ''
 
 if __name__ == '__main__':

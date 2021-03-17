@@ -9,13 +9,18 @@ class Command(BaseCommand):
 
     def generate_stats(self):
         utils_stats.calc_next_events()
-        member_count, green_count = utils_stats.calc_member_counts()
+        member_count, green_count, six_month_plus_count, vetted_count = utils_stats.calc_member_counts()
         signup_count = utils_stats.calc_signup_counts()
 
         # do this hourly in case an admin causes a change
         models.StatsMemberCount.objects.update_or_create(
             date=utils.today_alberta_tz(),
-            defaults=dict(member_count=member_count, green_count=green_count),
+            defaults=dict(
+                member_count=member_count,
+                green_count=green_count,
+                six_month_plus_count=six_month_plus_count,
+                vetted_count=vetted_count,
+            ),
         )
 
         models.StatsSignupCount.objects.update_or_create(

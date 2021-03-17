@@ -2,7 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import time
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import requests
 from django.core.cache import cache
 from django.utils.timezone import now, pytz
@@ -22,8 +22,10 @@ DEFAULTS = {
     'bay_108_temp': None,
     'bay_110_temp': None,
     'minecraft_players': [],
+    'mumble_users': [],
     'card_scans': 0,
     'track': {},
+    'alarm': {},
 }
 
 def changed_card():
@@ -62,11 +64,16 @@ def calc_member_counts():
     paused_count = members.count() - member_count
     green_count = num_current + num_prepaid
 
+    six_months_ago = today_alberta_tz() - timedelta(days=183)
+    six_month_plus_count = not_paused.filter(application_date__lte=six_months_ago).count()
+
+    vetted_count = not_paused.filter(vetted_date__isnull=False).count()
+
     cache.set('member_count', member_count)
     cache.set('paused_count', paused_count)
     cache.set('green_count', green_count)
 
-    return member_count, green_count
+    return member_count, green_count, six_month_plus_count, vetted_count
 
 def calc_signup_counts():
     month_beginning = today_alberta_tz().replace(day=1)
@@ -111,6 +118,21 @@ def check_minecraft_server():
             return players
         except BaseException as e:
             logger.error('Problem checking Minecraft: {} - {}'.format(e.__class__.__name__, str(e)))
+
+    return []
+
+def check_mumble_server():
+    if secrets.MUMBLE:
+        url = secrets.MUMBLE
+
+        try:
+            r = requests.get(url, timeout=5)
+            r.raise_for_status()
+            users = r.text.split()
+            cache.set('mumble_users', users)
+            return users
+        except BaseException as e:
+            logger.error('Problem checking Mumble: {} - {}'.format(e.__class__.__name__, str(e)))
 
     return []
 

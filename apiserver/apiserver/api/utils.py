@@ -19,11 +19,6 @@ from django.core.cache import cache
 from django.utils.timezone import now, pytz
 
 from . import models, serializers, utils_ldap
-try:
-    from . import old_models
-except ImportError:
-    logger.info('Running without old portal data...')
-    old_models = None
 
 STATIC_FOLDER = 'data/static/'
 
@@ -234,28 +229,29 @@ def gen_card_photo(member):
     # check font size
     font_sizes = (60, 72)
     font = ImageFont.truetype('DejaVuSans-Bold.ttf', font_sizes[1])
-    size = draw.textsize(member.last_name, font=font)
+    size = draw.textsize(str(member.last_name), font=font)
     if size[0] > CARD_TEXT_SIZE_LIMIT:
         font_sizes = (36, 48)
 
     font = ImageFont.truetype('DejaVuSans.ttf', font_sizes[0])
     x = CARD_PHOTO_MARGIN_SIDE
     y = my + CARD_PHOTO_MARGIN_TOP + CARD_PHOTO_MARGIN_SIDE
-    draw.text((x, y), member.first_name, (0,0,0), font=font)
+    draw.text((x, y), str(member.first_name), (0,0,0), font=font)
 
     font = ImageFont.truetype('DejaVuSans-Bold.ttf', font_sizes[1])
     y = my + CARD_PHOTO_MARGIN_TOP + CARD_PHOTO_MARGIN_SIDE + font_sizes[1]
-    draw.text((x, y), member.last_name, (0,0,0), font=font)
+    draw.text((x, y), str(member.last_name), (0,0,0), font=font)
 
     font = ImageFont.truetype('DejaVuSans.ttf', 36)
-    draw.text((x, 800), 'Joined: ' + str(member.application_date), (0,0,0), font=font)
+    draw.text((x, 800), 'Joined: ' + str(member.application_date or 'Unknown'), (0,0,0), font=font)
     y = CARD_PHOTO_MARGIN_SIDE
     draw.text((475, y), str(member.id), (0,0,0), font=font)
 
-    file_name = str(uuid4()) + '.jpg'
-    card_template.save(STATIC_FOLDER + file_name, quality=95)
+    bio = io.BytesIO()
+    card_template.save(bio, 'JPEG', quality=95)
+    bio.seek(0)
 
-    return file_name
+    return bio
 
 
 ALLOWED_TAGS = [
@@ -292,15 +288,11 @@ def link_old_member(data, user):
     Since this runs AFTER registration, we need to delete the user on any
     failures or else the username will be taken when they try again
     '''
-    if not old_models:
-        msg = 'Unable to link, old DB wasn\'t imported.'
-        logger.info(msg)
-        raise ValidationError(dict(email=msg))
 
     try:
         member = models.Member.objects.get(old_email__iexact=data['email'])
     except models.Member.DoesNotExist:
-        msg = 'Unable to find email in old portal.'
+        msg = 'Unable to find email in old portal. Maybe try your other email addresses?'
         logger.info(msg)
         raise ValidationError(dict(email=msg))
     except models.Member.MultipleObjectsReturned:
@@ -318,15 +310,18 @@ def link_old_member(data, user):
         if result == 200:
             if utils_ldap.set_password(data) != 200:
                 msg = 'Problem connecting to LDAP server: set.'
+                alert_tanner(msg)
                 logger.info(msg)
                 raise ValidationError(dict(non_field_errors=msg))
         elif result == 404:
             if utils_ldap.create_user(data) != 200:
                 msg = 'Problem connecting to LDAP server: create.'
+                alert_tanner(msg)
                 logger.info(msg)
                 raise ValidationError(dict(non_field_errors=msg))
         else:
             msg = 'Problem connecting to LDAP server: find.'
+            alert_tanner(msg)
             logger.info(msg)
             raise ValidationError(dict(non_field_errors=msg))
 
@@ -342,12 +337,11 @@ def link_old_member(data, user):
     models.Training.objects.filter(member_id=member.id).update(user=user)
 
 def create_new_member(data, user):
-    if old_models:
-        old_members = old_models.Members.objects.using('old_portal')
-        if old_members.filter(email__iexact=data['email']).exists():
-            msg = 'Account was found in old portal.'
-            logger.info(msg)
-            raise ValidationError(dict(email=msg))
+    members = models.Member.objects
+    if members.filter(old_email__iexact=data['email']).exists():
+        msg = 'Account was found in old portal.'
+        logger.info(msg)
+        raise ValidationError(dict(email=msg))
 
     if utils_ldap.is_configured():
         result = utils_ldap.find_user(user.username)
@@ -359,11 +353,13 @@ def create_new_member(data, user):
             pass
         else:
             msg = 'Problem connecting to LDAP server.'
+            alert_tanner(msg)
             logger.info(msg)
             raise ValidationError(dict(non_field_errors=msg))
 
         if utils_ldap.create_user(data) != 200:
             msg = 'Problem connecting to LDAP server: create.'
+            alert_tanner(msg)
             logger.info(msg)
             raise ValidationError(dict(non_field_errors=msg))
 
@@ -393,7 +389,6 @@ def gen_member_forms(member):
 
     packet = io.BytesIO()
     can = canvas.Canvas(packet, pagesize=letter)
-    can.drawString(75, 775, '[  ] Paid    [  ] Sponsored & Approved    [  ] Vetted    [  ] Got Card')
     can.drawString(34, 683, data['first_name'])
     can.drawString(218, 683, data['last_name'])
     can.drawString(403, 683, data['preferred_name'])
@@ -407,7 +402,7 @@ def gen_member_forms(member):
 
     packet = io.BytesIO()
     can = canvas.Canvas(packet, pagesize=letter)
-    can.drawRightString(600, 775, '{} {} ({})'.format(
+    can.drawRightString(600, 770, '{} {} ({})'.format(
         data['first_name'],
         data['last_name'],
         data['id'],

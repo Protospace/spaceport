@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Link, useParams, useLocation } from 'react-router-dom';
 import moment from 'moment-timezone';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Popup, Segment, Table } from 'semantic-ui-react';
@@ -128,12 +128,15 @@ function MemberInfo(props) {
 };
 
 export function Home(props) {
-	const { user } = props;
+	const { user, token } = props;
 	const [stats, setStats] = useState(JSON.parse(localStorage.getItem('stats', 'false')));
 	const [refreshCount, refreshStats] = useReducer(x => x + 1, 0);
+	const location = useLocation();
+
+	const bypass_code = location.hash.replace('#', '');
 
 	useEffect(() => {
-		requester('/stats/', 'GET')
+		requester('/stats/', 'GET', token)
 		.then(res => {
 			setStats(res);
 			localStorage.setItem('stats', JSON.stringify(res));
@@ -142,17 +145,21 @@ export function Home(props) {
 			console.log(err);
 			setStats(false);
 		});
-	}, [refreshCount]);
+	}, [refreshCount, token]);
 
 	const getStat = (x) => stats && stats[x] ? stats[x] : '?';
 	const getZeroStat = (x) => stats && stats[x] ? stats[x] : '0';
 	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz('America/Edmonton').format('ll') : '?';
 
 	const mcPlayers = stats && stats['minecraft_players'] ? stats['minecraft_players'] : [];
+	const mumbleUsers = stats && stats['mumble_users'] ? stats['mumble_users'] : [];
 
-	const getTrackStat = (x) => stats && stats.track && stats.track[x] ? moment().unix() - stats.track[x] > 60 ? 'Free' : 'In Use' : '?';
-	const getTrackLast = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]).tz('America/Edmonton').format('llll') : 'Unknown';
-	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]).tz('America/Edmonton').fromNow() : '';
+	const getTrackStat = (x) => stats && stats.track && stats.track[x] ? moment().unix() - stats.track[x]['time'] > 60 ? 'Free' : 'In Use' : '?';
+	const getTrackLast = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').format('llll') : 'Unknown';
+	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').fromNow() : '';
+	const getTrackName = (x) => stats && stats.track && stats.track[x] && stats.track[x]['username'] ? stats.track[x]['username'] : 'Unknown';
+
+	const alarmStat = () => stats && stats.alarm && moment().unix() - stats.alarm['time'] < 300 ? stats.alarm['data'] > 200 ? 'Armed' : 'Disarmed' : 'Unknown';
 
 	return (
 		<Container>
@@ -172,9 +179,18 @@ export function Home(props) {
 							</div>
 					:
 						<div>
-							<LoginForm {...props} />
+							{bypass_code ?
+								<Message warning>
+									<Message.Header>Outside Registration</Message.Header>
+									<p>This page allows you to sign up from outside of Protospace.</p>
+								</Message>
+							:
+								<>
+									<LoginForm {...props} />
 
-							<Divider section horizontal>Or</Divider>
+									<Divider section horizontal>Or</Divider>
+								</>
+							}
 
 							<SignupForm {...props} />
 						</div>
@@ -201,11 +217,10 @@ export function Home(props) {
 							<p>Next monthly clean: {getDateStat('next_clean')}</p>
 							<p>Member count: {getStat('member_count')} <Link to='/charts'>[more]</Link></p>
 							<p>Green members: {getStat('green_count')}</p>
-							<p>Old members: {getStat('paused_count')}</p>
 							<p>Card scans today: {getZeroStat('card_scans')}</p>
 
 							<p>
-								Minecraft players: {mcPlayers.length} <Popup content={
+								Minecraft players: {mcPlayers.length} {mcPlayers.length > 5 && '🔥'} <Popup content={
 									<React.Fragment>
 										<p>
 											Server IP:<br />
@@ -217,6 +232,22 @@ export function Home(props) {
 										</p>
 									</React.Fragment>
 								} trigger={<a>[more]</a>} />
+							{' '}<a href='http://games.protospace.ca:8123/?worldname=world&mapname=flat&zoom=3&x=74&y=64&z=354' target='_blank'>[map]</a>
+							</p>
+
+							<p>
+								Mumble users: {mumbleUsers.length} <Popup content={
+									<React.Fragment>
+										<p>
+											Server IP:<br />
+											mumble.protospace.ca
+										</p>
+										<p>
+											Users:<br />
+											{mumbleUsers.length ? mumbleUsers.map(x => <React.Fragment>{x}<br /></React.Fragment>) : 'None'}
+										</p>
+									</React.Fragment>
+								} trigger={<a>[more]</a>} />
 							</p>
 
 							<p>
@@ -225,7 +256,8 @@ export function Home(props) {
 										<p>
 											Last use:<br />
 											{getTrackLast('TROTECS300')}<br />
-											{getTrackAgo('TROTECS300')}
+											{getTrackAgo('TROTECS300')}<br />
+											by {getTrackName('TROTECS300')}
 										</p>
 									</React.Fragment>
 								} trigger={<a>[more]</a>} />
@@ -237,11 +269,14 @@ export function Home(props) {
 										<p>
 											Last use:<br />
 											{getTrackLast('FRICKIN-LASER')}<br />
-											{getTrackAgo('FRICKIN-LASER')}
+											{getTrackAgo('FRICKIN-LASER')}<br />
+											by {getTrackName('FRICKIN-LASER')}
 										</p>
 									</React.Fragment>
 								} trigger={<a>[more]</a>} />
 							</p>
+
+							{user && user.member.vetted_date && <p>Alarm status: {alarmStat()}</p>}
 						</div>
 
 					</Segment>

@@ -23,14 +23,14 @@ export function TransactionEditor(props) {
 	});
 
 	const accountOptions = [
-		{ key: '0', text: 'Cash (CAD Lock Box)', value: 'Cash' },
+		{ key: '0', text: 'Cash (Lock Box)', value: 'Cash' },
 		{ key: '1', text: 'Interac (Email) Transfer (TD)', value: 'Interac' },
-		{ key: '2', text: 'Square (Credit)', value: 'Square Pmt' },
-		{ key: '3', text: 'Dream Payments (Debit/Credit)', value: 'Dream Pmt' },
-		{ key: '4', text: 'Deposit to TD (Not Interac)', value: 'TD Chequing' },
-		{ key: '5', text: 'PayPal', value: 'PayPal' },
-		{ key: '6', text: 'Member Balance / Protocash', value: 'Member' },
-		{ key: '7', text: 'Supense (Clearing)  Acct / Membership Adjustment', value: 'Clearing' },
+		{ key: '2', text: 'Square (Credit Card)', value: 'Square Pmt' },
+		//{ key: '3', text: 'Dream Payments (Debit/Credit)', value: 'Dream Pmt' },
+		{ key: '4', text: 'Cheque / Deposit to TD', value: 'TD Chequing' },
+		//{ key: '5', text: 'Member Balance / Protocash', value: 'Member' },
+		{ key: '6', text: 'Membership Adjustment / Clearing', value: 'Clearing' },
+		{ key: '7', text: 'PayPal', value: 'PayPal' },
 	];
 
 	const sourceOptions = [
@@ -53,9 +53,9 @@ export function TransactionEditor(props) {
 		{ key: '1', text: 'Payment On Account (ie. Course Fee)', value: 'OnAcct' },
 		{ key: '2', text: 'Snack / Pop / Coffee', value: 'Snacks' },
 		{ key: '3', text: 'Donations', value: 'Donation' },
-		{ key: '4', text: 'Consumables (Specify which in memo)', value: 'Consumables' },
+		{ key: '4', text: 'Consumables (Explain in memo)', value: 'Consumables' },
 		{ key: '5', text: 'Purchase of Locker / Goods / Merch / Stock', value: 'Purchases' },
-		{ key: '6', text: 'Auction, Garage Sale, Nearly Free Shelf', value: 'Garage Sale' },
+		//{ key: '6', text: 'Auction, Garage Sale, Nearly Free Shelf', value: 'Garage Sale' },
 		{ key: '7', text: 'Reimbursement (Enter a negative value)', value: 'Reimburse' },
 		{ key: '8', text: 'Other (Explain in memo)', value: 'Other' },
 	];
@@ -94,14 +94,14 @@ export function TransactionEditor(props) {
 			/>
 
 			<Form.Select
-				label='Account'
+				label='Payment Method / Account'
 				fluid
 				options={accountOptions}
 				{...makeProps('account_type')}
 				onChange={handleValues}
 			/>
 
-			<Form.Group widths='equal'>
+			{/* <Form.Group widths='equal'>
 				<Form.Input
 					label='Payment Method'
 					fluid
@@ -114,7 +114,7 @@ export function TransactionEditor(props) {
 					{...makeProps('info_source')}
 					onChange={handleValues}
 				/>
-			</Form.Group>
+			</Form.Group> */}
 
 			<Form.Group widths='equal'>
 				<Form.Input
@@ -124,7 +124,7 @@ export function TransactionEditor(props) {
 				/>
 
 				<Form.Input
-					label='# Membership Months'
+					label='Number of Membership Months'
 					fluid
 					{...makeProps('number_of_membership_months')}
 				/>
@@ -349,10 +349,10 @@ class TransactionTable extends React.Component {
 						<Table.Cell>Account:</Table.Cell>
 						<Table.Cell>{transaction.account_type}</Table.Cell>
 					</Table.Row>
-					<Table.Row>
+					{/* <Table.Row>
 						<Table.Cell>Payment Method:</Table.Cell>
 						<Table.Cell>{transaction.payment_method}</Table.Cell>
-					</Table.Row>
+					</Table.Row> */}
 					<Table.Row>
 						<Table.Cell>Info Source:</Table.Cell>
 						<Table.Cell>{transaction.info_source}</Table.Cell>

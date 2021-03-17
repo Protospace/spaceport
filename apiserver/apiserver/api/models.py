@@ -21,7 +21,6 @@ class Member(models.Model):
     photo_medium = models.CharField(max_length=64, blank=True, null=True)
     photo_small = models.CharField(max_length=64, blank=True, null=True)
     member_forms = models.CharField(max_length=64, blank=True, null=True)
-    card_photo = models.CharField(max_length=64, blank=True, null=True)
 
     set_details = models.BooleanField(default=False)
     first_name = models.CharField(max_length=32)
@@ -53,6 +52,8 @@ class Member(models.Model):
     wood_cert_date = models.DateField(blank=True, null=True, default=None)
     wood2_cert_date = models.DateField(blank=True, null=True, default=None)
     cnc_cert_date = models.DateField(blank=True, null=True, default=None)
+    rabbit_cert_date = models.DateField(blank=True, null=True, default=None)
+    trotec_cert_date = models.DateField(blank=True, null=True, default=None)
     paused_date = models.DateField(blank=True, null=True)
     monthly_fees = models.IntegerField(default=55, blank=True, null=True)
 
@@ -141,6 +142,8 @@ class StatsMemberCount(models.Model):
     date = models.DateField(default=today_alberta_tz)
     member_count = models.IntegerField()
     green_count = models.IntegerField()
+    six_month_plus_count = models.IntegerField()
+    vetted_count = models.IntegerField()
 
 class StatsSignupCount(models.Model):
     month = models.DateField()

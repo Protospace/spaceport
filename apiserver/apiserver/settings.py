@@ -116,6 +116,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'data/db.sqlite3'),
+        'OPTIONS': {
+            'timeout': 20,  # increased because generate_backups.py blocks
+        },
     },
     'old_portal': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -221,11 +224,14 @@ LOGGING = {
         'ignore_stats': {
             '()': 'apiserver.filters.IgnoreStats',
         },
+        'ignore_lockout': {
+            '()': 'apiserver.filters.IgnoreLockout',
+        },
     },
     'handlers': {
         'console': {
             'level': 'DEBUG',
-            'filters': ['ignore_stats'],
+            'filters': ['ignore_stats', 'ignore_lockout'],
             'class': 'logging.StreamHandler',
             'formatter': 'medium'
         },

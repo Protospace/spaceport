@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Max
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, FileResponse
 from django.core.files.base import File
 from django.core.cache import cache
 from django.utils.timezone import now
@@ -12,7 +12,7 @@ from rest_framework import viewsets, views, mixins, generics, exceptions
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_auth.views import PasswordChangeView, PasswordResetView, PasswordResetConfirmView
+from rest_auth.views import PasswordChangeView, PasswordResetView, PasswordResetConfirmView, LoginView
 from rest_auth.registration.views import RegisterView
 from fuzzywuzzy import fuzz, process
 from collections import OrderedDict
@@ -20,7 +20,7 @@ import datetime, time
 
 import requests
 
-from . import models, serializers, utils, utils_paypal, utils_stats
+from . import models, serializers, utils, utils_paypal, utils_stats, utils_ldap
 from .permissions import (
     is_admin_director,
     AllowMetadata,
@@ -50,6 +50,8 @@ class SearchViewSet(Base, Retrieve):
     def get_serializer_class(self):
         if is_admin_director(self.request.user) and self.action == 'retrieve':
             return serializers.AdminSearchSerializer
+        elif self.request.user.member.is_instructor and self.action == 'retrieve':
+            return serializers.InstructorSearchSerializer
         else:
             return serializers.SearchSerializer
 
@@ -82,6 +84,7 @@ class SearchViewSet(Base, Retrieve):
             result_objects = [queryset.get(id=x) for x in result_ids]
 
             queryset = result_objects
+            logging.info('Search for: {}, results: {}'.format(search, len(queryset)))
         elif self.action == 'create':
             utils.gen_search_strings() # update cache
             queryset = queryset.order_by('-vetted_date')
@@ -137,11 +140,23 @@ class MemberViewSet(Base, Retrieve, Update):
         member = self.get_object()
         member.current_start_date = utils.today_alberta_tz()
         member.paused_date = None
+        if not member.monthly_fees:
+            member.monthly_fees = 55
         member.save()
         utils.tally_membership_months(member)
         utils.gen_member_forms(member)
         utils_stats.changed_card()
         return Response(200)
+
+    @action(detail=True, methods=['get'])
+    def card_photo(self, request, pk=None):
+        if not is_admin_director(self.request.user):
+            raise exceptions.PermissionDenied()
+        member = self.get_object()
+        if not member.photo_large:
+            raise Http404
+        card_photo = utils.gen_card_photo(member)
+        return FileResponse(card_photo, filename='card.jpg')
 
 
 class CardViewSet(Base, Create, Retrieve, Update, Destroy):
@@ -200,6 +215,38 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         else:
             return serializers.StudentTrainingSerializer
 
+    def update_cert(self, session, member, status):
+        # always update cert date incase member is returning and gets recertified
+        if session.course.id == 249:
+            member.orientation_date = utils.today_alberta_tz() if status == 'Attended' else None
+        elif session.course.id == 261:
+            member.wood_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+        elif session.course.id == 401:
+            member.wood2_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+        elif session.course.id == 281:
+            member.lathe_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+        elif session.course.id == 283:
+            member.mill_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+        elif session.course.id == 259:
+            member.cnc_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+        elif session.course.id == 247:
+            member.rabbit_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+
+            if utils_ldap.is_configured():
+                if status == 'Attended':
+                    utils_ldap.add_to_group(member, 'Laser Users')
+                else:
+                    utils_ldap.remove_from_group(member, 'Laser Users')
+        elif session.course.id == 321:
+            member.trotec_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+
+            if utils_ldap.is_configured():
+                if status == 'Attended':
+                    utils_ldap.add_to_group(member, 'Trotec Users')
+                else:
+                    utils_ldap.remove_from_group(member, 'Trotec Users')
+        member.save()
+
     # TODO: turn these into @actions
     # TODO: check if full, but not for instructors
     # TODO: if already paid, skip to confirmed
@@ -222,19 +269,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             if (user and training1.exists()) or training2.exists():
                 raise exceptions.ValidationError(dict(non_field_errors='Already registered.'))
 
-            if session.course.id == 249:
-                member.orientation_date = utils.today_alberta_tz() if status == 'Attended' else None
-            elif session.course.id == 261:
-                member.wood_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-            elif session.course.id == 401:
-                member.wood2_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-            elif session.course.id == 281:
-                member.lathe_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-            elif session.course.id == 283:
-                member.mill_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-            elif session.course.id == 259:
-                member.cnc_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-            member.save()
+            self.update_cert(session, member, status)
 
             serializer.save(user=user, member_id=member.id, attendance_status=status)
         else:
@@ -261,19 +296,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         else:
             member = models.Member.objects.get(id=training.member_id)
 
-        if session.course.id == 249:
-            member.orientation_date = utils.today_alberta_tz() if status == 'Attended' else None
-        elif session.course.id == 261:
-            member.wood_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-        elif session.course.id == 401:
-            member.wood2_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-        elif session.course.id == 281:
-            member.lathe_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-        elif session.course.id == 283:
-            member.mill_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-        elif session.course.id == 259:
-            member.cnc_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
-        member.save()
+        self.update_cert(session, member, status)
 
 
 class TransactionViewSet(Base, List, Create, Retrieve, Update):
@@ -440,6 +463,11 @@ class StatsViewSet(viewsets.ViewSet, List):
         cached_stats = cache.get_many(stats_keys)
         stats = utils_stats.DEFAULTS.copy()
         stats.update(cached_stats)
+
+        user = self.request.user
+        if not user.is_authenticated or not user.member.vetted_date:
+            stats.pop('alarm', None)
+
         return Response(stats)
 
     @action(detail=False, methods=['post'])
@@ -463,10 +491,26 @@ class StatsViewSet(viewsets.ViewSet, List):
             raise exceptions.ValidationError(dict(data='This field is required.'))
 
     @action(detail=False, methods=['post'])
+    def alarm(self, request):
+        try:
+            alarm = dict(time=time.time(), data=int(request.data['data']))
+            cache.set('alarm', alarm)
+            return Response(200)
+        except ValueError:
+            raise exceptions.ValidationError(dict(data='Invalid integer.'))
+        except KeyError:
+            raise exceptions.ValidationError(dict(data='This field is required.'))
+
+    @action(detail=False, methods=['post'])
     def track(self, request):
         if 'name' in request.data:
             track = cache.get('track', {})
-            track[request.data['name']] = time.time()
+
+            name = request.data['name']
+            username = request.data.get('username', '')
+            username = username.split('.')[0].title()
+
+            track[name] = dict(time=time.time(), username=username)
             cache.set('track', track)
             return Response(200)
         else:
@@ -500,14 +544,18 @@ class BackupView(views.APIView):
         backup_user = secrets.BACKUP_TOKENS.get(auth_token, None)
 
         if backup_user:
+            logger.info('Backup user: ' + backup_user['name'])
             backup_path = cache.get(backup_user['cache_key'], None)
 
             if not backup_path:
+                logger.error('Backup not found')
                 raise Http404
 
             if str(now().date()) not in backup_path:
                 # sanity check - make sure it's actually today's backup
-                return Response('Today\'s backup not ready yet', status=400)
+                msg = 'Today\'s backup not ready yet'
+                logger.error(msg)
+                return Response(msg, status=503)
 
             backup_url = 'https://static.{}/backups/{}'.format(
                 settings.PRODUCTION_HOST,
@@ -597,6 +645,9 @@ class PasswordResetView(PasswordResetView):
 
 class PasswordResetConfirmView(PasswordResetConfirmView):
     serializer_class = serializers.MyPasswordResetConfirmSerializer
+
+class SpaceportAuthView(LoginView):
+    serializer_class = serializers.SpaceportAuthSerializer
 
 
 @api_view()

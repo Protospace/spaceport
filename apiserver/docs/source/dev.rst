@@ -13,7 +13,7 @@ Install dependencies:
     $ sudo apt install memcached
 
     # Python:
-    $ sudo apt install build-essential python3 python3-dev python3-pip python-virtualenv python3-virtualenv
+    $ sudo apt install build-essential python3 python3-dev python3-pip python3-virtualenv
 
     # Yarn / nodejs:
     # from https://yarnpkg.com/lang/en/docs/install/#debian-stable
@@ -111,7 +111,7 @@ Point a domain to the server and reverse proxy requests according to subdomain.
 
 Domains: `portal.example.com`, `api.portal.example.com`, `static.portal.example.com`, `docs.portal.example.com` should all be reverse proxied.
 
-Configure nginx:
+Configure nginx (`/etc/nginx/sites-available/default`):
 
 .. sourcecode:: text
 
@@ -185,7 +185,7 @@ Install certbot and run it:
 
 .. sourcecode:: bash
 
-    $ sudo apt install certbot python-certbot-nginx
+    $ sudo apt install certbot python3-certbot-nginx
     $ sudo certbot --nginx
 
 Answer the prompts, enable redirect.

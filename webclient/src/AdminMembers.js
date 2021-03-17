@@ -123,7 +123,7 @@ export function AdminMemberCards(props) {
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
-	const [viewCard, setViewCard] = useState(false);
+	const [cardPhoto, setCardPhoto] = useState(false);
 	const { id } = useParams();
 
 	useEffect(() => {
@@ -155,6 +155,18 @@ export function AdminMemberCards(props) {
 		});
 	};
 
+	const getCardPhoto = (e) => {
+		e.preventDefault();
+		requester('/members/' + id + '/card_photo/', 'GET', token)
+		.then(res => res.blob())
+		.then(res => {
+			setCardPhoto(URL.createObjectURL(res));
+		})
+		.catch(err => {
+			console.log(err);
+		});
+	};
+
 	const makeProps = (name) => ({
 		name: name,
 		onChange: handleChange,
@@ -176,17 +188,17 @@ export function AdminMemberCards(props) {
 			<Form onSubmit={handleSubmit}>
 				<Header size='small'>Add a Card</Header>
 
-				{result.member.card_photo ?
+				{result.member.photo_large ?
 					<p>
-						<Button onClick={() => setViewCard(true)}>View card image</Button>
+						<Button onClick={(e) => getCardPhoto(e)}>View card image</Button>
 					</p>
 				:
 					<p>No card image, member photo missing!</p>
 				}
 
-				{viewCard && <>
+				{cardPhoto && <>
 					<p>
-						<Image rounded size='medium' src={staticUrl + '/' + result.member.card_photo} />
+						<Image rounded size='medium' src={cardPhoto} />
 					</p>
 
 					<Header size='small'>How to Print a Card</Header>
@@ -221,7 +233,15 @@ export function AdminMemberCards(props) {
 					/>
 				</Form.Group>
 
-				<Form.Button loading={loading} error={error.non_field_errors}>
+				<Form.Checkbox
+					label='Confirmed that the member has been given a tour and knows the alarm code'
+					required
+					{...makeProps('given_tour')}
+					onChange={handleCheck}
+					checked={input.given_tour}
+				/>
+
+				<Form.Button disabled={!input.given_tour} loading={loading} error={error.non_field_errors}>
 					Submit
 				</Form.Button>
 				{success && <div>Success!</div>}
@@ -498,6 +518,12 @@ export function AdminMemberInfo(props) {
 						<Table.Cell>Emergency Contact Phone:</Table.Cell>
 						<Table.Cell>{member.emergency_contact_phone || 'None'}</Table.Cell>
 					</Table.Row>
+
+					<Table.Row>
+						<Table.Cell>On Spaceport:</Table.Cell>
+						<Table.Cell>{member.user ? 'Yes' : 'No'}</Table.Cell>
+					</Table.Row>
+
 					<Table.Row>
 						<Table.Cell>Public Bio:</Table.Cell>
 					</Table.Row>
@@ -541,6 +567,7 @@ export function AdminCert(props) {
 
 	const handleCert = (e) => {
 		e.preventDefault();
+		if (loading) return;
 		setLoading(true);
 		let data = Object();
 		data[field] = moment.utc().tz('America/Edmonton').format('YYYY-MM-DD');
@@ -555,6 +582,7 @@ export function AdminCert(props) {
 
 	const handleUncert = (e) => {
 		e.preventDefault();
+		if (loading) return;
 		setLoading(true);
 		let data = Object();
 		data[field] = null;
@@ -645,6 +673,18 @@ export function AdminMemberCertifications(props) {
 						<Table.Cell>{member.cnc_cert_date ? 'Yes, ' + member.cnc_cert_date : 'No'}</Table.Cell>
 						<Table.Cell><Link to='/courses/259'>Tormach: CAM and Tormach Intro</Link></Table.Cell>
 						<Table.Cell><AdminCert name='CNC' field='cnc_cert_date' {...props} /></Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Rabbit Laser</Table.Cell>
+						<Table.Cell>{member.rabbit_cert_date ? 'Yes, ' + member.rabbit_cert_date : 'No'}</Table.Cell>
+						<Table.Cell><Link to='/courses/247'>Laser: Cutting and Engraving</Link></Table.Cell>
+						<Table.Cell><AdminCert name='Rabbit' field='rabbit_cert_date' {...props} /></Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Trotec Laser</Table.Cell>
+						<Table.Cell>{member.trotec_cert_date ? 'Yes, ' + member.trotec_cert_date : 'No'}</Table.Cell>
+						<Table.Cell><Link to='/courses/321'>Laser: Trotec Course</Link></Table.Cell>
+						<Table.Cell><AdminCert name='Trotec' field='trotec_cert_date' {...props} /></Table.Cell>
 					</Table.Row>
 				</Table.Body>
 			</Table>

@@ -110,7 +110,7 @@ export function SignupForm(props) {
 
 	return (
 		<Form onSubmit={handleSubmit}>
-			<Header size='medium'>Sign Up from Protospace</Header>
+			<Header size='medium'>Sign Up to Spaceport</Header>
 
 			<Form.Group widths='equal'>
 				<Form.Input

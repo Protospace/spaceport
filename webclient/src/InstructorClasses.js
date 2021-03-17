@@ -68,8 +68,12 @@ class AttendanceSheet extends React.Component {
 function AttendanceRow(props) {
 	const { student, token, refreshClass } = props;
 	const [error, setError] = useState(false);
+	const [loading, setLoading] = useState(false);
 
 	const handleMark = (newStatus) => {
+		if (loading) return;
+		if (student.attendance_status == newStatus) return;
+		setLoading(newStatus);
 		const data = { ...student, attendance_status: newStatus };
 		requester('/training/'+student.id+'/', 'PATCH', token, data)
 		.then(res => {
@@ -86,11 +90,19 @@ function AttendanceRow(props) {
 		onClick: () => handleMark(name),
 		toggle: true,
 		active: student.attendance_status === name,
+		loading: loading === name,
 	});
+
+	useEffect(() => {
+		setLoading(false);
+	}, [student.attendance_status]);
 
 	return (
 		<div className='attendance-row'>
-			<p>{student.student_name}:</p>
+			<p>
+				<Link to={'/members/'+student.student_id}>{student.student_name}</Link>
+				{student.attendance_status === 'Waiting for payment' && ' (Waiting for payment)'}:
+			</p>
 
 			<Button {...makeProps('Withdrawn')}>
 				Withdrawn
@@ -118,9 +130,11 @@ function AttendanceRow(props) {
 	);
 }
 
+let attendanceOpenCache = false;
+
 export function InstructorClassAttendance(props) {
 	const { clazz, token, refreshClass, user } = props;
-	const [open, setOpen] = useState(false);
+	const [open, setOpen] = useState(attendanceOpenCache);
 	const [input, setInput] = useState({});
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -201,7 +215,7 @@ export function InstructorClassAttendance(props) {
 					</Form>
 				</div>
 			:
-				<Button onClick={() => setOpen(true)}>
+				<Button onClick={() => {setOpen(true); attendanceOpenCache = true;}}>
 					Edit Attendance
 				</Button>
 			}
@@ -321,7 +335,7 @@ export function InstructorClassDetail(props) {
 export function InstructorClassList(props) {
 	const { course, setCourse, token } = props;
 	const [open, setOpen] = useState(false);
-	const [input, setInput] = useState({});
+	const [input, setInput] = useState({ max_students: null });
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
