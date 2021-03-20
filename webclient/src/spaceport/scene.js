@@ -45,6 +45,11 @@ export const scene = ({ ref }) => {
 	scene.add(ship.mesh);
 	ships.push(ship);
 
+	window.addEventListener('resize', () => {
+		camera.updateProjectionMatrix();
+		renderer.setSize(ref.current.clientWidth, ref.current.clientHeight);
+	});
+
 	const animate = () => {
 		const deltaTime = 0.075;
 		t += deltaTime;
@@ -73,16 +78,7 @@ export const scene = ({ ref }) => {
 
 		ships = ships.filter((s) => !s.kill);
 
-		window.addEventListener('resize', onWindowResize);
-
-		function onWindowResize() {
-			console.log(ref.current.clientWidth, ref.current.clientHeight)
-			camera.updateProjectionMatrix();
-			renderer.setSize(ref.current.clientWidth, ref.current.clientHeight);
-		}
-
 		requestAnimationFrame(animate);
-
 		renderer.render(scene, camera);
 	};
 
