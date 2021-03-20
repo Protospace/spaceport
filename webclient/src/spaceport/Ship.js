@@ -54,8 +54,6 @@ export class Ship {
 			const a = Math.abs(this.life);
 			this.mesh.position.z += a * 2;
 			this.mesh.scale.z = a * 4;
-
-			// accelerate away
 		}
 
 		if (this.mesh.position.z > 55) {

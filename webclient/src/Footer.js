@@ -8,6 +8,7 @@ export const Footer = () => {
 
 	useEffect(() => {
 		if (!footerRef.current) return;
+		if (footerRef.current.clientWidth < 650) return
 		scene({ ref: footerRef });
 	}, [footerRef]);
 

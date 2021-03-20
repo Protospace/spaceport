@@ -16,6 +16,7 @@ export const scene = ({ ref }) => {
 
 	const width = ref.current.clientWidth;
 	const height = ref.current.clientHeight;
+
 	renderer.setSize(width, height);
 
 	const camera = new THREE.PerspectiveCamera(65, width / height, 0.01, 1000);
@@ -57,7 +58,6 @@ export const scene = ({ ref }) => {
 		// camera.z = cos(mu * Math.PI * 2)
 
 		if (t > nextShip) {
-			console.log('bing');
 			const ship = new Ship();
 			scene.add(ship.mesh);
 			ships.push(ship);
@@ -67,16 +67,16 @@ export const scene = ({ ref }) => {
 		for (const ship of ships) {
 			ship.update({ deltaTime });
 			if (ship.kill) {
-				console.log('killing ship');
 				scene.remove(ship.mesh);
 			}
 		}
 
 		ships = ships.filter((s) => !s.kill);
 
-		window.addEventListener('resize', onWindowResize, false);
+		window.addEventListener('resize', onWindowResize);
 
 		function onWindowResize() {
+			console.log(ref.current.clientWidth, ref.current.clientHeight)
 			camera.updateProjectionMatrix();
 			renderer.setSize(ref.current.clientWidth, ref.current.clientHeight);
 		}
