@@ -82,9 +82,14 @@ export const scene = ({ ref }) => {
 
 		for (const bolt of bolts) {
 			bolt.update({ deltaTime });
+
+			if (bolt.kill) {
+				scene.remove(bolt.mesh);
+			}
 		}
 
 		ships = ships.filter((s) => !s.kill);
+		bolts = bolts.filter((s) => !s.kill);
 
 		requestAnimationFrame(animate);
 		renderer.render(scene, camera);
