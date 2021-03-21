@@ -1,6 +1,14 @@
 import * as THREE from 'three';
 
 const SHIP_SIZE = 1;
+const geometry = new THREE.BoxGeometry(
+	SHIP_SIZE * 0.1,
+	SHIP_SIZE * 0.1,
+	SHIP_SIZE
+);
+const material = new THREE.MeshStandardMaterial(0xffffff, {
+	flatShading: true,
+});
 
 export class Ship {
 	constructor(direction) {
@@ -11,15 +19,8 @@ export class Ship {
 		this.flyIn = true;
 		this.firing = false;
 
-		const shipGeo = new THREE.BoxGeometry(
-			SHIP_SIZE * 0.1,
-			SHIP_SIZE * 0.1,
-			SHIP_SIZE
-		);
-		this.mesh = new THREE.Mesh(
-			shipGeo,
-			new THREE.MeshStandardMaterial(this.direction > 0 ? 0xff0000 : 0x0000ff, { flatShading: true })
-		);
+		const shipGeo = geometry;
+		this.mesh = new THREE.Mesh(shipGeo, material);
 		this.y = (Math.random() - 0.5) * 2;
 		this.x = (Math.random() - 0.5) * 2;
 
@@ -28,7 +29,7 @@ export class Ship {
 		);
 		this.mesh.position.y = this.y;
 		this.mesh.position.x = this.x;
-		this.mesh.position.z = (-475/4 - 6) * this.direction; //+ Math.random()
+		this.mesh.position.z = (-475 / 4 - 6) * this.direction; //+ Math.random()
 	}
 
 	update({ deltaTime }) {
@@ -52,10 +53,10 @@ export class Ship {
 		this.life -= deltaTime;
 
 		if (!this.flyIn) {
-			const xs = Math.sin(this.life*0.5 + this.x);
+			const xs = Math.sin(this.life * 0.5 + this.x);
 			this.mesh.position.y = this.y + Math.sin(this.life + this.y) * 0.08;
 			this.mesh.position.x = this.x + xs * 0.08;
-			this.mesh.rotation.y = xs*0.25;
+			this.mesh.rotation.y = xs * 0.25;
 			this.mesh.position.z += 0.01 * this.direction;
 			this.nextShot -= deltaTime;
 			if (this.nextShot <= 0) {
@@ -71,7 +72,7 @@ export class Ship {
 			this.firing = false;
 		}
 
-		if (Math.abs(this.mesh.position.z > 475/2)) {
+		if (Math.abs(this.mesh.position.z > 475 / 2)) {
 			this.kill = true;
 		}
 	}
