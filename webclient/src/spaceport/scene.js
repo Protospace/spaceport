@@ -1,5 +1,6 @@
 import * as THREE from 'three/build/three.module';
 import { Ship } from './Ship';
+import { Laser } from './Laser';
 
 export const scene = ({ ref }) => {
 	// TODO: add waves of ships
@@ -7,7 +8,7 @@ export const scene = ({ ref }) => {
 	// TODO: use aspect ratio to determine space docking point
 
 	let t = 0.01;
-	const shipInterval = 2;
+	const shipInterval = 1;
 	let nextShip = shipInterval;
 
 	var scene = new THREE.Scene();
@@ -21,8 +22,9 @@ export const scene = ({ ref }) => {
 
 	const camera = new THREE.PerspectiveCamera(65, width / height, 0.01, 1000);
 
-	camera.position.set(3, 0.5, 5);
+	camera.position.set(5, 0.5, 1);
 	camera.lookAt(new THREE.Vector3(-9, 0, 3));
+	camera.lookAt(new THREE.Vector3(0, 0, 0));
 	scene.add(camera);
 
 	ref.current.appendChild(renderer.domElement);
@@ -32,18 +34,8 @@ export const scene = ({ ref }) => {
 	light.position.z = 1;
 	scene.add(light);
 
-	var sphere = new THREE.SphereBufferGeometry(1);
-	var object = new THREE.Mesh(
-		sphere,
-		new THREE.MeshStandardMaterial(0xff0000, { flatShading: true })
-	);
-	var boxHelp = new THREE.BoxHelper(object, 0xffff00);
-	// scene.add(boxHelp);
-
 	let ships = [];
-	const ship = new Ship();
-	scene.add(ship.mesh);
-	ships.push(ship);
+	let bolts = [];
 
 	window.addEventListener('resize', () => {
 		camera.updateProjectionMatrix();
@@ -61,9 +53,12 @@ export const scene = ({ ref }) => {
 
 		// camera.x = sin(mu * Math.PI * 2)
 		// camera.z = cos(mu * Math.PI * 2)
+		//
+
+		const direction = Math.random() > 0.5 ? 1 : -1;
 
 		if (t > nextShip) {
-			const ship = new Ship();
+			const ship = new Ship(direction);
 			scene.add(ship.mesh);
 			ships.push(ship);
 			nextShip += shipInterval + (Math.random() - 0.5) * 2;
@@ -71,9 +66,22 @@ export const scene = ({ ref }) => {
 
 		for (const ship of ships) {
 			ship.update({ deltaTime });
+
+			if (ship.firing) {
+				const bolt = new Laser(ship);
+				bolts.push(bolt);
+				scene.add(bolt.mesh);
+				console.log(bolt.mesh.position);
+				ship.firing = false;
+			}
+
 			if (ship.kill) {
 				scene.remove(ship.mesh);
 			}
+		}
+
+		for (const bolt of bolts) {
+			bolt.update({ deltaTime });
 		}
 
 		ships = ships.filter((s) => !s.kill);
