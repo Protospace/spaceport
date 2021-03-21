@@ -124,13 +124,15 @@ body {
 	display: grid;
 }
 
-.footer-content {
-	transition: all 0.2s ease-in;
-	opacity: 0.25;
-}
+@media (min-width: 650px) {
+	.footer-content {
+		transition: all 0.2s ease-in;
+		opacity: 0.25;
+	}
 
-.footer-content:hover {
-	opacity: 1;
+	.footer-content:hover {
+		opacity: 1;
+	}
 }
 
 /* grid bottom */
