@@ -1,12 +1,16 @@
 import * as THREE from 'three';
 
 const LASER_SIZE = 0.5;
+const BULLET_SPREAD = 0.1;
 
 export class Laser {
 	constructor(ship) {
 		const position = new THREE.Vector3();
 		this.direction = ship.direction;
 		this.kill = false;
+
+		this.stepX = (Math.random()-0.5) * BULLET_SPREAD;
+		this.stepY = (Math.random()-0.5) * BULLET_SPREAD;
 
 		ship.mesh.getWorldPosition(position)
 
@@ -28,6 +32,8 @@ export class Laser {
 	}
 
 	update({ deltaTime }) {
+		this.mesh.position.x += this.stepX;
+		this.mesh.position.y += this.stepY;
 		this.mesh.position.z += 0.5 * this.direction;
 
 		if (Math.abs(this.mesh.position.z > 475/2)) {
