@@ -22,17 +22,22 @@ export const scene = ({ ref }) => {
 
 	const camera = new THREE.PerspectiveCamera(65, width / height, 0.01, 1000);
 
-	camera.position.set(5, 0.5, 1);
-	camera.lookAt(new THREE.Vector3(-9, 0, 3));
+	camera.position.set(5, 2, 1);
 	camera.lookAt(new THREE.Vector3(0, 0, 0));
 	scene.add(camera);
 
 	ref.current.appendChild(renderer.domElement);
 
-	const light = new THREE.DirectionalLight('#fff', 1);
-	light.position.x = 3;
-	light.position.z = 1;
-	scene.add(light);
+	const light1 = new THREE.DirectionalLight('#fff', 1);
+	light1.position.x = 3;
+	light1.position.z = 1;
+	scene.add(light1);
+
+	const light2 = new THREE.PointLight('#fff', 2);
+	light2.position.x = 5;
+	light2.position.y = 5;
+	light2.position.z = 1;
+	scene.add(light2);
 
 	let ships = [];
 	let bolts = [];
