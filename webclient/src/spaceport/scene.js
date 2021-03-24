@@ -47,18 +47,16 @@ export const scene = ({ ref }) => {
 		renderer.setSize(ref.current.clientWidth, ref.current.clientHeight);
 	});
 
+	ref.current.addEventListener('mousemove', (e) => {
+		const x = e.clientX;
+		const ratio = x / ref.current.clientWidth;
+		camera.position.set(5, 2, ratio*4 - 2);
+		camera.lookAt(new THREE.Vector3(0, 0, 0));
+	});
+
 	const animate = () => {
 		const deltaTime = 0.075;
 		t += deltaTime;
-
-		// register mouse event for 'onmove'
-		// get mouse x & y
-		// const mu = mousex / ref.width
-		// const mv = mousey / ref.heigh
-
-		// camera.x = sin(mu * Math.PI * 2)
-		// camera.z = cos(mu * Math.PI * 2)
-		//
 
 		const direction = Math.random() > 0.5 ? 1 : -1;
 
@@ -76,7 +74,6 @@ export const scene = ({ ref }) => {
 				const bolt = new Laser(ship);
 				bolts.push(bolt);
 				scene.add(bolt.mesh);
-				console.log(bolt.mesh.position);
 				ship.firing = false;
 			}
 
