@@ -22,11 +22,13 @@ DEFAULTS = {
     'bay_108_temp': None,
     'bay_110_temp': None,
     'minecraft_players': [],
-    'mumble_users': [],
     'card_scans': 0,
     'track': {},
     'alarm': {},
 }
+
+if secrets.MUMBLE:
+    DEFAULTS['mumble_users'] = []
 
 def changed_card():
     '''
