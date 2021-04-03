@@ -9,23 +9,22 @@ const geometry = new THREE.BoxGeometry(
 	LASER_SIZE
 );
 
-const material = new THREE.MeshStandardMaterial(this.direction > 0 ? 0xff0000 : 0x0000ff, { flatShading: true })
-
 export class Laser {
 	constructor(ship) {
 		const position = new THREE.Vector3();
 		this.direction = ship.direction;
 		this.kill = false;
 
-		this.stepX = (Math.random()-0.5) * BULLET_SPREAD;
-		this.stepY = (Math.random()-0.5) * BULLET_SPREAD;
+		this.stepX = (Math.random() - 0.5) * BULLET_SPREAD;
+		this.stepY = (Math.random() - 0.5) * BULLET_SPREAD;
 
-		ship.mesh.getWorldPosition(position)
+		ship.mesh.getWorldPosition(position);
 
-		this.mesh = new THREE.Mesh(
-			geometery,
-			material
-		);
+		const material = new THREE.MeshStandardMaterial(0xffffff, {
+			flatShading: true,
+		});
+
+		this.mesh = new THREE.Mesh(geometry, material);
 
 		this.mesh.material.color.set(
 			new THREE.Color(`hsl(${ship.direction > 0 ? 0 : 180},100%,70%)`)
@@ -39,7 +38,7 @@ export class Laser {
 		this.mesh.position.y += this.stepY;
 		this.mesh.position.z += 0.5 * this.direction;
 
-		if (Math.abs(this.mesh.position.z > 475/2)) {
+		if (Math.abs(this.mesh.position.z > 475 / 2)) {
 			this.kill = true;
 		}
 	}
