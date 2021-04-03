@@ -3,6 +3,14 @@ import * as THREE from 'three';
 const LASER_SIZE = 0.5;
 const BULLET_SPREAD = 0.1;
 
+const geometry = new THREE.BoxGeometry(
+	LASER_SIZE * 0.03,
+	LASER_SIZE * 0.03,
+	LASER_SIZE
+);
+
+const material = new THREE.MeshStandardMaterial(this.direction > 0 ? 0xff0000 : 0x0000ff, { flatShading: true })
+
 export class Laser {
 	constructor(ship) {
 		const position = new THREE.Vector3();
@@ -14,14 +22,9 @@ export class Laser {
 
 		ship.mesh.getWorldPosition(position)
 
-		const shipGeo = new THREE.BoxGeometry(
-			LASER_SIZE * 0.03,
-			LASER_SIZE * 0.03,
-			LASER_SIZE
-		);
 		this.mesh = new THREE.Mesh(
-			shipGeo,
-			new THREE.MeshStandardMaterial(this.direction > 0 ? 0xff0000 : 0x0000ff, { flatShading: true })
+			geometery,
+			material
 		);
 
 		this.mesh.material.color.set(
