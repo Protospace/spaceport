@@ -235,7 +235,7 @@ export function Home(props) {
 							{' '}<a href='http://games.protospace.ca:8123/?worldname=world&mapname=flat&zoom=3&x=74&y=64&z=354' target='_blank'>[map]</a>
 							</p>
 
-							<p>
+							{stats && stats.hasOwnProperty('mumble_users') && <p>
 								Mumble users: {mumbleUsers.length} <Popup content={
 									<React.Fragment>
 										<p>
@@ -248,7 +248,7 @@ export function Home(props) {
 										</p>
 									</React.Fragment>
 								} trigger={<a>[more]</a>} />
-							</p>
+							</p>}
 
 							<p>
 								Trotec availability: {getTrackStat('TROTECS300')} <Popup content={
