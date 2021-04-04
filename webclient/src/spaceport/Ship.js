@@ -77,7 +77,6 @@ export class Ship {
 		if (this.life < 0 && !this.flyin && !this.exploded) {
 			this.mesh.geometry = burstGeo;
 			this.mesh.material.transparent = true;
-			this.mesh.material.opacity *= 0.95;
 			this.exploded = true;
 			this.mesh.scale.x = 1;
 			this.mesh.scale.y = 1;
@@ -85,6 +84,7 @@ export class Ship {
 		}
 
 		if (this.exploded) {
+			this.mesh.material.opacity *= 0.95;
 			this.mesh.scale.x *= 1.1;
 			this.mesh.scale.y *= 1.1;
 			this.mesh.scale.z *= 1.1;
