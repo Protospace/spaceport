@@ -155,6 +155,16 @@ class StatsSpaceActivity(models.Model):
     date = models.DateField(default=today_alberta_tz)
     card_scans = models.IntegerField()
 
+class UsageTrack(models.Model):
+    user = models.ForeignKey(User, related_name='usages', blank=True, null=True, on_delete=models.SET_NULL)
+    username = models.CharField(max_length=64)
+    devicename = models.CharField(max_length=64)
+
+    start_time = models.DateTimeField(auto_now_add=True)
+    num_seconds = models.IntegerField()
+
+    history = HistoricalRecords(excluded_fields=['num_seconds'])
+
 class HistoryIndex(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField()

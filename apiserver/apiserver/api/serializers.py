@@ -14,6 +14,11 @@ import re
 from . import models, fields, utils, utils_ldap, utils_auth
 from .. import settings, secrets
 
+class UsageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.UsageTrack
+        fields = '__all__'
+
 class TransactionSerializer(serializers.ModelSerializer):
     # fields directly from old portal. replace with slugs we want
     account_type = serializers.ChoiceField([
@@ -262,6 +267,7 @@ class AdminSearchSerializer(serializers.Serializer):
     member = serializers.SerializerMethodField()
     training = serializers.SerializerMethodField()
     transactions = serializers.SerializerMethodField()
+    usages = serializers.SerializerMethodField()
 
     def get_member(self, obj):
         serializer = AdminMemberSerializer(obj)
@@ -293,6 +299,12 @@ class AdminSearchSerializer(serializers.Serializer):
             queryset = models.Transaction.objects.filter(member_id=obj.id)
         queryset = queryset.order_by('-id', '-date')
         serializer = TransactionSerializer(data=queryset, many=True)
+        serializer.is_valid()
+        return serializer.data
+
+    def get_usages(self, obj):
+        queryset = obj.user.usages.order_by('-start_time')
+        serializer = UsageSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
 
@@ -445,6 +457,7 @@ class UserSerializer(serializers.ModelSerializer):
             'is_staff',
             'door_code',
             'wifi_pass',
+            'usages',
         ]
         depth = 1
 

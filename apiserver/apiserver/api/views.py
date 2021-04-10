@@ -3,6 +3,7 @@ logger = logging.getLogger(__name__)
 
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404, redirect
+from django.db import transaction
 from django.db.models import Max
 from django.http import HttpResponse, Http404, FileResponse
 from django.core.files.base import File
@@ -501,20 +502,45 @@ class StatsViewSet(viewsets.ViewSet, List):
         except KeyError:
             raise exceptions.ValidationError(dict(data='This field is required.'))
 
+    @transaction.atomic
     @action(detail=False, methods=['post'])
     def track(self, request):
-        if 'name' in request.data:
-            track = cache.get('track', {})
+        if 'name' not in request.data:
+            raise exceptions.ValidationError(dict(name='This field is required.'))
 
-            name = request.data['name']
-            username = request.data.get('username', '')
-            username = username.split('.')[0].title()
+        if 'username' not in request.data:
+            raise exceptions.ValidationError(dict(username='This field is required.'))
 
-            track[name] = dict(time=time.time(), username=username)
-            cache.set('track', track)
-            return Response(200)
+        track = cache.get('track', {})
+
+        devicename = request.data['name']
+        username = request.data['username']
+        first_name = username.split('.')[0].title()
+
+        track[devicename] = dict(time=time.time(), username=first_name)
+        cache.set('track', track)
+
+        # update device usage
+        last_session = models.UsageTrack.objects.filter(devicename=devicename).last()
+        if not last_session or last_session.username != username:
+            try:
+                user = User.objects.get(username__iexact=username)
+            except User.DoesNotExist:
+                logging.error('Username not found: ' + username)
+                user = None
+
+            models.UsageTrack.objects.create(
+                user=user,
+                username=username,
+                devicename=devicename,
+                num_seconds=10,
+            )
+            logging.info('New ' + devicename + ' session created for: ' + username)
         else:
-            raise exceptions.ValidationError(dict(paste='This field is required.'))
+            last_session.num_seconds += 10
+            last_session.save()
+
+        return Response(200)
 
 
 class MemberCountViewSet(Base, List):
