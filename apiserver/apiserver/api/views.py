@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404, redirect
 from django.db import transaction
-from django.db.models import Max
+from django.db.models import Max, F
 from django.db.utils import OperationalError
 from django.http import HttpResponse, Http404, FileResponse
 from django.core.files.base import File
@@ -505,48 +505,42 @@ class StatsViewSet(viewsets.ViewSet, List):
 
     @action(detail=False, methods=['post'])
     def track(self, request):
-        try:
-            with transaction.atomic():
-                if 'name' not in request.data:
-                    raise exceptions.ValidationError(dict(name='This field is required.'))
+        if 'name' not in request.data:
+            raise exceptions.ValidationError(dict(name='This field is required.'))
 
-                if 'username' not in request.data:
-                    raise exceptions.ValidationError(dict(username='This field is required.'))
+        if 'username' not in request.data:
+            raise exceptions.ValidationError(dict(username='This field is required.'))
 
-                track = cache.get('track', {})
+        track = cache.get('track', {})
 
-                devicename = request.data['name']
-                username = request.data['username']
-                first_name = username.split('.')[0].title()
+        devicename = request.data['name']
+        username = request.data['username']
+        first_name = username.split('.')[0].title()
 
-                track[devicename] = dict(time=time.time(), username=first_name)
-                cache.set('track', track)
+        track[devicename] = dict(time=time.time(), username=first_name)
+        cache.set('track', track)
 
-                # update device usage
-                last_session = models.UsageTrack.objects.filter(devicename=devicename).last()
-                if not last_session or last_session.username != username:
-                    try:
-                        user = User.objects.get(username__iexact=username)
-                    except User.DoesNotExist:
-                        logging.error('Username not found: ' + username)
-                        user = None
+        # update device usage
+        last_session = models.UsageTrack.objects.filter(devicename=devicename).last()
+        if not last_session or last_session.username != username:
+            try:
+                user = User.objects.get(username__iexact=username)
+            except User.DoesNotExist:
+                logging.error('Username not found: ' + username)
+                user = None
 
-                    models.UsageTrack.objects.create(
-                        user=user,
-                        username=username,
-                        devicename=devicename,
-                        num_seconds=10,
-                    )
-                    logging.info('New ' + devicename + ' session created for: ' + username)
-                else:
-                    last_session.num_seconds += 10
-                    last_session.save()
+            models.UsageTrack.objects.create(
+                user=user,
+                username=username,
+                devicename=devicename,
+                num_seconds=10,
+            )
+            logging.info('New ' + devicename + ' session created for: ' + username)
+        else:
+            last_session.num_seconds = F('num_seconds') + 10
+            last_session.save(update_fields=['num_seconds'])
 
-            return Response(200)
-
-        # keep trying if we hit a "database locked" error
-        except OperationalError:
-            return self.track(request)
+        return Response(200)
 
 
 class MemberCountViewSet(Base, List):
