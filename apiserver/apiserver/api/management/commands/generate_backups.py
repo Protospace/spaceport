@@ -29,6 +29,7 @@ class Command(BaseCommand):
     @transaction.atomic
     def generate_backups(self):
         backup_users = secrets.BACKUP_TOKENS.values()
+        count = 0
 
         for user in backup_users:
             models.MetaInfo.objects.update_or_create(
@@ -39,6 +40,9 @@ class Command(BaseCommand):
                 f.write(user['name'] + '\n')
             with open(DATA_FOLDER + '/static/123e4567-e89b-12d3-a456-426655440000.jpg', 'w') as f:
                 f.write(backup_id_string(user) + '\n')
+
+            if user['name'] == 'null':  # reset the canaries for data-at-rest
+                continue
 
             file_name = 'spaceport-backup-{}.tar.gz'.format(
                 str(now().date()),
@@ -72,8 +76,9 @@ class Command(BaseCommand):
             cache.set(user['cache_key'], path_name + '/' + file_name)
 
             self.stdout.write('Wrote backup for: ' + user['name'])
+            count += 1
 
-        return len(backup_users)
+        return count
 
     def handle(self, *args, **options):
         self.stdout.write('{} - Generating backups'.format(str(now())))
