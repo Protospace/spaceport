@@ -526,7 +526,9 @@ class StatsViewSet(viewsets.ViewSet, List):
             try:
                 user = User.objects.get(username__iexact=username)
             except User.DoesNotExist:
-                logging.error('Username not found: ' + username)
+                msg = 'Device tracker problem finding username: ' + username
+                utils.alert_tanner(msg)
+                logger.error(msg)
                 user = None
 
             models.UsageTrack.objects.create(
