@@ -303,7 +303,10 @@ class AdminSearchSerializer(serializers.Serializer):
         return serializer.data
 
     def get_usages(self, obj):
-        queryset = obj.user.usages.order_by('-start_time')
+        if obj.user:
+            queryset = obj.user.usages.order_by('-start_time')
+        else:
+            queryset = []
         serializer = UsageSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data

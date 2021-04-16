@@ -157,9 +157,11 @@ class StatsSpaceActivity(models.Model):
 
 class UsageTrack(models.Model):
     user = models.ForeignKey(User, related_name='usages', blank=True, null=True, on_delete=models.SET_NULL)
-    username = models.CharField(max_length=64)
-    devicename = models.CharField(max_length=64)
 
+    # member_id = models.IntegerField(blank=True, null=True)  # restrict to current users for now
+    username = models.CharField(max_length=64)  # allows us to match non-Spaceport users later
+
+    devicename = models.CharField(max_length=64)
     start_time = models.DateTimeField(auto_now_add=True)
     num_seconds = models.IntegerField()
 
