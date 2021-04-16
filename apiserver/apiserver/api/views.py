@@ -535,7 +535,7 @@ class StatsViewSet(viewsets.ViewSet, List):
                 user=user,
                 username=username,
                 devicename=devicename,
-                num_seconds=10,
+                num_seconds=0,
             )
             logging.info('New ' + devicename + ' session created for: ' + username)
         else:
