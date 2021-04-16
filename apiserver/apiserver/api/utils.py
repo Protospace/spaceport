@@ -144,16 +144,18 @@ def gen_search_strings():
     '''
     search_strings = {}
     for m in models.Member.objects.order_by('-expire_date'):
-        string = '{} {}'.format(
+        string = '{} {} | {} {}'.format(
             m.preferred_name,
+            m.last_name,
+            m.first_name,
             m.last_name,
         )
 
         if m.old_email:
-            string += '  ' + m.old_email
+            string += ' | ' + m.old_email
         if m.user:
-            string += '  ' + m.user.email
-        string += ' ' + str(m.id)
+            string += ' | ' + m.user.email
+        string += ' | ' + str(m.id)
 
         string = string.lower()
         search_strings[string] = m.id
