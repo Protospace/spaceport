@@ -10,6 +10,8 @@ import { NotFound, PleaseLogin } from './Misc.js';
 export function TransactionEditor(props) {
 	const { token, input, setInput, error, noMemberSearch } = props;
 
+	const [prevInput, setPrevInput] = useState(input);
+
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
@@ -62,7 +64,7 @@ export function TransactionEditor(props) {
 
 	return (
 		<div className='transaction-editor'>
-			{!noMemberSearch &&<Form.Field error={error.member_id}>
+			{!noMemberSearch && <Form.Field error={error.member_id}>
 				<label>Member (search)</label>
 				<MembersDropdown
 					token={token}
@@ -100,6 +102,13 @@ export function TransactionEditor(props) {
 				{...makeProps('account_type')}
 				onChange={handleValues}
 			/>
+
+			{ input?.account_type != prevInput?.account_type && input?.account_type == 'PayPal' &&
+				<Message visible warning>
+					<Message.Header>Are you absolutely sure?</Message.Header>
+					<p>PayPal transactions should be automatic. Double check there's no duplicate. They may take 24h to appear.</p>
+				</Message>
+			}
 
 			{/* <Form.Group widths='equal'>
 				<Form.Input
