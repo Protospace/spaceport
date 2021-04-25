@@ -165,8 +165,6 @@ class UsageTrack(models.Model):
     start_time = models.DateTimeField(auto_now_add=True)
     num_seconds = models.IntegerField()
 
-    history = HistoricalRecords(excluded_fields=['num_seconds'])
-
 class HistoryIndex(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField()
