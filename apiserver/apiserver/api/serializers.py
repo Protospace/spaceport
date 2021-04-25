@@ -14,10 +14,10 @@ import re
 from . import models, fields, utils, utils_ldap, utils_auth
 from .. import settings, secrets
 
-class UsageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.UsageTrack
-        fields = '__all__'
+#class UsageSerializer(serializers.ModelSerializer):
+#    class Meta:
+#        model = models.UsageTrack
+#        fields = '__all__'
 
 class TransactionSerializer(serializers.ModelSerializer):
     # fields directly from old portal. replace with slugs we want
@@ -267,7 +267,7 @@ class AdminSearchSerializer(serializers.Serializer):
     member = serializers.SerializerMethodField()
     training = serializers.SerializerMethodField()
     transactions = serializers.SerializerMethodField()
-    usages = serializers.SerializerMethodField()
+    #usages = serializers.SerializerMethodField()
 
     def get_member(self, obj):
         serializer = AdminMemberSerializer(obj)
@@ -302,14 +302,14 @@ class AdminSearchSerializer(serializers.Serializer):
         serializer.is_valid()
         return serializer.data
 
-    def get_usages(self, obj):
-        if obj.user:
-            queryset = obj.user.usages.order_by('-start_time')
-        else:
-            queryset = []
-        serializer = UsageSerializer(data=queryset, many=True)
-        serializer.is_valid()
-        return serializer.data
+    #def get_usages(self, obj):
+    #    if obj.user:
+    #        queryset = obj.user.usages.order_by('-start_time')
+    #    else:
+    #        queryset = []
+    #    serializer = UsageSerializer(data=queryset, many=True)
+    #    serializer.is_valid()
+    #    return serializer.data
 
 
 class CardSerializer(serializers.ModelSerializer):
@@ -460,7 +460,7 @@ class UserSerializer(serializers.ModelSerializer):
             'is_staff',
             'door_code',
             'wifi_pass',
-            'usages',
+            #'usages',
         ]
         depth = 1
 

@@ -520,27 +520,29 @@ class StatsViewSet(viewsets.ViewSet, List):
         track[devicename] = dict(time=time.time(), username=first_name)
         cache.set('track', track)
 
-        # update device usage
-        last_session = models.UsageTrack.objects.filter(devicename=devicename).last()
-        if not last_session or last_session.username != username:
-            try:
-                user = User.objects.get(username__iexact=username)
-            except User.DoesNotExist:
-                msg = 'Device tracker problem finding username: ' + username
-                utils.alert_tanner(msg)
-                logger.error(msg)
-                user = None
+        ## update device usage
+        ## issue: sometimes two sessions are created
+        ## issue: sometimes two /track/ requests are sent and double time is counted
+        #last_session = models.UsageTrack.objects.filter(devicename=devicename).last()
+        #if not last_session or last_session.username != username:
+        #    try:
+        #        user = User.objects.get(username__iexact=username)
+        #    except User.DoesNotExist:
+        #        msg = 'Device tracker problem finding username: ' + username
+        #        utils.alert_tanner(msg)
+        #        logger.error(msg)
+        #        user = None
 
-            models.UsageTrack.objects.create(
-                user=user,
-                username=username,
-                devicename=devicename,
-                num_seconds=0,
-            )
-            logging.info('New ' + devicename + ' session created for: ' + username)
-        else:
-            last_session.num_seconds = F('num_seconds') + 10
-            last_session.save(update_fields=['num_seconds'])
+        #    models.UsageTrack.objects.create(
+        #        user=user,
+        #        username=username,
+        #        devicename=devicename,
+        #        num_seconds=0,
+        #    )
+        #    logging.info('New ' + devicename + ' session created for: ' + username)
+        #else:
+        #    last_session.num_seconds = F('num_seconds') + 10
+        #    last_session.save(update_fields=['num_seconds'])
 
         return Response(200)
 
