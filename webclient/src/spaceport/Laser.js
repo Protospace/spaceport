@@ -9,25 +9,32 @@ const geometry = new THREE.BoxGeometry(
 	LASER_SIZE
 );
 
+const badLaserMat = new THREE.MeshStandardMaterial(0xffffff, {
+	flatShading: true,
+	color: new THREE.Color(`hsl(0,100%,70%)`),
+});
+
+const goodLaserMat = new THREE.MeshStandardMaterial(0xffffff, {
+	flatShading: true,
+	color: new THREE.Color(`hsl(180,100%,70%)`),
+});
+
 export class Laser {
-	constructor(ship) {
+	constructor(ship, count) {
 		const position = new THREE.Vector3();
 		this.direction = ship.direction;
 		this.kill = false;
+		this.life = 10;
 
 		this.stepX = (Math.random() - 0.5) * BULLET_SPREAD;
 		this.stepY = (Math.random() - 0.5) * BULLET_SPREAD;
 
 		ship.mesh.getWorldPosition(position);
 
-		const material = new THREE.MeshStandardMaterial(0xffffff, {
-			flatShading: true,
-		});
-
-		this.mesh = new THREE.Mesh(geometry, material);
-
-		this.mesh.material.color.set(
-			new THREE.Color(`hsl(${ship.direction > 0 ? 0 : 180},100%,70%)`)
+		this.mesh = new THREE.Mesh(
+			geometry,
+			ship.direction > 0 ? goodLaserMat : badLaserMat,
+			count
 		);
 
 		this.mesh.position.set(position.x, position.y, position.z);
@@ -37,9 +44,8 @@ export class Laser {
 		this.mesh.position.x += this.stepX;
 		this.mesh.position.y += this.stepY;
 		this.mesh.position.z += 0.5 * this.direction;
+		this.life -= deltaTime;
 
-		if (Math.abs(this.mesh.position.z > 475 / 2)) {
-			this.kill = true;
-		}
+		if (this.life < 0) this.kill = true;
 	}
 }

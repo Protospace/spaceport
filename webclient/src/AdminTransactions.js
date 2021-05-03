@@ -1,52 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './light.css';
-import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Container, Checkbox, Form, Header, Segment } from 'semantic-ui-react';
 import * as Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
 import moment from 'moment';
-import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
+import { requester } from './utils.js';
 import { TransactionList, TransactionEditor } from './Transactions.js';
-import { NotFound } from './Misc.js';
 
 export function AdminReportedTransactions(props) {
-	const { token, user } = props;
+	const { token } = props;
 	const [transactions, setTransactions] = useState(false);
 	const [error, setError] = useState(false);
 
 	useEffect(() => {
 		requester('/transactions/', 'GET', token)
-		.then(res => {
-			setTransactions(res.results);
-			setError(false);
-		})
-		.catch(err => {
-			console.log(err);
-			setError(true);
-		});
+			.then((res) => {
+				setTransactions(res.results);
+				setError(false);
+			})
+			.catch((err) => {
+				console.log(err);
+				setError(true);
+			});
 	}, []);
 
 	return (
 		<div>
-			{!error ?
-				transactions ?
+			{!error ? (
+				transactions ? (
 					<div>
 						<TransactionList transactions={transactions} />
 					</div>
-				:
+				) : (
 					<p>Loading...</p>
-			:
+				)
+			) : (
 				<p>Error loading.</p>
-			}
+			)}
 		</div>
 	);
-};
+}
 
 let transactionsCache = false;
 let excludePayPalCache = false;
 
 export function AdminHistoricalTransactions(props) {
-	const { token, user } = props;
+	const { token } = props;
 	const [input, setInput] = useState({ month: moment() });
 	const [transactions, setTransactions] = useState(transactionsCache);
 	const [excludePayPal, setExcludePayPal] = useState(excludePayPalCache);
@@ -65,17 +65,17 @@ export function AdminHistoricalTransactions(props) {
 		setLoading(true);
 		const month = input.month.format('YYYY-MM');
 		requester('/transactions/?month=' + month, 'GET', token)
-		.then(res => {
-			setLoading(false);
-			setError(false);
-			setTransactions(res.results);
-			transactionsCache = res.results;
-		})
-		.catch(err => {
-			setLoading(false);
-			console.log(err);
-			setError(true);
-		});
+			.then((res) => {
+				setLoading(false);
+				setError(false);
+				setTransactions(res.results);
+				transactionsCache = res.results;
+			})
+			.catch((err) => {
+				setLoading(false);
+				console.log(err);
+				setError(true);
+			});
 	};
 
 	return (
@@ -85,45 +85,59 @@ export function AdminHistoricalTransactions(props) {
 				<Form.Group>
 					<Form.Field>
 						<Datetime
-							dateFormat='YYYY-MM'
+							dateFormat="YYYY-MM"
 							timeFormat={false}
 							value={input.month}
 							onChange={handleDatetime}
 						/>
 					</Form.Field>
 
-					<Form.Button loading={loading}>
-						Submit
-					</Form.Button>
+					<Form.Button loading={loading}>Submit</Form.Button>
 				</Form.Group>
 			</Form>
 
-			{!error ?
-				transactions && <div>
-					<p>Found {transactions.length} transactions.</p>
-					{!!transactions.length &&
-						<Header size='small'>{moment(transactions[0].date, 'YYYY-MM-DD').format('MMMM YYYY')} Transactions</Header>
-					}
+			{!error ? (
+				transactions && (
+					<div>
+						<p>Found {transactions.length} transactions.</p>
+						{!!transactions.length && (
+							<Header size="small">
+								{moment(
+									transactions[0].date,
+									'YYYY-MM-DD'
+								).format('MMMM YYYY')}{' '}
+								Transactions
+							</Header>
+						)}
 
-					<Checkbox
-						label='Exclude PayPal'
-						onChange={handleExcludePayPal}
-						checked={excludePayPal}
-					/>
+						<Checkbox
+							label="Exclude PayPal"
+							onChange={handleExcludePayPal}
+							checked={excludePayPal}
+						/>
 
-					<TransactionList transactions={transactions.filter(x => !excludePayPal || x.account_type !== 'PayPal')} />
-				</div>
-			:
+						<TransactionList
+							transactions={transactions.filter(
+								(x) =>
+									!excludePayPal ||
+									x.account_type !== 'PayPal'
+							)}
+						/>
+					</div>
+				)
+			) : (
 				<p>Error loading transactions.</p>
-			}
+			)}
 		</div>
 	);
-};
+}
 
 export function AdminAddTransaction(props) {
 	const { token } = props;
-	const [open, setOpen] = useState(false);
-	const [input, setInput] = useState({ date: moment().format('YYYY-MM-DD'), info_source: 'Web' });
+	const [input, setInput] = useState({
+		date: moment().format('YYYY-MM-DD'),
+		info_source: 'Web',
+	});
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
@@ -133,69 +147,79 @@ export function AdminAddTransaction(props) {
 		setLoading(true);
 		setSuccess(false);
 		requester('/transactions/', 'POST', token, input)
-		.then(res => {
-			setSuccess(res.id);
-			setInput({});
-			setLoading(false);
-			setError(false);
-		})
-		.catch(err => {
-			setLoading(false);
-			console.log(err);
-			setError(err.data);
-		});
+			.then((res) => {
+				setSuccess(res.id);
+				setInput({});
+				setLoading(false);
+				setError(false);
+			})
+			.catch((err) => {
+				setLoading(false);
+				console.log(err);
+				setError(err.data);
+			});
 	};
 
 	return (
 		<Form onSubmit={handleSubmit}>
-			<TransactionEditor {...props} input={input} setInput={setInput} error={error} />
+			<TransactionEditor
+				{...props}
+				input={input}
+				setInput={setInput}
+				error={error}
+			/>
 
 			<Form.Button loading={loading} error={error.non_field_errors}>
 				Submit
 			</Form.Button>
-			{success && <p>Added! <Link to={'/transactions/'+success}>View the transaction.</Link></p>}
+			{success && (
+				<p>
+					Added!{' '}
+					<Link to={'/transactions/' + success}>
+						View the transaction.
+					</Link>
+				</p>
+			)}
 		</Form>
 	);
-};
+}
 
 export function AdminTransactions(props) {
 	return (
 		<Container>
-			<Header size='large'>Admin Transactions</Header>
+			<Header size="large">Admin Transactions</Header>
 
 			<Segment padded>
-				<Header size='medium'>Add a Transaction</Header>
+				<Header size="medium">Add a Transaction</Header>
 				<AdminAddTransaction {...props} />
 			</Segment>
 
-			<Header size='medium'>Reported</Header>
+			<Header size="medium">Reported</Header>
 			<AdminReportedTransactions {...props} />
 
-			<Header size='medium'>Historical</Header>
+			<Header size="medium">Historical</Header>
 			<AdminHistoricalTransactions {...props} />
 		</Container>
 	);
 }
 
 export function AdminMemberTransactions(props) {
-	const { token, result, refreshResult } = props;
+	const { result } = props;
 	const transactions = result.transactions;
-	const { id } = useParams();
 
 	return (
 		<div>
-			<Header size='medium'>Member Transactions</Header>
+			<Header size="medium">Member Transactions</Header>
 
-			<Link to='/admintrans'>Add a transaction</Link>
+			<Link to="/admintrans">Add a transaction</Link>
 
-			<Header size='small'>Current Transactions</Header>
+			<Header size="small">Current Transactions</Header>
 
-			{transactions.length ?
+			{transactions.length ? (
 				<TransactionList noMember transactions={transactions} />
-			:
+			) : (
 				<p>None</p>
-			}
-
+			)}
 		</div>
 	);
-};
+}
