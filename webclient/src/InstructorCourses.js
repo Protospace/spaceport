@@ -10,10 +10,7 @@ function InstructorCourseEditor(props) {
 	const { input, setInput, error } = props;
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
-	const handleUpload = (e, v) =>
-		setInput({ ...input, [v.name]: e.target.files[0] });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
-	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 	const handleQuill = (v, d, s, e) =>
 		s === 'user' &&
 		setInput({

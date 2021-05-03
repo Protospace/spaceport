@@ -15,7 +15,11 @@ export function PleaseLogin() {
 				</p>
 			</Message>
 
-			<img className="photo-404" src="/404.jpg" />
+			<img
+				className="photo-404"
+				src="/404.jpg"
+				alt="Rocketship breaking through the clouds."
+			/>
 			<p style={{ textAlign: 'right' }}>
 				<i>Space shuttle Endeavour, NASA (2011)</i>
 			</p>
