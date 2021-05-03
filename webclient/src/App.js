@@ -110,6 +110,7 @@ function App() {
 								<img
 									src="/logo-long.svg"
 									className="logo-long"
+									alt="Logo"
 								/>
 							</Link>
 						</div>

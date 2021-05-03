@@ -125,7 +125,8 @@ export function ClassDetail(props) {
 	const [loading, setLoading] = useState(false);
 	const { token, user, refreshUser } = props;
 	const { id } = useParams();
-	const userTraining = clazz && clazz.students.find((x) => x.user == user.id);
+	const userTraining =
+		clazz && clazz.students.find((x) => x.user === user.id);
 
 	useEffect(() => {
 		requester('/sessions/' + id + '/', 'GET', token)
@@ -257,7 +258,7 @@ export function ClassDetail(props) {
 							</Segment>
 						)}
 
-						{clazz.instructor != user.id &&
+						{clazz.instructor !== user.id &&
 							(userTraining ? (
 								<div>
 									<p>

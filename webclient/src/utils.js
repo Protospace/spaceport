@@ -42,7 +42,7 @@ export const requester = (route, method, token, data) => {
 		options.headers.Authorization = 'Token ' + token;
 	}
 
-	if (method == 'GET') {
+	if (method === 'GET') {
 		// pass
 	} else if (['POST', 'PUT', 'PATCH'].includes(method)) {
 		const formData = new FormData();
@@ -55,7 +55,7 @@ export const requester = (route, method, token, data) => {
 			method: method,
 			body: formData,
 		};
-	} else if (method == 'DELETE') {
+	} else if (method === 'DELETE') {
 		options = {
 			...options,
 			method: method,
@@ -89,11 +89,11 @@ export const requester = (route, method, token, data) => {
 		})
 		.catch((error) => {
 			const code = error.data ? error.data.status : null;
-			if (code == 413) {
+			if (code === 413) {
 				throw customError({ non_field_errors: ['File too big'] });
 			} else if (code >= 400 && code < 500) {
 				return error.data.json().then((result) => {
-					if (result.detail == 'Invalid token.') {
+					if (result.detail === 'Invalid token.') {
 						localStorage.clear();
 						window.location = '/';
 					}

@@ -28,15 +28,8 @@ function ResetForm() {
 			});
 	};
 
-	const makeProps = (name) => ({
-		name: name,
-		onChange: handleChange,
-		value: input[name] || '',
-		error: error[name],
-	});
-
 	return (
-		<Form onSubmit={handleSubmit} error={error.email == 'Not found.'}>
+		<Form onSubmit={handleSubmit} error={error.email === 'Not found.'}>
 			<Form.Input
 				label="Email"
 				name="email"
