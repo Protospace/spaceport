@@ -54,8 +54,6 @@ export const scene = ({ ref }) => {
 		camera.lookAt(new THREE.Vector3(0, 0, 0));
 	});
 
-	let boltCount = 0;
-
 	const animate = () => {
 		const deltaTime = 0.075;
 		t += deltaTime;
@@ -73,10 +71,8 @@ export const scene = ({ ref }) => {
 			ship.update({ deltaTime });
 
 			if (ship.firing) {
-				const bolt = new Laser(ship, boltCount + 1);
-				boltCount += 1;
+				const bolt = new Laser(ship);
 
-				console.log('pew', boltCount);
 				bolts.push(bolt);
 				scene.add(bolt.mesh);
 				ship.firing = false;
@@ -91,7 +87,6 @@ export const scene = ({ ref }) => {
 			bolt.update({ deltaTime });
 
 			if (bolt.kill) {
-				boltCount -= 1;
 				scene.remove(bolt.mesh);
 			}
 		}
