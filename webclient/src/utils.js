@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Table } from 'semantic-ui-react';
 
-export const siteUrl = window.location.protocol + '//' + window.location.hostname;
-export const apiUrl = window.location.protocol + '//api.' + window.location.hostname;
-export const staticUrl = window.location.protocol + '//static.' + window.location.hostname;
+export const siteUrl =
+	window.location.protocol + '//' + window.location.hostname;
+export const apiUrl =
+	window.location.protocol + '//api.' + window.location.hostname;
+export const staticUrl =
+	window.location.protocol + '//static.' + window.location.hostname;
 
-export const isAdmin = (user) => user.is_staff || user.member.is_director || user.member.is_staff;
-export const isInstructor = (user) => isAdmin(user) || user.member.is_instructor;
+export const isAdmin = (user) =>
+	user.is_staff || user.member.is_director || user.member.is_staff;
+export const isInstructor = (user) =>
+	isAdmin(user) || user.member.is_instructor;
 
 export const getInstructor = (x) => {
 	if (x.course === 413 || x.course === 317 || x.course === 273) {
@@ -17,21 +22,21 @@ export const getInstructor = (x) => {
 };
 
 export const statusColor = {
-	'Prepaid': 'green',
-	'Current': 'green',
-	'Due': 'yellow',
-	'Overdue': 'red',
+	Prepaid: 'green',
+	Current: 'green',
+	Due: 'yellow',
+	Overdue: 'red',
 	'Former Member': 'black',
 };
 
 export const BasicTable = (props) => (
-	<Table collapsing padded unstackable basic='very'>
+	<Table collapsing padded unstackable basic="very">
 		{props.children}
 	</Table>
 );
 
 export const requester = (route, method, token, data) => {
-	let options = {headers: {}};
+	let options = { headers: {} };
 
 	if (token) {
 		options.headers.Authorization = 'Token ' + token;
@@ -41,7 +46,7 @@ export const requester = (route, method, token, data) => {
 		// pass
 	} else if (['POST', 'PUT', 'PATCH'].includes(method)) {
 		const formData = new FormData();
-		Object.keys(data).forEach(key =>
+		Object.keys(data).forEach((key) =>
 			formData.append(key, data[key] === null ? '' : data[key])
 		);
 
@@ -63,42 +68,41 @@ export const requester = (route, method, token, data) => {
 		const error = new Error(JSON.stringify(data));
 		error.data = data;
 		return error;
-	}
+	};
 
 	return fetch(apiUrl + route, options)
-	.then(response => {
-		if (!response.ok) {
-			throw customError(response);
-		}
+		.then((response) => {
+			if (!response.ok) {
+				throw customError(response);
+			}
 
-		if (method === 'DELETE') {
-			return {};
-		}
+			if (method === 'DELETE') {
+				return {};
+			}
 
-		const contentType = response.headers.get('content-type');
-		if (contentType && contentType.indexOf('application/json') !== -1) {
-			return response.json();
-		} else {
-			return response;
-		}
-	})
-	.catch(error => {
-		const code = error.data ? error.data.status : null;
-		if (code == 413) {
-			throw customError({non_field_errors: ['File too big']});
-		} else if (code >= 400 && code < 500) {
-			return error.data.json()
-			.then(result => {
-				if (result.detail == 'Invalid token.') {
-					localStorage.clear();
-					window.location = '/';
-				}
-				throw customError(result);
-			});
-		} else if (code >= 500 && code < 600) {
-			throw customError({non_field_errors: ['Server Error']});
-		} else {
-			throw customError({non_field_errors: ['Network Error']});
-		}
-	});
-}
+			const contentType = response.headers.get('content-type');
+			if (contentType && contentType.indexOf('application/json') !== -1) {
+				return response.json();
+			} else {
+				return response;
+			}
+		})
+		.catch((error) => {
+			const code = error.data ? error.data.status : null;
+			if (code == 413) {
+				throw customError({ non_field_errors: ['File too big'] });
+			} else if (code >= 400 && code < 500) {
+				return error.data.json().then((result) => {
+					if (result.detail == 'Invalid token.') {
+						localStorage.clear();
+						window.location = '/';
+					}
+					throw customError(result);
+				});
+			} else if (code >= 500 && code < 600) {
+				throw customError({ non_field_errors: ['Server Error'] });
+			} else {
+				throw customError({ non_field_errors: ['Network Error'] });
+			}
+		});
+};
