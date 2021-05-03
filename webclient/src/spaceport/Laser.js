@@ -4,8 +4,8 @@ const LASER_SIZE = 0.5;
 const BULLET_SPREAD = 0.1;
 
 const geometry = new THREE.BoxGeometry(
-	LASER_SIZE * 0.3,
-	LASER_SIZE * 0.3,
+	LASER_SIZE * 0.03,
+	LASER_SIZE * 0.03,
 	LASER_SIZE
 );
 
@@ -24,16 +24,18 @@ export class Laser {
 		const position = new THREE.Vector3();
 		this.direction = ship.direction;
 		this.kill = false;
-		this.life = 20;
+		this.life = 10;
 
 		this.stepX = (Math.random() - 0.5) * BULLET_SPREAD;
 		this.stepY = (Math.random() - 0.5) * BULLET_SPREAD;
 
 		ship.mesh.getWorldPosition(position);
 
-		this.mesh = new THREE.InstancedMesh(geometry, badLaserMat, count);
-
-		this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+		this.mesh = new THREE.Mesh(
+			geometry,
+			ship.direction > 0 ? goodLaserMat : badLaserMat,
+			count
+		);
 
 		this.mesh.position.set(position.x, position.y, position.z);
 	}
