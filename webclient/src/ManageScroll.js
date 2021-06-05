@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useReducer, useContext } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 
 let scrollPositions = {};
 let timeout = null;
@@ -24,7 +24,7 @@ export function ManageScroll() {
 		window.addEventListener('scroll', scrollListener);
 		return () => {
 			window.removeEventListener('scroll', scrollListener);
-		}
+		};
 	}, []);
 
 	useEffect(() => {
@@ -38,7 +38,5 @@ export function ManageScroll() {
 		}
 	}, [history.location]);
 
-	return (
-		null
-	);
-};
+	return null;
+}

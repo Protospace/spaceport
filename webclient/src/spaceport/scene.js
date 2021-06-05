@@ -50,7 +50,7 @@ export const scene = ({ ref }) => {
 	ref.current.addEventListener('mousemove', (e) => {
 		const x = e.clientX;
 		const ratio = x / ref.current.clientWidth;
-		camera.position.set(5, 2, ratio*4 - 2);
+		camera.position.set(5, 2, ratio * 4 - 2);
 		camera.lookAt(new THREE.Vector3(0, 0, 0));
 	});
 
@@ -72,6 +72,7 @@ export const scene = ({ ref }) => {
 
 			if (ship.firing) {
 				const bolt = new Laser(ship);
+
 				bolts.push(bolt);
 				scene.add(bolt.mesh);
 				ship.firing = false;
