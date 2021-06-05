@@ -53,22 +53,22 @@ def num_months_difference(d1, d2):
 
 def calc_member_status(expire_date, fake_date=None):
     '''
-    Return: status, if we should pause them
+    Return: member status
     '''
     today = fake_date or today_alberta_tz()
 
     difference = num_months_difference(expire_date, today)
 
     if today + timedelta(days=29) < expire_date:
-        return 'Prepaid', False
+        return 'Prepaid'
     elif difference <= -3:
-        return 'Overdue', True
+        return 'Former Member'
     elif today - timedelta(days=29) >= expire_date:
-        return 'Overdue', False
+        return 'Overdue'
     elif today < expire_date:
-        return 'Current', False
+        return 'Current'
     elif today >= expire_date:
-        return 'Due', False
+        return 'Due'
     else:
         raise()
 
@@ -126,12 +126,12 @@ def tally_membership_months(member, fake_date=None):
     total_months = total_months_agg['number_of_membership_months__sum'] or 0
 
     expire_date = add_months(start_date, total_months)
-    status, former = calc_member_status(expire_date, fake_date)
+    status = calc_member_status(expire_date, fake_date)
 
     member.expire_date = expire_date
     member.status = status
 
-    if former:
+    if status == 'Former Member':
         member.paused_date = expire_date
 
     member.save()

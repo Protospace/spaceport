@@ -101,8 +101,6 @@ class TransactionSerializer(serializers.ModelSerializer):
 
 # member viewing other members
 class OtherMemberSerializer(serializers.ModelSerializer):
-    status = serializers.SerializerMethodField()
-
     class Meta:
         model = models.Member
         fields = [
@@ -117,13 +115,9 @@ class OtherMemberSerializer(serializers.ModelSerializer):
             'public_bio',
         ]
 
-    def get_status(self, obj):
-        return 'Former Member' if obj.paused_date else obj.status
-
 
 # member viewing his own details
 class MemberSerializer(serializers.ModelSerializer):
-    status = serializers.SerializerMethodField()
     photo = serializers.ImageField(write_only=True, required=False)
     crop = serializers.CharField(write_only=True, required=False)
     email = fields.UserEmailField(serializers.EmailField)
@@ -165,9 +159,6 @@ class MemberSerializer(serializers.ModelSerializer):
             'rabbit_cert_date',
             'trotec_cert_date',
         ]
-
-    def get_status(self, obj):
-        return 'Former Member' if obj.paused_date else obj.status
 
     def update(self, instance, validated_data):
         if instance.user:

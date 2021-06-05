@@ -131,6 +131,7 @@ class MemberViewSet(Base, Retrieve, Update):
         if not is_admin_director(self.request.user):
             raise exceptions.PermissionDenied()
         member = self.get_object()
+        member.status = 'Former Member'
         member.paused_date = utils.today_alberta_tz()
         member.save()
         return Response(200)
