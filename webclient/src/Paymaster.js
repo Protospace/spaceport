@@ -12,6 +12,7 @@ export function Paymaster(props) {
 	const [pop, setPop] = useState('20.00');
 	const [locker, setLocker] = useState('5.00');
 	const [donate, setDonate] = useState('20.00');
+	const [memo, setMemo] = useState('');
 
 	const monthly_fees = user.member.monthly_fees || 55;
 
@@ -99,7 +100,7 @@ export function Paymaster(props) {
 					<PayPalPayNow
 						amount={5}
 						name='Protospace Donation'
-						custom={JSON.stringify({ category: 'Donation', member: user.member.id })}
+						custom={JSON.stringify({ category: 'Donation', member: user.member.id, memo: memo })}
 					/>
 				</Grid.Column>
 
@@ -108,7 +109,7 @@ export function Paymaster(props) {
 					<PayPalPayNow
 						amount={10}
 						name='Protospace Donation'
-						custom={JSON.stringify({ category: 'Donation', member: user.member.id })}
+						custom={JSON.stringify({ category: 'Donation', member: user.member.id, memo: memo })}
 					/>
 				</Grid.Column>
 
@@ -128,9 +129,16 @@ export function Paymaster(props) {
 					<PayPalPayNow
 						amount={donate}
 						name='Protospace Donation'
-						custom={JSON.stringify({ category: 'Donation', member: user.member.id })}
+						custom={JSON.stringify({ category: 'Donation', member: user.member.id, memo: memo })}
 					/>
 				</Grid.Column>
+
+			Add an optional memo to your donation:
+			<Input
+				value={memo}
+				maxLength={50}
+				onChange={(e, v) => setMemo(v.value)}
+			/>
 			</Grid>
 
 			<Header size='medium'>Locker Storage</Header>
