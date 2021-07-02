@@ -4,16 +4,19 @@ import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Hea
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { apiUrl, statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound } from './Misc.js';
+import moment from 'moment-timezone';
 
 let memberCountCache = false;
 let signupCountCache = false;
 let spaceActivityCache = false;
+let dustLevelCache = false;
 
 export function Charts(props) {
 	const [memberCount, setMemberCount] = useState(memberCountCache);
 	const [signupCount, setSignupCount] = useState(signupCountCache);
 	const [spaceActivity, setSpaceActivity] = useState(spaceActivityCache);
 	const [fullActivity, setFullActivity] = useState(false);
+	const [dustLevel, setDustLevel] = useState(dustLevelCache);
 
 	useEffect(() => {
 		requester('/charts/membercount/', 'GET')
@@ -38,6 +41,15 @@ export function Charts(props) {
 		.then(res => {
 			setSpaceActivity(res);
 			spaceActivityCache = res;
+		})
+		.catch(err => {
+			console.log(err);
+		});
+
+		requester('https://ps-iot.dns.t0.vc/sensors/air/0/pm25/week', 'GET')
+		.then(res => {
+			setDustLevel(res.result);
+			dustLevelCache = res.result;
 		})
 		.catch(err => {
 			console.log(err);
@@ -280,6 +292,37 @@ export function Charts(props) {
 			<p>Later Vetted Count: number of those signups who eventually got vetted (at a later date).</p>
 
 			<p>Retained Count: number of those signups who are still a member currently.</p>
+
+
+			<Header size='medium'>Dust Level</Header>
+
+			<p>Averaged every 15 minutes for the past week.</p>
+
+			<p>
+				{dustLevel &&
+					<ResponsiveContainer width='100%' height={300}>
+						<LineChart data={dustLevel}>
+							<XAxis dataKey='time' tickFormatter={(t) => moment(t).format('ddd h:mm a')} minTickGap={10} />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip formatter={v => v.toFixed(2) + ' μg/m³'} labelFormatter={t => 'Time: ' + moment(t).format('ddd h:mm a')}  />
+							<Legend />
+
+							<Line
+								type='monotone'
+								dataKey='value'
+								name='Classroom PM2.5'
+								stroke='#8884d8'
+								strokeWidth={2}
+								dot={false}
+								animationDuration={1000}
+							/>
+						</LineChart>
+					</ResponsiveContainer>
+				}
+			</p>
+
+			<p>Classroom PM2.5: Amount of PM2.5 particles measured from the classroom ceiling. Units are μg/m³.</p>
 
 		</Container>
 	);

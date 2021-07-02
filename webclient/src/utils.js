@@ -32,6 +32,7 @@ export const BasicTable = (props) => (
 
 export const requester = (route, method, token, data) => {
 	let options = {headers: {}};
+	let url = '';
 
 	if (token) {
 		options.headers.Authorization = 'Token ' + token;
@@ -65,7 +66,13 @@ export const requester = (route, method, token, data) => {
 		return error;
 	}
 
-	return fetch(apiUrl + route, options)
+	if (route.startsWith('http')) {
+		url = route;
+	} else {
+		url = apiUrl + route;
+	}
+
+	return fetch(url, options)
 	.then(response => {
 		if (!response.ok) {
 			throw customError(response);
