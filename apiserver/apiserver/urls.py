@@ -11,6 +11,7 @@ IPN_ROUTE = r'^ipn/{}/'.format(secrets.IPN_RANDOM)
 ADMIN_ROUTE = '{}/admin/'.format(secrets.ADMIN_RANDOM)
 
 router = routers.DefaultRouter()
+router.register(r'coin', views.CoinViewSet, basename='coin')
 router.register(r'door', views.DoorViewSet, basename='door')
 router.register(r'lockout', views.LockoutViewSet, basename='lockout')
 router.register(r'cards', views.CardViewSet, basename='card')

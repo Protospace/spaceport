@@ -681,6 +681,38 @@ class SpaceportAuthView(LoginView):
     serializer_class = serializers.SpaceportAuthSerializer
 
 
+class CoinViewSet(viewsets.ViewSet):
+    def get_balance(self, card_number):
+        return dict(first_name='John', last_name='Smith', status='Current', balance=69.00)
+
+    @action(detail=False, methods=['get'])
+    def balance(self, request):
+        #auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        #if auth_token != 'Bearer ' + secrets.CASH_API_TOKEN:
+        #    raise exceptions.PermissionDenied()
+
+        card_number = request.data.get('card_number', '')
+        if not card_number:
+            raise exceptions.ValidationError(dict(card_number='This field may not be blank.'))
+
+        return Response(self.get_balance(card_number))
+
+    @action(detail=False, methods=['post'])
+    def card_update(self, request):
+        #auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        #if auth_token != 'Bearer ' + secrets.CASH_API_TOKEN:
+        #    raise exceptions.PermissionDenied()
+
+        serializer = serializers.CoinCardUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        if data['balance'] != 69.0:
+            raise exceptions.ValidationError(dict(balance='Incorrect balance.'))
+
+        return Response(self.get_balance(data['card_number']))
+
+
 @api_view()
 def null_view(request, *args, **kwargs):
     raise Http404

@@ -99,6 +99,18 @@ class TransactionSerializer(serializers.ModelSerializer):
         return member.preferred_name + ' ' + member.last_name
 
 
+class CoinCardUpdateSerializer(serializers.Serializer):
+    card_number = serializers.CharField(max_length=10)
+    balance = serializers.DecimalField(max_digits=None, decimal_places=2, min_value=0, max_value=200)
+    amount = serializers.DecimalField(max_digits=None, decimal_places=2, min_value=0, max_value=200)
+    memo = serializers.CharField()
+
+class CoinWebUpdateSerializer(serializers.Serializer):
+    balance = serializers.DecimalField(max_digits=None, decimal_places=2, min_value=0, max_value=200)
+    amount = serializers.DecimalField(max_digits=None, decimal_places=2, min_value=0, max_value=200)
+    memo = serializers.CharField()
+
+
 # member viewing other members
 class OtherMemberSerializer(serializers.ModelSerializer):
     class Meta:

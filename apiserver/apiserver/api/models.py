@@ -69,6 +69,7 @@ class Transaction(models.Model):
     reference_number = models.CharField(max_length=32, blank=True, null=True)
     memo = models.TextField(blank=True, null=True)
     number_of_membership_months = models.IntegerField(blank=True, null=True)
+    #number_of_protocoin = models.DecimalField(max_digits=7, decimal_places=2)
     payment_method = models.TextField(blank=True, null=True)
     category = models.TextField(blank=True, null=True)
     account_type = models.TextField(blank=True, null=True)
