@@ -21,6 +21,7 @@ def index():
 
 @app.route('/ping')
 def ping():
+    ldap_functions.find_user('tanner.collin')
     return 'pong'
 
 @app.route('/find-user', methods=['POST'])
