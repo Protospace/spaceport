@@ -103,6 +103,9 @@ class SearchViewSet(Base, Retrieve):
         elif self.action == 'create' and sort == 'oldest_overall':
             queryset = queryset.filter(application_date__isnull=False)
             queryset = queryset.order_by('application_date')
+        elif self.action == 'create' and sort == 'recently_inactive':
+            queryset = queryset.filter(paused_date__isnull=False)
+            queryset = queryset.order_by('-paused_date')
         elif self.action == 'create' and sort == 'best_looking':
             queryset = []
 

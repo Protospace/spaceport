@@ -14,6 +14,7 @@ const memberSorts = {
 	best_looking: 'Best Looking',
 	oldest_active: 'Oldest Active',
 	oldest_overall: 'Oldest Overall',
+	recently_inactive: 'Recently Inactive',
 };
 
 export function MembersDropdown(props) {
@@ -59,6 +60,7 @@ export function MembersDropdown(props) {
 };
 
 let searchCache = '';
+let numShowCache = 20;
 
 export function Members(props) {
 	const qs = useLocation().search;
@@ -66,7 +68,7 @@ export function Members(props) {
 	const sort = params.get('sort') || 'recently_vetted';
 
 	const [response, setResponse] = useState(false);
-	const [numShow, setNumShow] = useState(20);
+	const [numShow, setNumShow] = useState(numShowCache);
 	const searchDefault = {seq: 0, q: searchCache};
 	const [search, setSearch] = useState(searchDefault);
 	const { token } = props;
@@ -157,7 +159,7 @@ export function Members(props) {
 						{numShow !== 100 ?
 							<Button
 								content='Load More'
-								onClick={() => setNumShow(100)}
+								onClick={() => {setNumShow(100); numShowCache = 100;}}
 							/> : ''
 						}
 					</>
