@@ -117,6 +117,13 @@ body {
 	margin-left: 1rem;
 }
 
+.list-num {
+	display: flex;
+	align-items: center;
+	margin-right: 1rem;
+	color: black;
+}
+
 .footer {
 	margin-top: -20rem;
 	background: black;

@@ -1,11 +1,20 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Link, useParams, useLocation } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Input, Item, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { statusColor, isAdmin, isInstructor, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { AdminMemberInfo, AdminMemberPause, AdminMemberForm, AdminMemberCards, AdminMemberTraining, AdminMemberCertifications } from './AdminMembers.js';
 import { AdminMemberTransactions } from './AdminTransactions.js';
+
+const memberSorts = {
+	recently_vetted: 'Recently Vetted',
+	newest_active: 'Newest Active',
+	newest_overall: 'Newest Overall',
+	best_looking: 'Best Looking',
+	oldest_active: 'Oldest Active',
+	oldest_overall: 'Oldest Overall',
+};
 
 export function MembersDropdown(props) {
 	const { token, name, onChange, value, initial } = props;
@@ -52,13 +61,22 @@ export function MembersDropdown(props) {
 let searchCache = '';
 
 export function Members(props) {
+	const qs = useLocation().search;
+	const params = new URLSearchParams(qs);
+	const sort = params.get('sort') || 'recently_vetted';
+
 	const [response, setResponse] = useState(false);
+	const [numShow, setNumShow] = useState(20);
 	const searchDefault = {seq: 0, q: searchCache};
 	const [search, setSearch] = useState(searchDefault);
 	const { token } = props;
 
+	console.log(sort);
+
 	useEffect(() => {
+		setResponse(false);
 		searchCache = search.q;
+		search.sort = sort;
 		requester('/search/', 'POST', token, search)
 		.then(res => {
 			if (!search.seq || res.seq > response.seq) {
@@ -68,7 +86,7 @@ export function Members(props) {
 		.catch(err => {
 			console.log(err);
 		});
-	}, [search]);
+	}, [search, sort]);
 
 	return (
 		<Container>
@@ -91,32 +109,60 @@ export function Members(props) {
 				/> : ''
 			}
 
+			<p></p>
+
+			<p>
+				Sort by{' '}
+				{Object.entries(memberSorts).map((x, i) =>
+					<>
+						<Link to={'/members?sort='+x[0]} replace>{x[1]}</Link>
+						{i < Object.keys(memberSorts).length - 1 && ', '}
+					</>
+				)}.
+			</p>
+
 			<Header size='medium'>
-				{search.q.length ? 'Search Results' : 'Newest Vetted Members'}
+				{search.q.length ? 'Search Results' : memberSorts[sort] + ' Members'}
 			</Header>
 
-			{response ?
-				<Item.Group unstackable divided>
-					{response.results.length ?
-						response.results.map(x =>
-							<Item key={x.member.id} as={Link} to={'/members/'+x.member.id}>
-								<Item.Image size='tiny' src={x.member.photo_small ? staticUrl + '/' + x.member.photo_small : '/nophoto.png'} />
-								<Item.Content verticalAlign='top'>
-									<Item.Header>
-										<Icon name='circle' color={statusColor[x.member.status]} />
-										{x.member.preferred_name} {x.member.last_name}
-									</Item.Header>
-									<Item.Description>Status: {x.member.status || 'Unknown'}</Item.Description>
-									<Item.Description>Joined: {x.member.application_date || 'Unknown'}</Item.Description>
-								</Item.Content>
-							</Item>
-						)
-					:
-						<p>No Results</p>
-					}
-				</Item.Group>
+			{sort === 'best_looking' ?
+				<center>
+					<img className='bean' src='/mr-bean.jpg' />
+				</center>
 			:
-				<p>Loading...</p>
+				response ?
+					<>
+						<Item.Group unstackable divided>
+							{response.results.length ?
+								response.results.slice(0, numShow).map((x, i) =>
+									<Item key={x.member.id} as={Link} to={'/members/'+x.member.id}>
+										<div className='list-num'>{i+1}</div>
+										<Item.Image size='tiny' src={x.member.photo_small ? staticUrl + '/' + x.member.photo_small : '/nophoto.png'} />
+										<Item.Content verticalAlign='top'>
+											<Item.Header>
+												<Icon name='circle' color={statusColor[x.member.status]} />
+												{x.member.preferred_name} {x.member.last_name}
+											</Item.Header>
+											<Item.Description>Status: {x.member.status || 'Unknown'}</Item.Description>
+											<Item.Description>Joined: {x.member.application_date || 'Unknown'}</Item.Description>
+											<Item.Description>ID: {x.member.id}</Item.Description>
+										</Item.Content>
+									</Item>
+								)
+							:
+								<p>No Results</p>
+							}
+						</Item.Group>
+
+						{numShow !== 100 ?
+							<Button
+								content='Load More'
+								onClick={() => setNumShow(100)}
+							/> : ''
+						}
+					</>
+				:
+					<p>Loading...</p>
 			}
 
 		</Container>

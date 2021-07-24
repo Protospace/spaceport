@@ -60,6 +60,7 @@ class SearchViewSet(Base, Retrieve):
     def get_queryset(self):
         queryset = models.Member.objects.all()
         search = self.request.data.get('q', '').lower()
+        sort = self.request.data.get('sort', '').lower()
 
         if not cache.touch('search_strings'):
             utils.gen_search_strings() # init cache
@@ -87,9 +88,23 @@ class SearchViewSet(Base, Retrieve):
 
             queryset = result_objects
             logging.info('Search for: {}, results: {}'.format(search, len(queryset)))
-        elif self.action == 'create':
+        elif self.action == 'create' and sort == 'recently_vetted':
             utils.gen_search_strings() # update cache
             queryset = queryset.order_by('-vetted_date')
+        elif self.action == 'create' and sort == 'newest_active':
+            queryset = queryset.filter(paused_date__isnull=True)
+            queryset = queryset.order_by('-application_date')
+        elif self.action == 'create' and sort == 'newest_overall':
+            queryset = queryset.filter(paused_date__isnull=True)
+            queryset = queryset.order_by('-application_date')
+        elif self.action == 'create' and sort == 'oldest_active':
+            queryset = queryset.filter(paused_date__isnull=True)
+            queryset = queryset.order_by('application_date')
+        elif self.action == 'create' and sort == 'oldest_overall':
+            queryset = queryset.filter(application_date__isnull=False)
+            queryset = queryset.order_by('application_date')
+        elif self.action == 'create' and sort == 'best_looking':
+            queryset = []
 
         return queryset
 
@@ -101,7 +116,13 @@ class SearchViewSet(Base, Retrieve):
         except ValueError:
             seq = 0
 
-        queryset = self.get_queryset()[:NUM_SEARCH_RESULTS]
+        search = self.request.data.get('q', '').lower()
+        if search:
+            num_results = NUM_SEARCH_RESULTS
+        else:
+            num_results = 100
+
+        queryset = self.get_queryset()[:num_results]
         serializer = serializers.SearchSerializer(queryset, many=True)
         return Response({'seq': seq, 'results': serializer.data})
 
