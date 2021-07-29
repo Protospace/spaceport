@@ -294,7 +294,7 @@ def link_old_member(data, user):
     try:
         member = models.Member.objects.get(old_email__iexact=data['email'])
     except models.Member.DoesNotExist:
-        msg = 'Unable to find email in old portal. Maybe try your other email addresses?'
+        msg = 'Unable to find email in old portal. Try a different one or ask a director to look up which one you used.'
         logger.info(msg)
         raise ValidationError(dict(email=msg))
     except models.Member.MultipleObjectsReturned:
