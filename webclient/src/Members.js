@@ -90,6 +90,10 @@ export function Members(props) {
 		});
 	}, [search, sort]);
 
+	useEffect(() => {
+		setSearch({seq: 0, q: ''});
+	}, [sort]);
+
 	return (
 		<Container>
 			<Header size='large'>Member List</Header>
@@ -156,7 +160,7 @@ export function Members(props) {
 							}
 						</Item.Group>
 
-						{numShow !== 100 ?
+						{response.results.length > 20 && numShow !== 100 ?
 							<Button
 								content='Load More'
 								onClick={() => {setNumShow(100); numShowCache = 100;}}
