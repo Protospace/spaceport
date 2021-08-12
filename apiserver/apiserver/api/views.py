@@ -439,7 +439,8 @@ class DoorViewSet(viewsets.ViewSet, List):
             member = card.user.member
         else:
             member = models.Member.objects.get(id=card.member_id)
-        logger.info('Name: {} {} ({})'.format(member.first_name, member.last_name, member.id))
+        t = utils.now_alberta_tz().strftime('%Y-%m-%d %H:%M:%S, %a %I:%M %p')
+        logger.info('Time: {} - Name: {} {} ({})'.format(t, member.first_name, member.last_name, member.id))
 
         utils_stats.calc_card_scans()
 

@@ -26,6 +26,9 @@ STATIC_FOLDER = 'data/static/'
 def today_alberta_tz():
     return datetime.now(pytz.timezone('America/Edmonton')).date()
 
+def now_alberta_tz():
+    return datetime.now(pytz.timezone('America/Edmonton'))
+
 def alert_tanner(message):
     try:
         logger.info('Alerting Tanner: ' + message)
