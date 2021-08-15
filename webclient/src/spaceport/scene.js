@@ -20,7 +20,7 @@ export const scene = ({ ref }) => {
 
 	renderer.setSize(width, height);
 
-	const camera = new THREE.PerspectiveCamera(65, width / height, 0.01, 1000);
+	const camera = new THREE.PerspectiveCamera(65, width / height, 0.01, 1000000);
 
 	camera.position.set(5, 2, 1);
 	camera.lookAt(new THREE.Vector3(0, 0, 0));
@@ -38,6 +38,23 @@ export const scene = ({ ref }) => {
 	light2.position.y = 5;
 	light2.position.z = 1;
 	scene.add(light2);
+
+	const star_material = new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, color: 0xaaaaaa } );
+	let stars = [];
+
+	for (let i = 0; i < 200; i++) {
+		const star_geometry = new THREE.CircleGeometry( Math.random() * 200 + 100, 8 );
+		const star_circle = new THREE.Mesh( star_geometry, star_material );
+		scene.add(star_circle);
+		//star_circle.rotation.y = Math.PI / 2;
+		const u = Math.random() - 0.5;
+		const v = Math.random() - 0.5;
+		const w = Math.random() - 0.5;
+		star_circle.position.set(-100000*Math.sin(v*Math.PI+Math.PI/2), 300000*u, 100000*Math.cos(v*Math.PI+Math.PI/2));
+		star_circle.lookAt(camera.position);
+		stars.push(star_circle);
+	}
+
 
 	let ships = [];
 	let bolts = [];
