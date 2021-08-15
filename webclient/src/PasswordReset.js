@@ -48,13 +48,14 @@ function ResetForm() {
 			<Message
 				error
 				header='Email not found in Spaceport'
-				content='You can only use this form if you have an account with this new member portal.'
+				content='Ask a director if you forgot which one you used.'
 			/>
 
 			<Form.Button loading={loading} error={error.non_field_errors}>
 				Submit
 			</Form.Button>
-			{success && <div>Success! Be sure to check your spam folder.</div>}
+			{loading && <div>Give me like 30 seconds...</div>}
+			{success && <div>Success! Be sure to check your <b>spam folder</b>.</div>}
 		</Form>
 	);
 };
