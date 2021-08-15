@@ -7,6 +7,11 @@
 	filter: brightness(75%);
 }
 
+.darkmode--activated .bean {
+	mix-blend-mode: difference;
+	filter: brightness(75%);
+}
+
 .darkmode--activated i.green.circle.icon {
 	mix-blend-mode: difference;
 	color: #21ba4582 !important;
