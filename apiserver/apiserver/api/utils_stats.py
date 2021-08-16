@@ -40,7 +40,7 @@ def changed_card():
 def calc_next_events():
     sessions = models.Session.objects
 
-    member_meeting = sessions.filter(is_cancelled=False, course=317, datetime__gte=now()).first()
+    member_meeting = sessions.filter(is_cancelled=False, course__in=[317, 413], datetime__gte=now()).first()
     monthly_clean = sessions.filter(is_cancelled=False, course=273, datetime__gte=now()).first()
 
     if member_meeting:
