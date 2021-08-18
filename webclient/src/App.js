@@ -21,6 +21,7 @@ import { Classes, ClassDetail } from './Classes.js';
 import { Members, MemberDetail } from './Members.js';
 import { Charts } from './Charts.js';
 import { Auth } from './Auth.js';
+import { Subscribe } from './PayPal.js';
 import { PasswordReset, ConfirmReset } from './PasswordReset.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { Footer } from './Footer.js';
@@ -224,6 +225,10 @@ function App() {
 
 					<Route path='/auth'>
 						<Auth user={user} />
+					</Route>
+
+					<Route path='/subscribe'>
+						<Subscribe />
 					</Route>
 
 					{user && user.member.set_details ?

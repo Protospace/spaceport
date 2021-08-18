@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useReducer } from 'react';
+import { useLocation } from 'react-router-dom';
+import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Input, Item, Menu, Message, Segment, Table } from 'semantic-ui-react';
 
 export function PayPalPayNow(props) {
 	const { amount, custom, name } = props;
@@ -75,5 +77,32 @@ export function PayPalSubscribeDeal(props) {
 				<img alt='' border='0' src='https://www.paypalobjects.com/en_US/i/scr/pixel.gif' width='1' height='1' />
 			</form>
 		</div>
+	);
+}
+
+export function Subscribe(props) {
+	const qs = useLocation().search;
+	const params = new URLSearchParams(qs);
+	const monthly_fees = params.get('monthly_fees') || false;
+	const id = params.get('id') || false;
+
+	return (
+		<Container>
+			<Header size='large'>Create a PayPal Subscription</Header>
+
+			<p>Use this page to set up a Protospace membership subscription.</p>
+
+			{monthly_fees && id ?
+				<PayPalSubscribeDeal
+					amount={monthly_fees}
+					name='Protospace Membership'
+					custom={JSON.stringify({ deal: 3, member: id })}
+				/>
+			:
+				<p>Error, invalid subscribe link.</p>
+			}
+
+			<p>Click "Checkout as Guest" if you don't have a PayPal account.</p>
+		</Container>
 	);
 }

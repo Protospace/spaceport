@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useLocation } from 'react-router-dom';
 import moment from 'moment-timezone';
+import QRCode from 'react-qr-code';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Popup, Segment, Table } from 'semantic-ui-react';
-import { statusColor, BasicTable, staticUrl, requester, isAdmin } from './utils.js';
+import { statusColor, BasicTable, siteUrl, staticUrl, requester, isAdmin } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 import { AccountForm } from './Account.js';
 import { PayPalSubscribeDeal } from './PayPal.js';
@@ -68,6 +69,10 @@ function MemberInfo(props) {
 					name='Protospace Membership'
 					custom={JSON.stringify({ deal: 3, member: user.member.id })}
 				/>
+
+				<p>Click "Checkout as Guest" if you don't have a PayPal account.</p>
+
+				<QRCode value={siteUrl + '/subscribe?monthly_fees=' + user.member.monthly_fees + '&id=' + user.member.id} />
 			</React.Fragment>}
 
 			<Header size='medium'>Details</Header>
@@ -159,7 +164,7 @@ export function Home(props) {
 	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').fromNow() : '';
 	const getTrackName = (x) => stats && stats.track && stats.track[x] && stats.track[x]['username'] ? stats.track[x]['username'] : 'Unknown';
 
-	const alarmStat = () => stats && stats.alarm && moment().unix() - stats.alarm['time'] < 300 ? stats.alarm['data'] > 200 ? 'Armed' : 'Disarmed' : 'Unknown';
+	const alarmStat = () => stats && stats.alarm && moment().unix() - stats.alarm['time'] < 300 ? stats.alarm['data'] < 270 ? 'Armed' : 'Disarmed' : 'Unknown';
 
 	return (
 		<Container>
