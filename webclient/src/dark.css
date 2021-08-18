@@ -2,12 +2,9 @@
 	z-index: 500;
 }
 
-.darkmode--activated .ui.image {
-	mix-blend-mode: difference;
-	filter: brightness(75%);
-}
-
-.darkmode--activated .bean {
+.darkmode--activated .ui.image,
+.darkmode--activated .bean,
+.darkmode--activated .photo-404 {
 	mix-blend-mode: difference;
 	filter: brightness(75%);
 }
