@@ -100,7 +100,29 @@ class TransactionSerializer(serializers.ModelSerializer):
 
 
 # member viewing other members
+# hide info for non-vetted members so someone sitting
+# in our parking lot can't scrape all our info
 class OtherMemberSerializer(serializers.ModelSerializer):
+    last_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Member
+        fields = [
+            'id',
+            'preferred_name',
+            'last_name',
+            'status',
+            'current_start_date',
+            'application_date',
+            'photo_small',
+            'public_bio',
+        ]
+
+    def get_last_name(self, obj):
+        return obj.last_name[0] + '.'
+
+# vetted member viewing other members
+class VettedOtherMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Member
         fields = [
@@ -234,13 +256,23 @@ class SearchSerializer(serializers.Serializer):
         serializer = OtherMemberSerializer(obj)
         return serializer.data
 
+# vetted member viewing member list or search result
+class VettedSearchSerializer(serializers.Serializer):
+    q = serializers.CharField(write_only=True, max_length=64)
+    seq = serializers.IntegerField(write_only=True)
+    member = serializers.SerializerMethodField()
+
+    def get_member(self, obj):
+        serializer = VettedOtherMemberSerializer(obj)
+        return serializer.data
+
 # instructor viewing search result
 class InstructorSearchSerializer(serializers.Serializer):
     member = serializers.SerializerMethodField()
     training = serializers.SerializerMethodField()
 
     def get_member(self, obj):
-        serializer = OtherMemberSerializer(obj)
+        serializer = VettedOtherMemberSerializer(obj)
         return serializer.data
 
     def get_training(self, obj):
@@ -402,7 +434,7 @@ class SessionSerializer(serializers.ModelSerializer):
 
     def get_instructor_name(self, obj):
         if obj.instructor and hasattr(obj.instructor, 'member'):
-            name = '{} {}'.format(obj.instructor.member.preferred_name, obj.instructor.member.last_name[0])
+            name = '{} {}.'.format(obj.instructor.member.preferred_name, obj.instructor.member.last_name[0])
         else:
             name = 'Unknown'
         return obj.old_instructor or name

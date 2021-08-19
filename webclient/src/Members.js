@@ -73,8 +73,6 @@ export function Members(props) {
 	const [search, setSearch] = useState(searchDefault);
 	const { token } = props;
 
-	console.log(sort);
-
 	useEffect(() => {
 		setResponse(false);
 		searchCache = search.q;
@@ -197,6 +195,7 @@ export function MemberDetail(props) {
 	}, [refreshCount]);
 
 	const member = result.member || false;
+	const photo = member?.photo_large || member?.photo_small || false;
 
 	return (
 		<Container>
@@ -208,7 +207,7 @@ export function MemberDetail(props) {
 						<Grid stackable columns={2}>
 							<Grid.Column width={isAdmin(user) ? 8 : 5}>
 								<p>
-									<Image rounded size='medium' src={member.photo_large ? staticUrl + '/' + member.photo_large : '/nophoto.png'} />
+									<Image rounded size='medium' src={photo ? staticUrl + '/' + photo : '/nophoto.png'} />
 								</p>
 
 								{isAdmin(user) ?

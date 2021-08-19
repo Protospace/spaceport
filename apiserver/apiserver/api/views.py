@@ -54,6 +54,8 @@ class SearchViewSet(Base, Retrieve):
             return serializers.AdminSearchSerializer
         elif self.request.user.member.is_instructor and self.action == 'retrieve':
             return serializers.InstructorSearchSerializer
+        elif self.request.user.member.vetted_date:
+            return serializers.VettedSearchSerializer
         else:
             return serializers.SearchSerializer
 
@@ -126,7 +128,12 @@ class SearchViewSet(Base, Retrieve):
             num_results = 100
 
         queryset = self.get_queryset()[:num_results]
-        serializer = serializers.SearchSerializer(queryset, many=True)
+
+        if self.request.user.member.vetted_date:
+            serializer = serializers.VettedSearchSerializer(queryset, many=True)
+        else:
+            serializer = serializers.SearchSerializer(queryset, many=True)
+
         return Response({'seq': seq, 'results': serializer.data})
 
 
