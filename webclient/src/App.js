@@ -176,6 +176,11 @@ function App() {
 								as={Link}
 								to='/paste'
 							/>
+							<Dropdown.Item
+								content='Charts'
+								as={Link}
+								to='/charts'
+							/>
 
 							{user && isAdmin(user) && <Dropdown.Item
 								content='Admin'
