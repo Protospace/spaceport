@@ -119,7 +119,10 @@ class OtherMemberSerializer(serializers.ModelSerializer):
         ]
 
     def get_last_name(self, obj):
-        return obj.last_name[0] + '.'
+        if len(obj.last_name):
+            return obj.last_name[0] + '.'
+        else:
+            return ''
 
 # vetted member viewing other members
 class VettedOtherMemberSerializer(serializers.ModelSerializer):
