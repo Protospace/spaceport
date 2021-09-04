@@ -18,7 +18,7 @@ from django.db.models import Sum
 from django.core.cache import cache
 from django.utils.timezone import now, pytz
 
-from . import models, serializers, utils_ldap
+from . import models, serializers, utils_ldap, utils_stats
 
 STATIC_FOLDER = 'data/static/'
 
@@ -311,6 +311,7 @@ def link_old_member(data, user):
         raise ValidationError(dict(email=msg))
 
     if utils_ldap.is_configured():
+        if data['request_id']: utils_stats.set_progress(data['request_id'], 'Finding LDAP account...')
         result = utils_ldap.find_user(user.username)
         if result == 200:
             if utils_ldap.set_password(data) != 200:
@@ -331,6 +332,8 @@ def link_old_member(data, user):
             raise ValidationError(dict(non_field_errors=msg))
 
 
+    if data['request_id']: utils_stats.set_progress(data['request_id'], 'Linking old member data...')
+
     member.user = user
     member.first_name = data['first_name'].title()
     member.last_name = data['last_name'].title()
@@ -349,6 +352,7 @@ def create_new_member(data, user):
         raise ValidationError(dict(email=msg))
 
     if utils_ldap.is_configured():
+        if data['request_id']: utils_stats.set_progress(data['request_id'], 'Creating LDAP account...')
         result = utils_ldap.find_user(user.username)
         if result == 200:
             msg = 'Username was found in old portal.'
@@ -368,6 +372,8 @@ def create_new_member(data, user):
             logger.info(msg)
             raise ValidationError(dict(non_field_errors=msg))
 
+    if data['request_id']: utils_stats.set_progress(data['request_id'], 'Creating new member...')
+
     models.Member.objects.create(
         user=user,
         first_name=data['first_name'].title(),
@@ -386,6 +392,9 @@ def register_user(data, user):
     except:
         user.delete()
         raise
+
+    if data['request_id']: utils_stats.set_progress(data['request_id'], 'Done!')
+
 
 BLANK_FORM = 'misc/blank_member_form.pdf'
 def gen_member_forms(member):

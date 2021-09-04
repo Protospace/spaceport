@@ -11,7 +11,7 @@ from rest_auth.serializers import PasswordChangeSerializer, PasswordResetSeriali
 from rest_auth.serializers import UserDetailsSerializer
 import re
 
-from . import models, fields, utils, utils_ldap, utils_auth
+from . import models, fields, utils, utils_ldap, utils_auth, utils_stats
 from .. import settings, secrets
 
 #class UsageSerializer(serializers.ModelSerializer):
@@ -515,6 +515,7 @@ class MyRegisterSerializer(RegisterSerializer):
     first_name = serializers.CharField(max_length=32)
     last_name = serializers.CharField(max_length=32)
     existing_member = serializers.ChoiceField(['true', 'false'])
+    request_id = serializers.CharField(required=False)
 
     def validate_username(self, username):
         if re.search(r'[^a-z.]', username):
@@ -538,6 +539,8 @@ class MyRegisterSerializer(RegisterSerializer):
             logger.info('Request not from protospace')
             user.delete()
             raise ValidationError(dict(non_field_errors='Can only register from Protospace.'))
+
+        if data['request_id']: utils_stats.set_progress(data['request_id'], 'Registering...')
 
         utils.register_user(data, user)
 

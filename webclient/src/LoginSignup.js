@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useLocation } from 'react-router-dom';
 import './light.css';
 import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { requester } from './utils.js';
+import { requester, randomString } from './utils.js';
 
 export function LoginForm(props) {
 	const [input, setInput] = useState({ username: '' });
@@ -75,6 +75,7 @@ export function LoginForm(props) {
 export function SignupForm(props) {
 	const [input, setInput] = useState({ email: '' });
 	const [error, setError] = useState({});
+	const [progress, setProgress] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const location = useLocation();
 
@@ -94,14 +95,29 @@ export function SignupForm(props) {
 		if (loading) return;
 		setLoading(true);
 		input.username = genUsername();
-		const data = { ...input, email: input.email.toLowerCase(), bypass_code: bypass_code };
+
+		const request_id = randomString();
+		const getStatus = () => {
+			requester('/stats/progress/?request_id='+request_id, 'GET')
+			.then(res => {
+				setProgress(res);
+			})
+			.catch(err => {
+				console.log(err);
+			});
+		};
+		const interval = setInterval(getStatus, 500);
+
+		const data = { ...input, email: input.email.toLowerCase(), bypass_code: bypass_code, request_id: request_id };
 		requester('/registration/', 'POST', '', data)
 		.then(res => {
+			clearInterval(interval);
 			setError({});
 			props.setTokenCache(res.key);
 			window.scrollTo(0, 0);
 		})
 		.catch(err => {
+			clearInterval(interval);
 			setLoading(false);
 			console.log(err);
 			setError(err.data);
@@ -178,6 +194,10 @@ export function SignupForm(props) {
 						onChange={handleChange}
 						error={error.password2}
 					/>
+
+					<p>
+						{progress.map(x => <>{x}<br /></>)}
+					</p>
 
 					<Form.Button loading={loading} error={error.non_field_errors}>
 						Sign Up

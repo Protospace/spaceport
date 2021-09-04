@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Table } from 'semantic-ui-react';
 
+export const randomString = () => Math.random().toString(36).substr(2, 10);
+
 export const siteUrl = window.location.protocol + '//' + window.location.hostname;
 export const apiUrl = window.location.protocol + '//api.' + window.location.hostname;
 export const staticUrl = window.location.protocol + '//static.' + window.location.hostname;

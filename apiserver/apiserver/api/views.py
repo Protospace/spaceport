@@ -506,6 +506,14 @@ class StatsViewSet(viewsets.ViewSet, List):
 
         return Response(stats)
 
+    @action(detail=False, methods=['get'])
+    def progress(self, request):
+        try:
+            request_id = request.query_params['request_id']
+            return Response(utils_stats.get_progress(request_id))
+        except KeyError:
+            raise exceptions.ValidationError(dict(request_id='This field is required.'))
+
     @action(detail=False, methods=['post'])
     def bay_108_temp(self, request):
         try:
