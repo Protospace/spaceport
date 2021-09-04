@@ -564,7 +564,7 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
         )
 
         if utils_auth.is_configured():
-            if utils_auth.set_password(data) != 200:
+            if utils_auth.set_wiki_password(data) != 200:
                 msg = 'Problem connecting to Auth server: set.'
                 utils.alert_tanner(msg)
                 logger.info(msg)
@@ -605,7 +605,7 @@ class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
         )
 
         if utils_auth.is_configured():
-            if utils_auth.set_password(data) != 200:
+            if utils_auth.set_wiki_password(data) != 200:
                 msg = 'Problem connecting to Auth server: set.'
                 utils.alert_tanner(msg)
                 logger.info(msg)
@@ -657,6 +657,6 @@ class SpaceportAuthSerializer(LoginSerializer):
 
         if result:
             data = self.context['request'].data
-            utils_auth.set_password(data)
+            utils_auth.set_wiki_password(data)
 
         return result
