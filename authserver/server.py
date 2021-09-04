@@ -23,7 +23,7 @@ def index():
 def ping():
     return 'pong'
 
-@app.route('/set-password', methods=['POST'])
+@app.route('/set-wiki-password', methods=['POST'])
 def set_password():
     check_auth()
 
@@ -31,6 +31,18 @@ def set_password():
     password = request.form['password']
 
     auth_functions.set_wiki_password(username, password)
+    return ''
+
+@app.route('/set-discourse-password', methods=['POST'])
+def set_password():
+    check_auth()
+
+    username = request.form['username']
+    password = request.form['password']
+    first_name = request.form['first_name']
+    email = request.form['email']
+
+    auth_functions.set_discourse_password(username, password, first_name, email)
     return ''
 
 if __name__ == '__main__':
