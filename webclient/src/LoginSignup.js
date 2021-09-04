@@ -112,74 +112,92 @@ export function SignupForm(props) {
 		<Form onSubmit={handleSubmit}>
 			<Header size='medium'>Sign Up to Spaceport</Header>
 
-			<Form.Group widths='equal'>
-				<Form.Input
-					label='First Name'
-					name='first_name'
-					fluid
-					onChange={handleChange}
-					error={error.first_name}
-				/>
-				<Form.Input
-					label='Last Name'
-					name='last_name'
-					fluid
-					onChange={handleChange}
-					error={error.last_name}
-				/>
-			</Form.Group>
+			{props.show_signup ?
+				<>
+					<Form.Group widths='equal'>
+						<Form.Input
+							label='First Name'
+							name='first_name'
+							fluid
+							onChange={handleChange}
+							error={error.first_name}
+						/>
+						<Form.Input
+							label='Last Name'
+							name='last_name'
+							fluid
+							onChange={handleChange}
+							error={error.last_name}
+						/>
+					</Form.Group>
 
-			<Form.Input
-				label='Username'
-				name='username'
-				value={genUsername()}
-				error={error.username}
-				readOnly
-			/>
-			<Form.Input
-				label='Email'
-				name='email'
-				onChange={handleChange}
-				error={error.email}
-			/>
+					<Form.Input
+						label='Username'
+						name='username'
+						value={genUsername()}
+						error={error.username}
+						readOnly
+					/>
+					<Form.Input
+						label='Email'
+						name='email'
+						onChange={handleChange}
+						error={error.email}
+					/>
 
-			<Form.Group grouped>
-				<Form.Radio
-					label='I have an account on the old portal'
-					name='existing_member'
-					value={'true'}
-					checked={input.existing_member === 'true'}
-					onChange={handleValues}
-					error={!!error.existing_member}
-				/>
-				<Form.Radio
-					label='I am new to Protospace'
-					name='existing_member'
-					value={'false'}
-					checked={input.existing_member === 'false'}
-					onChange={handleValues}
-					error={!!error.existing_member}
-				/>
-			</Form.Group>
+					<Form.Group grouped>
+						<Form.Radio
+							label='I have an account on the old portal'
+							name='existing_member'
+							value={'true'}
+							checked={input.existing_member === 'true'}
+							onChange={handleValues}
+							error={!!error.existing_member}
+						/>
+						<Form.Radio
+							label='I am new to Protospace'
+							name='existing_member'
+							value={'false'}
+							checked={input.existing_member === 'false'}
+							onChange={handleValues}
+							error={!!error.existing_member}
+						/>
+					</Form.Group>
 
-			<Form.Input
-				label='Password'
-				name='password1'
-				type='password'
-				onChange={handleChange}
-				error={error.password1}
-			/>
-			<Form.Input
-				label='Confirm Password'
-				name='password2'
-				type='password'
-				onChange={handleChange}
-				error={error.password2}
-			/>
+					<Form.Input
+						label='Password'
+						name='password1'
+						type='password'
+						onChange={handleChange}
+						error={error.password1}
+					/>
+					<Form.Input
+						label='Confirm Password'
+						name='password2'
+						type='password'
+						onChange={handleChange}
+						error={error.password2}
+					/>
 
-			<Form.Button loading={loading} error={error.non_field_errors}>
-				Sign Up
-			</Form.Button>
+					<Form.Button loading={loading} error={error.non_field_errors}>
+						Sign Up
+					</Form.Button>
+				</>
+			:
+				<>
+					<Message info>
+						<Message.Header>Please Visit Protospace</Message.Header>
+						<p>You'll need to sign a waiver and fill out member forms.</p>
+					</Message>
+					<p>
+						Our address: <br />
+						1530 27th Avenue NE <br />
+						Bay 108 <br />
+						Calgary, Alberta, Canada
+					</p>
+					<p><a href="https://goo.gl/maps/u1NeC71HzUEUhe7N9" target="_blank">Google Maps Link</a></p>
+				</>
+			}
 		</Form>
 	);
 };

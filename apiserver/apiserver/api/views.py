@@ -502,6 +502,8 @@ class StatsViewSet(viewsets.ViewSet, List):
         if not user.is_authenticated or not user.member.vetted_date:
             stats.pop('alarm', None)
 
+        stats['at_protospace'] = utils.is_request_from_protospace(request)
+
         return Response(stats)
 
     @action(detail=False, methods=['post'])

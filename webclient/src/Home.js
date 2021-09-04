@@ -166,6 +166,8 @@ export function Home(props) {
 
 	const alarmStat = () => stats && stats.alarm && moment().unix() - stats.alarm['time'] < 300 ? stats.alarm['data'] < 270 ? 'Armed' : 'Disarmed' : 'Unknown';
 
+	const show_signup = stats?.at_protospace || bypass_code;
+
 	return (
 		<Container>
 			<Grid stackable padded columns={2}>
@@ -197,7 +199,7 @@ export function Home(props) {
 								</>
 							}
 
-							<SignupForm {...props} />
+							<SignupForm {...props} show_signup={show_signup} />
 						</div>
 					}
 				</Grid.Column>
