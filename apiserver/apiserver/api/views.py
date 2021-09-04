@@ -422,10 +422,10 @@ class DoorViewSet(viewsets.ViewSet, List):
         active_member_cards = {}
 
         for card in cards:
-            if card.user:
-                member = card.user.member
-            else:
+            try:
                 member = models.Member.objects.get(id=card.member_id)
+            except models.Member.DoesNotExist:
+                continue
             if member.paused_date: continue
 
             active_member_cards[card.card_number] = '{} ({})'.format(
@@ -441,10 +441,10 @@ class DoorViewSet(viewsets.ViewSet, List):
         card.last_seen_at = utils.today_alberta_tz()
         card.save()
 
-        if card.user:
-            member = card.user.member
-        else:
+        try:
             member = models.Member.objects.get(id=card.member_id)
+        except models.Member.DoesNotExist:
+            raise Http404
         t = utils.now_alberta_tz().strftime('%Y-%m-%d %H:%M:%S, %a %I:%M %p')
         logger.info('Time: {} - Name: {} {} ({})'.format(t, member.first_name, member.last_name, member.id))
 
@@ -463,7 +463,10 @@ class LockoutViewSet(viewsets.ViewSet, List):
         active_member_cards = {}
 
         for card in cards:
-            member = get_object_or_404(models.Member, id=card.member_id)
+            try:
+                member = models.Member.objects.get(id=card.member_id)
+            except models.Member.DoesNotExist:
+                continue
             if member.paused_date: continue
 
             authorization = {}
