@@ -24,7 +24,7 @@ def ping():
     return 'pong'
 
 @app.route('/set-wiki-password', methods=['POST'])
-def set_password():
+def set_wiki_password():
     check_auth()
 
     username = request.form['username']
@@ -34,7 +34,7 @@ def set_password():
     return ''
 
 @app.route('/set-discourse-password', methods=['POST'])
-def set_password():
+def set_discourse_password():
     check_auth()
 
     username = request.form['username']
