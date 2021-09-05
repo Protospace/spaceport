@@ -18,7 +18,7 @@ export function AuthForm(props) {
 
 	const handleSubmit = (e) => {
 		if (input.username.includes('@')) {
-			setError({ username: 'Username, not email.' });
+			setError({ username: 'Spaceport username, not email.' });
 		} else {
 			if (loading) return;
 			setLoading(true);
@@ -104,12 +104,43 @@ export function AuthWiki(props) {
 
 			<p>would like to request Spaceport authentication.</p>
 
-			<p>URL: <a href='http://wiki.protospace.ca/Welcome_to_Protospace' target='_blank' rel='noopener noreferrer'>wiki.protospace.ca</a></p>
+			<p>URL: <a href='https://wiki.protospace.ca/Welcome_to_Protospace' target='_blank' rel='noopener noreferrer'>wiki.protospace.ca</a></p>
 
 			<AuthForm user={user}>
 				<Header size='small'>Success!</Header>
-				<p>You can now log into the wiki:</p>
-				<p><a href='http://wiki.protospace.ca/index.php?title=Special:UserLogin&returnto=Welcome+to+Protospace' rel='noopener noreferrer'>Protospace Wiki</a></p>
+				<p>You can now log into the Wiki:</p>
+				<p>
+					Username: {user.username}<br/>
+					Password: [this Spaceport password]
+				</p>
+				<p><a href='https://wiki.protospace.ca/index.php?title=Special:UserLogin&returnto=Welcome+to+Protospace' rel='noopener noreferrer'>Protospace Wiki</a></p>
+			</AuthForm>
+		</Segment>
+	);
+}
+
+export function AuthDiscourse(props) {
+	const { user } = props;
+
+	return (
+		<Segment compact padded>
+			<Header size='medium'>
+				<Image src={'/discourselogo.png'} />
+				Protospace Discourse
+			</Header>
+
+			<p>would like to request Spaceport authentication.</p>
+
+			<p>URL: <a href='https://forum.protospace.ca' target='_blank' rel='noopener noreferrer'>forum.protospace.ca</a></p>
+
+			<AuthForm user={user}>
+				<Header size='small'>Success!</Header>
+				<p>You can now log into the Discourse:</p>
+				<p>
+					Username: {user.username}<br/>
+					Password: [this Spaceport password]
+				</p>
+				<p><a href='https://forum.protospace.ca' rel='noopener noreferrer'>Protospace Discourse</a></p>
 			</AuthForm>
 		</Segment>
 	);
@@ -126,6 +157,10 @@ export function Auth(props) {
 
 			<Route path='/auth/wiki'>
 				<AuthWiki user={user} />
+			</Route>
+
+			<Route path='/auth/discourse'>
+				<AuthDiscourse user={user} />
 			</Route>
 		</Container>
 	);

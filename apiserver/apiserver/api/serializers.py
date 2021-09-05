@@ -561,11 +561,20 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
         data = dict(
             username=self.user.username,
             password=self.data['new_password1'],
+            email=self.user.email,
+            first_name=self.user.member.first_name,
         )
 
         if utils_auth.wiki_is_configured():
             if utils_auth.set_wiki_password(data) != 200:
-                msg = 'Problem connecting to Auth server: set.'
+                msg = 'Problem connecting to Wiki Auth server: set.'
+                utils.alert_tanner(msg)
+                logger.info(msg)
+                raise ValidationError(dict(non_field_errors=msg))
+
+        if utils_auth.discourse_is_configured():
+            if utils_auth.set_discourse_password(data) != 200:
+                msg = 'Problem connecting to Discourse Auth server: set.'
                 utils.alert_tanner(msg)
                 logger.info(msg)
                 raise ValidationError(dict(non_field_errors=msg))
@@ -602,11 +611,20 @@ class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
         data = dict(
             username=self.user.username,
             password=self.data['new_password1'],
+            email=self.user.email,
+            first_name=self.user.member.first_name,
         )
 
         if utils_auth.wiki_is_configured():
             if utils_auth.set_wiki_password(data) != 200:
-                msg = 'Problem connecting to Auth server: set.'
+                msg = 'Problem connecting to Wiki Auth server: set.'
+                utils.alert_tanner(msg)
+                logger.info(msg)
+                raise ValidationError(dict(non_field_errors=msg))
+
+        if utils_auth.discourse_is_configured():
+            if utils_auth.set_discourse_password(data) != 200:
+                msg = 'Problem connecting to Discourse Auth server: set.'
                 utils.alert_tanner(msg)
                 logger.info(msg)
                 raise ValidationError(dict(non_field_errors=msg))
@@ -653,10 +671,14 @@ class HistorySerializer(serializers.ModelSerializer):
 
 class SpaceportAuthSerializer(LoginSerializer):
     def authenticate(self, **kwargs):
-        result = super().authenticate(**kwargs)
+        user = super().authenticate(**kwargs)
 
-        if result:
-            data = self.context['request'].data
+        if user:
+            data = self.context['request'].data.copy()
+            data['email'] = user.email
+            data['first_name'] = user.member.first_name
+
             utils_auth.set_wiki_password(data)
+            utils_auth.set_discourse_password(data)
 
-        return result
+        return user
