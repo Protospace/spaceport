@@ -4,6 +4,7 @@ logger = logging.getLogger(__name__)
 import io
 import json
 import requests
+import time
 from datetime import datetime, timedelta
 from rest_framework.exceptions import ValidationError
 from dateutil import relativedelta
@@ -18,7 +19,7 @@ from django.db.models import Sum
 from django.core.cache import cache
 from django.utils.timezone import now, pytz
 
-from . import models, serializers, utils_ldap, utils_stats
+from . import models, serializers, utils_ldap, utils_stats, utils_auth, utils
 
 STATIC_FOLDER = 'data/static/'
 
@@ -393,7 +394,29 @@ def register_user(data, user):
         user.delete()
         raise
 
+    auth_data = dict(
+        username=data['username'],
+        password=data['password1'],
+        email=data['email'],
+        first_name=data['first_name'],
+    )
+
+    if utils_auth.wiki_is_configured():
+        if data['request_id']: utils_stats.set_progress(data['request_id'], 'Creating Wiki account...')
+        if utils_auth.set_wiki_password(auth_data) != 200:
+            msg = 'Problem connecting to Wiki Auth server: set.'
+            utils.alert_tanner(msg)
+            logger.info(msg)
+
+    if utils_auth.discourse_is_configured():
+        if data['request_id']: utils_stats.set_progress(data['request_id'], 'Creating Discourse account...')
+        if utils_auth.set_discourse_password(auth_data) != 200:
+            msg = 'Problem connecting to Discourse Auth server: set.'
+            utils.alert_tanner(msg)
+            logger.info(msg)
+
     if data['request_id']: utils_stats.set_progress(data['request_id'], 'Done!')
+    time.sleep(1)
 
 
 BLANK_FORM = 'misc/blank_member_form.pdf'
