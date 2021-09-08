@@ -649,6 +649,8 @@ class BackupView(views.APIView):
             cache.set(backup_user['name'], datetime.datetime.now())
 
             return redirect(backup_url)
+        elif auth_token:
+            raise exceptions.PermissionDenied()
         else:
             backup_stats = []
             for backup_user in secrets.BACKUP_TOKENS.values():
