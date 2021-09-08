@@ -166,6 +166,8 @@ export function Home(props) {
 
 	const alarmStat = () => stats && stats.alarm && moment().unix() - stats.alarm['time'] < 300 ? stats.alarm['data'] < 270 ? 'Armed' : 'Disarmed' : 'Unknown';
 
+	const doorOpenStat = () => alarmStat() == 'Disarmed' && stats.alarm['data'] > 360 ? ', door open' : '';
+
 	const show_signup = stats?.at_protospace || bypass_code;
 
 	return (
@@ -283,7 +285,7 @@ export function Home(props) {
 								} trigger={<a>[more]</a>} />
 							</p>
 
-							{user && user.member.vetted_date && <p>Alarm status: {alarmStat()}</p>}
+							{user && user.member.vetted_date && <p>Alarm status: {alarmStat()}{doorOpenStat()}</p>}
 						</div>
 
 					</Segment>
