@@ -481,6 +481,7 @@ class LockoutViewSet(viewsets.ViewSet, List):
             authorization['mill'] = bool(member.mill_cert_date) and authorization['common']
             authorization['wood'] = bool(member.wood_cert_date) and authorization['common']
             authorization['wood2'] = bool(member.wood2_cert_date) and authorization['common']
+            authorization['cnc'] = bool(member.tormach_cnc_cert_date) and authorization['common']
             authorization['tormach_cnc'] = bool(member.tormach_cnc_cert_date) and authorization['common']
             authorization['precix_cnc'] = bool(member.precix_cnc_cert_date) and authorization['common']
 
