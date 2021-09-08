@@ -261,7 +261,11 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         elif session.course.id == 283:
             member.mill_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
         elif session.course.id == 259:
-            member.cnc_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+            member.tormach_cnc_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+        elif session.course.id == 428:
+            member.precix_cnc_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+
+            # TODO: change group membership
         elif session.course.id == 247:
             member.rabbit_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
 
@@ -477,7 +481,8 @@ class LockoutViewSet(viewsets.ViewSet, List):
             authorization['mill'] = bool(member.mill_cert_date) and authorization['common']
             authorization['wood'] = bool(member.wood_cert_date) and authorization['common']
             authorization['wood2'] = bool(member.wood2_cert_date) and authorization['common']
-            authorization['cnc'] = bool(member.cnc_cert_date) and authorization['common']
+            authorization['tormach_cnc'] = bool(member.tormach_cnc_cert_date) and authorization['common']
+            authorization['precix_cnc'] = bool(member.precix_cnc_cert_date) and authorization['common']
 
             active_member_cards[card.card_number] = authorization
 

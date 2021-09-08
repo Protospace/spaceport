@@ -180,7 +180,8 @@ class MemberSerializer(serializers.ModelSerializer):
             'mill_cert_date',
             'wood_cert_date',
             'wood2_cert_date',
-            'cnc_cert_date',
+            'tormach_cnc_cert_date',
+            'precix_cnc_cert_date',
             'rabbit_cert_date',
             'trotec_cert_date',
         ]

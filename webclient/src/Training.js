@@ -53,9 +53,14 @@ export function CertList(props) {
 					<Table.Cell><Link to='/courses/283'>Metal: Manual Mill & Advanced Lathe</Link></Table.Cell>
 				</Table.Row>
 				<Table.Row>
-					<Table.Cell>CNC {MoreCert('Tormach metal CNC, CNC wood router.')}</Table.Cell>
-					<Table.Cell>{member.cnc_cert_date ? 'Yes, ' + member.cnc_cert_date : 'No'}</Table.Cell>
+					<Table.Cell>Tormach CNC</Table.Cell>
+					<Table.Cell>{member.tormach_cnc_cert_date ? 'Yes, ' + member.tormach_cnc_cert_date : 'No'}</Table.Cell>
 					<Table.Cell><Link to='/courses/259'>Tormach: CAM and Tormach Intro</Link></Table.Cell>
+				</Table.Row>
+				<Table.Row>
+					<Table.Cell>Precix CNC</Table.Cell>
+					<Table.Cell>{member.precix_cnc_cert_date ? 'Yes, ' + member.precix_cnc_cert_date : 'No'}</Table.Cell>
+					<Table.Cell><Link to='/courses/428'>Basic CNC Wood Router</Link></Table.Cell>
 				</Table.Row>
 				<Table.Row>
 					<Table.Cell>Rabbit Laser</Table.Cell>
