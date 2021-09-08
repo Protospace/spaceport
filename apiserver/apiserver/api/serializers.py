@@ -231,6 +231,14 @@ class AdminMemberSerializer(MemberSerializer):
         ]
 
     def update(self, instance, validated_data):
+        if 'precix_cnc_cert_date' in validated_data:
+            changed = validated_data['precix_cnc_cert_date'] != instance.precix_cnc_cert_date
+            if changed:
+                if validated_data['precix_cnc_cert_date']:
+                    utils_ldap.add_to_group(instance, 'CNC-Precix-Users')
+                else:
+                    utils_ldap.remove_from_group(instance, 'CNC-Precix-Users')
+
         if 'rabbit_cert_date' in validated_data:
             changed = validated_data['rabbit_cert_date'] != instance.rabbit_cert_date
             if changed:

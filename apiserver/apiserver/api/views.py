@@ -265,7 +265,11 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         elif session.course.id == 428:
             member.precix_cnc_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
 
-            # TODO: change group membership
+            if utils_ldap.is_configured():
+                if status == 'Attended':
+                    utils_ldap.add_to_group(member, 'CNC-Precix-Users')
+                else:
+                    utils_ldap.remove_from_group(member, 'CNC-Precix-Users')
         elif session.course.id == 247:
             member.rabbit_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
 
