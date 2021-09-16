@@ -55,6 +55,7 @@ function InstructorCourseEditor(props) {
 					modules={modules}
 					onChange={handleQuill}
 				/>
+
 				{error.description &&
 					<Label pointing prompt>
 						{error.description}
@@ -131,6 +132,22 @@ export function InstructorCourseList(props) {
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
 
+	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
+	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
+	const handleChange = (e) => handleValues(e, e.currentTarget);
+	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
+	const handleQuill = (v, d, s, e) => s === 'user' && setInput({
+		...input,
+		description: v === '<p><br></p>' ? '' : v,
+	});
+
+	const makeProps = (name) => ({
+		name: name,
+		onChange: handleChange,
+		value: input[name] || '',
+		error: error[name],
+	});
+
 	const handleSubmit = (e) => {
 		if (loading) return;
 		setLoading(true);
@@ -164,7 +181,15 @@ export function InstructorCourseList(props) {
 
 					<InstructorCourseEditor input={input} setInput={setInput} error={error} />
 
-					<Form.Button loading={loading} error={error.non_field_errors}>
+					<Form.Checkbox
+						label='I understand the difference between a course and a class. There are no other courses for this topic.'
+						required
+						{...makeProps('understand_courses')}
+						onChange={handleCheck}
+						checked={input.understand_courses}
+					/>
+
+					<Form.Button disabled={!input.understand_courses} loading={loading} error={error.non_field_errors}>
 						Submit
 					</Form.Button>
 				</Form>
