@@ -117,7 +117,7 @@ function AdminCardDetail(props) {
 export function AdminMemberCards(props) {
 	const { token, result, refreshResult } = props;
 	const cards = result.cards;
-	const startDimmed = Boolean(result.member.paused_date && cards.length);
+	const startDimmed = Boolean((result.member.paused_date || !result.member.is_allowed_entry) && cards.length);
 	const [dimmed, setDimmed] = useState(startDimmed);
 	const [input, setInput] = useState({ active_status: 'card_active' });
 	const [error, setError] = useState(false);
@@ -127,7 +127,7 @@ export function AdminMemberCards(props) {
 	const { id } = useParams();
 
 	useEffect(() => {
-		const startDimmed = Boolean(result.member.paused_date && cards.length);
+		const startDimmed = Boolean((result.member.paused_date || !result.member.is_allowed_entry) && cards.length);
 		setDimmed(startDimmed);
 	}, [result.member]);
 
@@ -260,7 +260,7 @@ export function AdminMemberCards(props) {
 
 				<Dimmer active={dimmed}>
 					<p>
-						Member paused, {cards.length} card{cards.length === 1 ? '' : 's'} ignored anyway.
+						Member paused or not allowed entry, {cards.length} card{cards.length === 1 ? '' : 's'} ignored anyway.
 					</p>
 					<p>
 						<Button size='tiny' onClick={() => setDimmed(false)}>Close</Button>
@@ -445,6 +445,16 @@ export function AdminMemberForm(props) {
 						name='is_instructor'
 						onChange={handleCheck}
 						checked={input.is_instructor}
+					/>
+				</Form.Field>
+
+				<Form.Field>
+					<label>Is the member allowed entry?</label>
+					<Checkbox
+						label='Yes'
+						name='is_allowed_entry'
+						onChange={handleCheck}
+						checked={input.is_allowed_entry}
 					/>
 				</Form.Field>
 

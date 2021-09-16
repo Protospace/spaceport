@@ -435,6 +435,7 @@ class DoorViewSet(viewsets.ViewSet, List):
             except models.Member.DoesNotExist:
                 continue
             if member.paused_date: continue
+            if not member.is_allowed_entry: continue
 
             active_member_cards[card.card_number] = '{} ({})'.format(
                 member.first_name + ' ' + member.last_name[0],
@@ -476,6 +477,7 @@ class LockoutViewSet(viewsets.ViewSet, List):
             except models.Member.DoesNotExist:
                 continue
             if member.paused_date: continue
+            if not member.is_allowed_entry: continue
 
             authorization = {}
             authorization['id'] = member.id

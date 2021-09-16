@@ -57,6 +57,7 @@ class Member(models.Model):
     trotec_cert_date = models.DateField(blank=True, null=True, default=None)
     paused_date = models.DateField(blank=True, null=True)
     monthly_fees = models.IntegerField(default=55, blank=True, null=True)
+    is_allowed_entry = models.BooleanField(default=True)
 
     history = HistoricalRecords(excluded_fields=['member_forms'])
 
