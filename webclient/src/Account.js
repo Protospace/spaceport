@@ -5,7 +5,7 @@ import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import './light.css';
 import { Button, Container, Checkbox, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { BasicTable, staticUrl, requester } from './utils.js';
+import { BasicTable, staticUrl, requester, randomString } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 
 function LogoutEverywhere(props) {
@@ -54,6 +54,7 @@ function ChangePasswordForm(props) {
 	const { token } = props;
 	const [input, setInput] = useState({});
 	const [error, setError] = useState({});
+	const [progress, setProgress] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const history = useHistory();
 
@@ -64,12 +65,28 @@ function ChangePasswordForm(props) {
 	const handleSubmit = (e) => {
 		if (loading) return;
 		setLoading(true);
-		requester('/password/change/', 'POST', token, input)
+
+		const request_id = randomString();
+		const getStatus = () => {
+			requester('/stats/progress/?request_id='+request_id, 'GET')
+			.then(res => {
+				setProgress(res);
+			})
+			.catch(err => {
+				console.log(err);
+			});
+		};
+		const interval = setInterval(getStatus, 500);
+
+		const data = { ...input, request_id: request_id };
+		requester('/password/change/', 'POST', token, data)
 		.then(res => {
+			clearInterval(interval);
 			setError({});
 			history.push('/');
 		})
 		.catch(err => {
+			clearInterval(interval);
 			setLoading(false);
 			console.log(err);
 			setError(err.data);
@@ -105,6 +122,10 @@ function ChangePasswordForm(props) {
 				required
 				{...makeProps('new_password2')}
 			/>
+
+			<p>
+				{progress.map(x => <>{x}<br /></>)}
+			</p>
 
 			<Form.Button loading={loading} error={error.non_field_errors}>
 				Submit

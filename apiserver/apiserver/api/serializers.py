@@ -10,6 +10,7 @@ from rest_auth.registration.serializers import RegisterSerializer
 from rest_auth.serializers import PasswordChangeSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer, LoginSerializer
 from rest_auth.serializers import UserDetailsSerializer
 import re
+import time
 
 from . import models, fields, utils, utils_ldap, utils_auth, utils_stats
 from .. import settings, secrets
@@ -556,12 +557,15 @@ class MyRegisterSerializer(RegisterSerializer):
 
 class MyPasswordChangeSerializer(PasswordChangeSerializer):
     def save(self):
+        request_id = self.request.data.get('request_id', '')
+
         data = dict(
             username=self.user.username,
             password1=self.request.data['new_password1'],
         )
 
         if utils_ldap.is_configured():
+            if request_id: utils_stats.set_progress(request_id, 'Changing LDAP password...')
             if utils_ldap.set_password(data) != 200:
                 msg = 'Problem connecting to LDAP server: set.'
                 utils.alert_tanner(msg)
@@ -576,6 +580,7 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
         )
 
         if utils_auth.wiki_is_configured():
+            if request_id: utils_stats.set_progress(request_id, 'Changing Wiki password...')
             if utils_auth.set_wiki_password(data) != 200:
                 msg = 'Problem connecting to Wiki Auth server: set.'
                 utils.alert_tanner(msg)
@@ -583,11 +588,15 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
                 raise ValidationError(dict(non_field_errors=msg))
 
         if utils_auth.discourse_is_configured():
+            if request_id: utils_stats.set_progress(request_id, 'Changing Discourse password...')
             if utils_auth.set_discourse_password(data) != 200:
                 msg = 'Problem connecting to Discourse Auth server: set.'
                 utils.alert_tanner(msg)
                 logger.info(msg)
                 raise ValidationError(dict(non_field_errors=msg))
+
+        if request_id: utils_stats.set_progress(request_id, 'Done!')
+        time.sleep(1)
 
         super().save()
 
