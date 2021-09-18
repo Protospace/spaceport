@@ -71,6 +71,8 @@ export function Classes(props) {
 		<Container>
 			<Header size='large'>Class List</Header>
 
+			<p><Link to={'/courses'}>Click here to view the list of all courses.</Link></p>
+
 			<Header size='medium'>Upcoming</Header>
 
 			<p>Ordered by nearest date.</p>

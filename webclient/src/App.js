@@ -162,11 +162,6 @@ function App() {
 								to='/members'
 							/>
 							<Dropdown.Item
-								content='Courses'
-								as={Link}
-								to='/courses'
-							/>
-							<Dropdown.Item
 								content='Classes'
 								as={Link}
 								to='/classes'
