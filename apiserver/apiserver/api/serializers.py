@@ -595,7 +595,7 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
                 logger.info(msg)
                 raise ValidationError(dict(non_field_errors=msg))
 
-        if request_id: utils_stats.set_progress(request_id, 'Done!')
+        if request_id: utils_stats.set_progress(request_id, 'Changing Spaceport password...')
         time.sleep(1)
 
         super().save()
@@ -656,7 +656,7 @@ class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
         member = self.user.member
         logging.info('Password reset completed for: {} {} ({})'.format(member.first_name, member.last_name, member.id))
 
-        if request_id: utils_stats.set_progress(request_id, 'Done!')
+        if request_id: utils_stats.set_progress(request_id, 'Changing Spaceport password...')
         time.sleep(1)
 
         super().save()
