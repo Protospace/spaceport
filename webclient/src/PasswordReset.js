@@ -64,6 +64,7 @@ function ConfirmForm() {
 	const { uid, token } = useParams();
 	const [input, setInput] = useState({ uid: uid, token: token });
 	const [error, setError] = useState({});
+	const [progress, setProgress] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
 	const history = useHistory();
@@ -74,8 +75,22 @@ function ConfirmForm() {
 	const handleSubmit = (e) => {
 		if (loading) return;
 		setLoading(true);
+
+		const request_id = token.slice(-10);
+		const getStatus = () => {
+			requester('/stats/progress/?request_id='+request_id, 'GET')
+			.then(res => {
+				setProgress(res);
+			})
+			.catch(err => {
+				console.log(err);
+			});
+		};
+		const interval = setInterval(getStatus, 500);
+
 		requester('/password/reset/confirm/', 'POST', '', input)
 		.then(res => {
+			clearInterval(interval);
 			setLoading(false);
 			setSuccess(true);
 			setError({});
@@ -83,6 +98,7 @@ function ConfirmForm() {
 			window.scrollTo(0, 0);
 		})
 		.catch(err => {
+			clearInterval(interval);
 			setLoading(false);
 			console.log(err);
 			setError(err.data);
@@ -110,6 +126,10 @@ function ConfirmForm() {
 			/>
 
 			{(error.token || error.uid) && <p>Error: Invalid password reset URL! Try doing another reset.</p>}
+
+			<p>
+				{progress.map(x => <>{x}<br /></>)}
+			</p>
 
 			<Form.Button loading={loading} error={error.non_field_errors}>
 				Submit
