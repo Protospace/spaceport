@@ -298,7 +298,7 @@ def dump_users():
     try:
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
         criteria = '(&(objectClass=user)(objectGUID=*))'
-        attributes = ['cn', 'sAMAccountName', 'mail', 'displayName', 'givenName', 'name', 'sn', 'logonCount', 'objectGUID']
+        attributes = ['cn', 'sAMAccountName', 'userPrincipalName', 'mail', 'displayName', 'givenName', 'name', 'sn', 'logonCount', 'objectGUID']
         results = ldap_conn.search_s(secrets.BASE_MEMBERS, ldap.SCOPE_SUBTREE, criteria, attributes)
         results = convert(results)
 
@@ -324,16 +324,11 @@ def dump_users():
 if __name__ == '__main__':
     pass
     print("=-=-=-=-=-=-=-=-=-=")
-    #print(create_user('Elon', 'Tusk', 'elon.tusk', 'elon.tusk@lab39.lab', 'protospace*&^g87g6'))
-    #print(find_user('noorullah.hussain.zada'))
+    #print(create_user('test', 'test', 'test.test', 'test@example.com', 'protospace*&^g87g6'))
     #print("----------")
-    #print(find_user('pat.spencer'))
-    print("----------")
-    print(find_user('elon.tusk'))
-    print("----------")
-    print(delete_user('elon.tusk'))
-    print("----------")
-    print(find_user('elon.tusk'))
+    #print(find_user('elon.tusk'))
+    #print("----------")
+    #print(delete_user('elon.tusk'))
     #print("============================================================")
     #print(create_group("newgroup", "new group"))
     #print("   ==============  ")
