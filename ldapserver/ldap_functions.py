@@ -46,7 +46,7 @@ def find_user(query):
     try:
         logger.info('Looking up user ' + query)
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
-        criteria = '(&(objectClass=user)(|(mail={})(sAMAccountName={}))(!(objectClass=computer)))'.format(query, query)
+        criteria = '(&(objectClass=user)(|(mail={})(sAMAccountName={})(userPrincipalName={}*))(!(objectClass=computer)))'.format(query, query, query)
         results = ldap_conn.search_s(secrets.BASE_MEMBERS, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName','email'])
 
         logger.info('  Results: ' + str(results))
@@ -91,7 +91,7 @@ def create_user(first, last, username, email, password):
             ('objectClass', [b'top', b'person', b'organizationalPerson', b'user']),
             ('cn', [full_name.encode()]),
             ('userPrincipalName', [username.encode()]),
-            ('sAMAccountName', [username.encode()]),
+            ('sAMAccountName', [username.encode()[:20]]),
             ('givenName', [first.encode()]),
             ('sn', [last.encode()]),
             ('DisplayName', [full_name.encode()]),
@@ -240,12 +240,30 @@ def list_group(groupname):
     try:
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
         group_dn = find_group(groupname)
-        
+
         criteria = '(&(objectClass=group)(sAMAccountName={}))'.format(groupname)
         results = ldap_conn.search_s(secrets.BASE_GROUPS, ldap.SCOPE_SUBTREE, criteria, ['member'])
         members_tmp = results[0][1]
         members = members_tmp.get('member', [])
         return [find_dn(dn.decode()) for dn in members]
+
+    finally:
+        ldap_conn.unbind()
+
+def delete_user(username):
+    '''
+    Delete user;  required data is sAMAccountName or userPrincipleName
+    '''
+    ldap_conn = init_ldap()
+    try:
+        logger.info('Deleting user: ' + username)
+
+        ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
+        user_dn = find_user(username)
+        result = ldap_conn.delete_s(user_dn)
+
+        logger.info('  Result: ' + str(result))
+        return result
 
     finally:
         ldap_conn.unbind()
@@ -305,10 +323,17 @@ def dump_users():
 
 if __name__ == '__main__':
     pass
-    #print(create_user('Elon', 'Tusk', 'elon.tusk', 'elont@example.com', 'protospace*&^g87g6'))
-    #print(find_user('tanner.collin'))
-    #print(set_password('tanner.collin', 'Supersecret@@'))
-    #print(find_dn('CN=Tanner Collin,OU=MembersOU,DC=ps,DC=protospace,DC=ca'))
+    print("=-=-=-=-=-=-=-=-=-=")
+    #print(create_user('Elon', 'Tusk', 'elon.tusk', 'elon.tusk@lab39.lab', 'protospace*&^g87g6'))
+    #print(find_user('noorullah.hussain.zada'))
+    #print("----------")
+    #print(find_user('pat.spencer'))
+    print("----------")
+    print(find_user('elon.tusk'))
+    print("----------")
+    print(delete_user('elon.tusk'))
+    print("----------")
+    print(find_user('elon.tusk'))
     #print("============================================================")
     #print(create_group("newgroup", "new group"))
     #print("   ==============  ")
@@ -322,9 +347,10 @@ if __name__ == '__main__':
     #print("   ==============  ")
     #print(remove_from_group('newgroup','tanner.collin'))
     #print("   ==============  ")
-    print(list_group('Trotec Users'))
+    #print(list_group('Trotec Users'))
     #print(dump_users())
 
     #users = list_group('Laser Users')
     #import json
     #print(json.dumps(users, indent=4))
+(
