@@ -353,4 +353,3 @@ if __name__ == '__main__':
     #users = list_group('Laser Users')
     #import json
     #print(json.dumps(users, indent=4))
-(
