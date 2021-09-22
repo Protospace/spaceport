@@ -29,6 +29,12 @@ function MemberInfo(props) {
 				<Grid.Column width={11}>
 					<Header size='large'>{member.preferred_name} {member.last_name}</Header>
 
+					{member.is_allowed_entry ?
+						<p>You are allowed entry to Protospace ✅</p>
+					:
+						<p>You are not allowed entry to Protospace ❌</p>
+					}
+
 					<BasicTable>
 						<Table.Body>
 							<Table.Row>
