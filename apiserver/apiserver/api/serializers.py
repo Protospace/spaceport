@@ -233,6 +233,11 @@ class AdminMemberSerializer(MemberSerializer):
         ]
 
     def update(self, instance, validated_data):
+        if 'is_allowed_entry' in validated_data:
+            changed = validated_data['is_allowed_entry'] != instance.is_allowed_entry
+            if changed:
+                utils_stats.changed_card()
+
         if 'precix_cnc_cert_date' in validated_data:
             changed = validated_data['precix_cnc_cert_date'] != instance.precix_cnc_cert_date
             if changed:
