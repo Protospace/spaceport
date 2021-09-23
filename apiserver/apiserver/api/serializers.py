@@ -66,6 +66,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         'User Flagged',
     ], allow_null=True, required=False)
     number_of_membership_months = serializers.IntegerField(max_value=36, min_value=-36)
+    recorder = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Transaction
@@ -98,6 +99,12 @@ class TransactionSerializer(serializers.ModelSerializer):
         else:
             member = models.Member.objects.get(id=obj.member_id)
         return member.preferred_name + ' ' + member.last_name
+
+    def get_recorder(self, obj):
+        if obj.recorder:
+            return obj.recorder.username
+        else:
+            return None
 
 
 # member viewing other members

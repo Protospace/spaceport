@@ -374,6 +374,10 @@ class TransactionTable extends React.Component {
 						<Table.Cell>Memo:</Table.Cell>
 						<Table.Cell>{transaction.memo}</Table.Cell>
 					</Table.Row>
+					<Table.Row>
+						<Table.Cell>Recorder:</Table.Cell>
+						<Table.Cell>{transaction.recorder || 'System'}</Table.Cell>
+					</Table.Row>
 
 					{!!transaction.report_type && <Table.Row>
 						<Table.Cell>Report Type:</Table.Cell>
