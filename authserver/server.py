@@ -45,5 +45,25 @@ def set_discourse_password():
     auth_functions.set_discourse_password(username, password, first_name, email)
     return ''
 
+@app.route('/add-discourse-group-members', methods=['POST'])
+def add_discourse_group_members():
+    check_auth()
+
+    group_name = request.form['group_name']
+    usernames = request.form['usernames']
+
+    auth_functions.add_discourse_group_members(group_name, usernames)
+    return ''
+
+@app.route('/remove-discourse-group-members', methods=['POST'])
+def remove_discourse_group_members():
+    check_auth()
+
+    group_name = request.form['group_name']
+    usernames = request.form['usernames']
+
+    auth_functions.remove_discourse_group_members(group_name, usernames)
+    return ''
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

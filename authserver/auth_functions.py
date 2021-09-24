@@ -72,6 +72,16 @@ def discourse_api_post(url, data={}):
     logger.info('Response: %s %s', response.status_code, response.text)
     return response
 
+def discourse_api_delete(url, data={}):
+    headers = {
+        'Api-Key': secrets.DISCOURSE_API_KEY,
+        'Api-Username': secrets.DISCOURSE_API_USER,
+    }
+    response = requests.delete(url, headers=headers, data=data, timeout=10)
+    response.raise_for_status()
+    logger.info('Response: %s %s', response.status_code, response.text)
+    return response
+
 def discourse_rails_script(script):
     result = subprocess.run(['docker', 'exec', '-i', secrets.DISCOURSE_CONTAINER, 'rails', 'runner', script],
             shell=False, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -167,6 +177,75 @@ def set_discourse_password(username, password, first_name, email):
 
     if result.stderr:
         abort(400)
+
+
+def add_discourse_group_members(group_name, usernames):
+    if not group_name:
+        logger.error('Empty group_name, aborting')
+        abort(400)
+
+    if not usernames:
+        logger.error('Empty usernames, aborting')
+        abort(400)
+
+    logger.info('Getting the ID of group %s', group_name)
+
+    url = 'https://forum.protospace.ca/groups/{}.json'.format(group_name)
+    response = discourse_api_get(url)
+    response = response.json()
+
+    group_id = response['group']['id']
+    all_usernames = set(usernames.split(','))
+
+    logger.info('Filtering out usernames that are already members...')
+
+    url = 'https://forum.protospace.ca/groups/{}/members.json'.format(group_name)
+    response = discourse_api_get(url)
+    response = response.json()
+
+    member_usernames = set([m['username'] for m in response['members']])
+    good_usernames = list(all_usernames - member_usernames)
+
+    if not len(good_usernames):
+        logger.info('Skipping, no one left to add')
+        return True
+
+    logger.info('Adding %s remaining usernames to the group...', len(good_usernames))
+
+    url = 'https://forum.protospace.ca/groups/{}/members.json'.format(group_id)
+    data = {
+        'usernames': ','.join(good_usernames)
+    }
+    discourse_api_put(url, data)
+    return True
+
+def remove_discourse_group_members(group_name, usernames):
+    if not group_name:
+        logger.error('Empty group_name, aborting')
+        abort(400)
+
+    if not usernames:
+        logger.error('Empty usernames, aborting')
+        abort(400)
+
+    logger.info('Getting the ID of group %s', group_name)
+
+    url = 'https://forum.protospace.ca/groups/{}.json'.format(group_name)
+    response = discourse_api_get(url)
+    response = response.json()
+
+    group_id = response['group']['id']
+
+    logger.info('Removing usernames from the group...')
+
+    url = 'https://forum.protospace.ca/groups/{}/members.json'.format(group_id)
+    data = {
+        'usernames': usernames
+    }
+    discourse_api_delete(url, data)
+    return True
+
+
 
 if __name__ == '__main__':
     #set_wiki_password('tanner.collin', 'protospace1')
