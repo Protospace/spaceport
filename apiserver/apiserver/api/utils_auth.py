@@ -13,10 +13,10 @@ def discourse_is_configured():
     return bool(secrets.DISCOURSE_AUTH_API_URL and secrets.AUTH_API_KEY)
 
 
-def auth_api(url, data):
+def auth_api(url, data=None, json=None):
     try:
         headers = {'Authorization': 'Token ' + secrets.AUTH_API_KEY}
-        r = requests.post(url, data=data, headers=headers, timeout=20)
+        r = requests.post(url, data=data, json=json, headers=headers, timeout=20)
         return r.status_code
     except BaseException as e:
         logger.error('Auth {} - {} - {}'.format(url, e.__class__.__name__, str(e)))
@@ -24,16 +24,30 @@ def auth_api(url, data):
 
 def set_wiki_password(data):
     auth_data = dict(
-        username=data['username'],
+        username=data['username'].lower(),
         password=data['password'],
     )
-    return auth_api(secrets.WIKI_AUTH_API_URL + 'set-wiki-password', auth_data)
+    return auth_api(secrets.WIKI_AUTH_API_URL + 'set-wiki-password', data=auth_data)
 
 def set_discourse_password(data):
     auth_data = dict(
-        username=data['username'],
+        username=data['username'].lower(),
         password=data['password'],
         first_name=data['first_name'],
         email=data['email'],
     )
-    return auth_api(secrets.DISCOURSE_AUTH_API_URL + 'set-discourse-password', auth_data)
+    return auth_api(secrets.DISCOURSE_AUTH_API_URL + 'set-discourse-password', data=auth_data)
+
+def add_discourse_group_members(group_name, usernames):
+    json = dict(
+        group_name=group_name,
+        usernames=usernames,
+    )
+    return auth_api(secrets.DISCOURSE_AUTH_API_URL + 'add-discourse-group-members', json=json)
+
+def remove_discourse_group_members(group_name, usernames):
+    json = dict(
+        group_name=group_name,
+        usernames=usernames,
+    )
+    return auth_api(secrets.DISCOURSE_AUTH_API_URL + 'remove-discourse-group-members', json=json)
