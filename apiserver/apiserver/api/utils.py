@@ -415,6 +415,13 @@ def register_user(data, user):
             utils.alert_tanner(msg)
             logger.info(msg)
 
+    if utils_auth.discourse_is_configured():
+        if data['request_id']: utils_stats.set_progress(data['request_id'], 'Adding to Discourse group...')
+        if utils_auth.add_discourse_group_members('protospace_members', [data['username']]) != 200:
+            msg = 'Problem connecting to Discourse Auth server: add.'
+            utils.alert_tanner(msg)
+            logger.info(msg)
+
     if data['request_id']: utils_stats.set_progress(data['request_id'], 'Done!')
     time.sleep(1)
 
