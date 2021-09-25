@@ -121,6 +121,26 @@ def get_discourse_usernames():
 
     return usernames
 
+def translate_usernames(portal_usernames, discourse_usernames):
+    # the case of portal and discourse usernames might not match
+    # this causes a problem if someone creates a discourse user
+    # as John.Smith and later sets up a portal account as john.smith
+    #
+    # solution: look for usernames in discourse with the same letters,
+    # and then convert to the discourse version when using the API
+
+    result = []
+
+    for pu in portal_usernames:
+        for du in discourse_usernames:
+            if pu.lower() == du.lower():
+                result.append(du)
+                break
+        else:  # for
+            result.append(pu)
+
+    return result
+
 def set_discourse_password(username, password, first_name, email):
     # sets a user's discourse password
     # creates the account if it doesn't exist
@@ -152,6 +172,9 @@ def set_discourse_password(username, password, first_name, email):
         logger.error('Empty email, aborting')
         abort(400)
 
+    discourse_usernames = get_discourse_usernames()
+    username = translate_usernames([username], discourse_usernames)[0]
+
     logger.info('Checking Discourse for existing email: ' + email)
     params = {
         'filter': email,
@@ -161,7 +184,7 @@ def set_discourse_password(username, password, first_name, email):
     response = response.json()
 
     for user in response:
-        if user['email'] == email:
+        if user['email'].lower() == email.lower():
             if user['username'] == username:
                 logger.info('Username match, skipping')
                 continue
@@ -220,12 +243,14 @@ def add_discourse_group_members(group_name, usernames):
         logger.error('Empty usernames, aborting')
         abort(400)
 
+    discourse_usernames = get_discourse_usernames()
+    usernames = translate_usernames(usernames, discourse_usernames)
+    usernames = set(usernames)
     group_id = get_discourse_group_id(group_name)
-    usernames = set(usernames.split(','))
 
     logger.info('Filtering out usernames not on Discourse...')
 
-    discourse_usernames = set(get_discourse_usernames())
+    discourse_usernames = set(discourse_usernames)
     usernames = usernames & discourse_usernames
 
     logger.info('Filtering out usernames that are already group members...')
@@ -260,16 +285,22 @@ def remove_discourse_group_members(group_name, usernames):
         logger.error('Empty usernames, aborting')
         abort(400)
 
+    discourse_usernames = get_discourse_usernames()
+    usernames = translate_usernames(usernames, discourse_usernames)
+    usernames = set(usernames)
     group_id = get_discourse_group_id(group_name)
-    usernames = set(usernames.split(','))
 
     logger.info('Filtering out usernames not on Discourse...')
 
-    discourse_usernames = set(get_discourse_usernames())
+    discourse_usernames = set(discourse_usernames)
     usernames = usernames & discourse_usernames
     usernames = list(usernames)
 
-    logger.info('Removing usernames from the group...')
+    if not len(usernames):
+        logger.info('Skipping, no one left to remove')
+        return True
+
+    logger.info('Removing %s remaining usernames from the group...', len(usernames))
 
     url = 'https://forum.protospace.ca/groups/{}/members.json'.format(group_id)
     data = {

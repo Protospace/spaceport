@@ -49,8 +49,9 @@ def set_discourse_password():
 def add_discourse_group_members():
     check_auth()
 
-    group_name = request.form['group_name']
-    usernames = request.form['usernames']
+    data = request.get_json()
+    group_name = data['group_name']
+    usernames = data['usernames']
 
     auth_functions.add_discourse_group_members(group_name, usernames)
     return ''
@@ -59,8 +60,9 @@ def add_discourse_group_members():
 def remove_discourse_group_members():
     check_auth()
 
-    group_name = request.form['group_name']
-    usernames = request.form['usernames']
+    data = request.get_json()
+    group_name = data['group_name']
+    usernames = data['usernames']
 
     auth_functions.remove_discourse_group_members(group_name, usernames)
     return ''
