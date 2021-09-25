@@ -49,7 +49,7 @@ def discourse_api_get(url, params={}):
     }
     response = requests.get(url, headers=headers, params=params, timeout=10)
     response.raise_for_status()
-    logger.info('Response: %s %s', response.status_code, response.text)
+    logger.debug('Response: %s %s', response.status_code, response.text)
     return response
 
 def discourse_api_put(url, data={}):
@@ -59,7 +59,7 @@ def discourse_api_put(url, data={}):
     }
     response = requests.put(url, headers=headers, data=data, timeout=10)
     response.raise_for_status()
-    logger.info('Response: %s %s', response.status_code, response.text)
+    logger.debug('Response: %s %s', response.status_code, response.text)
     return response
 
 def discourse_api_post(url, data={}):
@@ -69,7 +69,7 @@ def discourse_api_post(url, data={}):
     }
     response = requests.post(url, headers=headers, data=data, timeout=10)
     response.raise_for_status()
-    logger.info('Response: %s %s', response.status_code, response.text)
+    logger.debug('Response: %s %s', response.status_code, response.text)
     return response
 
 def discourse_api_delete(url, data={}):
@@ -79,7 +79,7 @@ def discourse_api_delete(url, data={}):
     }
     response = requests.delete(url, headers=headers, data=data, timeout=10)
     response.raise_for_status()
-    logger.info('Response: %s %s', response.status_code, response.text)
+    logger.debug('Response: %s %s', response.status_code, response.text)
     return response
 
 def discourse_rails_script(script):
@@ -88,6 +88,38 @@ def discourse_rails_script(script):
     output = result.stdout or result.stderr
     output = output.strip() or 'No complaints'
     return result, output
+
+def get_discourse_group_id(group_name):
+    logger.info('Getting the ID of group %s', group_name)
+
+    url = 'https://forum.protospace.ca/groups/{}.json'.format(group_name)
+    response = discourse_api_get(url)
+    response = response.json()
+    return response['group']['id']
+
+def get_discourse_usernames():
+    usernames = []
+    page = 1
+
+    for _ in range(10):
+        params = {
+            'page': page,
+        }
+        response = discourse_api_get('https://forum.protospace.ca/admin/users/list/active.json', params)
+        response = response.json()
+
+        if not len(response):
+            break
+
+        for u in response:
+            usernames.append(u['username'])
+
+        page += 1
+    else:  # for
+        logger.error('Too many user pages, aborting')
+        abort(400)
+
+    return usernames
 
 def set_discourse_password(username, password, first_name, email):
     # sets a user's discourse password
@@ -188,33 +220,33 @@ def add_discourse_group_members(group_name, usernames):
         logger.error('Empty usernames, aborting')
         abort(400)
 
-    logger.info('Getting the ID of group %s', group_name)
+    group_id = get_discourse_group_id(group_name)
+    usernames = set(usernames.split(','))
 
-    url = 'https://forum.protospace.ca/groups/{}.json'.format(group_name)
-    response = discourse_api_get(url)
-    response = response.json()
+    logger.info('Filtering out usernames not on Discourse...')
 
-    group_id = response['group']['id']
-    all_usernames = set(usernames.split(','))
+    discourse_usernames = set(get_discourse_usernames())
+    usernames = usernames & discourse_usernames
 
-    logger.info('Filtering out usernames that are already members...')
+    logger.info('Filtering out usernames that are already group members...')
 
     url = 'https://forum.protospace.ca/groups/{}/members.json'.format(group_name)
     response = discourse_api_get(url)
     response = response.json()
 
     member_usernames = set([m['username'] for m in response['members']])
-    good_usernames = list(all_usernames - member_usernames)
+    usernames = usernames - member_usernames
+    usernames = list(usernames)
 
-    if not len(good_usernames):
+    if not len(usernames):
         logger.info('Skipping, no one left to add')
         return True
 
-    logger.info('Adding %s remaining usernames to the group...', len(good_usernames))
+    logger.info('Adding %s remaining usernames to the group...', len(usernames))
 
     url = 'https://forum.protospace.ca/groups/{}/members.json'.format(group_id)
     data = {
-        'usernames': ','.join(good_usernames)
+        'usernames': ','.join(usernames)
     }
     discourse_api_put(url, data)
     return True
@@ -228,19 +260,20 @@ def remove_discourse_group_members(group_name, usernames):
         logger.error('Empty usernames, aborting')
         abort(400)
 
-    logger.info('Getting the ID of group %s', group_name)
+    group_id = get_discourse_group_id(group_name)
+    usernames = set(usernames.split(','))
 
-    url = 'https://forum.protospace.ca/groups/{}.json'.format(group_name)
-    response = discourse_api_get(url)
-    response = response.json()
+    logger.info('Filtering out usernames not on Discourse...')
 
-    group_id = response['group']['id']
+    discourse_usernames = set(get_discourse_usernames())
+    usernames = usernames & discourse_usernames
+    usernames = list(usernames)
 
     logger.info('Removing usernames from the group...')
 
     url = 'https://forum.protospace.ca/groups/{}/members.json'.format(group_id)
     data = {
-        'usernames': usernames
+        'usernames': ','.join(usernames)
     }
     discourse_api_delete(url, data)
     return True
@@ -249,5 +282,6 @@ def remove_discourse_group_members(group_name, usernames):
 
 if __name__ == '__main__':
     #set_wiki_password('tanner.collin', 'protospace1')
-    set_discourse_password('test8a', 'protospace1', 'testie', 'test8@example.com')
+    #set_discourse_password('test8a', 'protospace1', 'testie', 'test8@example.com')
+    print(get_discourse_usernames())
     pass
