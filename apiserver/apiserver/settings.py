@@ -270,13 +270,13 @@ if not secrets.EMAIL_USER or not secrets.EMAIL_PASS:
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_HOST = 'smtp-relay.gmail.com'
+EMAIL_HOST = secrets.EMAIL_HOST
 EMAIL_PORT = '587'
 EMAIL_HOST_USER = secrets.EMAIL_USER
 EMAIL_HOST_PASSWORD = secrets.EMAIL_PASS
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-DEFAULT_FROM_EMAIL = 'Protospace Portal <portal@protospace.ca>'
+DEFAULT_FROM_EMAIL = 'Protospace Portal <portal@mg.protospace.ca>'
 
 if DEBUG: logger.info('Debug mode ON')
 logger.info('Test logging for each thread')
