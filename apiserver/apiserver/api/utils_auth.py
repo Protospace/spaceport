@@ -51,3 +51,10 @@ def remove_discourse_group_members(group_name, usernames):
         usernames=usernames,
     )
     return auth_api(secrets.DISCOURSE_AUTH_API_URL + 'remove-discourse-group-members', json=json)
+
+def change_discourse_username(username, new_username):
+    data = dict(
+        username=username,
+        new_username=new_username,
+    )
+    return auth_api(secrets.DISCOURSE_AUTH_API_URL + 'change-discourse-username', data=data)

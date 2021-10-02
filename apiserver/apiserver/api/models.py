@@ -58,6 +58,7 @@ class Member(models.Model):
     paused_date = models.DateField(blank=True, null=True)
     monthly_fees = models.IntegerField(default=55, blank=True, null=True)
     is_allowed_entry = models.BooleanField(default=True)
+    discourse_username = models.CharField(default=None, max_length=40, blank=True, null=True)
 
     history = HistoricalRecords(excluded_fields=['member_forms'])
 

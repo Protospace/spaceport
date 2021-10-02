@@ -535,6 +535,11 @@ export function AdminMemberInfo(props) {
 					</Table.Row>
 
 					<Table.Row>
+						<Table.Cell>Discourse Username:</Table.Cell>
+						<Table.Cell>{member.discourse_username || '?'}</Table.Cell>
+					</Table.Row>
+
+					<Table.Row>
 						<Table.Cell>Public Bio:</Table.Cell>
 					</Table.Row>
 				</Table.Body>

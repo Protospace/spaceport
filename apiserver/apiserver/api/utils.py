@@ -414,6 +414,9 @@ def register_user(data, user):
             msg = 'Problem connecting to Discourse Auth server: set.'
             utils.alert_tanner(msg)
             logger.info(msg)
+        if not user.member.discourse_username:
+            user.member.discourse_username = user.username
+            user.member.save()
 
     if utils_auth.discourse_is_configured():
         if data['request_id']: utils_stats.set_progress(data['request_id'], 'Adding to Discourse group...')

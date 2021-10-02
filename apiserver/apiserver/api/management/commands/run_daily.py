@@ -32,8 +32,8 @@ class Command(BaseCommand):
             'protospace_instructors': [],
         }
 
-        for user in User.objects.all():
-            username = user.username
+        for user in User.objects.filter(member__discourse_username__isnull=False):
+            username = user.member.discourse_username
 
             # handle non-member vs. member
             if user.member.paused_date:

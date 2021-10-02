@@ -259,6 +259,11 @@ export function AccountForm(props) {
 				{...makeProps('emergency_contact_phone')}
 			/>
 
+			{member.discourse_username && <Form.Input
+				label='Discourse Username'
+				{...makeProps('discourse_username')}
+			/>}
+
 			<Form.Input
 				label='Member Photo'
 				name='photo'

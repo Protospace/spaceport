@@ -210,6 +210,18 @@ class MemberSerializer(serializers.ModelSerializer):
             instance.photo_medium = medium
             instance.photo_large = large
 
+        if 'discourse_username' in validated_data:
+            changed = validated_data['discourse_username'] != instance.discourse_username
+            if changed and utils_auth.discourse_is_configured():
+                username = instance.discourse_username
+                new_username = validated_data['discourse_username']
+                logger.info('Changing discourse_username from %s to %s', username, new_username)
+                if utils_auth.change_discourse_username(username, new_username) != 200:
+                    msg = 'Problem connecting to Discourse Auth server: change username.'
+                    utils.alert_tanner(msg)
+                    logger.info(msg)
+                    raise ValidationError(dict(discourse_username='Invalid Discourse username.'))
+
         return super().update(instance, validated_data)
 
 # admin viewing member details
@@ -599,6 +611,8 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
                 logger.info(msg)
                 raise ValidationError(dict(non_field_errors=msg))
 
+        data['username'] = self.user.member.discourse_username or self.user.username
+
         if utils_auth.discourse_is_configured():
             if request_id: utils_stats.set_progress(request_id, 'Changing Discourse password...')
             if utils_auth.set_discourse_password(data) != 200:
@@ -606,6 +620,9 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
                 utils.alert_tanner(msg)
                 logger.info(msg)
                 raise ValidationError(dict(non_field_errors=msg))
+            if not self.user.member.discourse_username:
+                self.user.member.discourse_username = self.user.username
+                self.user.member.save()
 
         if request_id: utils_stats.set_progress(request_id, 'Changing Spaceport password...')
         time.sleep(1)
@@ -657,6 +674,8 @@ class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
                 logger.info(msg)
                 raise ValidationError(dict(non_field_errors=msg))
 
+        data['username'] = self.user.member.discourse_username or self.user.username
+
         if utils_auth.discourse_is_configured():
             if request_id: utils_stats.set_progress(request_id, 'Changing Discourse password...')
             if utils_auth.set_discourse_password(data) != 200:
@@ -664,6 +683,9 @@ class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
                 utils.alert_tanner(msg)
                 logger.info(msg)
                 raise ValidationError(dict(non_field_errors=msg))
+            if not self.user.member.discourse_username:
+                self.user.member.discourse_username = self.user.username
+                self.user.member.save()
 
         member = self.user.member
         logging.info('Password reset completed for: {} {} ({})'.format(member.first_name, member.last_name, member.id))
@@ -718,6 +740,12 @@ class SpaceportAuthSerializer(LoginSerializer):
             data['first_name'] = user.member.first_name
 
             utils_auth.set_wiki_password(data)
+
+            data['username'] = user.member.discourse_username or user.username
             utils_auth.set_discourse_password(data)
+
+            if not user.member.discourse_username:
+                user.member.discourse_username = user.username
+                user.member.save()
 
         return user

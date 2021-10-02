@@ -137,7 +137,7 @@ export function AuthDiscourse(props) {
 				<Header size='small'>Success!</Header>
 				<p>You can now log into the Discourse:</p>
 				<p>
-					Username: {user.username}<br/>
+					Username: {user.member.discourse_username || user.username}<br/>
 					Password: [this Spaceport password]
 				</p>
 				<p><a href='https://forum.protospace.ca' rel='noopener noreferrer'>Protospace Discourse</a></p>
