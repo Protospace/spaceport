@@ -32,7 +32,7 @@ class Command(BaseCommand):
             'protospace_instructors': [],
         }
 
-        for user in User.objects.filter(member__discourse_username__isnull=False):
+        for user in User.objects.exclude(member__discourse_username__exact=''):
             username = user.member.discourse_username
 
             # handle non-member vs. member

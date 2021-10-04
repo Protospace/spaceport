@@ -27,8 +27,8 @@ class Member(models.Model):
     last_name = models.CharField(max_length=32)
     preferred_name = models.CharField(max_length=32)
     phone = models.CharField(default='', max_length=32, null=True)
-    emergency_contact_name = models.CharField(max_length=64, blank=True)
-    emergency_contact_phone = models.CharField(max_length=32, blank=True)
+    emergency_contact_name = models.CharField(default='', max_length=64, blank=True)
+    emergency_contact_phone = models.CharField(default='', max_length=32, blank=True)
     birthdate = models.DateField(blank=True, null=True)
     is_minor = models.BooleanField(default=False)
     guardian_name = models.CharField(max_length=32, blank=True, null=True)
@@ -58,7 +58,7 @@ class Member(models.Model):
     paused_date = models.DateField(blank=True, null=True)
     monthly_fees = models.IntegerField(default=55, blank=True, null=True)
     is_allowed_entry = models.BooleanField(default=True)
-    discourse_username = models.CharField(default=None, max_length=40, blank=True, null=True)
+    discourse_username = models.CharField(default='', max_length=40, blank=True, null=True)
 
     history = HistoricalRecords(excluded_fields=['member_forms'])
 
