@@ -291,7 +291,7 @@ export function Home(props) {
 								} trigger={<a>[more]</a>} />
 							</p>
 
-							{user && user.member.vetted_date && <p>Alarm status: {alarmStat()}{doorOpenStat()}</p>}
+							{user && <p>Alarm status: {alarmStat()}{doorOpenStat()}</p>}
 						</div>
 
 					</Segment>
