@@ -514,7 +514,7 @@ class StatsViewSet(viewsets.ViewSet, List):
         stats.update(cached_stats)
 
         user = self.request.user
-        if not user.is_authenticated or not user.member.vetted_date:
+        if not user.is_authenticated:
             stats.pop('alarm', None)
 
         stats['at_protospace'] = utils.is_request_from_protospace(request)
