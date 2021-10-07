@@ -744,6 +744,9 @@ class SpaceportAuthSerializer(LoginSerializer):
             data['username'] = user.member.discourse_username or user.username
             utils_auth.set_discourse_password(data)
 
+            if not user.member.paused_date:
+                utils_auth.add_discourse_group_members('protospace_members', [data['username']])
+
             if not user.member.discourse_username:
                 user.member.discourse_username = user.username
                 user.member.save()
