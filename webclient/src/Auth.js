@@ -109,10 +109,10 @@ export function AuthWiki(props) {
 			<AuthForm user={user}>
 				<Header size='small'>Success!</Header>
 				<p>You can now log into the Wiki:</p>
-				<p>
+				{user && <p>
 					Username: {user.username}<br/>
 					Password: [this Spaceport password]
-				</p>
+				</p>}
 				<p><a href='https://wiki.protospace.ca/index.php?title=Special:UserLogin&returnto=Welcome+to+Protospace' rel='noopener noreferrer'>Protospace Wiki</a></p>
 			</AuthForm>
 		</Segment>
@@ -136,10 +136,10 @@ export function AuthDiscourse(props) {
 			<AuthForm user={user}>
 				<Header size='small'>Success!</Header>
 				<p>You can now log into the Discourse:</p>
-				<p>
+				{user && <p>
 					Username: {user.member.discourse_username || user.username}<br/>
 					Password: [this Spaceport password]
-				</p>
+				</p>}
 				<p><a href='https://forum.protospace.ca' rel='noopener noreferrer'>Protospace Discourse</a></p>
 			</AuthForm>
 		</Segment>
