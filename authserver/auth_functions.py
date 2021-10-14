@@ -211,9 +211,11 @@ def set_discourse_password(username, password, first_name, email):
         'email': email,
         'active': True,
         'approved': True,
+        'user_fields[10]': 'Spaceport auth'
     }
     response = discourse_api_post('https://forum.protospace.ca/users.json', data)
     response = response.json()
+    logger.info('Response: %s', response)
 
     if response['success']:
         logger.info('Skipping set password')
@@ -309,10 +311,27 @@ def remove_discourse_group_members(group_name, usernames):
     discourse_api_delete(url, data)
     return True
 
+def change_discourse_username(username, new_username):
+    if not username:
+        logger.error('Empty username, aborting')
+        abort(400)
 
+    if not new_username:
+        logger.error('Empty new_username, aborting')
+        abort(400)
+
+    logger.info('Changing username %s to %s...', username, new_username)
+
+    url = 'https://forum.protospace.ca/users/{}/preferences/username'.format(username)
+    data = {
+        'new_username': new_username,
+    }
+    discourse_api_put(url, data)
+    return True
 
 if __name__ == '__main__':
     #set_wiki_password('tanner.collin', 'protospace1')
-    #set_discourse_password('test8a', 'protospace1', 'testie', 'test8@example.com')
-    print(get_discourse_usernames())
-    pass
+    set_discourse_password('test8a', 'protospace1', 'testie', 'test8@example.com')
+    #for u in get_discourse_usernames():
+    #    print(u)
+    #pass

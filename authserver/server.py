@@ -11,6 +11,7 @@ HTTP_UNAUTHORIZED = 401
 def check_auth():
     auth_header = request.headers.get('Authorization', '')
     if auth_header != 'Token ' + secrets.AUTH_TOKEN:
+        logger.info('Bad auth token, aborting.')
         abort(HTTP_UNAUTHORIZED)
 
 @app.route('/')
@@ -65,6 +66,16 @@ def remove_discourse_group_members():
     usernames = data['usernames']
 
     auth_functions.remove_discourse_group_members(group_name, usernames)
+    return ''
+
+@app.route('/change-discourse-username', methods=['POST'])
+def change_discourse_username():
+    check_auth()
+
+    username = request.form['username']
+    new_username = request.form['new_username']
+
+    auth_functions.change_discourse_username(username, new_username)
     return ''
 
 if __name__ == '__main__':
