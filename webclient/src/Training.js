@@ -94,7 +94,7 @@ export function TrainingList(props) {
 			<Table.Body>
 				{training.slice().sort((a, b) => a.session.datetime < b.session.datetime ? 1 : -1).map(x =>
 					<Table.Row key={x.id}>
-						<Table.Cell>{x.session.course_name}</Table.Cell>
+						<Table.Cell>{x.session.course_data.name}</Table.Cell>
 						<Table.Cell>
 							<Link to={'/classes/'+x.session.id}>{moment(x.session.datetime).format('MMMM Do YYYY')}</Link>
 						</Table.Cell>

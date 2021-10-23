@@ -449,9 +449,14 @@ class StudentTrainingSerializer(TrainingSerializer):
     attendance_status = serializers.ChoiceField(['Waiting for payment', 'Withdrawn'])
 
 
+class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Course
+        fields = ['id', 'name', 'is_old', 'description']
+
 class SessionSerializer(serializers.ModelSerializer):
     student_count = serializers.SerializerMethodField()
-    course_name = serializers.SerializerMethodField()
+    course_data = serializers.SerializerMethodField()
     instructor_name = serializers.SerializerMethodField()
     datetime = serializers.DateTimeField()
     course = serializers.PrimaryKeyRelatedField(queryset=models.Course.objects.all())
@@ -467,8 +472,8 @@ class SessionSerializer(serializers.ModelSerializer):
     def get_student_count(self, obj):
         return len([x for x in obj.students.all() if x.attendance_status != 'Withdrawn'])
 
-    def get_course_name(self, obj):
-        return obj.course.name
+    def get_course_data(self, obj):
+        return CourseSerializer(obj.course).data
 
     def get_instructor_name(self, obj):
         if obj.instructor and hasattr(obj.instructor, 'member'):
@@ -480,11 +485,6 @@ class SessionSerializer(serializers.ModelSerializer):
 class SessionListSerializer(SessionSerializer):
     students = None
 
-
-class CourseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Course
-        fields = ['id', 'name']
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     sessions = SessionListSerializer(many=True, read_only=True)

@@ -28,7 +28,7 @@ function ClassTable(props) {
 				{classes.length ?
 					classes.map(x =>
 						<Table.Row key={x.id}>
-							<Table.Cell>{x.course_name}</Table.Cell>
+							<Table.Cell>{x.course_data.name}</Table.Cell>
 							<Table.Cell>
 								<Link to={'/classes/'+x.id}>
 									{moment.utc(x.datetime).tz('America/Edmonton').format('ll')}
@@ -170,7 +170,7 @@ export function ClassDetail(props) {
 									<Table.Cell>Name:</Table.Cell>
 									<Table.Cell>
 										<Link to={'/courses/'+clazz.course}>
-											{clazz.course_name}
+											{clazz.course_data.name}
 										</Link>
 									</Table.Cell>
 								</Table.Row>
@@ -201,6 +201,15 @@ export function ClassDetail(props) {
 							</Table.Body>
 						</BasicTable>
 
+						<Header size='medium'>Course Description</Header>
+						{clazz.course_data.is_old ?
+							clazz.course_data.description.split('\n').map((x, i) =>
+								<p key={i}>{x}</p>
+							)
+						:
+							<div dangerouslySetInnerHTML={{__html: clazz.course_data.description}} />
+						}
+
 						<Header size='medium'>Attendance</Header>
 
 						{(isAdmin(user) || clazz.instructor === user.id) &&
@@ -230,7 +239,7 @@ export function ClassDetail(props) {
 											<p>Please pay the course fee of ${clazz.cost} to confirm your attendance.</p>
 											<PayPalPayNow
 												amount={clazz.cost}
-												name={clazz.course_name}
+												name={clazz.course_data.name}
 												custom={JSON.stringify({ training: userTraining.id })}
 											/>
 										</div>

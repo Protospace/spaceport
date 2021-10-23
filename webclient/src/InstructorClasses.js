@@ -16,7 +16,7 @@ class AttendanceSheet extends React.Component {
 
 		return (
 			<div style={{ padding: '3rem' }}>
-				<Header size='medium'>{clazz.course_name} Attendance</Header>
+				<Header size='medium'>{clazz.course_data.name} Attendance</Header>
 				<p>
 					{moment.utc(clazz.datetime).tz('America/Edmonton').format('llll')}
 					{num >= 2 ? ', '+num+' students sorted by registration time.' : '.'}
@@ -406,7 +406,7 @@ export function InstructorClassList(props) {
 								{sameClasses.length ?
 									sameClasses.map(x =>
 										<p>
-											{moment.utc(x.datetime).tz('America/Edmonton').format('LT')} — {x.course_name}
+											{moment.utc(x.datetime).tz('America/Edmonton').format('LT')} — {x.course_data.name}
 										</p>
 									)
 								:

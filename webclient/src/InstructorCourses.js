@@ -173,7 +173,10 @@ export function InstructorCourseList(props) {
 		<div>
 			<Header size='medium'>Instructor Panel</Header>
 
-			{!open && success && <p>Added to bottom of course list! <Link to={'/courses/'+success}>View the course.</Link></p>}
+			{!open && success && <>
+				<p>Added to bottom of course list!</p>
+				<p><Link to={'/courses/'+success}>View the course.</Link></p>
+			</>}
 
 			{open ?
 				<Form onSubmit={handleSubmit}>
