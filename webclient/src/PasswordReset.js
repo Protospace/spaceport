@@ -37,7 +37,7 @@ function ResetForm() {
 	});
 
 	return (
-		<Form onSubmit={handleSubmit} error={error.email == 'Not found.'}>
+		<Form onSubmit={handleSubmit} error={!!error.email}>
 			<Form.Input
 				label='Email'
 				name='email'
@@ -45,11 +45,28 @@ function ResetForm() {
 				error={error.email}
 			/>
 
-			<Message
-				error
-				header='Email not found in Spaceport'
-				content='Ask a director if you forgot which one you used.'
-			/>
+			{error.email == 'Not found.' &&
+				<Message
+					error
+					header='Email not found in Spaceport'
+					content='Ask a director if you forgot which one you used.'
+				/>
+			}
+
+			{error.email == 'Not on Spaceport.' &&
+				<Message
+					error
+					header={'You haven\'t registered to Spaceport yet'}
+					content={
+						<>
+							Please sign up to the new portal here:<br />
+							<Link to='/#outside-protospace-15c7b5'>
+								Spaceport Registration
+							</Link>
+						</>
+					}
+				/>
+			}
 
 			<Form.Button loading={loading} error={error.non_field_errors}>
 				Submit

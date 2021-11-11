@@ -40,11 +40,6 @@ export function LoginForm(props) {
 		>
 			<Header size='medium'>Log In to Spaceport</Header>
 
-			<Message warning>
-				<Message.Header>First time at the new portal?</Message.Header>
-				<p>Sign up below from Protospace Wi-Fi / computers.</p>
-			</Message>
-
 			<Form.Input
 				label='Username'
 				name='username'
@@ -109,6 +104,11 @@ export function SignupForm(props) {
 		const interval = setInterval(getStatus, 500);
 
 		const data = { ...input, email: input.email.toLowerCase(), bypass_code: bypass_code, request_id: request_id };
+
+		if (bypass_code) {
+			data.existing_member = true;
+		}
+
 		requester('/registration/', 'POST', '', data)
 		.then(res => {
 			clearInterval(interval);
@@ -161,7 +161,7 @@ export function SignupForm(props) {
 						error={error.email}
 					/>
 
-					<Form.Group grouped>
+					{!!bypass_code || <Form.Group grouped>
 						<Form.Radio
 							label='I have an account on the old portal'
 							name='existing_member'
@@ -178,7 +178,7 @@ export function SignupForm(props) {
 							onChange={handleValues}
 							error={!!error.existing_member}
 						/>
-					</Form.Group>
+					</Form.Group>}
 
 					<Form.Input
 						label='Password'

@@ -84,6 +84,21 @@ class TransactionSerializer(serializers.ModelSerializer):
         member = get_object_or_404(models.Member, id=validated_data['member_id'])
         if member.user:
             validated_data['user'] = member.user
+
+        if validated_data['account_type'] != 'Clearing':
+            if validated_data['amount'] == 0:
+                raise ValidationError(dict(account_type='You can\'t have a $0 {} transaction. Do you want "Membership Adjustment"?'.format(validated_data['account_type'])))
+            elif validated_data['amount'] < 0.1:
+                raise ValidationError(dict(amount='Don\'t try and trick me.'))
+
+        if validated_data['account_type'] == 'PayPal':
+            msg = 'Manual PayPal transaction added:\n' + str(validated_data)
+            utils.alert_tanner(msg)
+
+        if validated_data['account_type'] in ['Interac', 'Dream Pmt', 'Square Pmt', 'PayPal']:
+            if not validated_data.get('reference_number', None):
+                raise ValidationError(dict(reference_number='This field is required.'))
+
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
@@ -632,8 +647,12 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
 class MyPasswordResetSerializer(PasswordResetSerializer):
     def validate_email(self, email):
         if not User.objects.filter(email__iexact=email).exists():
-            logging.info('Email not found: ' + email)
-            raise ValidationError('Not found.')
+            if models.Member.objects.filter(old_email__iexact=email).exists():
+                logging.info('Email hasn\'t migrated to Spaceport yet: ' + email)
+                raise ValidationError('Not on Spaceport.')
+            else:
+                logging.info('Email not found: ' + email)
+                raise ValidationError('Not found.')
         return super().validate_email(email)
 
     def save(self):
