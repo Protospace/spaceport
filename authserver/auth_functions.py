@@ -48,8 +48,8 @@ def discourse_api_get(url, params={}):
         'Api-Username': secrets.DISCOURSE_API_USER,
     }
     response = requests.get(url, headers=headers, params=params, timeout=10)
-    response.raise_for_status()
     logger.debug('Response: %s %s', response.status_code, response.text)
+    response.raise_for_status()
     return response
 
 def discourse_api_put(url, data={}):
@@ -58,8 +58,8 @@ def discourse_api_put(url, data={}):
         'Api-Username': secrets.DISCOURSE_API_USER,
     }
     response = requests.put(url, headers=headers, data=data, timeout=10)
-    response.raise_for_status()
     logger.debug('Response: %s %s', response.status_code, response.text)
+    response.raise_for_status()
     return response
 
 def discourse_api_post(url, data={}):
@@ -68,8 +68,8 @@ def discourse_api_post(url, data={}):
         'Api-Username': secrets.DISCOURSE_API_USER,
     }
     response = requests.post(url, headers=headers, data=data, timeout=10)
-    response.raise_for_status()
     logger.debug('Response: %s %s', response.status_code, response.text)
+    response.raise_for_status()
     return response
 
 def discourse_api_delete(url, data={}):
@@ -78,8 +78,8 @@ def discourse_api_delete(url, data={}):
         'Api-Username': secrets.DISCOURSE_API_USER,
     }
     response = requests.delete(url, headers=headers, data=data, timeout=10)
-    response.raise_for_status()
     logger.debug('Response: %s %s', response.status_code, response.text)
+    response.raise_for_status()
     return response
 
 def discourse_rails_script(script):
@@ -257,7 +257,7 @@ def add_discourse_group_members(group_name, usernames):
 
     logger.info('Filtering out usernames that are already group members...')
 
-    url = 'https://forum.protospace.ca/groups/{}/members.json'.format(group_name)
+    url = 'https://forum.protospace.ca/groups/{}/members.json?limit=1000'.format(group_name)
     response = discourse_api_get(url)
     response = response.json()
 
