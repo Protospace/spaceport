@@ -32,8 +32,8 @@ export const BasicTable = (props) => (
 	</Table>
 );
 
-export const requester = (route, method, token, data) => {
-	let options = {headers: {}};
+export const requester = (route, method, token, data, signal=null) => {
+	let options = {headers: {}, signal: signal};
 	let url = '';
 
 	if (token) {
@@ -106,6 +106,8 @@ export const requester = (route, method, token, data) => {
 			});
 		} else if (code >= 500 && code < 600) {
 			throw customError({non_field_errors: ['Server Error']});
+		} else if (error.message === 'The operation was aborted. ') {
+			throw error;
 		} else {
 			throw customError({non_field_errors: ['Network Error']});
 		}

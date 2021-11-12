@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Link, useParams, useLocation, useHistory } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Input, Item, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { statusColor, isAdmin, isInstructor, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { AdminMemberInfo, AdminMemberPause, AdminMemberForm, AdminMemberCards, AdminMemberTraining, AdminMemberCertifications } from './AdminMembers.js';
 import { AdminMemberTransactions } from './AdminTransactions.js';
+import queryString from 'query-string';
+import AbortController from 'abort-controller';
 
 const memberSorts = {
 	recently_vetted: 'Recently Vetted',
@@ -59,38 +61,52 @@ export function MembersDropdown(props) {
 	);
 };
 
-let searchCache = '';
 let numShowCache = 20;
 
 export function Members(props) {
+	const history = useHistory();
 	const qs = useLocation().search;
 	const params = new URLSearchParams(qs);
 	const sort = params.get('sort') || 'recently_vetted';
+	const search = params.get('q') || '';
 
 	const [response, setResponse] = useState(false);
 	const [numShow, setNumShow] = useState(numShowCache);
-	const searchDefault = {seq: 0, q: searchCache};
-	const [search, setSearch] = useState(searchDefault);
+	const [controller, setController] = useState(false);
 	const { token } = props;
 
-	useEffect(() => {
-		setResponse(false);
-		searchCache = search.q;
-		search.sort = sort;
-		requester('/search/', 'POST', token, search)
-		.then(res => {
-			if (!search.seq || res.seq > response.seq) {
-				setResponse(res);
-			}
-		})
-		.catch(err => {
-			console.log(err);
-		});
-	}, [search, sort]);
+	const doSearch = (q) => {
+		console.log('doing search', q);
+		if (q.length) {
+			const qs = queryString.stringify({ 'q': q });
+			history.replace('/members?' + qs);
+		} else {
+			history.replace('/members');
+		}
+	};
+
+	const handleChange = (event) => {
+		const q = event.target.value;
+		doSearch(q);
+	};
 
 	useEffect(() => {
-		setSearch({seq: 0, q: ''});
-	}, [sort]);
+		if (controller) {
+			controller.abort();
+		}
+		const ctl = new AbortController();
+		setController(ctl);
+		const signal = ctl.signal;
+
+		const data = {q: search, sort: sort};
+		requester('/search/', 'POST', token, data, signal)
+		.then(res => {
+			setResponse(res);
+		})
+		.catch(err => {
+			;
+		});
+	}, [search, sort]);
 
 	return (
 		<Container>
@@ -100,16 +116,16 @@ export function Members(props) {
 
 			<Input autoFocus focus icon='search'
 				placeholder='Search...'
-				value={search.q}
-				onChange={(e, v) => setSearch({seq: parseInt(e.timeStamp), q: v.value})}
+				value={search}
+				onChange={handleChange}
 				aria-label='search products'
 				style={{ marginRight: '0.5rem' }}
 			/>
 
-			{search.q.length ?
+			{search.length ?
 				<Button
 					content='Clear'
-					onClick={() => setSearch({seq: 0, q: ''})}
+					onClick={() => doSearch('')}
 				/> : ''
 			}
 
@@ -126,7 +142,7 @@ export function Members(props) {
 			</p>
 
 			<Header size='medium'>
-				{search.q.length ? 'Search Results' : memberSorts[sort] + ' Members'}
+				{search.length ? 'Search Results' : memberSorts[sort] + ' Members'}
 			</Header>
 
 			{sort === 'best_looking' ?
