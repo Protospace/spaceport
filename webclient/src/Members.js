@@ -11,12 +11,15 @@ import AbortController from 'abort-controller';
 
 const memberSorts = {
 	recently_vetted: 'Recently Vetted',
-	newest_active: 'Newest Active',
-	newest_overall: 'Newest Overall',
-	best_looking: 'Best Looking',
-	oldest_active: 'Oldest Active',
-	oldest_overall: 'Oldest Overall',
-	recently_inactive: 'Recently Inactive',
+	newest_active: 'Newest',
+	//newest_overall: 'Newest Overall',
+	oldest_active: 'Oldest',
+	//oldest_overall: 'Oldest Overall',
+	recently_inactive: 'Inactive',
+	is_director: 'Directors',
+	is_instructor: 'Instructors',
+	due: 'Due',
+	overdue: 'Overdue',
 };
 
 export function MembersDropdown(props) {
@@ -81,6 +84,7 @@ export function Members(props) {
 			const qs = queryString.stringify({ 'q': q });
 			history.replace('/members?' + qs);
 		} else {
+			setResponse(false);
 			history.replace('/members');
 		}
 	};
@@ -107,6 +111,10 @@ export function Members(props) {
 			;
 		});
 	}, [search, sort]);
+
+	useEffect(() => {
+		setResponse(false);
+	}, [sort]);
 
 	return (
 		<Container>
@@ -142,7 +150,7 @@ export function Members(props) {
 			</p>
 
 			<Header size='medium'>
-				{search.length ? 'Search Results' : memberSorts[sort] + ' Members'}
+				{search.length ? 'Search Results' : memberSorts[sort]}
 			</Header>
 
 			{sort === 'best_looking' ?

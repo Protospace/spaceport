@@ -107,6 +107,18 @@ class SearchViewSet(Base, Retrieve):
         elif self.action == 'create' and sort == 'recently_inactive':
             queryset = queryset.filter(paused_date__isnull=False)
             queryset = queryset.order_by('-paused_date')
+        elif self.action == 'create' and sort == 'is_director':
+            queryset = queryset.filter(is_director=True)
+            queryset = queryset.order_by('application_date')
+        elif self.action == 'create' and sort == 'is_instructor':
+            queryset = queryset.filter(is_instructor=True)
+            queryset = queryset.order_by('application_date')
+        elif self.action == 'create' and sort == 'due':
+            queryset = queryset.filter(status='Due')
+            queryset = queryset.order_by('expire_date')
+        elif self.action == 'create' and sort == 'overdue':
+            queryset = queryset.filter(status='Overdue')
+            queryset = queryset.order_by('expire_date')
         elif self.action == 'create' and sort == 'best_looking':
             queryset = []
 
