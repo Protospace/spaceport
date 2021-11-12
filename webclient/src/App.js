@@ -274,7 +274,7 @@ function App() {
 								<MemberDetail token={token} user={user} />
 							</Route>
 							<Route path='/members'>
-								<Members token={token} />
+								<Members token={token} user={user} />
 							</Route>
 
 							{user && isAdmin(user) &&

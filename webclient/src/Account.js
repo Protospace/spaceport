@@ -264,6 +264,16 @@ export function AccountForm(props) {
 				{...makeProps('discourse_username')}
 			/>}
 
+			<Form.Field>
+				<label>Participate in "Last Scanned" member list?</label>
+				<Checkbox
+					label='Yes, show me'
+					name='allow_last_scanned'
+					onChange={handleCheck}
+					checked={input.allow_last_scanned}
+				/>
+			</Form.Field>
+
 			<Form.Input
 				label='Member Photo'
 				name='photo'

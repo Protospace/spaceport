@@ -119,6 +119,12 @@ class SearchViewSet(Base, Retrieve):
         elif self.action == 'create' and sort == 'overdue':
             queryset = queryset.filter(status='Overdue')
             queryset = queryset.order_by('expire_date')
+        elif self.action == 'create' and sort == 'last_scanned':
+            if self.request.user.member.allow_last_scanned:
+                queryset = queryset.filter(allow_last_scanned=True)
+                queryset = queryset.order_by('-user__cards__last_seen_at')
+            else:
+                queryset = []
         elif self.action == 'create' and sort == 'best_looking':
             queryset = []
 

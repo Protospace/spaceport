@@ -11,6 +11,7 @@ import AbortController from 'abort-controller';
 
 const memberSorts = {
 	recently_vetted: 'Recently Vetted',
+	last_scanned: 'Last Scanned',
 	newest_active: 'Newest',
 	//newest_overall: 'Newest Overall',
 	oldest_active: 'Oldest',
@@ -76,7 +77,7 @@ export function Members(props) {
 	const [response, setResponse] = useState(false);
 	const [numShow, setNumShow] = useState(numShowCache);
 	const [controller, setController] = useState(false);
-	const { token } = props;
+	const { token, user } = props;
 
 	const doSearch = (q) => {
 		console.log('doing search', q);
@@ -153,44 +154,47 @@ export function Members(props) {
 				{search.length ? 'Search Results' : memberSorts[sort]}
 			</Header>
 
-			{sort === 'best_looking' ?
-				<center>
-					<img className='bean' src='/mr-bean.jpg' />
-				</center>
-			:
-				response ?
-					<>
-						<Item.Group unstackable divided>
-							{response.results.length ?
-								response.results.slice(0, numShow).map((x, i) =>
-									<Item key={x.member.id} as={Link} to={'/members/'+x.member.id}>
-										<div className='list-num'>{i+1}</div>
-										<Item.Image size='tiny' src={x.member.photo_small ? staticUrl + '/' + x.member.photo_small : '/nophoto.png'} />
-										<Item.Content verticalAlign='top'>
-											<Item.Header>
-												<Icon name='circle' color={statusColor[x.member.status]} />
-												{x.member.preferred_name} {x.member.last_name}
-											</Item.Header>
-											<Item.Description>Status: {x.member.status || 'Unknown'}</Item.Description>
-											<Item.Description>Joined: {x.member.application_date || 'Unknown'}</Item.Description>
-											<Item.Description>ID: {x.member.id}</Item.Description>
-										</Item.Content>
-									</Item>
-								)
-							:
-								<p>No Results</p>
-							}
-						</Item.Group>
-
-						{response.results.length > 20 && numShow !== 100 ?
-							<Button
-								content='Load More'
-								onClick={() => {setNumShow(100); numShowCache = 100;}}
-							/> : ''
-						}
-					</>
+			{sort === 'last_scanned' &&
+				(user.member.allow_last_scanned ?
+					<p>Hide yourself from this list on the <Link to='/account'>Account Settings</Link> page.</p>
 				:
-					<p>Loading...</p>
+					<p>Participate in this list on the <Link to='/account'>Account Settings</Link> page.</p>
+				)
+			}
+
+			{response ?
+				<>
+					<Item.Group unstackable divided>
+						{response.results.length ?
+							response.results.slice(0, numShow).map((x, i) =>
+								<Item key={x.member.id} as={Link} to={'/members/'+x.member.id}>
+									<div className='list-num'>{i+1}</div>
+									<Item.Image size='tiny' src={x.member.photo_small ? staticUrl + '/' + x.member.photo_small : '/nophoto.png'} />
+									<Item.Content verticalAlign='top'>
+										<Item.Header>
+											<Icon name='circle' color={statusColor[x.member.status]} />
+											{x.member.preferred_name} {x.member.last_name}
+										</Item.Header>
+										<Item.Description>Status: {x.member.status || 'Unknown'}</Item.Description>
+										<Item.Description>Joined: {x.member.application_date || 'Unknown'}</Item.Description>
+										<Item.Description>ID: {x.member.id}</Item.Description>
+									</Item.Content>
+								</Item>
+							)
+						:
+							<p>No Results</p>
+						}
+					</Item.Group>
+
+					{response.results.length > 20 && numShow !== 100 ?
+						<Button
+							content='Load More'
+							onClick={() => {setNumShow(100); numShowCache = 100;}}
+						/> : ''
+					}
+				</>
+			:
+				<p>Loading...</p>
 			}
 
 		</Container>
