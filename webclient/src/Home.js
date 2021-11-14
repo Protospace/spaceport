@@ -14,7 +14,7 @@ function MemberInfo(props) {
 	const member = user.member;
 
 	const lastTrans = user.transactions && user.transactions.slice(0,3);
-	const lastCard = user.cards && user.cards.sort((a, b) => a.last_seen_at < b.last_seen_at)[0];
+	const lastCard = user.cards && user.cards.sort((a, b) => a.last_seen < b.last_seen)[0];
 
 	return (
 		<div>

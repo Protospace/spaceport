@@ -122,7 +122,7 @@ class SearchViewSet(Base, Retrieve):
         elif self.action == 'create' and sort == 'last_scanned':
             if self.request.user.member.allow_last_scanned:
                 queryset = queryset.filter(allow_last_scanned=True)
-                queryset = queryset.order_by('-user__cards__last_seen_at')
+                queryset = queryset.order_by('-user__cards__last_seen')
             else:
                 queryset = []
         elif self.action == 'create' and sort == 'best_looking':
@@ -465,7 +465,7 @@ class DoorViewSet(viewsets.ViewSet, List):
     @action(detail=True, methods=['post'])
     def seen(self, request, pk=None):
         card = get_object_or_404(models.Card, card_number=pk)
-        card.last_seen_at = utils.today_alberta_tz()
+        card.last_seen = now()
         card.save()
 
         try:

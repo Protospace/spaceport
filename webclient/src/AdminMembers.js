@@ -103,8 +103,16 @@ function AdminCardDetail(props) {
 						</Form.Group>
 					</Form.Group>
 
-					Notes: {input.notes || 'None'},
-					Last Seen: {input.last_seen_at || 'Unknown'}
+					Notes: {input.notes || 'None'}<br />
+					Last Seen:{' '}
+					{input.last_seen ?
+						input.last_seen > '2021-11-14T02:01:35.415685Z' ?
+							moment.utc(input.last_seen).tz('America/Edmonton').format('lll')
+						:
+							moment.utc(input.last_seen).tz('America/Edmonton').format('ll')
+					:
+						'Unknown'
+					}
 				</Form>
 			</Segment>
 		:

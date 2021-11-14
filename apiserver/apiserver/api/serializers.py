@@ -73,7 +73,6 @@ class TransactionSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = [
             'id',
-            'last_seen_at',
             'user',
             'recorder',
             'paypal_txn_id',
@@ -354,7 +353,7 @@ class AdminSearchSerializer(serializers.Serializer):
             queryset = obj.user.cards
         else:
             queryset = models.Card.objects.filter(member_id=obj.id)
-        queryset = queryset.order_by('-last_seen_at')
+        queryset = queryset.order_by('-last_seen')
         serializer = CardSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
@@ -406,7 +405,7 @@ class CardSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = [
             'id',
-            'last_seen_at',
+            'last_seen',
             'user',
         ]
 

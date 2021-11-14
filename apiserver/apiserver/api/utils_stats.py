@@ -9,8 +9,9 @@ from django.utils.timezone import now, pytz
 from apiserver.api import models
 from apiserver import secrets
 
+tz = pytz.timezone('America/Edmonton')
 def today_alberta_tz():
-    return datetime.now(pytz.timezone('America/Edmonton')).date()
+    return datetime.now(tz).date()
 
 DEFAULTS = {
     'last_card_change': time.time(),
@@ -140,13 +141,16 @@ def check_mumble_server():
 
 def calc_card_scans():
     date = today_alberta_tz()
+    dt = datetime.combine(date, datetime.min.time())
+    midnight = tz.localize(dt)
+
     cards = models.Card.objects
-    count = cards.filter(last_seen_at=date).count()
+    count = cards.filter(last_seen__gte=midnight).count()
 
     cache.set('card_scans', count)
 
     models.StatsSpaceActivity.objects.update_or_create(
-        date=today_alberta_tz(),
+        date=date,
         defaults=dict(card_scans=count),
     )
 

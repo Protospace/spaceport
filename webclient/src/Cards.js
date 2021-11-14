@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
+import moment from 'moment-timezone';
 import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { BasicTable, requester, staticUrl } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
@@ -45,7 +46,16 @@ export function Cards(props) {
 								<Table.Row key={x.id}>
 									<Table.Cell>{x.card_number}</Table.Cell>
 									<Table.Cell>{x.notes}</Table.Cell>
-									<Table.Cell>{x.last_seen_at}</Table.Cell>
+									<Table.Cell>
+										{x.last_seen ?
+											x.last_seen > '2021-11-14T02:01:35.415685Z' ?
+												moment.utc(x.last_seen).tz('America/Edmonton').format('lll')
+											:
+												moment.utc(x.last_seen).tz('America/Edmonton').format('ll')
+										:
+											'Unknown'
+										}
+									</Table.Cell>
 									<Table.Cell>{cardStatus(x)}</Table.Cell>
 								</Table.Row>
 							)}
@@ -64,7 +74,16 @@ export function Cards(props) {
 							</Table.Row>
 							<Table.Row>
 								<Table.Cell>Last Seen:</Table.Cell>
-								<Table.Cell>{card.last_seen_at}</Table.Cell>
+								<Table.Cell>
+									{card.last_seen ?
+										card.last_seen > '2021-11-14T02:01:35.415685Z' ?
+											moment.utc(card.last_seen).tz('America/Edmonton').format('lll')
+										:
+											moment.utc(card.last_seen).tz('America/Edmonton').format('ll')
+									:
+										'Unknown'
+									}
+								</Table.Cell>
 							</Table.Row>
 							<Table.Row>
 								<Table.Cell>Active:</Table.Cell>
