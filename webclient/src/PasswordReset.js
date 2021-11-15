@@ -53,21 +53,6 @@ function ResetForm() {
 				/>
 			}
 
-			{error.email == 'Not on Spaceport.' &&
-				<Message
-					error
-					header={'You haven\'t registered to Spaceport yet'}
-					content={
-						<>
-							Please sign up to the new portal here:<br />
-							<Link to='/#outside-protospace-15c7b5'>
-								Spaceport Registration
-							</Link>
-						</>
-					}
-				/>
-			}
-
 			<Form.Button loading={loading} error={error.non_field_errors}>
 				Submit
 			</Form.Button>
@@ -92,6 +77,7 @@ function ConfirmForm() {
 	const handleSubmit = (e) => {
 		if (loading) return;
 		setLoading(true);
+		setProgress([]);
 
 		const request_id = token.slice(-10);
 		const getStatus = () => {
@@ -111,8 +97,6 @@ function ConfirmForm() {
 			setLoading(false);
 			setSuccess(true);
 			setError({});
-			history.push('/');
-			window.scrollTo(0, 0);
 		})
 		.catch(err => {
 			clearInterval(interval);
@@ -151,7 +135,6 @@ function ConfirmForm() {
 			<Form.Button loading={loading} error={error.non_field_errors}>
 				Submit
 			</Form.Button>
-			{success && <div>Success!</div>}
 		</Form>
 	);
 };

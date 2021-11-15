@@ -639,12 +639,8 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
 class MyPasswordResetSerializer(PasswordResetSerializer):
     def validate_email(self, email):
         if not User.objects.filter(email__iexact=email).exists():
-            if models.Member.objects.filter(old_email__iexact=email).exists():
-                logging.info('Email hasn\'t migrated to Spaceport yet: ' + email)
-                raise ValidationError('Not on Spaceport.')
-            else:
-                logging.info('Email not found: ' + email)
-                raise ValidationError('Not found.')
+            logging.info('Email not found: ' + email)
+            raise ValidationError('Not found.')
         return super().validate_email(email)
 
     def save(self):
@@ -701,7 +697,8 @@ class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
         member = self.user.member
         logging.info('Password reset completed for: {} {} ({})'.format(member.first_name, member.last_name, member.id))
 
-        if request_id: utils_stats.set_progress(request_id, 'Changing Spaceport password...')
+        if request_id: utils_stats.set_progress(request_id, 'Success! You can now log in as: ' + self.user.username)
+
         time.sleep(1)
 
         super().save()
