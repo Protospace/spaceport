@@ -74,8 +74,6 @@ export function SignupForm(props) {
 	const [loading, setLoading] = useState(false);
 	const location = useLocation();
 
-	const bypass_code = location.hash.replace('#', '');
-
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
 
@@ -103,11 +101,7 @@ export function SignupForm(props) {
 		};
 		const interval = setInterval(getStatus, 500);
 
-		const data = { ...input, email: input.email.toLowerCase(), bypass_code: bypass_code, request_id: request_id };
-
-		if (bypass_code) {
-			data.existing_member = true;
-		}
+		const data = { ...input, email: input.email.toLowerCase(), request_id: request_id };
 
 		requester('/registration/', 'POST', '', data)
 		.then(res => {
@@ -161,24 +155,29 @@ export function SignupForm(props) {
 						error={error.email}
 					/>
 
-					{!!bypass_code || <Form.Group grouped>
+					<Form.Group grouped>
 						<Form.Radio
 							label='I have an account on the old portal'
 							name='existing_member'
-							value={'true'}
-							checked={input.existing_member === 'true'}
+							value={true}
+							checked={input.existing_member === true}
 							onChange={handleValues}
 							error={!!error.existing_member}
 						/>
 						<Form.Radio
 							label='I am new to Protospace'
 							name='existing_member'
-							value={'false'}
-							checked={input.existing_member === 'false'}
+							value={false}
+							checked={input.existing_member === false}
 							onChange={handleValues}
 							error={!!error.existing_member}
 						/>
-					</Form.Group>}
+					</Form.Group>
+
+					{input.existing_member && <Message info>
+						<Message.Header>Welcome back!</Message.Header>
+						<p>Please do a <Link to='/password/reset'>password reset</Link> instead.</p>
+					</Message>}
 
 					<Form.Input
 						label='Password'
@@ -199,7 +198,7 @@ export function SignupForm(props) {
 						{progress.map(x => <>{x}<br /></>)}
 					</p>
 
-					<Form.Button loading={loading} error={error.non_field_errors}>
+					<Form.Button loading={loading} error={error.non_field_errors} disabled={input.existing_member !== false}>
 						Sign Up
 					</Form.Button>
 				</>

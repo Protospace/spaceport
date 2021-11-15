@@ -144,8 +144,6 @@ export function Home(props) {
 	const [refreshCount, refreshStats] = useReducer(x => x + 1, 0);
 	const location = useLocation();
 
-	const bypass_code = location.hash.replace('#', '');
-
 	useEffect(() => {
 		requester('/stats/', 'GET', token)
 		.then(res => {
@@ -174,7 +172,7 @@ export function Home(props) {
 
 	const doorOpenStat = () => alarmStat() == 'Disarmed' && stats.alarm['data'] > 360 ? ', door open' : '';
 
-	const show_signup = stats?.at_protospace || bypass_code;
+	const show_signup = stats?.at_protospace;
 
 	return (
 		<Container>
@@ -194,18 +192,9 @@ export function Home(props) {
 							</div>
 					:
 						<div>
-							{bypass_code ?
-								<Message warning>
-									<Message.Header>Outside Registration</Message.Header>
-									<p>This page allows you to sign up from outside of Protospace.</p>
-								</Message>
-							:
-								<>
-									<LoginForm {...props} />
+							<LoginForm {...props} />
 
-									<Divider section horizontal>Or</Divider>
-								</>
-							}
+							<Divider section horizontal>Or</Divider>
 
 							<SignupForm {...props} show_signup={show_signup} />
 						</div>

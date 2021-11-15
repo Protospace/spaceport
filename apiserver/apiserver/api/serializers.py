@@ -563,7 +563,6 @@ class UserSerializer(serializers.ModelSerializer):
 class MyRegisterSerializer(RegisterSerializer):
     first_name = serializers.CharField(max_length=32)
     last_name = serializers.CharField(max_length=32)
-    existing_member = serializers.ChoiceField(['true', 'false'])
     request_id = serializers.CharField(required=False)
 
     def validate_username(self, username):
@@ -578,13 +577,7 @@ class MyRegisterSerializer(RegisterSerializer):
     def custom_signup(self, request, user):
         data = request.data
 
-        if secrets.REGISTRATION_BYPASS:
-            bypass_code = data.get('bypass_code', None)
-            allow_bypass = secrets.REGISTRATION_BYPASS == bypass_code
-        else:
-            allow_bypass = False
-
-        if not allow_bypass and not utils.is_request_from_protospace(request):
+        if not utils.is_request_from_protospace(request):
             logger.info('Request not from protospace')
             user.delete()
             raise ValidationError(dict(non_field_errors='Can only register from Protospace.'))

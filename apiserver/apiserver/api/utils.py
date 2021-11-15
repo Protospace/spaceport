@@ -20,6 +20,7 @@ from django.core.cache import cache
 from django.utils.timezone import now, pytz
 
 from . import models, serializers, utils_ldap, utils_stats, utils_auth, utils
+from .. import settings
 
 STATIC_FOLDER = 'data/static/'
 
@@ -280,70 +281,13 @@ clean = Cleaner(tags=ALLOWED_TAGS).clean
 def is_request_from_protospace(request):
     whitelist = ['24.66.110.96', '205.233.15.76', '205.233.15.69']
 
+    if settings.DEBUG:
+        return True
+
     # set (not appended) directly by nginx so we can trust it
     real_ip = request.META.get('HTTP_X_REAL_IP', False)
 
     return real_ip in whitelist
-
-def link_old_member(data, user):
-    '''
-    If a member claims they have an account on the old protospace portal,
-    go through and link their objects to their new user using the member_id
-    found with their email as a hint
-
-    Since this runs AFTER registration, we need to delete the user on any
-    failures or else the username will be taken when they try again
-    '''
-
-    try:
-        member = models.Member.objects.get(old_email__iexact=data['email'])
-    except models.Member.DoesNotExist:
-        msg = 'Unable to find email in old portal. Try a different one or ask a director to look up which one you used.'
-        logger.info(msg)
-        raise ValidationError(dict(email=msg))
-    except models.Member.MultipleObjectsReturned:
-        msg = 'Duplicate emails found. Talk to Tanner.'
-        logger.info(msg)
-        raise ValidationError(dict(email=msg))
-
-    if member.user:
-        msg = 'Old member already claimed.'
-        logger.info(msg)
-        raise ValidationError(dict(email=msg))
-
-    if utils_ldap.is_configured():
-        if data['request_id']: utils_stats.set_progress(data['request_id'], 'Finding LDAP account...')
-        result = utils_ldap.find_user(user.username)
-        if result == 200:
-            if utils_ldap.set_password(data) != 200:
-                msg = 'Problem connecting to LDAP server: set.'
-                alert_tanner(msg)
-                logger.info(msg)
-                raise ValidationError(dict(non_field_errors=msg))
-        elif result == 404:
-            if utils_ldap.create_user(data) != 200:
-                msg = 'Problem connecting to LDAP server: create.'
-                alert_tanner(msg)
-                logger.info(msg)
-                raise ValidationError(dict(non_field_errors=msg))
-        else:
-            msg = 'Problem connecting to LDAP server: find.'
-            alert_tanner(msg)
-            logger.info(msg)
-            raise ValidationError(dict(non_field_errors=msg))
-
-
-    if data['request_id']: utils_stats.set_progress(data['request_id'], 'Linking old member data...')
-
-    member.user = user
-    member.first_name = data['first_name'].title()
-    member.last_name = data['last_name'].title()
-    member.preferred_name = data['first_name'].title()
-    member.save()
-
-    models.Transaction.objects.filter(member_id=member.id).update(user=user)
-    models.Card.objects.filter(member_id=member.id).update(user=user)
-    models.Training.objects.filter(member_id=member.id).update(user=user)
 
 def create_new_member(data, user):
     members = models.Member.objects
@@ -384,12 +328,8 @@ def create_new_member(data, user):
 
 def register_user(data, user):
     try:
-        if data['existing_member'] == 'true':
-            logger.info('Linking old member...')
-            link_old_member(data, user)
-        else:
-            logger.info('Creating new member...')
-            create_new_member(data, user)
+        logger.info('Creating new member...')
+        create_new_member(data, user)
     except:
         user.delete()
         raise
