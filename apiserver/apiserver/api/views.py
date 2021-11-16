@@ -321,16 +321,15 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
                 raise exceptions.ValidationError('Not allowed to register others')
 
             member = get_object_or_404(models.Member, id=data['member_id'])
-            user = getattr(member, 'user', None)
+            user = member.user
 
             training1 = models.Training.objects.filter(user=user, session=session)
-            training2 = models.Training.objects.filter(member_id=member.id, session=session)
-            if (user and training1.exists()) or training2.exists():
+            if training1.exists()
                 raise exceptions.ValidationError(dict(non_field_errors='Already registered.'))
 
             self.update_cert(session, member, status)
 
-            serializer.save(user=user, member_id=member.id, attendance_status=status)
+            serializer.save(user=user, attendance_status=status)
         else:
             training = models.Training.objects.filter(user=user, session=session)
             if training.exists():
@@ -349,11 +348,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             status = 'Confirmed'
 
         training = serializer.save(attendance_status=status)
-
-        if training.user:
-            member = training.user.member
-        else:
-            member = models.Member.objects.get(id=training.member_id)
+        member = training.user.member
 
         self.update_cert(session, member, status)
 
@@ -388,10 +383,10 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
         utils.tally_membership_months(member)
 
     def train_paypal_hint(self, tx):
-        if tx.paypal_payer_id and tx.member_id:
+        if tx.paypal_payer_id:
             models.PayPalHint.objects.update_or_create(
                 account=tx.paypal_payer_id,
-                defaults=dict(member_id=tx.member_id),
+                defaults=dict(user=tx.user),
             )
 
     def perform_create(self, serializer):
@@ -448,10 +443,7 @@ class DoorViewSet(viewsets.ViewSet, List):
         active_member_cards = {}
 
         for card in cards:
-            try:
-                member = models.Member.objects.get(id=card.member_id)
-            except models.Member.DoesNotExist:
-                continue
+            member = card.user.member
             if member.paused_date: continue
             if not member.is_allowed_entry: continue
 
@@ -468,10 +460,7 @@ class DoorViewSet(viewsets.ViewSet, List):
         card.last_seen = now()
         card.save()
 
-        try:
-            member = models.Member.objects.get(id=card.member_id)
-        except models.Member.DoesNotExist:
-            raise Http404
+        member = card.user.member
         t = utils.now_alberta_tz().strftime('%Y-%m-%d %H:%M:%S, %a %I:%M %p')
         logger.info('Time: {} - Name: {} {} ({})'.format(t, member.first_name, member.last_name, member.id))
 
@@ -490,10 +479,7 @@ class LockoutViewSet(viewsets.ViewSet, List):
         active_member_cards = {}
 
         for card in cards:
-            try:
-                member = models.Member.objects.get(id=card.member_id)
-            except models.Member.DoesNotExist:
-                continue
+            member = card.user.member
             if member.paused_date: continue
             if not member.is_allowed_entry: continue
 

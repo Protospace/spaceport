@@ -81,8 +81,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         member = get_object_or_404(models.Member, id=validated_data['member_id'])
-        if member.user:
-            validated_data['user'] = member.user
+        validated_data['user'] = member.user
 
         if validated_data['account_type'] != 'Clearing':
             if validated_data['amount'] == 0:
@@ -106,12 +105,9 @@ class TransactionSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def get_member_name(self, obj):
-        if not obj.member_id: return 'Unknown'
+        if not obj.user: return 'Unknown'
 
-        if obj.user:
-            member = obj.user.member
-        else:
-            member = models.Member.objects.get(id=obj.member_id)
+        member = obj.user.member
         return member.preferred_name + ' ' + member.last_name
 
     def get_recorder(self, obj):
@@ -210,11 +206,8 @@ class MemberSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
-        if instance.user:
-            instance.user.email = validated_data.get('email', instance.user.email)
-            instance.user.save()
-        else:
-            instance.old_email = validated_data.get('email', instance.old_email)
+        instance.user.email = validated_data.get('email', instance.user.email)
+        instance.user.save()
 
         photo = validated_data.get('photo', None)
         crop = validated_data.get('crop', None)
@@ -328,10 +321,7 @@ class InstructorSearchSerializer(serializers.Serializer):
         return serializer.data
 
     def get_training(self, obj):
-        if obj.user:
-            queryset = obj.user.training
-        else:
-            queryset = models.Training.objects.filter(member_id=obj.id)
+        queryset = obj.user.training
         serializer = UserTrainingSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
@@ -349,39 +339,27 @@ class AdminSearchSerializer(serializers.Serializer):
         return serializer.data
 
     def get_cards(self, obj):
-        if obj.user:
-            queryset = obj.user.cards
-        else:
-            queryset = models.Card.objects.filter(member_id=obj.id)
+        queryset = obj.user.cards
         queryset = queryset.order_by('-last_seen')
         serializer = CardSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
 
     def get_training(self, obj):
-        if obj.user:
-            queryset = obj.user.training
-        else:
-            queryset = models.Training.objects.filter(member_id=obj.id)
+        queryset = obj.user.training
         serializer = UserTrainingSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
 
     def get_transactions(self, obj):
-        if obj.user:
-            queryset = obj.user.transactions
-        else:
-            queryset = models.Transaction.objects.filter(member_id=obj.id)
+        queryset = obj.user.transactions
         queryset = queryset.order_by('-id', '-date')
         serializer = TransactionSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
 
     #def get_usages(self, obj):
-    #    if obj.user:
-    #        queryset = obj.user.usages.order_by('-start_time')
-    #    else:
-    #        queryset = []
+    #    queryset = obj.user.usages.order_by('-start_time')
     #    serializer = UsageSerializer(data=queryset, many=True)
     #    serializer.is_valid()
     #    return serializer.data
@@ -411,8 +389,7 @@ class CardSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         member = get_object_or_404(models.Member, id=validated_data['member_id'])
-        if member.user:
-            validated_data['user'] = member.user
+        validated_data['user'] = member.user
 
         if not member.vetted_date:
             raise ValidationError(dict(non_field_errors='Member not vetted yet.'))
@@ -439,24 +416,14 @@ class TrainingSerializer(serializers.ModelSerializer):
         read_only_fields = ['user', 'sign_up_date', 'paid_date']
 
     def get_student_name(self, obj):
-        if obj.user:
-            member = obj.user.member
-        else:
-            member = models.Member.objects.get(id=obj.member_id)
+        member = obj.user.member
         return member.preferred_name + ' ' + member.last_name
 
     def get_student_email(self, obj):
-        if obj.user:
-            return obj.user.email
-        else:
-            member = models.Member.objects.get(id=obj.member_id)
-            return member.old_email
+        return obj.user.email
 
     def get_student_id(self, obj):
-        if obj.user:
-            return obj.user.member.id
-        else:
-            return obj.member_id
+        return obj.user.member.id
 
 
 class StudentTrainingSerializer(TrainingSerializer):
