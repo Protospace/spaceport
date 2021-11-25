@@ -340,9 +340,9 @@ def link_old_member(data, user):
     if data['request_id']: utils_stats.set_progress(data['request_id'], 'Linking old member data...')
 
     member.user = user
-    member.first_name = data['first_name'].title()
-    member.last_name = data['last_name'].title()
-    member.preferred_name = data['first_name'].title()
+    member.first_name = data['first_name'].title().strip()
+    member.last_name = data['last_name'].title().strip()
+    member.preferred_name = data['first_name'].title().strip()
     member.save()
 
     models.Transaction.objects.filter(member_id=member.id).update(user=user)
@@ -381,9 +381,9 @@ def create_new_member(data, user):
 
     models.Member.objects.create(
         user=user,
-        first_name=data['first_name'].title(),
-        last_name=data['last_name'].title(),
-        preferred_name=data['first_name'].title(),
+        first_name=data['first_name'].title().strip(),
+        last_name=data['last_name'].title().strip(),
+        preferred_name=data['first_name'].title().strip(),
     )
 
 def register_user(data, user):

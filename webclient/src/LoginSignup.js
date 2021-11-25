@@ -79,12 +79,20 @@ export function SignupForm(props) {
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
 
-	const genUsername = () => (
-		input.first_name && input.last_name ?
-			(input.first_name + '.' + input.last_name).toLowerCase().replace(/ /g, '.')
-		:
-			''
-	);
+	const genUsername = () => {
+		if (input.first_name && input.last_name) {
+			let first_name = input.first_name.trim();
+			let last_name = input.last_name.trim();
+			first_name = first_name.replace(/[^a-z- ]+/g, '');
+			last_name = last_name.replace(/[^a-z- ]+/g, '');
+			first_name = first_name.replace(/[ -]/g, '.');
+			last_name = last_name.replace(/[ -]/g, '.');
+			const username = first_name + '.' + last_name;
+			return username.toLowerCase();
+		} else {
+			return '';
+		}
+	};
 
 	const handleSubmit = (e) => {
 		if (loading) return;
