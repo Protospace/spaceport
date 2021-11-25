@@ -290,6 +290,19 @@ export function Home(props) {
 								} trigger={<a>[more]</a>} />
 							</p>
 
+							<p>
+								Precix availability: {getTrackStat('CNC-PRECIX')} <Popup content={
+									<React.Fragment>
+										<p>
+											Last use:<br />
+											{getTrackLast('CNC-PRECIX')}<br />
+											{getTrackAgo('CNC-PRECIX')}<br />
+											by {getTrackName('CNC-PRECIX')}
+										</p>
+									</React.Fragment>
+								} trigger={<a>[more]</a>} />
+							</p>
+
 							{user && <p>Alarm status: {alarmStat()}{doorOpenStat()}</p>}
 						</div>
 
