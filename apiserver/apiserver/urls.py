@@ -7,9 +7,6 @@ from rest_auth.views import LoginView, LogoutView
 from .api import views
 from . import secrets, settings
 
-IPN_ROUTE = r'^ipn/{}/'.format(secrets.IPN_RANDOM)
-ADMIN_ROUTE = '{}/admin/'.format(secrets.ADMIN_RANDOM)
-
 router = routers.DefaultRouter()
 router.register(r'door', views.DoorViewSet, basename='door')
 router.register(r'lockout', views.LockoutViewSet, basename='lockout')
@@ -31,7 +28,6 @@ router.register(r'charts/spaceactivity', views.SpaceActivityViewSet, basename='s
 
 urlpatterns = [
     path('', include(router.urls)),
-    path(ADMIN_ROUTE, admin.site.urls),
     url(r'^rest-auth/login/$', LoginView.as_view(), name='rest_login'),
     url(r'^spaceport-auth/login/$', views.SpaceportAuthView.as_view(), name='spaceport_auth'),
     url(r'^rest-auth/logout/$', LogoutView.as_view(), name='rest_logout'),
@@ -44,8 +40,15 @@ urlpatterns = [
     url(r'^ping/', views.PingView.as_view(), name='ping'),
     url(r'^paste/', views.PasteView.as_view(), name='paste'),
     url(r'^backup/', views.BackupView.as_view(), name='backup'),
-    url(IPN_ROUTE, views.IpnView.as_view(), name='ipn'),
 ]
+
+if secrets.IPN_RANDOM:
+    IPN_ROUTE = r'^ipn/{}/'.format(secrets.IPN_RANDOM)
+    urlpatterns.append(url(IPN_ROUTE, views.IpnView.as_view(), name='ipn'))
+
+if secrets.ADMIN_RANDOM:
+    ADMIN_ROUTE = '{}/admin/'.format(secrets.ADMIN_RANDOM)
+    urlpatterns.append(path(ADMIN_ROUTE, admin.site.urls))
 
 if settings.DEBUG:
     urlpatterns += [
