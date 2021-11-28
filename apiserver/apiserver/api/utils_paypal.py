@@ -161,7 +161,6 @@ def create_member_dues_tx(data, member, num_months, deal):
 
     tx = transactions.create(
         **build_tx(data),
-        member_id=member.id,
         memo=memo,
         category='Membership',
         number_of_membership_months=num_months,
@@ -184,7 +183,6 @@ def create_unmatched_purchase_tx(data, member):
 
     return transactions.create(
         **build_tx(data),
-        member_id=member.id,
         report_memo=report_memo,
         report_type='Unmatched Purchase',
         user=user,
@@ -205,7 +203,6 @@ def create_member_training_tx(data, member, training):
 
     return transactions.create(
         **build_tx(data),
-        member_id=member.id,
         category='OnAcct',
         memo=memo,
         user=user,
@@ -231,9 +228,6 @@ def check_training(data, training_id, amount):
     if training.session.cost != amount:
         return False
 
-    if not training.user:
-        return False
-
     member = training.user.member
 
     training.attendance_status = 'Confirmed'
@@ -257,7 +251,6 @@ def create_category_tx(data, member, custom_json):
 
     return transactions.create(
         **build_tx(data),
-        member_id=member.id,
         category=custom_json['category'],
         memo=memo,
         user=user,
@@ -324,21 +317,18 @@ def process_paypal_ipn(data):
             update_ipn(ipn, 'Accepted, training')
             hints.update_or_create(
                 account=data.get('payer_id', 'unknown'),
-                defaults=dict(member_id=tx.member_id),
+                defaults=dict(user=tx.user),
             )
             return tx
 
+    member = False
     member_id = False
 
-    if not member_id and hints.filter(account=data.get('payer_id', False)).exists():
-        member_id = hints.get(account=data['payer_id']).member_id
+    if hints.filter(account=data.get('payer_id', False)).exists():
+        member = hints.get(account=data['payer_id']).user.member
 
     if not member_id and 'member' in custom_json:
         member_id = custom_json['member']
-        hints.update_or_create(
-            account=data.get('payer_id', 'unknown'),
-            defaults=dict(member_id=member_id),
-        )
 
     if not members.filter(id=member_id).exists():
         logger.info('IPN - Unable to associate with member, reporting')
@@ -346,6 +336,11 @@ def process_paypal_ipn(data):
         return create_unmatched_member_tx(data)
 
     member = members.get(id=member_id)
+
+    hints.update_or_create(
+        account=data.get('payer_id', 'unknown'),
+        defaults=dict(user=member.user),
+    )
 
     if custom_json.get('category', False) in ['Snacks', 'OnAcct', 'Donation']:
         logger.info('IPN - Category matched')

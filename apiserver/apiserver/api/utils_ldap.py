@@ -45,10 +45,7 @@ def add_to_group(member, group):
     try:
         ldap_data = dict(group=group)
 
-        if member.user:
-            ldap_data['username'] = member.user.username
-        else:
-            ldap_data['email'] = member.old_email
+        ldap_data['username'] = member.user.username
 
         if ldap_api('add-to-group', ldap_data) != 200: raise
     except BaseException as e:
@@ -62,10 +59,7 @@ def remove_from_group(member, group):
     try:
         ldap_data = dict(group=group)
 
-        if member.user:
-            ldap_data['username'] = member.user.username
-        else:
-            ldap_data['email'] = member.old_email
+        ldap_data['username'] = member.user.username
 
         if ldap_api('remove-from-group', ldap_data) != 200: raise
     except BaseException as e:

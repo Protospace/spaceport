@@ -90,7 +90,7 @@ def fake_missing_membership_months(member):
 
     missing_months = num_months_spanned(expire_date, start_date)
 
-    user = member.user if member.user else None
+    user = member.user
     tx = False
     for i in range(missing_months):
         memo = '{} / {} month membership dues accounting old portal import, {} to {} - hidden'.format(
@@ -101,7 +101,6 @@ def fake_missing_membership_months(member):
             amount=0,
             user=user,
             memo=memo,
-            member_id=member.id,
             reference_number='',
             info_source='System',
             payment_method='N/A',
@@ -124,7 +123,7 @@ def tally_membership_months(member, fake_date=None):
     if not start_date: return False
 
     txs = models.Transaction.objects.filter(
-        member_id=member.id,
+        user__member=member,
         date__gte=start_date,
     )
     total_months_agg = txs.aggregate(Sum('number_of_membership_months'))
@@ -156,10 +155,7 @@ def gen_search_strings():
             m.last_name,
         )
 
-        if m.old_email:
-            string += ' | ' + m.old_email
-        if m.user:
-            string += ' | ' + m.user.email
+        string += ' | ' + m.user.email
         string += ' | ' + str(m.id)
 
         string = string.lower()

@@ -71,8 +71,26 @@ for member in members:
     x.update(user=user)
     print('    Linked', x.count(), 'trainings')
 
+    x = models.PayPalHint.objects.filter(member_id=member.id)
+    x.update(user=user)
+    print('    Linked', x.count(), 'hints')
+
 
     count += 1
     print()
 
 print('Generated', count, 'users.')
+
+print('Deleting orphan cards...')
+count = models.Card.objects.filter(user__isnull=True).delete()[0]
+print('Deleted', count, 'cards.')
+
+print('Deleting orphan trainings...')
+count = models.Training.objects.filter(user__isnull=True).delete()[0]
+print('Deleted', count, 'trainings.')
+
+print('Deleting orphan hints...')
+count = models.PayPalHint.objects.filter(user__isnull=True).delete()[0]
+print('Deleted', count, 'hints.')
+
+print('Done.')
