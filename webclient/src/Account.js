@@ -266,11 +266,16 @@ export function AccountForm(props) {
 
 			<Form.Field>
 				<label>Participate in "Last Scanned" member list?</label>
-				<Checkbox
+				<Form.Checkbox
 					label='Yes, show me'
 					name='allow_last_scanned'
 					onChange={handleCheck}
 					checked={input.allow_last_scanned}
+					error={error.allow_last_scanned ?
+						{ content: error.allow_last_scanned, pointing: 'left' }
+					:
+						false
+					}
 				/>
 			</Form.Field>
 
