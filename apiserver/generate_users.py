@@ -73,7 +73,7 @@ for member in members:
 
     x = models.PayPalHint.objects.filter(member_id=member.id)
     x.update(user=user)
-    print('    Linked', x.count(), 'hints')
+    print('    Linked', x.count(), 'paypal hints')
 
 
     count += 1

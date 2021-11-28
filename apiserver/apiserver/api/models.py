@@ -86,7 +86,7 @@ class Transaction(models.Model):
     history = HistoricalRecords()
 
 class PayPalHint(models.Model):
-    user = models.ForeignKey(User, related_name='hints', blank=True, null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(User, related_name='paypal_hints', blank=True, null=True, on_delete=models.SET_NULL)
 
     account = models.CharField(unique=True, max_length=13)
     member_id = models.IntegerField()
