@@ -14,6 +14,7 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+from recommonmark.parser import CommonMarkParser
 
 # -- Project information -----------------------------------------------------
 
@@ -28,9 +29,16 @@ author = 'Tanner Collin'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx_rtd_theme',
-    'sphinxcontrib.httpdomain',
+    'recommonmark',
 ]
+
+source_suffix = ['.rst', '.md']
+
+source_parsers = {
+    '.md': 'CommonMarkParser',
+}
+
+known_url_schemes = ['http', 'https']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
