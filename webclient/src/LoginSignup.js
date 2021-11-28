@@ -81,14 +81,13 @@ export function SignupForm(props) {
 
 	const genUsername = () => {
 		if (input.first_name && input.last_name) {
-			let first_name = input.first_name.trim();
-			let last_name = input.last_name.trim();
+			let first_name = input.first_name.trim().toLowerCase();
+			let last_name = input.last_name.trim().toLowerCase();
 			first_name = first_name.replace(/[^a-z- ]+/g, '');
 			last_name = last_name.replace(/[^a-z- ]+/g, '');
 			first_name = first_name.replace(/[ -]/g, '.');
 			last_name = last_name.replace(/[ -]/g, '.');
-			const username = first_name + '.' + last_name;
-			return username.toLowerCase();
+			return first_name + '.' + last_name;
 		} else {
 			return '';
 		}
