@@ -36,14 +36,14 @@ for member in members:
     if not member.last_name.isalpha():
         print('    Non-alpha last name.')
 
-    first_name = member.first_name.lower()
-    last_name = member.last_name.lower()
+    first_name = member.first_name.strip().lower()
+    last_name = member.last_name.strip().lower()
 
-    first_name = re.sub(r'[^a-z ]+', '', first_name)
-    last_name = re.sub(r'[^a-z ]+', '', last_name)
+    first_name = re.sub(r'[^a-z- ]+', '', first_name)
+    last_name = re.sub(r'[^a-z- ]+', '', last_name)
 
-    first_name = first_name.replace(' ', '.')
-    last_name = last_name.replace(' ', '.')
+    first_name = first_name.replace(' ', '.').replace('-', '.')
+    last_name = last_name.replace(' ', '.').replace('-', '.')
 
     username = first_name + '.' + last_name
     print('    Username:', username)
