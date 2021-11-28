@@ -324,7 +324,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             user = member.user
 
             training1 = models.Training.objects.filter(user=user, session=session)
-            if training1.exists()
+            if training1.exists():
                 raise exceptions.ValidationError(dict(non_field_errors='Already registered.'))
 
             self.update_cert(session, member, status)

@@ -25,61 +25,61 @@ print('Generating Users')
 count = 0
 
 for member in members:
-    if member.user:
-        continue
-
     print('Member', member.id, member.first_name, member.last_name)
 
-    if not member.first_name.isalpha():
-        print('    Non-alpha first name.')
+    if not member.user:
+        print('    No user, generating.')
 
-    if not member.last_name.isalpha():
-        print('    Non-alpha last name.')
+        if not member.first_name.isalpha():
+            print('    Non-alpha first name.')
 
-    first_name = member.first_name.strip().lower()
-    last_name = member.last_name.strip().lower()
+        if not member.last_name.isalpha():
+            print('    Non-alpha last name.')
 
-    first_name = re.sub(r'[^a-z- ]+', '', first_name)
-    last_name = re.sub(r'[^a-z- ]+', '', last_name)
+        first_name = member.first_name.strip().lower()
+        last_name = member.last_name.strip().lower()
 
-    first_name = first_name.replace(' ', '.').replace('-', '.')
-    last_name = last_name.replace(' ', '.').replace('-', '.')
+        first_name = re.sub(r'[^a-z- ]+', '', first_name)
+        last_name = re.sub(r'[^a-z- ]+', '', last_name)
 
-    username = first_name + '.' + last_name
-    print('    Username:', username)
+        first_name = first_name.replace(' ', '.').replace('-', '.')
+        last_name = last_name.replace(' ', '.').replace('-', '.')
 
-    if member.old_email:
-        email = member.old_email
-    else:
-        email = random_email()
-        print('    No email, using:', email)
+        username = first_name + '.' + last_name
+        print('    Username:', username)
 
-    user = User.objects.create_user(username, email, str(uuid4()))
+        if member.old_email:
+            email = member.old_email
+        else:
+            email = random_email()
+            print('    No email, using:', email)
 
-    member.user = user
-    member.save()
+        user = User.objects.create_user(username, email, str(uuid4()))
 
-    x = models.Transaction.objects.filter(member_id=member.id)
-    x.update(user=user)
-    print('    Linked', x.count(), 'transactions')
+        member.user = user
+        member.save()
 
-    x = models.Card.objects.filter(member_id=member.id)
-    x.update(user=user)
-    print('    Linked', x.count(), 'cards')
+    x = models.Transaction.objects.filter(user=None, member_id=member.id)
+    print('    Linking', x.count(), 'transactions')
+    x.update(user=member.user)
 
-    x = models.Training.objects.filter(member_id=member.id)
-    x.update(user=user)
-    print('    Linked', x.count(), 'trainings')
+    x = models.Card.objects.filter(user=None, member_id=member.id)
+    print('    Linking', x.count(), 'cards')
+    x.update(user=member.user)
 
-    x = models.PayPalHint.objects.filter(member_id=member.id)
-    x.update(user=user)
-    print('    Linked', x.count(), 'paypal hints')
+    x = models.Training.objects.filter(user=None, member_id=member.id)
+    print('    Linking', x.count(), 'trainings')
+    x.update(user=member.user)
+
+    x = models.PayPalHint.objects.filter(user=None, member_id=member.id)
+    print('    Linking', x.count(), 'paypal hints')
+    x.update(user=member.user)
 
 
     count += 1
     print()
 
-print('Generated', count, 'users.')
+print('Processed', count, 'members.')
 
 print('Deleting orphan cards...')
 count = models.Card.objects.filter(user__isnull=True).delete()[0]
