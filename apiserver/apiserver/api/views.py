@@ -475,7 +475,7 @@ class DoorViewSet(viewsets.ViewSet, List):
         except models.Member.DoesNotExist:
             raise Http404
         t = utils.now_alberta_tz().strftime('%Y-%m-%d %H:%M:%S, %a %I:%M %p')
-        logger.info('Time: {} - Name: {} {} ({})'.format(t, member.first_name, member.last_name, member.id))
+        logger.info('Scan - Time: {} | Name: {} {} ({})'.format(t, member.first_name, member.last_name, member.id))
 
         utils_stats.calc_card_scans()
 
@@ -651,7 +651,7 @@ class BackupView(views.APIView):
         backup_user = secrets.BACKUP_TOKENS.get(auth_token, None)
 
         if backup_user:
-            logger.info('Backup user: ' + backup_user['name'])
+            logger.info('Backup - User: ' + backup_user['name'])
             backup_path = cache.get(backup_user['cache_key'], None)
 
             if not backup_path:

@@ -421,6 +421,7 @@ class CardSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'id',
             'last_seen',
+            'last_seen_at',
             'user',
         ]
 
