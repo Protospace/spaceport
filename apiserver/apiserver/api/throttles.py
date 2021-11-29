@@ -13,6 +13,9 @@ class LoggingThrottle(throttling.BaseThrottle):
         method = request._request.method
         path = request._request.path
 
+        if path.startswith('/stats/') or path.startswith('/lockout/'):
+            return True
+
         if request.data:
             data = request.data.dict()
             for key in ['password', 'password1', 'password2', 'old_password', 'new_password1', 'new_password2']:
