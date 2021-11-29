@@ -437,9 +437,6 @@ class PingView(views.APIView):
     permission_classes = [AllowMetadata | IsAuthenticated]
 
     def post(self, request):
-        d = request.data.dict()
-        if d:
-            logger.info(str(d))
         return Response(200)
 
 
@@ -738,15 +735,6 @@ class VettingViewSet(Base, List):
 
 class RegistrationView(RegisterView):
     serializer_class = serializers.MyRegisterSerializer
-
-    def post(self, request):
-        data = request.data.copy()
-        data.pop('password1', None)
-        data.pop('password2', None)
-        logger.info(dict(data))
-
-        return super().post(request)
-
 
 class PasswordChangeView(PasswordChangeView):
     permission_classes = [AllowMetadata | IsAuthenticated]
