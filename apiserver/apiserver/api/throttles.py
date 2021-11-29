@@ -24,5 +24,5 @@ class LoggingThrottle(throttling.BaseThrottle):
         else:
             data = None
 
-        logging.info('Request - User: %s | %s %s | Data: %s', user, method, path, data)
+        logging.info('%s %s | User: %s | Data: %s', method, path, user, data)
         return True

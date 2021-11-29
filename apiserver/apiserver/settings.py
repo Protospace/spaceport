@@ -239,7 +239,7 @@ LOGGING = {
     'loggers': {
         'gunicorn': {
             'handlers': ['console'],
-            'level': 'DEBUG',
+            'level': 'DEBUG' if DEBUG else 'INFO',
             'propagate': False,
         },
         '': {
