@@ -26,6 +26,7 @@ DEFAULTS = {
     'card_scans': 0,
     'track': {},
     'alarm': {},
+    'sign': '',
 }
 
 if secrets.MUMBLE:
