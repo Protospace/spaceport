@@ -177,9 +177,9 @@ function SignForm(props) {
 				error={error.sign}
 			/>
 
-			{!!token &&<Form.Button loading={loading} error={error.non_field_errors}>
+			<Form.Button loading={loading} error={error.non_field_errors}>
 				Submit
-			</Form.Button>}
+			</Form.Button>
 			{success && <div>Success!</div>}
 		</Form>
 	);
