@@ -13,7 +13,14 @@ class LoggingThrottle(throttling.BaseThrottle):
         method = request._request.method
         path = request._request.path
 
-        if path.startswith('/stats/') or path.startswith('/lockout/'):
+        if method == 'OPTIONS':
+            return True
+
+        if path.startswith('/lockout/'):
+            return True
+        elif path == '/stats/sign/':
+            pass
+        elif path.startswith('/stats/'):
             return True
 
         if request.data:
