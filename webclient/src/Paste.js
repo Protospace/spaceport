@@ -41,7 +41,7 @@ function PasteForm(props) {
 		<Form onSubmit={handleSubmit}>
 			<Form.TextArea
 				maxLength={20000}
-				rows={20}
+				rows={15}
 				{...makeProps('paste')}
 			/>
 
@@ -49,6 +49,91 @@ function PasteForm(props) {
 				Submit
 			</Form.Button>}
 			{success && <div>Success!</div>}
+		</Form>
+	);
+};
+
+function LabelForm(props) {
+	const [error, setError] = useState(false);
+	const [input, setInput] = useState({ id: '107', size: '2' });
+	const [label, setLabel] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const [success, setSuccess] = useState(false);
+
+	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
+	const handleChange = (e) => handleValues(e, e.currentTarget);
+
+	const handleSubmit = (e) => {
+		if (loading) return;
+		setLoading(true);
+		fetch('https://decalator-proxy.dns.t0.vc/?' + new URLSearchParams(input))
+		.then(res => {
+			if (res.ok) {
+				return res.blob();
+			} else {
+				return res.text().then(text => {throw new Error(text)});
+			}
+		})
+		.then(res => {
+			setLoading(false);
+			setSuccess(true);
+			setError(false);
+			const imageObjectURL = URL.createObjectURL(res);
+			setLabel(imageObjectURL);
+		})
+		.catch(err => {
+			setLabel(false);
+			setLoading(false);
+			console.log(err);
+			setError(err);
+		});
+	};
+
+	const makeProps = (name) => ({
+		name: name,
+		onChange: handleChange,
+		value: input[name] || '',
+	});
+
+	const sizeOptions = [
+		{ key: '0', text: '1.0', value: '1' },
+		{ key: '1', text: '1.5', value: '1.5' },
+		{ key: '2', text: '2.0', value: '2' },
+		{ key: '3', text: '2.5', value: '2.5' },
+		{ key: '4', text: '3.0', value: '3' },
+		{ key: '5', text: '3.5', value: '3.5' },
+		{ key: '6', text: '4.0', value: '4' },
+	];
+
+	return (
+		<Form onSubmit={handleSubmit} error={!!error}>
+			<Form.Group widths='equal'>
+				<Form.Input
+					fluid
+					label='Wiki ID #'
+					{...makeProps('id')}
+				/>
+
+				<Form.Select
+					fluid
+					label='Size'
+					options={sizeOptions}
+					{...makeProps('size')}
+					onChange={handleValues}
+				/>
+			</Form.Group>
+
+			<Message
+				error
+				header='Label Error'
+				content={error.message}
+			/>
+
+			<Form.Button loading={loading}>
+				Submit
+			</Form.Button>
+
+			{label && <img src={label} />}
 		</Form>
 	);
 };
@@ -73,6 +158,14 @@ export function Paste(props) {
 
 	return (
 		<Container>
+			<Header size='large'>Label Generator</Header>
+
+			<p>Use this to generate QR code labels for tools at Protospace.</p>
+
+			<p>Choose a tool from here: <a href='https://wiki.protospace.ca/Category:Tools' target='_blank'>https://wiki.protospace.ca/Category:Tools</a></p>
+
+			<LabelForm />
+
 			<Header size='large'>Transporter</Header>
 
 			<p>

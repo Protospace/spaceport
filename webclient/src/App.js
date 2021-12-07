@@ -167,9 +167,9 @@ function App() {
 								to='/classes'
 							/>
 							<Dropdown.Item
-								content='Transporter'
+								content='Utilities'
 								as={Link}
-								to='/paste'
+								to='/utils'
 							/>
 							<Dropdown.Item
 								content='Charts'
@@ -215,7 +215,7 @@ function App() {
 						<PasswordReset />
 					</Route>
 
-					<Route path='/paste'>
+					<Route path='/utils'>
 						<Paste token={token} />
 					</Route>
 
