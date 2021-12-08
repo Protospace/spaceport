@@ -16,6 +16,7 @@ import { Training } from './Training.js';
 import { AdminTransactions } from './AdminTransactions.js';
 import { Admin } from './Admin.js';
 import { Paste } from './Paste.js';
+import { Sign } from './Sign.js';
 import { Courses, CourseDetail } from './Courses.js';
 import { Classes, ClassDetail } from './Classes.js';
 import { Members, MemberDetail } from './Members.js';
@@ -217,6 +218,10 @@ function App() {
 
 					<Route path='/utils'>
 						<Paste token={token} />
+					</Route>
+
+					<Route path='/sign'>
+						<Sign token={token} />
 					</Route>
 
 					<Route path='/charts'>
