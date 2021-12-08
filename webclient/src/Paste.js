@@ -66,7 +66,7 @@ function LabelForm(props) {
 	const handleSubmit = (e) => {
 		if (loading) return;
 		setLoading(true);
-		fetch('https://decalator-proxy.dns.t0.vc/?' + new URLSearchParams(input))
+		fetch('https://labels.protospace.ca/?' + new URLSearchParams(input))
 		.then(res => {
 			if (res.ok) {
 				return res.blob();
