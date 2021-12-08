@@ -22,13 +22,6 @@ def get_object_owner(obj):
     if getattr(obj, 'instructor', False):
         return full_name(obj.instructor.member), obj.instructor.member.id
 
-    if getattr(obj, 'member_id', False):
-        try:
-            member = models.Member.objects.get(id=obj.member_id)
-            return full_name(member), member.id
-        except models.Member.DoesNotExist:
-            pass
-
     return 'Protospace', 0
 
 @receiver(post_create_historical_record, dispatch_uid='create_hist')
