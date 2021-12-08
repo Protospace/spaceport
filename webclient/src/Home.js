@@ -7,6 +7,7 @@ import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Me
 import { statusColor, BasicTable, siteUrl, staticUrl, requester, isAdmin } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 import { AccountForm } from './Account.js';
+import { SignForm } from './Sign.js';
 import { PayPalSubscribeDeal } from './PayPal.js';
 
 function MemberInfo(props) {
@@ -202,9 +203,6 @@ export function Home(props) {
 				</Grid.Column>
 				<Grid.Column>
 					<Segment>
-						<Header size='medium'>Home</Header>
-						<p>Welcome to the Protospace member portal! Here you can view member info, join classes, and manage your membership.</p>
-
 						<Header size='medium'>Quick Links</Header>
 						<p><a href='http://protospace.ca/' target='_blank' rel='noopener noreferrer'>Main Website</a></p>
 						<p><a href='http://wiki.protospace.ca/Welcome_to_Protospace' target='_blank' rel='noopener noreferrer'>Protospace Wiki</a> — <Link to='/auth/wiki'>[register]</Link></p>
@@ -279,10 +277,26 @@ export function Home(props) {
 								} trigger={<a>[more]</a>} />
 							</p>
 
+							<p>
+								Precix availability: {getTrackStat('CNC-PRECIX')} <Popup content={
+									<React.Fragment>
+										<p>
+											Last use:<br />
+											{getTrackLast('CNC-PRECIX')}<br />
+											{getTrackAgo('CNC-PRECIX')}<br />
+											by {getTrackName('CNC-PRECIX')}
+										</p>
+									</React.Fragment>
+								} trigger={<a>[more]</a>} />
+							</p>
+
 							{user && <p>Alarm status: {alarmStat()}{doorOpenStat()}</p>}
 						</div>
 
+						<SignForm token={token} />
+
 					</Segment>
+
 				</Grid.Column>
 			</Grid>
 		</Container>

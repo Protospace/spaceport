@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404, redirect
 from django.db import transaction
-from django.db.models import Max, F
+from django.db.models import Max, F, Count
 from django.db.utils import OperationalError
 from django.http import HttpResponse, Http404, FileResponse
 from django.core.files.base import File
@@ -43,7 +43,7 @@ Create = mixins.CreateModelMixin
 Update = mixins.UpdateModelMixin
 Destroy = mixins.DestroyModelMixin
 
-NUM_SEARCH_RESULTS = 20
+NUM_RESULTS = 100
 
 
 class SearchViewSet(Base, Retrieve):
@@ -79,54 +79,57 @@ class SearchViewSet(Base, Retrieve):
 
             if len(results) == 0 and len(search) >= 3 and '@' not in search:
                 # then get fuzzy matches, but not for emails
-                fuzzy_results = process.extract(search, choices, limit=NUM_SEARCH_RESULTS, scorer=fuzz.token_set_ratio)
+                fuzzy_results = process.extract(search, choices, limit=20, scorer=fuzz.token_set_ratio)
                 results += [x[0] for x in fuzzy_results]
 
             # remove dupes, truncate list
-            results = list(OrderedDict.fromkeys(results))[:NUM_SEARCH_RESULTS]
+            results = list(OrderedDict.fromkeys(results))[:20]
 
             result_ids = [search_strings[x] for x in results]
             result_objects = [queryset.get(id=x) for x in result_ids]
 
             queryset = result_objects
             logging.info('Search for: {}, results: {}'.format(search, len(queryset)))
-        elif self.action == 'create' and sort == 'recently_vetted':
-            utils.gen_search_strings() # update cache
-            queryset = queryset.order_by('-vetted_date')
-        elif self.action == 'create' and sort == 'newest_active':
-            queryset = queryset.filter(paused_date__isnull=True)
-            queryset = queryset.order_by('-application_date')
-        elif self.action == 'create' and sort == 'newest_overall':
-            queryset = queryset.order_by('-application_date')
-        elif self.action == 'create' and sort == 'oldest_active':
-            queryset = queryset.filter(paused_date__isnull=True)
-            queryset = queryset.order_by('application_date')
-        elif self.action == 'create' and sort == 'oldest_overall':
-            queryset = queryset.filter(application_date__isnull=False)
-            queryset = queryset.order_by('application_date')
-        elif self.action == 'create' and sort == 'recently_inactive':
-            queryset = queryset.filter(paused_date__isnull=False)
-            queryset = queryset.order_by('-paused_date')
-        elif self.action == 'create' and sort == 'is_director':
-            queryset = queryset.filter(is_director=True)
-            queryset = queryset.order_by('application_date')
-        elif self.action == 'create' and sort == 'is_instructor':
-            queryset = queryset.filter(is_instructor=True)
-            queryset = queryset.order_by('application_date')
-        elif self.action == 'create' and sort == 'due':
-            queryset = queryset.filter(status='Due')
-            queryset = queryset.order_by('expire_date')
-        elif self.action == 'create' and sort == 'overdue':
-            queryset = queryset.filter(status='Overdue')
-            queryset = queryset.order_by('expire_date')
-        elif self.action == 'create' and sort == 'last_scanned':
-            if self.request.user.member.allow_last_scanned:
-                queryset = queryset.filter(allow_last_scanned=True)
-                queryset = queryset.order_by('-user__cards__last_seen')
-            else:
+        elif self.action == 'create':
+            if sort == 'recently_vetted':
+                queryset = queryset.filter(vetted_date__isnull=False)
+                queryset = queryset.order_by('-vetted_date')
+            elif sort == 'newest_active':
+                queryset = queryset.filter(paused_date__isnull=True)
+                queryset = queryset.order_by('-application_date')
+            elif sort == 'newest_overall':
+                queryset = queryset.order_by('-application_date')
+            elif sort == 'oldest_active':
+                queryset = queryset.filter(paused_date__isnull=True)
+                queryset = queryset.order_by('application_date')
+            elif sort == 'oldest_overall':
+                queryset = queryset.filter(application_date__isnull=False)
+                queryset = queryset.order_by('application_date')
+            elif sort == 'recently_inactive':
+                queryset = queryset.filter(paused_date__isnull=False)
+                queryset = queryset.order_by('-paused_date')
+            elif sort == 'is_director':
+                queryset = queryset.filter(is_director=True)
+                queryset = queryset.order_by('application_date')
+            elif sort == 'is_instructor':
+                queryset = queryset.filter(is_instructor=True)
+                queryset = queryset.order_by('application_date')
+            elif sort == 'due':
+                queryset = queryset.filter(status='Due')
+                queryset = queryset.order_by('expire_date')
+            elif sort == 'overdue':
+                queryset = queryset.filter(status='Overdue')
+                queryset = queryset.order_by('expire_date')
+            elif sort == 'last_scanned':
+                if self.request.user.member.allow_last_scanned:
+                    queryset = queryset.filter(allow_last_scanned=True)
+                    queryset = queryset.order_by('-user__cards__last_seen')
+                else:
+                    queryset = []
+            elif sort == 'everyone':
+                queryset = queryset.annotate(Count('user__transactions')).order_by('-user__transactions__count')
+            elif sort == 'best_looking':
                 queryset = []
-        elif self.action == 'create' and sort == 'best_looking':
-            queryset = []
 
         return queryset
 
@@ -139,19 +142,19 @@ class SearchViewSet(Base, Retrieve):
             seq = 0
 
         search = self.request.data.get('q', '').lower()
-        if search:
-            num_results = NUM_SEARCH_RESULTS
-        else:
-            num_results = 100
+        page = self.request.data.get('page', 0)
+        queryset = self.get_queryset()
+        total = len(queryset)
 
-        queryset = self.get_queryset()[:num_results]
+        start = int(page) * NUM_RESULTS - 80
+        queryset = queryset[max(start,0):start+NUM_RESULTS]
 
         if self.request.user.member.vetted_date:
             serializer = serializers.VettedSearchSerializer(queryset, many=True)
         else:
             serializer = serializers.SearchSerializer(queryset, many=True)
 
-        return Response({'seq': seq, 'results': serializer.data})
+        return Response({'seq': seq, 'results': serializer.data, 'total': total})
 
 
 class MemberViewSet(Base, Retrieve, Update):
@@ -168,11 +171,13 @@ class MemberViewSet(Base, Retrieve, Update):
         member = serializer.save()
         utils.tally_membership_months(member)
         utils.gen_member_forms(member)
+        utils.gen_search_strings()
 
     def perform_update(self, serializer):
         member = serializer.save()
         utils.tally_membership_months(member)
         utils.gen_member_forms(member)
+        utils.gen_search_strings()
 
     @action(detail=True, methods=['post'])
     def pause(self, request, pk=None):
@@ -427,16 +432,13 @@ class PingView(views.APIView):
     permission_classes = [AllowMetadata | IsAuthenticated]
 
     def post(self, request):
-        d = request.data.dict()
-        if d:
-            logger.info(str(d))
         return Response(200)
 
 
 class DoorViewSet(viewsets.ViewSet, List):
     def list(self, request):
         auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-        if auth_token != 'Bearer ' + secrets.DOOR_API_TOKEN:
+        if secrets.DOOR_API_TOKEN and auth_token != 'Bearer ' + secrets.DOOR_API_TOKEN:
             raise exceptions.PermissionDenied()
 
         cards = models.Card.objects.filter(active_status='card_active')
@@ -462,7 +464,7 @@ class DoorViewSet(viewsets.ViewSet, List):
 
         member = card.user.member
         t = utils.now_alberta_tz().strftime('%Y-%m-%d %H:%M:%S, %a %I:%M %p')
-        logger.info('Time: {} - Name: {} {} ({})'.format(t, member.first_name, member.last_name, member.id))
+        logger.info('Scan - Time: {} | Name: {} {} ({})'.format(t, member.first_name, member.last_name, member.id))
 
         utils_stats.calc_card_scans()
 
@@ -472,7 +474,7 @@ class DoorViewSet(viewsets.ViewSet, List):
 class LockoutViewSet(viewsets.ViewSet, List):
     def list(self, request):
         auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-        if auth_token != 'Bearer ' + secrets.DOOR_API_TOKEN:
+        if secrets.DOOR_API_TOKEN and auth_token != 'Bearer ' + secrets.DOOR_API_TOKEN:
             raise exceptions.PermissionDenied()
 
         cards = models.Card.objects.filter(active_status='card_active')
@@ -552,6 +554,24 @@ class StatsViewSet(viewsets.ViewSet, List):
             raise exceptions.ValidationError(dict(data='Invalid float.'))
         except KeyError:
             raise exceptions.ValidationError(dict(data='This field is required.'))
+
+    @action(detail=False, methods=['post'])
+    def sign(self, request):
+        try:
+            sign = request.data['sign']
+            cache.set('sign', sign)
+
+            if secrets.SIGN_TOKEN:
+                try:
+                    post_data = dict(access_token=secrets.SIGN_TOKEN, args=sign)
+                    r = requests.post('https://api.particle.io/v1/devices/200042000647343232363230/text/', data=post_data, timeout=5)
+                    r.raise_for_status()
+                except:
+                    raise exceptions.ValidationError(dict(sign='Something went wrong :('))
+
+            return Response(200)
+        except KeyError:
+            raise exceptions.ValidationError(dict(sign='This field is required.'))
 
     @action(detail=False, methods=['post'])
     def alarm(self, request):
@@ -635,7 +655,7 @@ class BackupView(views.APIView):
         backup_user = secrets.BACKUP_TOKENS.get(auth_token, None)
 
         if backup_user:
-            logger.info('Backup user: ' + backup_user['name'])
+            logger.info('Backup - User: ' + backup_user['name'])
             backup_path = cache.get(backup_user['cache_key'], None)
 
             if not backup_path:
@@ -719,15 +739,6 @@ class VettingViewSet(Base, List):
 
 class RegistrationView(RegisterView):
     serializer_class = serializers.MyRegisterSerializer
-
-    def post(self, request):
-        data = request.data.copy()
-        data.pop('password1', None)
-        data.pop('password2', None)
-        logger.info(dict(data))
-
-        return super().post(request)
-
 
 class PasswordChangeView(PasswordChangeView):
     permission_classes = [AllowMetadata | IsAuthenticated]

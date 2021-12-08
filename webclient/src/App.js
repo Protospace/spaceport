@@ -16,6 +16,7 @@ import { Training } from './Training.js';
 import { AdminTransactions } from './AdminTransactions.js';
 import { Admin } from './Admin.js';
 import { Paste } from './Paste.js';
+import { Sign } from './Sign.js';
 import { Courses, CourseDetail } from './Courses.js';
 import { Classes, ClassDetail } from './Classes.js';
 import { Members, MemberDetail } from './Members.js';
@@ -167,9 +168,9 @@ function App() {
 								to='/classes'
 							/>
 							<Dropdown.Item
-								content='Transporter'
+								content='Utilities'
 								as={Link}
-								to='/paste'
+								to='/utils'
 							/>
 							<Dropdown.Item
 								content='Charts'
@@ -215,8 +216,12 @@ function App() {
 						<PasswordReset />
 					</Route>
 
-					<Route path='/paste'>
+					<Route path='/utils'>
 						<Paste token={token} />
+					</Route>
+
+					<Route path='/sign'>
+						<Sign token={token} />
 					</Route>
 
 					<Route path='/charts'>

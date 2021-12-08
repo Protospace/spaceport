@@ -69,7 +69,7 @@ def post_create_historical_record_callback(
                 is_admin=is_admin_director(history_user),
             )
 
-            for change in changes:
+            for num, change in enumerate(changes):
                 change_old = str(change.old)
                 change_new = str(change.new)
 
@@ -84,6 +84,18 @@ def post_create_historical_record_callback(
                     old=change_old,
                     new=change_new,
                 )
+
+                logger.info('History - {} changed {}\'s {} {}/{}: {} "{}" --> "{}"'.format(
+                    history_user or 'System',
+                    owner[0],
+                    object_name,
+                    num+1,
+                    len(changes),
+                    change.field,
+                    change_old,
+                    change_new,
+                ))
+
     except BaseException as e:
         logger.error('History Signal - {} - {}'.format(e.__class__.__name__, e))
         logger.info(str(sender))

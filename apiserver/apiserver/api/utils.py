@@ -146,6 +146,8 @@ def gen_search_strings():
     '''
     Generate a cache dict of names to member ids for rapid string matching
     '''
+    start = time.time()
+
     search_strings = {}
     for m in models.Member.objects.order_by('-expire_date'):
         string = '{} {} | {} {}'.format(
@@ -161,6 +163,8 @@ def gen_search_strings():
         string = string.lower()
         search_strings[string] = m.id
     cache.set('search_strings', search_strings)
+
+    logger.info('Generated search strings in %s s.', time.time() - start)
 
 
 LARGE_SIZE = 1080
@@ -317,9 +321,9 @@ def create_new_member(data, user):
 
     models.Member.objects.create(
         user=user,
-        first_name=data['first_name'].title(),
-        last_name=data['last_name'].title(),
-        preferred_name=data['first_name'].title(),
+        first_name=data['first_name'].title().strip(),
+        last_name=data['last_name'].title().strip(),
+        preferred_name=data['first_name'].title().strip(),
     )
 
 def register_user(data, user):

@@ -16,11 +16,12 @@ const memberSorts = {
 	//newest_overall: 'Newest Overall',
 	oldest_active: 'Oldest',
 	//oldest_overall: 'Oldest Overall',
-	recently_inactive: 'Inactive',
+	recently_inactive: 'Recently Inactive',
 	is_director: 'Directors',
 	is_instructor: 'Instructors',
 	due: 'Due',
 	overdue: 'Overdue',
+	everyone: 'Everyone',
 };
 
 export function MembersDropdown(props) {
@@ -65,28 +66,94 @@ export function MembersDropdown(props) {
 	);
 };
 
-let numShowCache = 20;
+let responseCache = false;
+let pageCache = 0;
+let sortCache = '';
+let searchCache = '';
+
+const loadMoreStrings = [
+	'Load More',
+	'Load EVEN More',
+	'Load WAY More',
+	'Why did you stop? LOAD MORE!',
+	'GIVE ME MORE NAMES!!',
+	'Shower me with names, baby',
+	'I don\'t care about the poor server, MORE NAMES!',
+	'Names make me hotter than two rats in a wool sock',
+	'Holy shit, I can\'t get enough names',
+	'I don\'t have anything better to do than LOAD NAMES!',
+	'I need names because I love N̶a̸M̸E̵S̴ it\'s not to late to stop but I can\'t because it feels so good god help me',
+	'The One who loads the names will liquify the NERVES of the sentient whilst I o̴̭̐b̴̙̾s̷̺͝ē̶̟r̷̦̓v̸͚̐ę̸̈́ ̷̞̒t̸͘ͅh̴͂͜e̵̜̕i̶̾͜r̷̃͜ ̵̹͊Ḷ̷͝Ȍ̸͚Ä̶̘́D̴̰́I̸̧̚N̵͖̎G̷̣͒',
+	'The Song of Names will will e̶̟̤͋x̷̜̀͘͜t̴̳̀i̸̪͑̇n̷̘̍g̵̥̗̓ṳ̴̑̈́i̷͚̿s̸̨̪̓ḣ̶̡̓ ̷̲͊ṫ̴̫h̸̙͕͗ḛ̸̡̃̈́ ̷̘̫̉̏v̸̧̟͗̕o̴͕̾͜i̷̢͛̿ͅc̴͕̥̈́̂ȅ̵͕s̶̹͋̀ ̶̰́͜͠ǒ̷̰̯f̵̛̥̊ ̸̟̟̒͝m̸̯̀̂o̶̝͛̌͜r̸̞̀ṫ̴̥͗ä̶̢́l̶̯̄͘ ̵̫̈́m̷̦̑̂ą̶͕͝ṋ̴̎͝ from the sphere I can see it can you see it it is beautiful',
+	'The final suffering of T̷̯̂͝H̴̰̏̉Ḛ̸̀̓ ̷̟̒ͅN̷̠̾Ą̵̟̈́M̶̡̾͝E̸̥̟̐͐S̸̖̍ are lies all is lost the pony he come h̷̲̺͂̾͒̔͝ḙ̶̻͒͠ ̷̙̘͈̬̰̽̽̈́̒͘c̵͎̺̞̰͝ơ̷͚̱̺̰̺͐̏͑͠m̴̖̰̓̈͝ĕ̷̜s̶̛̹̤̦͉̓͝ the í̵̠̞̙̦̱̠̅̊͒̌͊̓͠͠c̴̻̺̙͕̲͚͔̩̥͑ḩ̷̦̰̠̯̳̖̘́̉̾̾͠o̴͈̯̟̣̲͙̦̖̖͍̞̞̻̎͐̊͊̇͋̒͛̅͆̌͂̈̕r̷̡̝̲̜͇͉̣̹̖͕̻̐̑̉̋͋̉͒͋̍́̒͐͐͘ͅ ̵̳̖͕̩̝̮͈̻̣̤͎̟͓̜̄̿̓̈́p̴̰̝͓̣͍̫̞͓̑͌͊͑̓̂̽͑͝e̶̛̪̜̐̋́̆͊͌̋̄́͘r̶̫̬͈͌̔̽m̶̛̱̣͍͌̈́͋̾̈̀͑̽̋̏̊͋͝ę̶̋̀̈̃͠ą̵̡̣̫̮͙͈͚̞̰̠̥͇̣̽̿̉́̔̒͌̓͌̂̌̕͜͠t̷̯͚̭̮̠̐͋͆́͛̿́̏̆̚ě̶̢̨̩̞ş̸̢͍̱̻͕̪̗̻͖͇̱̳̽̈́̚͠ ̴͉̝̖̤͚̖̩̻̪̒ͅà̸̙̥̩̠̝̪̰͋́̊̓͌́͒̕͝ĺ̵̖̖͚̱͎̤̟̲̺͎͑͋̐̈́̓͂͆̅̈́̎̆̋̇l̸̢̧̟͉̞͇̱͉̙͇͊̏͐͠ͅ',
+];
 
 export function Members(props) {
-	const history = useHistory();
-	const qs = useLocation().search;
-	const params = new URLSearchParams(qs);
-	const sort = params.get('sort') || 'recently_vetted';
-	const search = params.get('q') || '';
-
-	const [response, setResponse] = useState(false);
-	const [numShow, setNumShow] = useState(numShowCache);
+	const [response, setResponse] = useState(responseCache);
+	const [loading, setLoading] = useState(false);
+	const [page, setPage] = useState(pageCache);
+	const [sort, setSort] = useState(sortCache);
+	const [search, setSearch] = useState(searchCache);
 	const [controller, setController] = useState(false);
 	const { token, user } = props;
 
-	const doSearch = (q) => {
-		console.log('doing search', q);
-		if (q.length) {
-			const qs = queryString.stringify({ 'q': q });
-			history.replace('/members?' + qs);
+	const makeRequest = ({loadPage, q, sort_key}) => {
+		let pageNum = 0;
+		if (loadPage) {
+			pageNum = page + 1;
+			setPage(pageNum);
+			pageCache = pageNum;
 		} else {
 			setResponse(false);
-			history.replace('/members');
+			setPage(0);
+			pageCache = 0;
+		}
+
+		if (controller) {
+			controller.abort();
+		}
+		const ctl = new AbortController();
+		setController(ctl);
+		const signal = ctl.signal;
+
+		const data = {page: pageNum};
+		if (q) data.q = q;
+		if (sort_key) data.sort = sort_key;
+
+		requester('/search/', 'POST', token, data, signal)
+		.then(res => {
+			const r = loadPage ? {...response, results: [...response.results, ...res.results]} : res;
+			setResponse(r);
+			responseCache = r;
+			setLoading(false);
+		})
+		.catch(err => {
+			console.log('Aborted.');
+		});
+	}
+
+	const loadMore = () => {
+		setLoading(true);
+		makeRequest({loadPage: true, q: search, sort_key: sort});
+	};
+
+	const doSort = (sort_key) => {
+		setSort(sort_key);
+		sortCache = sort_key;
+		setSearch('');
+		searchCache = '';
+		makeRequest({loadPage: false, sort_key: sort_key});
+	};
+
+	const doSearch = (q) => {
+		if (q) {
+			setSearch(q);
+			searchCache = q;
+			setSort('');
+			sortCache = '';
+			makeRequest({loadPage: false, q: q});
+		} else {
+			doSort('recently_vetted');
 		}
 	};
 
@@ -96,26 +163,10 @@ export function Members(props) {
 	};
 
 	useEffect(() => {
-		if (controller) {
-			controller.abort();
+		if (!responseCache) {
+			doSort('recently_vetted');
 		}
-		const ctl = new AbortController();
-		setController(ctl);
-		const signal = ctl.signal;
-
-		const data = {q: search, sort: sort};
-		requester('/search/', 'POST', token, data, signal)
-		.then(res => {
-			setResponse(res);
-		})
-		.catch(err => {
-			;
-		});
-	}, [search, sort]);
-
-	useEffect(() => {
-		setResponse(false);
-	}, [sort]);
+	}, []);
 
 	return (
 		<Container>
@@ -144,7 +195,7 @@ export function Members(props) {
 				Sort by{' '}
 				{Object.entries(memberSorts).map((x, i) =>
 					<>
-						<Link to={'/members?sort='+x[0]} replace>{x[1]}</Link>
+						<a href='javascript:void(0)' onClick={() => doSort(x[0])}>{x[1]}</a>
 						{i < Object.keys(memberSorts).length - 1 && ', '}
 					</>
 				)}.
@@ -164,9 +215,11 @@ export function Members(props) {
 
 			{response ?
 				<>
+					<p>{response.total} results:</p>
+
 					<Item.Group unstackable divided>
-						{response.results.length ?
-							response.results.slice(0, numShow).map((x, i) =>
+						{!!response.results.length &&
+							response.results.map((x, i) =>
 								<Item key={x.member.id} as={Link} to={'/members/'+x.member.id}>
 									<div className='list-num'>{i+1}</div>
 									<Item.Image size='tiny' src={x.member.photo_small ? staticUrl + '/' + x.member.photo_small : '/nophoto.png'} />
@@ -181,16 +234,11 @@ export function Members(props) {
 									</Item.Content>
 								</Item>
 							)
-						:
-							<p>No Results</p>
 						}
 					</Item.Group>
 
-					{response.results.length > 20 && numShow !== 100 ?
-						<Button
-							content='Load More'
-							onClick={() => {setNumShow(100); numShowCache = 100;}}
-						/> : ''
+					{!search && response.total !== response.results.length &&
+						<Button content={loading ? 'Reticulating splines...' : loadMoreStrings[page]} onClick={loadMore} disabled={loading} />
 					}
 				</>
 			:

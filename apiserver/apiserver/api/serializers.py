@@ -3,6 +3,7 @@ logger = logging.getLogger(__name__)
 
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
+from django.utils.timezone import now
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
@@ -10,7 +11,7 @@ from rest_auth.registration.serializers import RegisterSerializer
 from rest_auth.serializers import PasswordChangeSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer, LoginSerializer
 from rest_auth.serializers import UserDetailsSerializer
 import re
-import time
+import datetime, time
 
 from . import models, fields, utils, utils_ldap, utils_auth, utils_stats
 from .. import settings, secrets
@@ -229,6 +230,20 @@ class MemberSerializer(serializers.ModelSerializer):
                     logger.info(msg)
                     raise ValidationError(dict(discourse_username='Invalid Discourse username.'))
 
+        if validated_data.get('allow_last_scanned', None) == True:
+            changed = validated_data['allow_last_scanned'] != instance.allow_last_scanned
+            ONE_WEEK = now() - datetime.timedelta(days=7)
+            if changed and models.HistoryChange.objects.filter(
+                field='allow_last_scanned',
+                index__history_user__member__id=instance.id,
+                index__owner_id=instance.id,
+                index__history_date__gte=ONE_WEEK,
+            ).count() >= 6:
+                msg = 'Member allow_last_scanned rate limit exceeded by: ' + instance.first_name + ' ' + instance.last_name
+                utils.alert_tanner(msg)
+                logger.info(msg)
+                raise ValidationError(dict(allow_last_scanned='You\'re doing that too often.'))
+
         return super().update(instance, validated_data)
 
 # admin viewing member details
@@ -384,6 +399,7 @@ class CardSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'id',
             'last_seen',
+            'last_seen_at',
             'user',
         ]
 
@@ -536,7 +552,7 @@ class MyRegisterSerializer(RegisterSerializer):
         if re.search(r'[^a-z.]', username):
             raise ValidationError('Invalid characters.')
         if '..' in username:
-            raise ValidationError('Can\'t have double periods.')
+            raise ValidationError('Can\'t have double periods. Remove spaces.')
         if username.startswith('.') or username.endswith('.'):
             raise ValidationError('Can\'t start or end with periods.')
         return super().validate_username(username)

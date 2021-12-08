@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = secrets.DJANGO_SECRET_KEY
+SECRET_KEY = secrets.DJANGO_SECRET_KEY or 'OaOBN2E+brpoRyDMlTD9eTE5PgBtkkl+L7Bzt6pQ5Qr3GS82SH'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG_ENV = os.environ.get('DEBUG', False)
@@ -54,7 +54,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_REFERRER_POLICY = 'same-origin'
-
 
 # Application definition
 
@@ -209,6 +208,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 300,
     'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES,
     'DEFAULT_AUTHENTICATION_CLASSES': DEFAULT_AUTHENTICATION_CLASSES,
+    'DEFAULT_THROTTLE_CLASSES': ['apiserver.api.throttles.LoggingThrottle'],
 }
 
 #DEFAULT_LOGGING = None
@@ -239,7 +239,7 @@ LOGGING = {
     'loggers': {
         'gunicorn': {
             'handlers': ['console'],
-            'level': 'DEBUG',
+            'level': 'DEBUG' if DEBUG else 'INFO',
             'propagate': False,
         },
         '': {

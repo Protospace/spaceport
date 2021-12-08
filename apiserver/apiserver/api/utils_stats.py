@@ -26,6 +26,7 @@ DEFAULTS = {
     'card_scans': 0,
     'track': {},
     'alarm': {},
+    'sign': '',
 }
 
 if secrets.MUMBLE:
@@ -158,7 +159,7 @@ def get_progress(request_id):
     return cache.get('request-progress-' + request_id, [])
 
 def set_progress(request_id, data):
-    logger.info('Request %s progress: %s', request_id, data)
+    logger.info('Progress - ID: %s | Status: %s', request_id, data)
     progress = get_progress(request_id)
     progress.append(data)
     cache.set('request-progress-' + request_id, progress)
