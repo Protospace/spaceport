@@ -558,7 +558,7 @@ class StatsViewSet(viewsets.ViewSet, List):
     @action(detail=False, methods=['post'])
     def sign(self, request):
         try:
-            sign = request.data['sign']
+            sign = request.data['sign'][:500]
             cache.set('sign', sign)
 
             if secrets.SIGN_TOKEN:
