@@ -330,14 +330,14 @@ def process_paypal_ipn(data):
 
     try:
         user = hints.get(account=data['payer_id']).user
-    except hints.DoesNotExist:
+    except models.PayPalHint.DoesNotExist:
         logger.info('IPN - No PayPalHint found for %s', data['payer_id'])
 
     if not user and 'member' in custom_json:
         member_id = custom_json['member']
         try:
             user = members.get(id=member_id).user
-        except members.DoesNotExist:
+        except models.Member.DoesNotExist:
             pass
 
     if not user:
