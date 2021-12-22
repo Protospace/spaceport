@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.utils.timezone import now
 
 from . import models, serializers, utils
+from .. import settings
 
 SANDBOX = False
 if SANDBOX:
@@ -77,6 +78,9 @@ def update_ipn(ipn, status):
     ipn.save()
 
 def verify_paypal_ipn(data):
+    if settings.DEBUG:
+        return True
+
     params = data.copy()
     params['cmd'] = '_notify-validate'
     headers = {
@@ -300,6 +304,7 @@ def process_paypal_ipn(data):
         update_ipn(ipn, 'Missing ID')
         return False
 
+    # TODO: index txn_id?
     if transactions.filter(paypal_txn_id=data['txn_id']).exists():
         logger.info('IPN - Duplicate transaction, ignoring')
         update_ipn(ipn, 'Duplicate')
@@ -321,25 +326,30 @@ def process_paypal_ipn(data):
             )
             return tx
 
-    member = False
-    member_id = False
+    user = False
 
-    if hints.filter(account=data.get('payer_id', False)).exists():
-        member = hints.get(account=data['payer_id']).user.member
+    try:
+        user = hints.get(account=data['payer_id']).user
+    except hints.DoesNotExist:
+        logger.info('IPN - No PayPalHint found for %s', data['payer_id'])
 
-    if not member_id and 'member' in custom_json:
+    if not user and 'member' in custom_json:
         member_id = custom_json['member']
+        try:
+            user = members.get(id=member_id).user
+        except members.DoesNotExist:
+            pass
 
-    if not members.filter(id=member_id).exists():
+    if not user:
         logger.info('IPN - Unable to associate with member, reporting')
         update_ipn(ipn, 'Accepted, Unmatched Member')
         return create_unmatched_member_tx(data)
 
-    member = members.get(id=member_id)
+    member = user.member
 
     hints.update_or_create(
         account=data.get('payer_id', 'unknown'),
-        defaults=dict(user=member.user),
+        defaults=dict(user=user),
     )
 
     if custom_json.get('category', False) in ['Snacks', 'OnAcct', 'Donation']:
