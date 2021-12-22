@@ -310,7 +310,7 @@ export function Transactions(props) {
 
 	return (
 		<Container>
-			<Header size='large'>Transactions</Header>
+			<Header size='large'>Your Transactions</Header>
 
 			<TransactionList noMember noCategory transactions={user.transactions} />
 

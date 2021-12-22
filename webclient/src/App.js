@@ -185,7 +185,7 @@ function App() {
 							/>}
 
 							{user && isAdmin(user) && <Dropdown.Item
-								content='Admin Txs'
+								content='Transactions'
 								as={Link}
 								to='/admintrans'
 							/>}

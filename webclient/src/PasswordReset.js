@@ -132,9 +132,13 @@ function ConfirmForm() {
 				{progress.map(x => <>{x}<br /></>)}
 			</p>
 
-			<Form.Button loading={loading} error={error.non_field_errors}>
-				Submit
-			</Form.Button>
+			{success ?
+				<p><Link to='/'>Return Home</Link> to log in.</p>
+			:
+				<Form.Button loading={loading} error={error.non_field_errors}>
+					Submit
+				</Form.Button>
+			}
 		</Form>
 	);
 };

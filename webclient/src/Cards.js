@@ -17,7 +17,7 @@ export function Cards(props) {
 		<Container>
 			<Header size='large'>Cards / Access</Header>
 
-			<Header size='medium'>Member Cards</Header>
+			<Header size='medium'>Your Cards</Header>
 
 			{user.member.card_photo ?
 				<p>

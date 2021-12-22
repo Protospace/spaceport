@@ -113,13 +113,13 @@ export function Training(props) {
 
 	return (
 		<Container>
-			<Header size='large'>Certifications</Header>
+			<Header size='large'>Your Certifications</Header>
 
 			<CertList member={user.member} />
 
 			<p>Certifications are based on the courses you've taken. If there's any errors, please email <a href='mailto:directors@protospace.ca'>directors@protospace.ca</a>.</p>
 
-			<Header size='large'>Training</Header>
+			<Header size='large'>Your Training</Header>
 
 			{user.training.length ?
 				<TrainingList training={user.training} />
