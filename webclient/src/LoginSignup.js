@@ -59,10 +59,7 @@ export function LoginForm(props) {
 				Log In
 			</Form.Button>
 
-			<Message warning>
-				<Message.Header>Forgot your password?</Message.Header>
-				<p><Link to='/password/reset/'>Click here</Link> to reset it.</p>
-			</Message>
+			<p><Link to='/password/reset/'>Forgot Password</Link></p>
 		</Form>
 	);
 };
