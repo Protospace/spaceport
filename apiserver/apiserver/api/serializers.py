@@ -58,7 +58,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         'Reimburse',
         'Other',
     ])
-    member_id = serializers.IntegerField()
+    member_id = serializers.SerializerMethodField()
     member_name = serializers.SerializerMethodField()
     date = serializers.DateField()
     report_type = serializers.ChoiceField([
@@ -81,7 +81,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        member = get_object_or_404(models.Member, id=validated_data['member_id'])
+        member = get_object_or_404(models.Member, id=self.initial_data['member_id'])
         validated_data['user'] = member.user
 
         if validated_data['account_type'] != 'Clearing':
@@ -101,9 +101,13 @@ class TransactionSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        member = get_object_or_404(models.Member, id=validated_data['member_id'])
+        member = get_object_or_404(models.Member, id=self.initial_data['member_id'])
         validated_data['user'] = member.user
         return super().update(instance, validated_data)
+
+    def get_member_id(self, obj):
+        if not obj.user: return None
+        return obj.user.member.id
 
     def get_member_name(self, obj):
         if not obj.user: return 'Unknown'
@@ -385,7 +389,7 @@ class CardSerializer(serializers.ModelSerializer):
         queryset=models.Card.objects.all(),
         message='Card number already exists.'
     )])
-    member_id = serializers.IntegerField()
+    member_id = serializers.SerializerMethodField()
     active_status = serializers.ChoiceField([
         'card_blocked',
         'card_inactive',
@@ -404,12 +408,21 @@ class CardSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        member = get_object_or_404(models.Member, id=validated_data['member_id'])
+        member = get_object_or_404(models.Member, id=self.initial_data['member_id'])
         validated_data['user'] = member.user
 
         if not member.vetted_date:
             raise ValidationError(dict(non_field_errors='Member not vetted yet.'))
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        member = get_object_or_404(models.Member, id=self.initial_data['member_id'])
+        validated_data['user'] = member.user
+        return super().update(instance, validated_data)
+
+    def get_member_id(self, obj):
+        if not obj.user: return None
+        return obj.user.member.id
 
 
 class TrainingSerializer(serializers.ModelSerializer):
