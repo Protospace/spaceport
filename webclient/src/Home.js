@@ -14,8 +14,9 @@ function MemberInfo(props) {
 	const user = props.user;
 	const member = user.member;
 
-	const lastTrans = user.transactions && user.transactions.slice(0,3);
-	const lastCard = user.cards && user.cards.sort((a, b) => a.last_seen < b.last_seen)[0];
+	const lastTrans = user.transactions?.slice(0,3);
+	const lastTrain = user.training?.sort((a, b) => a.session.datetime < b.session.datetime ? 1 : -1).slice(0,3);
+	const lastCard = user.cards?.sort((a, b) => a.last_seen < b.last_seen)[0];
 
 	return (
 		<div>
@@ -47,7 +48,7 @@ function MemberInfo(props) {
 							</Table.Row>
 							<Table.Row>
 								<Table.Cell>Expiry:</Table.Cell>
-								<Table.Cell>{member.expire_date}</Table.Cell>
+								<Table.Cell>{moment(member.expire_date).format('ll')}</Table.Cell>
 							</Table.Row>
 						</Table.Body>
 					</BasicTable>
@@ -82,29 +83,75 @@ function MemberInfo(props) {
 				<QRCode value={siteUrl + '/subscribe?monthly_fees=' + user.member.monthly_fees + '&id=' + user.member.id} />
 			</React.Fragment>}
 
+			<Header size='medium'>Latest Training</Header>
+			<BasicTable>
+				<Table.Body>
+					{lastTrain.length ?
+						lastTrain.map(x =>
+							<Table.Row key={x.id}>
+								<Table.Cell style={{ minWidth: '8rem' }}>
+									<Link to={'/classes/'+x.session.id}>{moment(x.session.datetime).tz('America/Edmonton').format('ll')}</Link>
+								</Table.Cell>
+								<Table.Cell>{x.session.course_data.name}</Table.Cell>
+							</Table.Row>
+						)
+					:
+						<Table.Row><Table.Cell>None, please sign up for an <Link to={'/courses/249/'}>Orientation</Link></Table.Cell></Table.Row>
+					}
+					{user.training.length > 3 && <Link to='/training'>[more]</Link>}
+				</Table.Body>
+			</BasicTable>
+
+			<Header size='medium'>Latest Transactions</Header>
+			<BasicTable>
+				<Table.Body>
+					{lastTrans.length ?
+						lastTrans.map(x =>
+							<Table.Row key={x.id}>
+								<Table.Cell style={{ minWidth: '8rem' }}>
+									<Link to={'/transactions/'+x.id}>{moment(x.date).format('ll')}</Link>
+								</Table.Cell>
+								<Table.Cell>{x.account_type}</Table.Cell>
+								<Table.Cell>${x.amount}</Table.Cell>
+							</Table.Row>
+						)
+					:
+						<Table.Row><Table.Cell>None</Table.Cell></Table.Row>
+					}
+					{user.transactions.length > 3 && <Link to='/transactions'>[more]</Link>}
+				</Table.Body>
+			</BasicTable>
+
 			<Header size='medium'>Details</Header>
 			<BasicTable>
 				<Table.Body>
 					<Table.Row>
 						<Table.Cell>Application:</Table.Cell>
-						<Table.Cell>{member.application_date || 'Unknown'}</Table.Cell>
+						<Table.Cell>{moment(member.application_date).format('ll') || 'Unknown'}</Table.Cell>
 					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Start:</Table.Cell>
-						<Table.Cell>{member.current_start_date || 'Unknown'}</Table.Cell>
+						<Table.Cell>{moment(member.current_start_date).format('ll') || 'Unknown'}</Table.Cell>
 					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Vetted:</Table.Cell>
-						<Table.Cell>{member.vetted_date || 'Not vetted'}</Table.Cell>
+						<Table.Cell>{moment(member.vetted_date).format('ll') || 'Not vetted'}</Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Cell>Monthly:</Table.Cell>
-						<Table.Cell>${member.monthly_fees || 'Unknown'}</Table.Cell>
+						<Table.Cell>Monthly dues:</Table.Cell>
+						<Table.Cell>${member.monthly_fees || 'Unknown'}.00</Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Cell>Card Number:</Table.Cell>
+						<Table.Cell>Last scan:</Table.Cell>
 						<Table.Cell>
-							{lastCard && lastCard.card_number || 'None'}
+							{lastCard && lastCard.last_seen ?
+								lastCard.last_seen > '2021-11-14T02:01:35.415685Z' ?
+									moment.utc(lastCard.last_seen).tz('America/Edmonton').format('lll')
+								:
+									moment.utc(lastCard.last_seen).tz('America/Edmonton').format('ll')
+							:
+								'Unknown'
+							}
 							{user.cards.length > 1 && <Link to='/cards'> [more]</Link>}
 						</Table.Cell>
 					</Table.Row>
@@ -116,25 +163,6 @@ function MemberInfo(props) {
 					View application forms
 				</a>
 			</p>}
-
-			<Header size='medium'>Latest Transactions</Header>
-			<BasicTable>
-				<Table.Body>
-					{lastTrans.length ?
-						lastTrans.map(x =>
-							<Table.Row key={x.id}>
-								<Table.Cell>
-									<Link to={'/transactions/'+x.id}>{x.date}</Link>
-								</Table.Cell>
-								<Table.Cell>{x.account_type}</Table.Cell>
-								<Table.Cell>${x.amount}</Table.Cell>
-							</Table.Row>
-						)
-					:
-						<Table.Row><Table.Cell>None</Table.Cell></Table.Row>
-					}
-				</Table.Body>
-			</BasicTable>
 		</div>
 	);
 };

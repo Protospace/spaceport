@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
+import moment from 'moment-timezone';
 import ReactToPrint from 'react-to-print';
 import './light.css';
 import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
@@ -279,8 +280,8 @@ export function TransactionList(props) {
 				{transactions.length ?
 					transactions.slice().sort((a, b) => a.date < b.date ? 1 : -1).map(x =>
 						<Table.Row key={x.id}>
-							<Table.Cell>
-								<Link to={'/transactions/'+x.id}>{x.date}</Link>
+							<Table.Cell style={{ minWidth: '8rem' }}>
+								<Link to={'/transactions/'+x.id}>{moment(x.date).format('ll')}</Link>
 							</Table.Cell>
 							{!noMember && <Table.Cell>
 								{x.member_id ?

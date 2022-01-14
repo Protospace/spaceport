@@ -36,7 +36,7 @@ export function Cards(props) {
 							<Table.Row>
 								<Table.HeaderCell>Number</Table.HeaderCell>
 								<Table.HeaderCell>Notes</Table.HeaderCell>
-								<Table.HeaderCell>Last Seen</Table.HeaderCell>
+								<Table.HeaderCell>Last Scan</Table.HeaderCell>
 								<Table.HeaderCell>Active</Table.HeaderCell>
 							</Table.Row>
 						</Table.Header>
