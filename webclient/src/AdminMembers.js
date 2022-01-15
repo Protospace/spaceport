@@ -427,11 +427,6 @@ export function AdminMemberForm(props) {
 				/>
 
 				<Form.Input
-					label='Application Date'
-					{...makeProps('application_date')}
-				/>
-
-				<Form.Input
 					label='Current Start Date'
 					{...makeProps('current_start_date')}
 				/>
@@ -502,9 +497,15 @@ export function AdminMemberInfo(props) {
 					</Table.Row>
 
 					<Table.Row>
+						<Table.Cell>Application Date:</Table.Cell>
+						<Table.Cell>{member.application_date}</Table.Cell>
+					</Table.Row>
+
+					<Table.Row>
 						<Table.Cell>Expire Date:</Table.Cell>
 						<Table.Cell>{member.expire_date}</Table.Cell>
 					</Table.Row>
+
 					{member.paused_date && <Table.Row>
 						<Table.Cell>Paused Date:</Table.Cell>
 						<Table.Cell>{member.paused_date}</Table.Cell>
@@ -535,11 +536,6 @@ export function AdminMemberInfo(props) {
 					<Table.Row>
 						<Table.Cell>Emergency Contact Phone:</Table.Cell>
 						<Table.Cell>{member.emergency_contact_phone || 'None'}</Table.Cell>
-					</Table.Row>
-
-					<Table.Row>
-						<Table.Cell>On Spaceport:</Table.Cell>
-						<Table.Cell>{member.user ? 'Yes' : 'No'}</Table.Cell>
 					</Table.Row>
 
 					<Table.Row>
