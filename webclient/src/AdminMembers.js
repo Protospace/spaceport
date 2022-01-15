@@ -540,7 +540,15 @@ export function AdminMemberInfo(props) {
 
 					<Table.Row>
 						<Table.Cell>Discourse Username:</Table.Cell>
-						<Table.Cell>{member.discourse_username || '?'}</Table.Cell>
+						<Table.Cell>
+							{member.discourse_username ?
+								<a href={'https://forum.protospace.ca/u/' + member.discourse_username + '/summary'} target='_blank'>
+									{member.discourse_username}
+								</a>
+							:
+								'None'
+							}
+						</Table.Cell>
 					</Table.Row>
 
 					<Table.Row>
