@@ -26,11 +26,11 @@ export function TransactionEditor(props) {
 	});
 
 	const accountOptions = [
-		{ key: '0', text: 'Cash (Lock Box)', value: 'Cash' },
-		{ key: '1', text: 'Interac (Email) Transfer (TD)', value: 'Interac' },
-		{ key: '2', text: 'Square (Credit Card)', value: 'Square Pmt' },
+		{ key: '0', text: 'Cash', value: 'Cash' },
+		{ key: '1', text: 'Interac e-Transfer', value: 'Interac' },
+		{ key: '2', text: 'Square', value: 'Square Pmt' },
 		//{ key: '3', text: 'Dream Payments (Debit/Credit)', value: 'Dream Pmt' },
-		{ key: '4', text: 'Cheque / Deposit to TD', value: 'TD Chequing' },
+		{ key: '4', text: 'Cheque', value: 'TD Chequing' },
 		//{ key: '5', text: 'Member Balance / Protocash', value: 'Member' },
 		{ key: '6', text: 'Membership Adjustment / Clearing', value: 'Clearing' },
 		{ key: '7', text: 'PayPal', value: 'PayPal' },
@@ -106,7 +106,7 @@ export function TransactionEditor(props) {
 
 			{ input?.account_type != prevInput?.account_type && input?.account_type == 'PayPal' &&
 				<Message visible warning>
-					<Message.Header>Are you absolutely sure?</Message.Header>
+					<Message.Header>Are you sure?</Message.Header>
 					<p>PayPal transactions should be automatic. Double check there's no duplicate. They may take 24h to appear.</p>
 				</Message>
 			}
