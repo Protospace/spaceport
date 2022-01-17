@@ -48,7 +48,7 @@ function MemberInfo(props) {
 							</Table.Row>
 							<Table.Row>
 								<Table.Cell>Expiry:</Table.Cell>
-								<Table.Cell>{moment(member.expire_date).format('ll')}</Table.Cell>
+								<Table.Cell>{member.expire_date ? moment(member.expire_date).format('ll') : 'Unknown'}</Table.Cell>
 							</Table.Row>
 						</Table.Body>
 					</BasicTable>
@@ -127,15 +127,15 @@ function MemberInfo(props) {
 				<Table.Body>
 					<Table.Row>
 						<Table.Cell>Application:</Table.Cell>
-						<Table.Cell>{moment(member.application_date).format('ll') || 'Unknown'}</Table.Cell>
+						<Table.Cell>{member.application_date ? moment(member.application_date).format('ll') : 'Unknown'}</Table.Cell>
 					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Start:</Table.Cell>
-						<Table.Cell>{moment(member.current_start_date).format('ll') || 'Unknown'}</Table.Cell>
+						<Table.Cell>{member.current_start_date ? moment(member.current_start_date).format('ll') : 'Unknown'}</Table.Cell>
 					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Vetted:</Table.Cell>
-						<Table.Cell>{moment(member.vetted_date).format('ll') || 'Not vetted'}</Table.Cell>
+						<Table.Cell>{member.vetted_date ? moment(member.vetted_date).format('ll') : 'Not vetted'}</Table.Cell>
 					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Monthly dues:</Table.Cell>
@@ -185,14 +185,14 @@ export function Home(props) {
 		});
 	}, [refreshCount, token]);
 
-	const getStat = (x) => stats && stats[x] ? stats[x] : '?';
+	const getStat = (x) => stats && stats[x] ? stats[x] : 'Unknown';
 	const getZeroStat = (x) => stats && stats[x] ? stats[x] : '0';
-	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz('America/Edmonton').format('ll') : '?';
+	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz('America/Edmonton').format('ll') : 'Unknown';
 
 	const mcPlayers = stats && stats['minecraft_players'] ? stats['minecraft_players'] : [];
 	const mumbleUsers = stats && stats['mumble_users'] ? stats['mumble_users'] : [];
 
-	const getTrackStat = (x) => stats && stats.track && stats.track[x] ? moment().unix() - stats.track[x]['time'] > 60 ? 'Free' : 'In Use' : '?';
+	const getTrackStat = (x) => stats && stats.track && stats.track[x] ? moment().unix() - stats.track[x]['time'] > 60 ? 'Free' : 'In Use' : 'Unknown';
 	const getTrackLast = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').format('llll') : 'Unknown';
 	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').fromNow() : '';
 	const getTrackName = (x) => stats && stats.track && stats.track[x] && stats.track[x]['username'] ? stats.track[x]['username'] : 'Unknown';
