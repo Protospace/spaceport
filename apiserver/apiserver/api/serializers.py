@@ -33,20 +33,6 @@ class TransactionSerializer(serializers.ModelSerializer):
         'Clearing',
         'Cash',
     ])
-    info_source = serializers.ChoiceField([
-        'Web',
-        'DB Edit',
-        'System',
-        'Receipt or Stmt',
-        'Quicken Import',
-        'PayPal IPN',
-        'Auto',
-        'Nexus DB Bulk',
-        'IPN Trigger',
-        'Intranet Receipt',
-        'Automatic',
-        'Manual',
-    ])
     category = serializers.ChoiceField([
         'Membership',
         'OnAcct',
@@ -86,7 +72,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
         if validated_data['account_type'] != 'Clearing':
             if validated_data['amount'] == 0:
-                raise ValidationError(dict(account_type='You can\'t have a $0 {} transaction. Do you want "Membership Adjustment"?'.format(validated_data['account_type'])))
+                raise ValidationError(dict(account_type='You can\'t have a $0.00 {} transaction. Do you want "Membership Adjustment"?'.format(validated_data['account_type'])))
             elif validated_data['amount'] < 0.1:
                 raise ValidationError(dict(amount='Don\'t try and trick me.'))
 
