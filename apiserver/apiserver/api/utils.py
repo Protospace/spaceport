@@ -7,6 +7,7 @@ import requests
 import time
 from datetime import datetime, timedelta
 from rest_framework.exceptions import ValidationError
+from rest_framework.views import exception_handler
 from dateutil import relativedelta
 from uuid import uuid4
 from PIL import Image, ImageDraw, ImageFont, ImageOps
@@ -417,3 +418,9 @@ def gen_member_forms(member):
 
     member.member_forms = file_name
     member.save()
+
+def custom_exception_handler(exc, context):
+    response = exception_handler(exc, context)
+    if response is not None:
+        logging.warning('Response: %s', json.dumps(exc.detail))
+    return response
