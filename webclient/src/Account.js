@@ -213,20 +213,28 @@ export function AccountForm(props) {
 		<Form onSubmit={handleSubmit}>
 			<Header size='medium'>Member Details</Header>
 
+			<div className='field'>
+				<label>Username</label>
+				<p>{user.username}</p>
+			</div>
+
 			<Form.Input
 				label='Preferred First Name'
+				autoComplete='off'
 				required
 				{...makeProps('preferred_name')}
 			/>
 
 			<Form.Input
 				label='Email Address'
+				autoComplete='off'
 				required
 				{...makeProps('email')}
 			/>
 
 			<Form.Input
 				label='Phone Number (999) 555-1234'
+				autoComplete='off'
 				required
 				{...makeProps('phone')}
 			/>
@@ -252,15 +260,18 @@ export function AccountForm(props) {
 
 			<Form.Input
 				label='Emergency Contact Name'
+				autoComplete='off'
 				{...makeProps('emergency_contact_name')}
 			/>
 			<Form.Input
 				label='Emergency Contact Phone'
+				autoComplete='off'
 				{...makeProps('emergency_contact_phone')}
 			/>
 
 			{member.discourse_username && <Form.Input
 				label='Discourse Username'
+				autoComplete='off'
 				{...makeProps('discourse_username')}
 			/>}
 

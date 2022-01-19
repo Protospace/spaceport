@@ -73,6 +73,7 @@ export function SignupForm(props) {
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
+	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 
 	const genUsername = () => {
 		if (input.first_name && input.last_name) {
@@ -130,15 +131,17 @@ export function SignupForm(props) {
 				<>
 					<Form.Group widths='equal'>
 						<Form.Input
-							label='First Name'
+							label='Legal First Name'
 							name='first_name'
+							autoComplete='off'
 							fluid
 							onChange={handleChange}
 							error={error.first_name}
 						/>
 						<Form.Input
-							label='Last Name'
+							label='Legal Last Name'
 							name='last_name'
+							autoComplete='off'
 							fluid
 							onChange={handleChange}
 							error={error.last_name}
@@ -146,14 +149,8 @@ export function SignupForm(props) {
 					</Form.Group>
 
 					<Form.Input
-						label='Username'
-						name='username'
-						value={genUsername()}
-						error={error.username}
-						readOnly
-					/>
-					<Form.Input
 						label='Email'
+						autoComplete='off'
 						name='email'
 						onChange={handleChange}
 						error={error.email}
@@ -183,8 +180,16 @@ export function SignupForm(props) {
 						<p>Please do a <Link to='/password/reset'>password reset</Link> instead.</p>
 					</Message>}
 
+					{!!genUsername() &&
+						<div className='field'>
+							<label>Username</label>
+							<p style={{background: 'yellow'}}>{genUsername()}</p>
+						</div>
+					}
+
 					<Form.Input
 						label='Password'
+						autoComplete='new-password'
 						name='password1'
 						type='password'
 						onChange={handleChange}
@@ -192,17 +197,32 @@ export function SignupForm(props) {
 					/>
 					<Form.Input
 						label='Confirm Password'
+						autoComplete='new-password'
 						name='password2'
 						type='password'
 						onChange={handleChange}
 						error={error.password2}
 					/>
 
+					<div className='field'>
+						<label>Please note that payment of your first dues is required with this application</label>
+						<Form.Checkbox
+							label='I am ready to pay'
+							name='ready_to_pay'
+							onChange={handleCheck}
+							checked={input.ready_to_pay}
+						/>
+					</div>
+
 					<p>
 						{progress.map(x => <>{x}<br /></>)}
 					</p>
 
-					<Form.Button loading={loading} error={error.non_field_errors} disabled={input.existing_member !== false}>
+					<Form.Button
+						loading={loading}
+						error={error.non_field_errors}
+						disabled={input.existing_member !== false || !input.ready_to_pay}
+					>
 						Sign Up
 					</Form.Button>
 				</>
