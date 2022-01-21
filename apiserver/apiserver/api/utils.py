@@ -10,7 +10,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.views import exception_handler
 from dateutil import relativedelta
 from uuid import uuid4
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageFont, ImageOps, JpegImagePlugin
+#JpegImagePlugin._getmp = lambda x: None
 from bleach.sanitizer import Cleaner
 from PyPDF2 import PdfFileWriter, PdfFileReader
 from reportlab.pdfgen import canvas
@@ -179,14 +180,16 @@ def process_image_upload(upload, crop):
     try:
         pic = Image.open(upload)
     except OSError:
-        raise serializers.ValidationError('Invalid image file.')
+        raise serializers.ValidationError(dict(photo='Invalid image file.'))
+
+    logging.info('Detected format: %s', pic.format)
 
     if pic.format == 'PNG':
         ext = '.png'
     elif pic.format == 'JPEG':
         ext = '.jpg'
     else:
-        raise serializers.ValidationError('Image must be a jpg or png.')
+        raise serializers.ValidationError(dict(photo='Image must be a jpg or png.'))
 
     pic = ImageOps.exif_transpose(pic)
 
