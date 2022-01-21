@@ -18,9 +18,35 @@
 
 		<title>Protospace Member Portal</title>
 
+		<style>
+			body {
+				background: black;
+			}
+			.htmlmessage {
+				margin: 1rem;
+				padding: 1rem;
+				position: absolute;
+				background: black;
+				color: white;
+				animation: showMessage 0s 2s forwards;
+				opacity: 0;
+			}
+
+			@keyframes showMessage {
+				to { opacity: 1; }
+			}
+		</style>
 	</head>
 	<body>
-		<noscript style="background: white">You need to enable JavaScript to run this app.</noscript>
+		<div class="htmlmessage">
+			<h1>Spaceport</h1>
+			<p>If you are reading this message, there's been an error.</p>
+			<noscript><p>You need to enable JavaScript to run this app.</p></noscript>
+			<p>
+				Try refreshing the page. If that doesn't work,<br/>
+				please contact Tanner (protospace@tannercollin.com) for help.
+			</p>
+		</div>
 		<div id="root"></div>
 		<!--
 			This HTML file is a template.
