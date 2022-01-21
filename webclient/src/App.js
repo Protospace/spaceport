@@ -27,6 +27,8 @@ import { PasswordReset, ConfirmReset } from './PasswordReset.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { Footer } from './Footer.js';
 
+const APP_VERSION = 1;  // TODO: automate this
+
 function App() {
 	const [token, setToken] = useState(localStorage.getItem('token', ''));
 	const [user, setUser] = useState(JSON.parse(localStorage.getItem('user', 'false')));
@@ -97,6 +99,11 @@ function App() {
 		const darkmode = new Darkmode(options);
 		darkmode.showWidget();
 	}, []);
+
+	if (user && user?.app_version !== APP_VERSION) {
+		setUserCache(false);
+		window.location.reload();
+	}
 
 	return (
 		<div>

@@ -504,6 +504,7 @@ class UserSerializer(serializers.ModelSerializer):
     transactions = serializers.SerializerMethodField()
     door_code = serializers.SerializerMethodField()
     wifi_pass = serializers.SerializerMethodField()
+    app_version = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -517,6 +518,7 @@ class UserSerializer(serializers.ModelSerializer):
             'is_staff',
             'door_code',
             'wifi_pass',
+            'app_version',
             #'usages',
         ]
         depth = 1
@@ -540,6 +542,9 @@ class UserSerializer(serializers.ModelSerializer):
             return secrets.WIFI_PASS
         else:
             return None
+
+    def get_app_version(self, obj):
+        return settings.APP_VERSION
 
 
 class MyRegisterSerializer(RegisterSerializer):
