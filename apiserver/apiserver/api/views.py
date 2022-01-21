@@ -245,7 +245,7 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
 
     def get_queryset(self):
         if self.action == 'list':
-            return models.Session.objects.order_by('-datetime')[:20]
+            return models.Session.objects.order_by('-datetime')[:50]
         else:
             return models.Session.objects.all()
 
