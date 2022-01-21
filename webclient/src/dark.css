@@ -29,6 +29,10 @@
 	mix-blend-mode: difference;
 }
 
+.darkmode--activated .ReactCrop {
+	mix-blend-mode: difference;
+}
+
 .darkmode--activated .ql-toolbar.ql-snow,
 .darkmode--activated .ql-container.ql-snow,
 .darkmode--activated .ui.segment,
