@@ -28,7 +28,9 @@
 				position: absolute;
 				background: black;
 				color: white;
-				animation: showMessage 0s 2s forwards;
+			}
+			.errormessage {
+				animation: showMessage 0s 5s forwards;
 				opacity: 0;
 			}
 
@@ -40,12 +42,15 @@
 	<body>
 		<div class="htmlmessage">
 			<h1>Spaceport</h1>
-			<p>If you are reading this message, there's been an error.</p>
-			<noscript><p>You need to enable JavaScript to run this app.</p></noscript>
-			<p>
-				Try refreshing the page. If that doesn't work,<br/>
-				please contact Tanner (protospace@tannercollin.com) for help.
-			</p>
+			<p>Loading...</p>
+			<div class="errormessage">
+				<p>If you are reading this message, there's been an error.</p>
+				<noscript><p>You need to enable JavaScript to run this app.</p></noscript>
+				<p>
+					Try refreshing the page. If that doesn't work,<br/>
+					please contact Tanner (protospace@tannercollin.com) for help.
+				</p>
+			</div>
 		</div>
 		<div id="root"></div>
 		<!--
