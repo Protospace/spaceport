@@ -181,10 +181,15 @@ export function SignupForm(props) {
 					</Message>}
 
 					{!!genUsername() &&
-						<div className='field'>
-							<label>Username</label>
-							<p style={{background: 'yellow'}}>{genUsername()}</p>
-						</div>
+						<Form.Input
+							label='Username'
+							name='username'
+							value={genUsername()}
+							error={error.username}
+							readOnly
+						>
+							<input style={{ border: 'none' }}></input>
+						</Form.Input>
 					}
 
 					<Form.Input
