@@ -77,7 +77,8 @@ class Transaction(models.Model):
     category = models.TextField(blank=True, null=True)
     account_type = models.TextField(blank=True, null=True)
     info_source = models.TextField(blank=True, null=True)
-    paypal_txn_id = models.CharField(max_length=17, blank=True, null=True)
+    paypal_txn_id = models.CharField(max_length=17, blank=True, null=True, unique=True)
+    paypal_txn_type = models.CharField(max_length=64, blank=True, null=True)
     paypal_payer_id = models.CharField(max_length=13, blank=True, null=True)
 
     report_type = models.TextField(blank=True, null=True)

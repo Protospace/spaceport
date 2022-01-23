@@ -63,6 +63,7 @@ class TransactionSerializer(serializers.ModelSerializer):
             'user',
             'recorder',
             'paypal_txn_id',
+            'paypal_txn_type',
             'paypal_payer_id',
         ]
 

@@ -122,6 +122,7 @@ def build_tx(data):
         payment_method=data.get('payment_type', 'unknown'),
         paypal_payer_id=data.get('payer_id', 'unknown'),
         paypal_txn_id=data.get('txn_id', 'unknown'),
+        paypal_txn_type=data.get('txn_type', 'unknown'),
         reference_number=data.get('txn_id', 'unknown'),
     )
 
