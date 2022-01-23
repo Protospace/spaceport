@@ -219,6 +219,43 @@ export function Charts(props) {
 
 			<p>Vetted Count: number of active vetted members.</p>
 
+			<p>
+				{memberCount &&
+					<ResponsiveContainer width='100%' height={300}>
+						<LineChart data={memberCount}>
+							<XAxis dataKey='date' minTickGap={10} />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip />
+							<Legend />
+
+							<Line
+								type='monotone'
+								dataKey='member_count'
+								name='Member Count'
+								stroke='#8884d8'
+								strokeWidth={2}
+								dot={false}
+								animationDuration={1000}
+							/>
+							<Line
+								type='monotone'
+								dataKey='subscriber_count'
+								name='PayPal Subscriber Count'
+								stroke='orange'
+								strokeWidth={2}
+								dot={false}
+								animationDuration={1500}
+							/>
+						</LineChart>
+					</ResponsiveContainer>
+				}
+			</p>
+
+			<p>Member Count: same as above.</p>
+
+			<p>PayPal Subscriber Count: number of members with a PayPal subscription.</p>
+
 			<Header size='medium'>Space Activity</Header>
 
 			{fullActivity ?

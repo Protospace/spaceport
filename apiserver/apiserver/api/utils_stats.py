@@ -4,6 +4,7 @@ logger = logging.getLogger(__name__)
 import time
 from datetime import date, datetime, timedelta
 import requests
+from django.db.models import Prefetch
 from django.core.cache import cache
 from django.utils.timezone import now, pytz
 from apiserver.api import models
@@ -73,11 +74,33 @@ def calc_member_counts():
 
     vetted_count = not_paused.filter(vetted_date__isnull=False).count()
 
+    related_membership_tx = Prefetch(
+        'user__transactions',
+        queryset=models.Transaction.objects.exclude(
+            number_of_membership_months=0,
+        ).exclude(
+            number_of_membership_months__isnull=True,
+        ),
+    )
+
+    subscriber_count = 0
+    for member in not_paused.prefetch_related(related_membership_tx):
+        if not member.user.transactions.count():
+            continue
+        if member.user.transactions.latest('date').paypal_txn_type == 'subscr_payment':
+            subscriber_count += 1
+
     cache.set('member_count', member_count)
     cache.set('paused_count', paused_count)
     cache.set('green_count', green_count)
 
-    return member_count, green_count, six_month_plus_count, vetted_count
+    return dict(
+        member_count=member_count,
+        green_count=green_count,
+        six_month_plus_count=six_month_plus_count,
+        vetted_count=vetted_count,
+        subscriber_count=subscriber_count,
+    )
 
 def calc_signup_counts():
     month_beginning = today_alberta_tz().replace(day=1)
