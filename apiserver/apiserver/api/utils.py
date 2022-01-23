@@ -134,13 +134,18 @@ def tally_membership_months(member, fake_date=None):
     expire_date = add_months(start_date, total_months)
     status = calc_member_status(expire_date, fake_date)
 
-    member.expire_date = expire_date
-    member.status = status
+    if member.expire_date != expire_date or member.status != status:
+        member.expire_date = expire_date
+        member.status = status
 
-    if status == 'Former Member':
-        member.paused_date = expire_date
+        if status == 'Former Member':
+            member.paused_date = expire_date
 
-    member.save()
+        member.save()
+        logging.debug('Tallied %s: updated.', member)
+    else:
+        logging.debug('Tallied %s: no changes.', member)
+
     return True
 
 

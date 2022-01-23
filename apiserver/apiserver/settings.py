@@ -250,7 +250,7 @@ LOGGING = {
         },
     },
     'root': {
-        'level': 'INFO',
+        'level': 'DEBUG' if DEBUG else 'INFO',
         'handlers': ['console'],
     },
 }
