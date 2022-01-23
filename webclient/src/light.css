@@ -125,6 +125,10 @@ body {
 	color: black;
 }
 
+.chartstats .ui.statistic {
+	margin: 0 1.5em 1em !important;
+}
+
 .footer {
 	margin-top: -20rem;
 	background: black;

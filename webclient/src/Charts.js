@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useReducer, useContext } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
-import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Statistic, Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { apiUrl, statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound } from './Misc.js';
@@ -71,10 +71,46 @@ export function Charts(props) {
 		<Container>
 			<Header size='large'>Charts</Header>
 
-			<Header size='medium'>Summary</Header>
-
 			{memberCount && signupCount &&
 				<>
+					<div className='chartstats'>
+						<Statistic
+							color='blue'
+							value={memberCount.slice().reverse()[0].member_count}
+							label='Members'
+						/>
+
+						<Statistic
+							color='green'
+							value={memberCount.slice().reverse()[0].green_count}
+							label='Green'
+						/>
+
+						<Statistic
+							color='red'
+							value={memberCount.slice().reverse()[0].six_month_plus_count}
+							label='Six Month+'
+						/>
+
+						<Statistic
+							color='purple'
+							value={memberCount.slice().reverse()[0].vetted_count}
+							label='Vetted'
+						/>
+
+						<Statistic
+							color='orange'
+							value={memberCount.slice().reverse()[0].subscriber_count}
+							label='PayPal Subs'
+						/>
+
+						<Statistic
+							color='black'
+							value={signupCount.slice().reverse()[0].signup_count}
+							label='Signups'
+						/>
+					</div>
+
 					<p>
 						The total member count is {memberCount.slice().reverse()[0].member_count} members,
 						compared to {memberCount.slice().reverse()[30].member_count} members 30 days ago.
@@ -102,10 +138,12 @@ export function Charts(props) {
 
 			<p>Daily since March 2nd, 2020.</p>
 
+			<Header size='small'>Total Members</Header>
+
 			<p>
 				{memberCount &&
 					<ResponsiveContainer width='100%' height={300}>
-						<LineChart data={memberCount}>
+						<LineChart syncId={1} data={memberCount}>
 							<XAxis dataKey='date' minTickGap={10} />
 							<YAxis />
 							<CartesianGrid strokeDasharray='3 3'/>
@@ -122,19 +160,124 @@ export function Charts(props) {
 								type='monotone'
 								dataKey='member_count'
 								name='Member Count'
-								stroke='#8884d8'
+								stroke='#2185d0'
 								strokeWidth={2}
 								dot={false}
-								animationDuration={1000}
+								animationDuration={250}
 							/>
 							<Line
 								type='monotone'
 								dataKey='green_count'
 								name='Green Count'
-								stroke='#82ca9d'
+								stroke='#21ba45'
 								strokeWidth={2}
 								dot={false}
-								animationDuration={1500}
+								animationDuration={500}
+							/>
+						</LineChart>
+					</ResponsiveContainer>
+				}
+			</p>
+
+			<Header size='small'>Six Month+ Members</Header>
+
+			<p>
+				{memberCount &&
+					<ResponsiveContainer width='100%' height={300}>
+						<LineChart syncId={1} data={memberCount}>
+							<XAxis dataKey='date' minTickGap={10} />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip />
+							<Legend />
+
+							<Line
+								type='monotone'
+								dataKey='member_count'
+								name='Member Count'
+								stroke='#2185d0'
+								strokeWidth={2}
+								dot={false}
+								animationDuration={250}
+							/>
+							<Line
+								type='monotone'
+								dataKey='six_month_plus_count'
+								name='Six Month+'
+								stroke='#db2828'
+								strokeWidth={2}
+								dot={false}
+								animationDuration={500}
+							/>
+						</LineChart>
+					</ResponsiveContainer>
+				}
+			</p>
+
+			<Header size='small'>Vetted Members</Header>
+
+			<p>
+				{memberCount &&
+					<ResponsiveContainer width='100%' height={300}>
+						<LineChart syncId={1} data={memberCount}>
+							<XAxis dataKey='date' minTickGap={10} />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip />
+							<Legend />
+
+							<Line
+								type='monotone'
+								dataKey='member_count'
+								name='Member Count'
+								stroke='#2185d0'
+								strokeWidth={2}
+								dot={false}
+								animationDuration={250}
+							/>
+							<Line
+								type='monotone'
+								dataKey='vetted_count'
+								name='Vetted Count'
+								stroke='#a333c8'
+								strokeWidth={2}
+								dot={false}
+								animationDuration={500}
+							/>
+						</LineChart>
+					</ResponsiveContainer>
+				}
+			</p>
+
+			<Header size='small'>PayPal Subscribers</Header>
+
+			<p>
+				{memberCount &&
+					<ResponsiveContainer width='100%' height={300}>
+						<LineChart syncId={1} data={memberCount}>
+							<XAxis dataKey='date' minTickGap={10} />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip />
+							<Legend />
+
+							<Line
+								type='monotone'
+								dataKey='member_count'
+								name='Member Count'
+								stroke='#2185d0'
+								strokeWidth={2}
+								dot={false}
+								animationDuration={250}
+							/>
+							<Line
+								type='monotone'
+								dataKey='subscriber_count'
+								name='PayPal Subscriber Count'
+								stroke='#f2711c'
+								strokeWidth={2}
+								dot={false}
+								animationDuration={500}
 							/>
 						</LineChart>
 					</ResponsiveContainer>
@@ -145,114 +288,9 @@ export function Charts(props) {
 
 			<p>Green Count: number of Prepaid and Current members.</p>
 
-			<p>
-				{memberCount &&
-					<ResponsiveContainer width='100%' height={300}>
-						<LineChart data={memberCount}>
-							<XAxis dataKey='date' minTickGap={10} />
-							<YAxis />
-							<CartesianGrid strokeDasharray='3 3'/>
-							<Tooltip />
-							<Legend />
-
-							<Line
-								type='monotone'
-								dataKey='member_count'
-								name='Member Count'
-								stroke='#8884d8'
-								strokeWidth={2}
-								dot={false}
-								animationDuration={1000}
-							/>
-							<Line
-								type='monotone'
-								dataKey='six_month_plus_count'
-								name='Six Months+'
-								stroke='red'
-								strokeWidth={2}
-								dot={false}
-								animationDuration={1500}
-							/>
-						</LineChart>
-					</ResponsiveContainer>
-				}
-			</p>
-
-			<p>Member Count: same as above.</p>
-
 			<p>Six Months+: number of active memberships older than six months.</p>
 
-			<p>
-				{memberCount &&
-					<ResponsiveContainer width='100%' height={300}>
-						<LineChart data={memberCount}>
-							<XAxis dataKey='date' minTickGap={10} />
-							<YAxis />
-							<CartesianGrid strokeDasharray='3 3'/>
-							<Tooltip />
-							<Legend />
-
-							<Line
-								type='monotone'
-								dataKey='member_count'
-								name='Member Count'
-								stroke='#8884d8'
-								strokeWidth={2}
-								dot={false}
-								animationDuration={1000}
-							/>
-							<Line
-								type='monotone'
-								dataKey='vetted_count'
-								name='Vetted Count'
-								stroke='purple'
-								strokeWidth={2}
-								dot={false}
-								animationDuration={1500}
-							/>
-						</LineChart>
-					</ResponsiveContainer>
-				}
-			</p>
-
-			<p>Member Count: same as above.</p>
-
 			<p>Vetted Count: number of active vetted members.</p>
-
-			<p>
-				{memberCount &&
-					<ResponsiveContainer width='100%' height={300}>
-						<LineChart data={memberCount}>
-							<XAxis dataKey='date' minTickGap={10} />
-							<YAxis />
-							<CartesianGrid strokeDasharray='3 3'/>
-							<Tooltip />
-							<Legend />
-
-							<Line
-								type='monotone'
-								dataKey='member_count'
-								name='Member Count'
-								stroke='#8884d8'
-								strokeWidth={2}
-								dot={false}
-								animationDuration={1000}
-							/>
-							<Line
-								type='monotone'
-								dataKey='subscriber_count'
-								name='PayPal Subscriber Count'
-								stroke='orange'
-								strokeWidth={2}
-								dot={false}
-								animationDuration={1500}
-							/>
-						</LineChart>
-					</ResponsiveContainer>
-				}
-			</p>
-
-			<p>Member Count: same as above.</p>
 
 			<p>PayPal Subscriber Count: number of members with a PayPal subscription.</p>
 
@@ -281,7 +319,7 @@ export function Charts(props) {
 								type='monotone'
 								dataKey='card_scans'
 								name='Card Scans'
-								fill='#8884d8'
+								fill='#2185d0'
 								maxBarSize={20}
 								isAnimationActive={false}
 							/>
@@ -310,9 +348,9 @@ export function Charts(props) {
 								type='monotone'
 								dataKey='signup_count'
 								name='Signup Count'
-								fill='#8884d8'
+								fill='#2185d0'
 								maxBarSize={20}
-								animationDuration={1000}
+								animationDuration={250}
 							/>
 							<Bar
 								type='monotone'
@@ -361,10 +399,10 @@ export function Charts(props) {
 								type='monotone'
 								dataKey='value'
 								name='Classroom PM2.5'
-								stroke='#8884d8'
+								stroke='#2185d0'
 								strokeWidth={2}
 								dot={false}
-								animationDuration={1000}
+								animationDuration={250}
 							/>
 						</LineChart>
 					</ResponsiveContainer>
@@ -384,7 +422,7 @@ export function Charts(props) {
 								stroke='#82ca9d'
 								strokeWidth={2}
 								dot={false}
-								animationDuration={1000}
+								animationDuration={250}
 							/>
 						</LineChart>
 					</ResponsiveContainer>
