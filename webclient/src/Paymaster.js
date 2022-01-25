@@ -11,6 +11,8 @@ export function Paymaster(props) {
 	const { user } = props;
 	const [pop, setPop] = useState('20.00');
 	const [locker, setLocker] = useState('5.00');
+	const [consumables, setConsumables] = useState('20.00');
+	const [consumablesMemo, setConsumablesMemo] = useState('');
 	const [donate, setDonate] = useState('20.00');
 	const [memo, setMemo] = useState('');
 
@@ -93,26 +95,44 @@ export function Paymaster(props) {
 				</Grid.Column>
 			</Grid>
 
+			<Header size='medium'>Consumables</Header>
+
+			<p>Pay for materials you use (ie. welding gas, 3D printing, blades, etc).</p>
+
+			<Grid stackable padded columns={1}>
+				<Grid.Column>
+					Custom amount:
+
+					<div className='pay-custom'>
+						<Input
+							fluid
+							label={{ basic: true, content: '$' }}
+							labelPosition='left'
+							value={consumables}
+							onChange={(e, v) => setConsumables(v.value)}
+						/>
+					</div>
+
+					<p>
+						Please explain what you bought:<br/>
+						<Input
+							value={consumablesMemo}
+							maxLength={50}
+							onChange={(e, v) => setConsumablesMemo(v.value)}
+						/>
+					</p>
+
+					<PayPalPayNow
+						amount={consumables}
+						name='Protospace Consumables'
+						custom={JSON.stringify({ category: 'Consumables', member: user.member.id, memo: consumablesMemo })}
+					/>
+				</Grid.Column>
+			</Grid>
+
 			<Header size='medium'>Donate</Header>
-			<Grid stackable padded columns={3}>
-				<Grid.Column>
-					<p>Donate $5.00:</p>
-					<PayPalPayNow
-						amount={5}
-						name='Protospace Donation'
-						custom={JSON.stringify({ category: 'Donation', member: user.member.id, memo: memo })}
-					/>
-				</Grid.Column>
 
-				<Grid.Column>
-					<p>Donate $10.00:</p>
-					<PayPalPayNow
-						amount={10}
-						name='Protospace Donation'
-						custom={JSON.stringify({ category: 'Donation', member: user.member.id, memo: memo })}
-					/>
-				</Grid.Column>
-
+			<Grid stackable padded columns={1}>
 				<Grid.Column>
 					Custom amount:
 
@@ -126,19 +146,21 @@ export function Paymaster(props) {
 						/>
 					</div>
 
+					<p>
+						Optional memo:<br/>
+						<Input
+							value={memo}
+							maxLength={50}
+							onChange={(e, v) => setMemo(v.value)}
+						/>
+					</p>
+
 					<PayPalPayNow
 						amount={donate}
 						name='Protospace Donation'
 						custom={JSON.stringify({ category: 'Donation', member: user.member.id, memo: memo })}
 					/>
 				</Grid.Column>
-
-			Add an optional memo to your donation:
-			<Input
-				value={memo}
-				maxLength={50}
-				onChange={(e, v) => setMemo(v.value)}
-			/>
 			</Grid>
 
 			<Header size='medium'>Locker Storage</Header>
