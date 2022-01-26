@@ -698,12 +698,23 @@ class PasteView(views.APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request):
-        return Response(dict(paste=cache.get('paste', '')))
+        if request.user.id == 9:
+            key = 'special_paste'
+            logging.info('Using special paste for a special someone.')
+        else:
+            key = 'paste'
+
+        return Response(dict(paste=cache.get(key, '')))
 
     def post(self, request):
         if 'paste' in request.data:
-            cache.set('paste', request.data['paste'][:20000])
-            return Response(dict(paste=cache.get('paste', '')))
+            if request.user.id == 9:
+                key = 'special_paste'
+                logging.info('Using special paste for a special someone.')
+            else:
+                key = 'paste'
+            cache.set(key, request.data['paste'][:20000])
+            return Response(dict(paste=cache.get(key, '')))
         else:
             raise exceptions.ValidationError(dict(paste='This field is required.'))
 
