@@ -282,7 +282,7 @@ DEFAULT_FROM_EMAIL = 'Protospace Portal <portal@mg.protospace.ca>'
 if DEBUG: logger.info('Debug mode ON')
 logger.info('Test logging for each thread')
 
-APP_VERSION = 1  # TODO: automate this
+APP_VERSION = 2  # TODO: automate this
 
 #import logging_tree
 #logging_tree.printout()

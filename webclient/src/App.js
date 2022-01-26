@@ -27,7 +27,7 @@ import { PasswordReset, ConfirmReset } from './PasswordReset.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { Footer } from './Footer.js';
 
-const APP_VERSION = 1;  // TODO: automate this
+const APP_VERSION = 2;  // TODO: automate this
 
 function App() {
 	const [token, setToken] = useState(localStorage.getItem('token', ''));
