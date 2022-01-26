@@ -624,7 +624,7 @@ class StatsViewSet(viewsets.ViewSet, List):
         else:
             track = cache.get('track', {})
             try:
-                username = track['device']['username']
+                username = track[device]['username']
             except KeyError:
                 msg = 'Usage tracker problem finding username for device: {}'.format(device)
                 #utils.alert_tanner(msg)
