@@ -230,7 +230,7 @@ class CardViewSet(Base, Create, Retrieve, Update, Destroy):
 
 
 class CourseViewSet(Base, List, Retrieve, Create, Update):
-    permission_classes = [AllowMetadata | IsAuthenticated, IsAdminOrReadOnly | IsInstructorOrReadOnly]
+    permission_classes = [AllowMetadata | IsAuthenticatedOrReadOnly, IsAdminOrReadOnly | IsInstructorOrReadOnly]
     queryset = models.Course.objects.annotate(date=Max('sessions__datetime')).order_by('-date')
 
     def get_serializer_class(self):
@@ -241,7 +241,7 @@ class CourseViewSet(Base, List, Retrieve, Create, Update):
 
 
 class SessionViewSet(Base, List, Retrieve, Create, Update):
-    permission_classes = [AllowMetadata | IsAuthenticated, IsAdminOrReadOnly | IsInstructorOrReadOnly]
+    permission_classes = [AllowMetadata | IsAuthenticatedOrReadOnly, IsAdminOrReadOnly | IsInstructorOrReadOnly]
 
     def get_queryset(self):
         if self.action == 'list':

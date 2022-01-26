@@ -50,6 +50,43 @@ function ClassTable(props) {
 
 let classesCache = false;
 
+export function ClassFeed(props) {
+	const [classes, setClasses] = useState(classesCache);
+
+	useEffect(() => {
+		const get = async() => {
+			requester('/sessions/', 'GET', '')
+			.then(res => {
+				setClasses(res.results);
+				classesCache = res.results;
+			})
+			.catch(err => {
+				console.log(err);
+			});
+		};
+
+		get();
+		const interval = setInterval(get, 60000);
+		return () => clearInterval(interval);
+	}, []);
+
+	const now = new Date().toISOString();
+
+	return (
+		<Container>
+			<p/>
+
+			<Header size='large'>Upcoming Protospace Classes</Header>
+
+			{classes ?
+				<ClassTable classes={classes.filter(x => x.datetime > now).sort((a, b) => a.datetime > b.datetime ? 1 : -1)} />
+			:
+				<p>Loading...</p>
+			}
+		</Container>
+	);
+};
+
 export function Classes(props) {
 	const [classes, setClasses] = useState(classesCache);
 	const { token } = props;
