@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404, redirect
 from django.db import transaction
-from django.db.models import Max, F, Count
+from django.db.models import Max, F, Count, Q
 from django.db.utils import OperationalError
 from django.http import HttpResponse, Http404, FileResponse
 from django.core.files.base import File
@@ -245,7 +245,23 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
 
     def get_queryset(self):
         if self.action == 'list':
-            return models.Session.objects.order_by('-datetime')[:50]
+            week_ago = now() - datetime.timedelta(days=7)
+            year_ago = now() - datetime.timedelta(days=365)
+
+            return models.Session.objects.annotate(
+                course_count=Count(
+                    'course__sessions',
+                    filter=Q(
+                        course__sessions__datetime__gte=year_ago,
+                    ),
+                ),
+            ).filter(
+                datetime__gte=week_ago,
+            ).order_by(
+                '-course_count',
+                '-course_id',
+                'datetime',
+            )
         else:
             return models.Session.objects.all()
 
