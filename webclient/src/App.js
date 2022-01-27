@@ -250,7 +250,7 @@ function App() {
 							</Route>
 
 							<Route exact path='/classes'>
-								<Classes token={token} />
+								<Classes token={token} user={user} />
 							</Route>
 
 							{user && user.member.set_details ?

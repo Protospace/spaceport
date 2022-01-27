@@ -11,6 +11,8 @@ import { PayPalPayNow } from './PayPal.js';
 function ClassTable(props) {
 	const { classes } = props;
 
+	const now = new Date().toISOString();
+
 	return (
 		<Table basic='very'>
 			<Table.Header>
@@ -27,8 +29,8 @@ function ClassTable(props) {
 			<Table.Body>
 				{classes.length ?
 					classes.map(x =>
-						<Table.Row key={x.id}>
-							<Table.Cell>{x.course_data.name}</Table.Cell>
+						<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
+							<Table.Cell>&nbsp;{x.course_data.name}</Table.Cell>
 							<Table.Cell>
 								<Link to={'/classes/'+x.id}>
 									{moment.utc(x.datetime).tz('America/Edmonton').format('ll')}
@@ -37,7 +39,16 @@ function ClassTable(props) {
 							<Table.Cell>{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}</Table.Cell>
 							<Table.Cell>{getInstructor(x)}</Table.Cell>
 							<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
-							<Table.Cell>{x.student_count} {!!x.max_students && '/ '+x.max_students}</Table.Cell>
+							<Table.Cell>
+								{!!x.max_students ?
+									x.max_students <= x.student_count ?
+										'Full'
+									:
+										x.student_count + ' / ' + x.max_students
+								:
+									x.student_count
+								}
+							</Table.Cell>
 						</Table.Row>
 					)
 				:
@@ -48,7 +59,87 @@ function ClassTable(props) {
 	);
 };
 
+function NewClassTable(props) {
+	const { classes } = props;
+
+	let sortedClasses = [];
+	if (classes.length) {
+		for (const clazz of classes) {
+			const course_data = clazz.course_data;
+			const course = sortedClasses.find(x => x?.course?.id === course_data?.id);
+
+			if (course) {
+				course.classes.push(clazz);
+			} else {
+				sortedClasses.push({
+					course: course_data,
+					classes: [clazz],
+				});
+			}
+		}
+	}
+
+	const now = new Date().toISOString();
+
+	return (
+		<>
+			<div style={{ margin: '0 -1.5rem 0 -0.5rem', display: 'flex', flexWrap: 'wrap' }}>
+				{sortedClasses.map(x =>
+					<Segment style={{ margin: '1rem 1rem 0 0', width: '30rem' }}>
+						<Header size='medium'>
+							<Link to={'/courses/'+x.course.id}>
+								{x.course.name}
+							</Link>
+						</Header>
+
+						<Table compact unstackable singleLine basic='very'>
+							<Table.Header>
+								<Table.Row>
+									<Table.HeaderCell>Date</Table.HeaderCell>
+									<Table.HeaderCell>Time</Table.HeaderCell>
+									<Table.HeaderCell>Cost</Table.HeaderCell>
+									<Table.HeaderCell>Students</Table.HeaderCell>
+								</Table.Row>
+							</Table.Header>
+
+							<Table.Body>
+								{x.classes.map(x =>
+									<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
+										<Table.Cell>
+											<Link to={'/classes/'+x.id}>
+												&nbsp;{moment.utc(x.datetime).tz('America/Edmonton').format('MMM Do')}
+											</Link>
+										</Table.Cell>
+
+										<Table.Cell>
+											{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}
+										</Table.Cell>
+
+										<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
+
+										<Table.Cell>
+											{!!x.max_students ?
+												x.max_students <= x.student_count ?
+													'Full'
+												:
+													x.student_count + ' / ' + x.max_students
+											:
+												x.student_count
+											}
+										</Table.Cell>
+									</Table.Row>
+								)}
+							</Table.Body>
+						</Table>
+					</Segment>
+				)}
+			</div>
+		</>
+	);
+};
+
 let classesCache = false;
+let sortCache = true;
 
 export function ClassFeed(props) {
 	const [classes, setClasses] = useState(classesCache);
@@ -89,7 +180,8 @@ export function ClassFeed(props) {
 
 export function Classes(props) {
 	const [classes, setClasses] = useState(classesCache);
-	const { token } = props;
+	const [sortByCourse, setSortByCourse] = useState(sortCache);
+	const { token, user } = props;
 
 	useEffect(() => {
 		requester('/sessions/', 'GET', token)
@@ -102,7 +194,8 @@ export function Classes(props) {
 		});
 	}, []);
 
-	const now = new Date().toISOString();
+	const isTeaching = (x) => x.instructor_id === user.member.id;
+	const sortDate = (a, b) => a.datetime > b.datetime ? 1 : -1;
 
 	return (
 		<Container>
@@ -110,22 +203,38 @@ export function Classes(props) {
 
 			<p><Link to={'/courses'}>Click here to view the list of all courses.</Link></p>
 
-			<Header size='medium'>Upcoming</Header>
-
-			<p>Ordered by nearest date.</p>
-
-			{classes ?
-				<ClassTable classes={classes.filter(x => x.datetime > now).sort((a, b) => a.datetime > b.datetime ? 1 : -1)} />
-			:
-				<p>Loading...</p>
+			{!!user && !!classes.length && !!classes.filter(isTeaching).length &&
+				<>
+					<Header size='medium'>Classes You're Teaching</Header>
+					<ClassTable classes={classes.slice().filter(isTeaching).sort(sortDate)} />
+				</>
 			}
 
-			<Header size='medium'>Recent</Header>
+			<Button
+				onClick={() => {
+					setSortByCourse(true);
+					sortCache = true;
+				}}
+				active={sortByCourse}
+			>
+				Sort by course
+			</Button>
 
-			<p>Ordered by nearest date.</p>
+			<Button
+				onClick={() => {
+					setSortByCourse(false);
+					sortCache = false;
+				}}
+				active={!sortByCourse}
+			>
+				Sort by date
+			</Button>
 
-			{classes ?
-				<ClassTable classes={classes.filter(x => x.datetime < now)} />
+			{classes.length ?
+				sortByCourse ?
+					<NewClassTable classes={classes} />
+				:
+					<ClassTable classes={classes.slice().sort(sortDate)} />
 			:
 				<p>Loading...</p>
 			}
