@@ -11,6 +11,7 @@ import { InstructorClassList } from './InstructorClasses.js';
 export const tags = {
 	Protospace: 'black',
 	Laser: 'red',
+	Wood: 'brown',
 	CNC: 'orange',
 	Niche: 'yellow',
 	//name: 'olive',
@@ -20,7 +21,6 @@ export const tags = {
 	//name: 'violet',
 	Event: 'purple',
 	Outing: 'pink',
-	Wood: 'brown',
 	Misc: 'grey',
 };
 
