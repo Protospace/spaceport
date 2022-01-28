@@ -129,6 +129,10 @@ body {
 	margin: 0 1.5em 1em !important;
 }
 
+.coursetags .ui.tag.label {
+	margin-top: 1rem;
+}
+
 .footer {
 	margin-top: -20rem;
 	background: black;

@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
-import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Label, Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
 import { isAdmin, isInstructor, getInstructor, BasicTable, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { InstructorClassDetail, InstructorClassAttendance } from './InstructorClasses.js';
 import { PayPalPayNow } from './PayPal.js';
+import { tags } from './Courses.js';
 
 function ClassTable(props) {
 	const { classes } = props;
@@ -92,6 +93,13 @@ function NewClassTable(props) {
 							</Link>
 						</Header>
 
+						{!!x.course.tags && x.course.tags.split(',').map(name =>
+							<Label color={tags[name]} tag>
+								{name}
+							</Label>
+						)}
+
+
 						<Table compact unstackable singleLine basic='very'>
 							<Table.Header>
 								<Table.Row>
@@ -140,6 +148,7 @@ function NewClassTable(props) {
 
 let classesCache = false;
 let sortCache = true;
+let tagFilterCache = false;
 
 export function ClassFeed(props) {
 	const [classes, setClasses] = useState(classesCache);
@@ -181,6 +190,7 @@ export function ClassFeed(props) {
 export function Classes(props) {
 	const [classes, setClasses] = useState(classesCache);
 	const [sortByCourse, setSortByCourse] = useState(sortCache);
+	const [tagFilter, setTagFilter] = useState(tagFilterCache);
 	const { token, user } = props;
 
 	useEffect(() => {
@@ -194,8 +204,11 @@ export function Classes(props) {
 		});
 	}, []);
 
-	const isTeaching = (x) => x.instructor_id === user.member.id;
-	const sortDate = (a, b) => a.datetime > b.datetime ? 1 : -1;
+	const byTeaching = (x) => x.instructor_id === user.member.id;
+	const byDate = (a, b) => a.datetime > b.datetime ? 1 : -1;
+	const byTag = (x) => tagFilter ? x.course_data.tags.includes(tagFilter) : true;
+
+	console.log(tagFilter);
 
 	return (
 		<Container>
@@ -203,38 +216,70 @@ export function Classes(props) {
 
 			<p><Link to={'/courses'}>Click here to view the list of all courses.</Link></p>
 
-			{!!user && !!classes.length && !!classes.filter(isTeaching).length &&
+			{!!user && !!classes.length && !!classes.filter(byTeaching).length &&
 				<>
 					<Header size='medium'>Classes You're Teaching</Header>
-					<ClassTable classes={classes.slice().filter(isTeaching).sort(sortDate)} />
+					<ClassTable classes={classes.slice().filter(byTeaching).sort(byDate)} />
 				</>
 			}
 
-			<Button
-				onClick={() => {
-					setSortByCourse(true);
-					sortCache = true;
-				}}
-				active={sortByCourse}
-			>
-				Sort by course
-			</Button>
+			<p>
+				<Button
+					onClick={() => {
+						setSortByCourse(true);
+						sortCache = true;
+					}}
+					active={sortByCourse}
+				>
+					Sort by course
+				</Button>
 
-			<Button
-				onClick={() => {
-					setSortByCourse(false);
-					sortCache = false;
-				}}
-				active={!sortByCourse}
-			>
-				Sort by date
-			</Button>
+				<Button
+					onClick={() => {
+						setSortByCourse(false);
+						sortCache = false;
+					}}
+					active={!sortByCourse}
+				>
+					Sort by date
+				</Button>
+			</p>
+
+			<p>
+				Filter by tag:
+				<div className='coursetags'>
+					{Object.entries(tags).map(([name, color]) =>
+						<Label
+							onClick={() => {
+								setTagFilter(name);
+								tagFilterCache = name;
+							}}
+							as='a'
+							color={color}
+							tag
+						>
+							{name}
+						</Label>
+					)}
+				</div>
+			</p>
+			<p>
+				{tagFilter && <Button
+					onClick={() => {
+						setTagFilter(false);
+						tagFilterCache = false;
+					}}
+				>
+					Clear {tagFilter} filter
+				</Button>}
+			</p>
+
 
 			{classes.length ?
 				sortByCourse ?
-					<NewClassTable classes={classes} />
+					<NewClassTable classes={classes.filter(byTag)} />
 				:
-					<ClassTable classes={classes.slice().sort(sortDate)} />
+					<ClassTable classes={classes.slice().filter(byTag).sort(byDate)} />
 			:
 				<p>Loading...</p>
 			}

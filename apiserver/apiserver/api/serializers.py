@@ -449,7 +449,7 @@ class StudentTrainingSerializer(TrainingSerializer):
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Course
-        fields = ['id', 'name', 'is_old', 'description']
+        fields = ['id', 'name', 'is_old', 'description', 'tags']
 
 class SessionSerializer(serializers.ModelSerializer):
     student_count = serializers.SerializerMethodField()

@@ -1,17 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
-import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Button, Label, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
 import { isInstructor, getInstructor, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { InstructorCourseList, InstructorCourseDetail } from './InstructorCourses.js';
 import { InstructorClassList } from './InstructorClasses.js';
 
+export const tags = {
+	Protospace: 'black',
+	Laser: 'red',
+	CNC: 'orange',
+	Niche: 'yellow',
+	//name: 'olive',
+	Electronics: 'green',
+	Computers: 'teal',
+	Metal: 'blue',
+	//name: 'violet',
+	Event: 'purple',
+	Outing: 'pink',
+	Wood: 'brown',
+	Misc: 'grey',
+};
+
 let courseCache = false;
+let tagFilterCache = false;
 
 export function Courses(props) {
 	const [courses, setCourses] = useState(courseCache);
+	const [tagFilter, setTagFilter] = useState(tagFilterCache);
 	const { token, user } = props;
 
 	useEffect(() => {
@@ -25,6 +43,8 @@ export function Courses(props) {
 		});
 	}, []);
 
+	const byTag = (x) => tagFilter ? x.tags.includes(tagFilter) : true;
+
 	return (
 		<Container>
 			<Header size='large'>Courses</Header>
@@ -32,6 +52,35 @@ export function Courses(props) {
 			{isInstructor(user) && <Segment padded>
 				<InstructorCourseList courses={courses} setCourses={setCourses} {...props} />
 			</Segment>}
+
+			<p>
+				Filter by tag:
+				<div className='coursetags'>
+					{Object.entries(tags).map(([name, color]) =>
+						<Label
+							onClick={() => {
+								setTagFilter(name);
+								tagFilterCache = name;
+							}}
+							as='a'
+							color={color}
+							tag
+						>
+							{name}
+						</Label>
+					)}
+				</div>
+			</p>
+			<p>
+				{tagFilter && <Button
+					onClick={() => {
+						setTagFilter(false);
+						tagFilterCache = false;
+					}}
+				>
+					Clear {tagFilter} filter
+				</Button>}
+			</p>
 
 			{courses ?
 				<Table basic='very'>
@@ -43,10 +92,17 @@ export function Courses(props) {
 
 					<Table.Body>
 						{courses.length ?
-							courses.map(x =>
+							courses.filter(byTag).map(x =>
 								<Table.Row key={x.id}>
 									<Table.Cell>
 										<Link to={'/courses/'+x.id}>{x.name}</Link>
+										<span style={{ marginLeft: '2rem' }}>
+											{!!x.tags && x.tags.split(',').map(name =>
+												<Label color={tags[name]} tag>
+													{name}
+												</Label>
+											)}
+										</span>
 									</Table.Cell>
 								</Table.Row>
 							)
