@@ -339,7 +339,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
 
         if data.get('member_id', None):
             if not (is_admin_director(user) or session.instructor == user):
-                raise exceptions.ValidationError('Not allowed to register others')
+                raise exceptions.ValidationError(dict(non_field_errors='Not allowed to register others'))
 
             member = get_object_or_404(models.Member, id=data['member_id'])
             user = member.user
@@ -354,9 +354,9 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         else:
             training = models.Training.objects.filter(user=user, session=session)
             if training.exists():
-                raise exceptions.ValidationError('Already registered')
+                raise exceptions.ValidationError(dict(non_field_errors='Already registered'))
             if user == session.instructor:
-                raise exceptions.ValidationError('You are teaching this session')
+                raise exceptions.ValidationError(dict(non_field_errors='You are teaching this session'))
             if status == 'Waiting for payment' and session.cost == 0:
                 status = 'Confirmed'
             serializer.save(user=user, attendance_status=status)

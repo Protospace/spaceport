@@ -137,6 +137,8 @@ export function CourseDetail(props) {
 		});
 	}, []);
 
+	const now = new Date().toISOString();
+
 	return (
 		<Container>
 			{!error ?
@@ -170,21 +172,32 @@ export function CourseDetail(props) {
 									<Table.HeaderCell>Time</Table.HeaderCell>
 									<Table.HeaderCell>Instructor</Table.HeaderCell>
 									<Table.HeaderCell>Cost</Table.HeaderCell>
+									<Table.HeaderCell>Students</Table.HeaderCell>
 								</Table.Row>
 							</Table.Header>
 
 							<Table.Body>
 								{course.sessions.length ?
 									course.sessions.sort((a, b) => a.datetime < b.datetime ? 1 : -1).slice(0,10).map(x =>
-										<Table.Row key={x.id}>
+										<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
 											<Table.Cell>
 												<Link to={'/classes/'+x.id}>
-													{moment.utc(x.datetime).tz('America/Edmonton').format('ll')}
+													&nbsp;{moment.utc(x.datetime).tz('America/Edmonton').format('ll')}
 												</Link>
 											</Table.Cell>
 											<Table.Cell>{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}</Table.Cell>
 											<Table.Cell>{getInstructor(x)}</Table.Cell>
 											<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
+											<Table.Cell>
+												{!!x.max_students ?
+													x.max_students <= x.student_count ?
+														'Full'
+													:
+														x.student_count + ' / ' + x.max_students
+												:
+													x.student_count
+												}
+											</Table.Cell>
 										</Table.Row>
 									)
 								:
