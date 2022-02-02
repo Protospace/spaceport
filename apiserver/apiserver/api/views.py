@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404, redirect
 from django.db import transaction
-from django.db.models import Max, F, Count
+from django.db.models import Max, F, Count, Q
 from django.db.utils import OperationalError
 from django.http import HttpResponse, Http404, FileResponse
 from django.core.files.base import File
@@ -230,7 +230,7 @@ class CardViewSet(Base, Create, Retrieve, Update, Destroy):
 
 
 class CourseViewSet(Base, List, Retrieve, Create, Update):
-    permission_classes = [AllowMetadata | IsAuthenticated, IsAdminOrReadOnly | IsInstructorOrReadOnly]
+    permission_classes = [AllowMetadata | IsAuthenticatedOrReadOnly, IsAdminOrReadOnly | IsInstructorOrReadOnly]
     queryset = models.Course.objects.annotate(date=Max('sessions__datetime')).order_by('-date')
 
     def get_serializer_class(self):
@@ -241,11 +241,27 @@ class CourseViewSet(Base, List, Retrieve, Create, Update):
 
 
 class SessionViewSet(Base, List, Retrieve, Create, Update):
-    permission_classes = [AllowMetadata | IsAuthenticated, IsAdminOrReadOnly | IsInstructorOrReadOnly]
+    permission_classes = [AllowMetadata | IsAuthenticatedOrReadOnly, IsAdminOrReadOnly | IsInstructorOrReadOnly]
 
     def get_queryset(self):
         if self.action == 'list':
-            return models.Session.objects.order_by('-datetime')[:50]
+            week_ago = now() - datetime.timedelta(days=7)
+            year_ago = now() - datetime.timedelta(days=365)
+
+            return models.Session.objects.annotate(
+                course_count=Count(
+                    'course__sessions',
+                    filter=Q(
+                        course__sessions__datetime__gte=year_ago,
+                    ),
+                ),
+            ).filter(
+                datetime__gte=week_ago,
+            ).order_by(
+                '-course_count',
+                '-course_id',
+                'datetime',
+            )
         else:
             return models.Session.objects.all()
 
@@ -323,7 +339,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
 
         if data.get('member_id', None):
             if not (is_admin_director(user) or session.instructor == user):
-                raise exceptions.ValidationError('Not allowed to register others')
+                raise exceptions.ValidationError(dict(non_field_errors='Not allowed to register others'))
 
             member = get_object_or_404(models.Member, id=data['member_id'])
             user = member.user
@@ -338,9 +354,9 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         else:
             training = models.Training.objects.filter(user=user, session=session)
             if training.exists():
-                raise exceptions.ValidationError('Already registered')
+                raise exceptions.ValidationError(dict(non_field_errors='Already registered'))
             if user == session.instructor:
-                raise exceptions.ValidationError('You are teaching this session')
+                raise exceptions.ValidationError(dict(non_field_errors='You are teaching this session'))
             if status == 'Waiting for payment' and session.cost == 0:
                 status = 'Confirmed'
             serializer.save(user=user, attendance_status=status)
@@ -736,12 +752,23 @@ class PasteView(views.APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request):
-        return Response(dict(paste=cache.get('paste', '')))
+        if request.user.id == 9:
+            key = 'special_paste'
+            logging.info('Using special paste for a special someone.')
+        else:
+            key = 'paste'
+
+        return Response(dict(paste=cache.get(key, '')))
 
     def post(self, request):
         if 'paste' in request.data:
-            cache.set('paste', request.data['paste'][:20000])
-            return Response(dict(paste=cache.get('paste', '')))
+            if request.user.id == 9:
+                key = 'special_paste'
+                logging.info('Using special paste for a special someone.')
+            else:
+                key = 'paste'
+            cache.set(key, request.data['paste'][:20000])
+            return Response(dict(paste=cache.get(key, '')))
         else:
             raise exceptions.ValidationError(dict(paste='This field is required.'))
 

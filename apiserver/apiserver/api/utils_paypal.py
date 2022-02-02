@@ -353,7 +353,7 @@ def process_paypal_ipn(data):
         defaults=dict(user=user),
     )
 
-    if custom_json.get('category', False) in ['Snacks', 'OnAcct', 'Donation']:
+    if custom_json.get('category', False) in ['Snacks', 'OnAcct', 'Donation', 'Consumables']:
         logger.info('IPN - Category matched')
         update_ipn(ipn, 'Accepted, category')
         return create_category_tx(data, member, custom_json)

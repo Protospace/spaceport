@@ -22,6 +22,8 @@ class LoggingThrottle(throttling.BaseThrottle):
             pass
         elif path.startswith('/stats/'):
             return True
+        elif path == '/sessions/' and user == None:
+            return True
 
         if request.data:
             data = request.data.dict()

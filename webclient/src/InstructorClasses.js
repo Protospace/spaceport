@@ -209,7 +209,11 @@ export function InstructorClassAttendance(props) {
 							/>
 						</Form.Field>
 
-						<Form.Button loading={loading} error={error.non_field_errors}>
+						<Form.Button
+							loading={loading}
+							error={error.non_field_errors}
+							disabled={!input.member_id}
+						>
 							Submit
 						</Form.Button>
 					</Form>

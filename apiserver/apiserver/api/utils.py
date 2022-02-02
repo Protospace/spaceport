@@ -21,7 +21,7 @@ from django.db.models import Sum
 from django.core.cache import cache
 from django.utils.timezone import now, pytz
 
-from . import models, serializers, utils_ldap, utils_stats, utils_auth, utils
+from . import models, serializers, utils_ldap, utils_stats, utils_auth, utils, utils_email
 from .. import settings
 
 STATIC_FOLDER = 'data/static/'
@@ -373,6 +373,14 @@ def register_user(data, user):
             msg = 'Problem connecting to Discourse Auth server: add.'
             utils.alert_tanner(msg)
             logger.info(msg)
+
+    if data['request_id']: utils_stats.set_progress(data['request_id'], 'Sending welcome email...')
+    try:
+        utils_email.send_welcome_email(user.member)
+    except BaseException as e:  # TODO: remove, just for testing
+        msg = 'Problem sending welcome email: ' + str(e)
+        logger.exception(msg)
+        alert_tanner(msg)
 
     if data['request_id']: utils_stats.set_progress(data['request_id'], 'Done!')
     time.sleep(1)

@@ -117,6 +117,7 @@ class Course(models.Model):
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     is_old = models.BooleanField(default=False)
+    tags = models.CharField(max_length=128, blank=True)
 
     history = HistoricalRecords()
 
