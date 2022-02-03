@@ -15,7 +15,7 @@ class AttendanceSheet extends React.Component {
 		const num = clazz.students.length;
 
 		return (
-			<div style={{ padding: '3rem' }}>
+			<div style={{ padding: '3rem', background: 'white', width: '100%', height: '100%' }}>
 				<Header size='medium'>{clazz.course_data.name} Attendance</Header>
 				<p>
 					{moment.utc(clazz.datetime).tz('America/Edmonton').format('llll')}
