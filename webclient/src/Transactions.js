@@ -400,7 +400,7 @@ class TransactionPrint extends React.Component {
 		const user = this.props.user;
 
 		return (
-			<div style={{padding: '1in'}}>
+			<div style={{padding: '1in', background: 'white', width: '100%', height: '100%'}}>
 				<Header size='large'>Protospace Transaction Receipt</Header>
 				<p>Calgary Protospace Ltd.</p>
 				<p>Bay 108, 1530 - 27th Ave NE<br />Calgary, AB  T2E 7S6<br />protospace.ca</p>
