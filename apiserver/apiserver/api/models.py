@@ -172,10 +172,12 @@ class Usage(models.Model):
 
     device = models.CharField(max_length=64)
     start_time = models.DateTimeField(auto_now_add=True)
-    last_update = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
     num_seconds = models.IntegerField()
+    memo = models.TextField(blank=True)
+    should_bill = models.BooleanField(default=True)
 
-    history = HistoricalRecords(excluded_fields=['num_seconds'])
+    history = HistoricalRecords(excluded_fields=['num_seconds', 'updated_at'])
 
 class HistoryIndex(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)

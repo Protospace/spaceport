@@ -663,6 +663,7 @@ class StatsViewSet(viewsets.ViewSet, List):
                 username=username,
                 device=device,
                 num_seconds=0,
+                memo='',
             )
             logging.info('New %s session created for: %s', device, username or '[no username]')
 
