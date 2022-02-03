@@ -172,6 +172,7 @@ class Usage(models.Model):
 
     device = models.CharField(max_length=64)
     start_time = models.DateTimeField(auto_now_add=True)
+    last_update = models.DateTimeField(auto_now=True)
     num_seconds = models.IntegerField()
 
     history = HistoricalRecords(excluded_fields=['num_seconds'])
