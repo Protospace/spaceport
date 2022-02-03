@@ -12,7 +12,7 @@ import { MembersDropdown } from './Members.js';
 class AttendanceSheet extends React.Component {
 	render() {
 		const clazz = this.props.clazz;
-		const num = clazz.students.length;
+		const num = clazz.students.filter(x => x.attendance_status !== 'Withdrawn').length;
 
 		return (
 			<div style={{ padding: '3rem', background: 'white', width: '100%', height: '100%' }}>
