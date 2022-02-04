@@ -517,19 +517,6 @@ export function AdminMemberInfo(props) {
 					</Table.Row>
 
 					<Table.Row>
-						<Table.Cell>Minor:</Table.Cell>
-						<Table.Cell>{member.is_minor ? 'Yes' : 'No'}</Table.Cell>
-					</Table.Row>
-					{member.is_minor && <Table.Row>
-						<Table.Cell>Birthdate:</Table.Cell>
-						<Table.Cell>{member.birthdate}</Table.Cell>
-					</Table.Row>}
-					{member.is_minor && <Table.Row>
-						<Table.Cell>Guardian:</Table.Cell>
-						<Table.Cell>{member.guardian_name}</Table.Cell>
-					</Table.Row>}
-
-					<Table.Row>
 						<Table.Cell>Emergency Contact Name:</Table.Cell>
 						<Table.Cell>{member.emergency_contact_name || 'None'}</Table.Cell>
 					</Table.Row>

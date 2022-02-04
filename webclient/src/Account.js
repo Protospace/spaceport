@@ -239,25 +239,6 @@ export function AccountForm(props) {
 				{...makeProps('phone')}
 			/>
 
-			<Form.Field>
-				<label>Are you under 18 years old?</label>
-				<Checkbox
-					label='I am a minor'
-					name='is_minor'
-					onChange={handleCheck}
-					checked={input.is_minor}
-				/>
-			</Form.Field>
-
-			{input.is_minor && <Form.Input
-				label='Birthdate YYYY-MM-DD'
-				{...makeProps('birthdate')}
-			/>}
-			{input.is_minor && <Form.Input
-				label="Guardian's Name"
-				{...makeProps('guardian_name')}
-			/>}
-
 			<Form.Input
 				label='Emergency Contact Name'
 				autoComplete='off'
