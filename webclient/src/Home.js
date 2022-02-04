@@ -229,102 +229,104 @@ export function Home(props) {
 						</div>
 					}
 				</Grid.Column>
+
 				<Grid.Column>
-					<Segment>
-						<Header size='medium'>Quick Links</Header>
-						<p><a href='http://protospace.ca/' target='_blank' rel='noopener noreferrer'>Main Website</a></p>
-						<p><a href='http://wiki.protospace.ca/Welcome_to_Protospace' target='_blank' rel='noopener noreferrer'>Protospace Wiki</a> — <Link to='/auth/wiki'>[register]</Link></p>
-						<p><a href='https://forum.protospace.ca' target='_blank' rel='noopener noreferrer'>Protospace Forum</a> — <Link to='/auth/discourse'>[register]</Link></p>
-						{!!user && <p><a href='https://drive.google.com/drive/folders/0By-vvp6fxFekfmU1cmdxaVRlaldiYXVyTE9rRnNVNjhkc3FjdkFIbjBwQkZ3MVVQX2Ezc3M?resourcekey=0-qVLjcYr8ZCmLypdINk2svg' target='_blank' rel='noopener noreferrer'>Google Drive</a></p>}
-						{!!user && isAdmin(user) && <p><a href='https://estancia.hippocmms.ca/' target='_blank' rel='noopener noreferrer'>Property Management Portal</a></p>}
+					{user.member.set_details &&
+						<Segment>
+							<Header size='medium'>Quick Links</Header>
+							<p><a href='http://protospace.ca/' target='_blank' rel='noopener noreferrer'>Main Website</a></p>
+							<p><a href='http://wiki.protospace.ca/Welcome_to_Protospace' target='_blank' rel='noopener noreferrer'>Protospace Wiki</a> — <Link to='/auth/wiki'>[register]</Link></p>
+							<p><a href='https://forum.protospace.ca' target='_blank' rel='noopener noreferrer'>Protospace Forum</a> — <Link to='/auth/discourse'>[register]</Link></p>
+							{!!user && <p><a href='https://drive.google.com/drive/folders/0By-vvp6fxFekfmU1cmdxaVRlaldiYXVyTE9rRnNVNjhkc3FjdkFIbjBwQkZ3MVVQX2Ezc3M?resourcekey=0-qVLjcYr8ZCmLypdINk2svg' target='_blank' rel='noopener noreferrer'>Google Drive</a></p>}
+							{!!user && isAdmin(user) && <p><a href='https://estancia.hippocmms.ca/' target='_blank' rel='noopener noreferrer'>Property Management Portal</a></p>}
 
-						<img className='swordfish' src='/swordfish.png' onClick={() => refreshStats()} />
+							<img className='swordfish' src='/swordfish.png' onClick={() => refreshStats()} />
 
-						<div>
-							<Header size='medium'>Protospace Stats</Header>
-							<p>Next member meeting: {getDateStat('next_meeting')}</p>
-							<p>Next monthly clean: {getDateStat('next_clean')}</p>
-							<p>Member count: {getStat('member_count')} <Link to='/charts'>[more]</Link></p>
-							<p>Green members: {getStat('green_count')}</p>
-							<p>Card scans today: {getZeroStat('card_scans')}</p>
+							<div>
+								<Header size='medium'>Protospace Stats</Header>
+								<p>Next member meeting: {getDateStat('next_meeting')}</p>
+								<p>Next monthly clean: {getDateStat('next_clean')}</p>
+								<p>Member count: {getStat('member_count')} <Link to='/charts'>[more]</Link></p>
+								<p>Green members: {getStat('green_count')}</p>
+								<p>Card scans today: {getZeroStat('card_scans')}</p>
 
-							<p>
-								Minecraft players: {mcPlayers.length} {mcPlayers.length > 5 && '🔥'} <Popup content={
-									<React.Fragment>
-										<p>
-											Server IP:<br />
-											games.protospace.ca
-										</p>
-										<p>
-											Players:<br />
-											{mcPlayers.length ? mcPlayers.map(x => <React.Fragment>{x}<br /></React.Fragment>) : 'None'}
-										</p>
-									</React.Fragment>
-								} trigger={<a>[more]</a>} />
-							{' '}<a href='http://games.protospace.ca:8123/?worldname=world&mapname=flat&zoom=3&x=74&y=64&z=354' target='_blank'>[map]</a>
-							</p>
+								<p>
+									Minecraft players: {mcPlayers.length} {mcPlayers.length > 5 && '🔥'} <Popup content={
+										<React.Fragment>
+											<p>
+												Server IP:<br />
+												games.protospace.ca
+											</p>
+											<p>
+												Players:<br />
+												{mcPlayers.length ? mcPlayers.map(x => <React.Fragment>{x}<br /></React.Fragment>) : 'None'}
+											</p>
+										</React.Fragment>
+									} trigger={<a>[more]</a>} />
+								{' '}<a href='http://games.protospace.ca:8123/?worldname=world&mapname=flat&zoom=3&x=74&y=64&z=354' target='_blank'>[map]</a>
+								</p>
 
-							{stats && stats.hasOwnProperty('mumble_users') && <p>
-								Mumble users: {mumbleUsers.length} <Popup content={
-									<React.Fragment>
-										<p>
-											Server IP:<br />
-											mumble.protospace.ca
-										</p>
-										<p>
-											Users:<br />
-											{mumbleUsers.length ? mumbleUsers.map(x => <React.Fragment>{x}<br /></React.Fragment>) : 'None'}
-										</p>
-									</React.Fragment>
-								} trigger={<a>[more]</a>} />
-							</p>}
+								{stats && stats.hasOwnProperty('mumble_users') && <p>
+									Mumble users: {mumbleUsers.length} <Popup content={
+										<React.Fragment>
+											<p>
+												Server IP:<br />
+												mumble.protospace.ca
+											</p>
+											<p>
+												Users:<br />
+												{mumbleUsers.length ? mumbleUsers.map(x => <React.Fragment>{x}<br /></React.Fragment>) : 'None'}
+											</p>
+										</React.Fragment>
+									} trigger={<a>[more]</a>} />
+								</p>}
 
-							<p>
-								Trotec availability: {getTrackStat('TROTECS300')} <Popup content={
-									<React.Fragment>
-										<p>
-											Last use:<br />
-											{getTrackLast('TROTECS300')}<br />
-											{getTrackAgo('TROTECS300')}<br />
-											by {getTrackName('TROTECS300')}
-										</p>
-									</React.Fragment>
-								} trigger={<a>[more]</a>} />
-							</p>
+								<p>
+									Trotec availability: {getTrackStat('TROTECS300')} <Popup content={
+										<React.Fragment>
+											<p>
+												Last use:<br />
+												{getTrackLast('TROTECS300')}<br />
+												{getTrackAgo('TROTECS300')}<br />
+												by {getTrackName('TROTECS300')}
+											</p>
+										</React.Fragment>
+									} trigger={<a>[more]</a>} />
+								</p>
 
-							<p>
-								Rabbit availability: {getTrackStat('FRICKIN-LASER')} <Popup content={
-									<React.Fragment>
-										<p>
-											Last use:<br />
-											{getTrackLast('FRICKIN-LASER')}<br />
-											{getTrackAgo('FRICKIN-LASER')}<br />
-											by {getTrackName('FRICKIN-LASER')}
-										</p>
-									</React.Fragment>
-								} trigger={<a>[more]</a>} />
-							</p>
+								<p>
+									Rabbit availability: {getTrackStat('FRICKIN-LASER')} <Popup content={
+										<React.Fragment>
+											<p>
+												Last use:<br />
+												{getTrackLast('FRICKIN-LASER')}<br />
+												{getTrackAgo('FRICKIN-LASER')}<br />
+												by {getTrackName('FRICKIN-LASER')}
+											</p>
+										</React.Fragment>
+									} trigger={<a>[more]</a>} />
+								</p>
 
-							<p>
-								Precix availability: {getTrackStat('CNC-PRECIX')} <Popup content={
-									<React.Fragment>
-										<p>
-											Last use:<br />
-											{getTrackLast('CNC-PRECIX')}<br />
-											{getTrackAgo('CNC-PRECIX')}<br />
-											by {getTrackName('CNC-PRECIX')}
-										</p>
-									</React.Fragment>
-								} trigger={<a>[more]</a>} />
-							</p>
+								<p>
+									Precix availability: {getTrackStat('CNC-PRECIX')} <Popup content={
+										<React.Fragment>
+											<p>
+												Last use:<br />
+												{getTrackLast('CNC-PRECIX')}<br />
+												{getTrackAgo('CNC-PRECIX')}<br />
+												by {getTrackName('CNC-PRECIX')}
+											</p>
+										</React.Fragment>
+									} trigger={<a>[more]</a>} />
+								</p>
 
-							{user && <p>Alarm status: {alarmStat()}{doorOpenStat()}</p>}
-						</div>
+								{user && <p>Alarm status: {alarmStat()}{doorOpenStat()}</p>}
+							</div>
 
-						<SignForm token={token} />
+							<SignForm token={token} />
 
-					</Segment>
-
+						</Segment>
+					}
 				</Grid.Column>
 			</Grid>
 		</Container>
