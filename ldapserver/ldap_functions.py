@@ -313,6 +313,54 @@ def dump_users():
     finally:
         ldap_conn.unbind()
 
+def set_account_enabled(username, is_enabled):
+    ldap_conn = init_ldap()
+    try:
+        logger.info('Setting account enabled for: ' + username)
+        ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
+        criteria = '(&(objectClass=user)(sAMAccountName={})(!(objectClass=computer)))'.format(username)
+        results = ldap_conn.search_s(
+            secrets.BASE_MEMBERS,
+            ldap.SCOPE_SUBTREE,
+            criteria, [
+                'displayName',
+                'sAMAccountName',
+                'email',
+                'userAccountControl',
+            ],
+        )
+
+        if len(results) != 1:
+            abort(HTTP_NOTFOUND)
+
+        try:
+            dn = results[0][0]
+            prev_control = results[0][1]['userAccountControl'][0]
+        except KeyError:
+            abort(HTTP_NOTFOUND)
+
+        prev_control = int(prev_control.decode())
+
+        if is_enabled:
+            logger.info('Enabling account')
+            new_control = prev_control & ~0x2
+        else:
+            logger.info('Disabling account')
+            new_control = prev_control | 0x2
+
+        logger.info('  Dn found: %s', dn)
+        logger.info('  Current control: %s', prev_control)
+        logger.info('  New control: %s', new_control)
+
+        new_control = str(new_control).encode()
+
+        mod_acct = [(ldap.MOD_REPLACE, 'userAccountControl', new_control)]
+        result = ldap_conn.modify_s(dn, mod_acct)
+        logger.info('  Result: ' + str(result)) 
+        return result
+    finally:
+        ldap_conn.unbind()
+
 
 # ===========================================================================
 
