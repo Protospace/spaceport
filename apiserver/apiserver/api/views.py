@@ -614,32 +614,71 @@ class StatsViewSet(viewsets.ViewSet, List):
         username = request.data['username']
         first_name = username.split('.')[0].title()
 
-        track[devicename] = dict(time=time.time(), username=first_name)
+        track[devicename] = dict(
+            time=time.time(),
+            username=username,
+            first_name=first_name,
+        )
         cache.set('track', track)
 
-        ## update device usage
-        ## issue: sometimes two sessions are created
-        ## issue: sometimes two /track/ requests are sent and double time is counted
-        #last_session = models.UsageTrack.objects.filter(devicename=devicename).last()
-        #if not last_session or last_session.username != username:
-        #    try:
-        #        user = User.objects.get(username__iexact=username)
-        #    except User.DoesNotExist:
-        #        msg = 'Device tracker problem finding username: ' + username
-        #        utils.alert_tanner(msg)
-        #        logger.error(msg)
-        #        user = None
+        return Response(200)
 
-        #    models.UsageTrack.objects.create(
-        #        user=user,
-        #        username=username,
-        #        devicename=devicename,
-        #        num_seconds=0,
-        #    )
-        #    logging.info('New ' + devicename + ' session created for: ' + username)
-        #else:
-        #    last_session.num_seconds = F('num_seconds') + 10
-        #    last_session.save(update_fields=['num_seconds'])
+    @action(detail=False, methods=['post'])
+    def usage(self, request):
+        #if 'seconds' not in request.data:
+        #    raise exceptions.ValidationError(dict(seconds='This field is required.'))
+
+        if 'device' not in request.data:
+            raise exceptions.ValidationError(dict(device='This field is required.'))
+
+        device = request.data['device']
+        data = request.data.get('data', None)
+        seconds = request.data.get('seconds', 20)
+
+        if 'username' in request.data:
+            username = request.data['username']
+        else:
+            track = cache.get('track', {})
+            try:
+                username = track[device]['username']
+            except KeyError:
+                msg = 'Usage tracker problem finding username for device: {}'.format(device)
+                #utils.alert_tanner(msg)
+                logger.error(msg)
+                username = ''
+
+
+        last_session = models.Usage.objects.filter(device=device).last()
+        if not last_session or last_session.username != username:
+            try:
+                user = User.objects.get(username__iexact=username)
+            except User.DoesNotExist:
+                msg = 'Usage trackerproblem finding user for username: {}'.format(username or '[no username]')
+                #utils.alert_tanner(msg)
+                logger.error(msg)
+                user = None
+
+            last_session = models.Usage.objects.create(
+                user=user,
+                username=username,
+                device=device,
+                num_seconds=0,
+                memo='',
+            )
+            logging.info('New %s session created for: %s', device, username or '[no username]')
+
+
+        logging.debug('Device %s data: %s', device, data)
+
+        if device == 'TROTECS300' and data and int(data) > 3:
+            should_count = True
+        else:
+            should_count = False
+
+        if should_count:
+            logging.debug('Counting %s seconds.', seconds)
+            last_session.num_seconds = F('num_seconds') + seconds
+            last_session.save(update_fields=['num_seconds'])
 
         return Response(200)
 

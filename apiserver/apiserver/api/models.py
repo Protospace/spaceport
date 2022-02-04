@@ -165,15 +165,19 @@ class StatsSpaceActivity(models.Model):
     date = models.DateField(default=today_alberta_tz)
     card_scans = models.IntegerField()
 
-#class UsageTrack(models.Model):
-#    user = models.ForeignKey(User, related_name='usages', blank=True, null=True, on_delete=models.SET_NULL)
-#
-#    # member_id = models.IntegerField(blank=True, null=True)  # restrict to current users for now
-#    username = models.CharField(max_length=64)  # allows us to match non-Spaceport users later
-#
-#    devicename = models.CharField(max_length=64)
-#    start_time = models.DateTimeField(auto_now_add=True)
-#    num_seconds = models.IntegerField()
+class Usage(models.Model):
+    user = models.ForeignKey(User, related_name='usages', blank=True, null=True, on_delete=models.SET_NULL)
+
+    username = models.CharField(max_length=64, blank=True)  # incase of LDAP-Spaceport mismatch
+
+    device = models.CharField(max_length=64)
+    start_time = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    num_seconds = models.IntegerField()
+    memo = models.TextField(blank=True)
+    should_bill = models.BooleanField(default=True)
+
+    history = HistoricalRecords(excluded_fields=['num_seconds', 'updated_at'])
 
 class HistoryIndex(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
