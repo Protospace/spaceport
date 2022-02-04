@@ -68,6 +68,9 @@ class TransactionSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
+        if not self.initial_data.get('member_id', None):
+            raise ValidationError(dict(member_id='This field is required.'))
+
         member = get_object_or_404(models.Member, id=self.initial_data['member_id'])
         validated_data['user'] = member.user
 
@@ -88,6 +91,9 @@ class TransactionSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
+        if not self.initial_data.get('member_id', None):
+            raise ValidationError(dict(member_id='This field is required.'))
+
         member = get_object_or_404(models.Member, id=self.initial_data['member_id'])
         validated_data['user'] = member.user
         return super().update(instance, validated_data)
@@ -395,6 +401,9 @@ class CardSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
+        if not self.initial_data.get('member_id', None):
+            raise ValidationError(dict(member_id='This field is required.'))
+
         member = get_object_or_404(models.Member, id=self.initial_data['member_id'])
         validated_data['user'] = member.user
 
@@ -403,6 +412,9 @@ class CardSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
+        if not self.initial_data.get('member_id', None):
+            raise ValidationError(dict(member_id='This field is required.'))
+
         member = get_object_or_404(models.Member, id=self.initial_data['member_id'])
         validated_data['user'] = member.user
         return super().update(instance, validated_data)
