@@ -195,7 +195,7 @@ export function Home(props) {
 	const getTrackStat = (x) => stats && stats.track && stats.track[x] ? moment().unix() - stats.track[x]['time'] > 60 ? 'Free' : 'In Use' : 'Unknown';
 	const getTrackLast = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').format('llll') : 'Unknown';
 	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').fromNow() : '';
-	const getTrackName = (x) => stats && stats.track && stats.track[x] && stats.track[x]['username'] ? stats.track[x]['username'] : 'Unknown';
+	const getTrackName = (x) => stats && stats.track && stats.track[x] && stats.track[x]['first_name'] ? stats.track[x]['first_name'] : 'Unknown';
 
 	const alarmStat = () => stats && stats.alarm && moment().unix() - stats.alarm['time'] < 300 ? stats.alarm['data'] < 270 ? 'Armed' : 'Disarmed' : 'Unknown';
 
