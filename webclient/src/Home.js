@@ -224,7 +224,7 @@ export function Home(props) {
 				</Grid.Column>
 
 				<Grid.Column>
-					{user.member.set_details &&
+					{user?.member?.set_details !== false &&
 						<Segment>
 							<Header size='medium'>Quick Links</Header>
 							<p><a href='http://protospace.ca/' target='_blank' rel='noopener noreferrer'>Main Website</a></p>
