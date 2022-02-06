@@ -538,6 +538,7 @@ class StatsViewSet(viewsets.ViewSet, List):
         user = self.request.user
         if not user.is_authenticated:
             stats.pop('alarm', None)
+            stats.pop('autoscan', None)
 
         stats['at_protospace'] = utils.is_request_from_protospace(request)
 
@@ -680,6 +681,14 @@ class StatsViewSet(viewsets.ViewSet, List):
             last_session.num_seconds = F('num_seconds') + seconds
             last_session.save(update_fields=['num_seconds'])
 
+        return Response(200)
+
+    @action(detail=False, methods=['post'])
+    def autoscan(self, request):
+        if 'autoscan' not in request.data:
+            raise exceptions.ValidationError(dict(autoscan='This field is required.'))
+
+        cache.set('autoscan', request.data['autoscan'])
         return Response(200)
 
 

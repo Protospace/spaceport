@@ -28,6 +28,7 @@ DEFAULTS = {
     'track': {},
     'alarm': {},
     'sign': '',
+    'autoscan': '',
 }
 
 if secrets.MUMBLE:

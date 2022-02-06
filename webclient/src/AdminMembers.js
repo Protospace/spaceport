@@ -122,6 +122,8 @@ function AdminCardDetail(props) {
 	);
 };
 
+let prevAutoscan = '';
+
 export function AdminMemberCards(props) {
 	const { token, result, refreshResult } = props;
 	const cards = result.cards;
@@ -163,6 +165,35 @@ export function AdminMemberCards(props) {
 		});
 	};
 
+	const getAutoscan = () => {
+		return requester('/stats/', 'GET', token)
+		.then(res => {
+			return res?.autoscan;
+		})
+		.catch(err => {
+			console.log(err);
+		});
+	};
+
+	const checkAutoscan = () => {
+		getAutoscan().then(newScan => {
+			if (newScan != prevAutoscan) {
+				prevAutoscan = newScan;
+				setInput({ ...input, card_number: newScan });
+			}
+		});
+	};
+
+	useEffect(() => {
+		if (cardPhoto) {
+			getAutoscan().then(scan => {
+				prevAutoscan = scan;
+			});
+			const interval = setInterval(checkAutoscan, 1000);
+			return () => clearInterval(interval);
+		}
+	}, [cardPhoto]);
+
 	const getCardPhoto = (e) => {
 		e.preventDefault();
 		requester('/members/' + id + '/card_photo/', 'GET', token)
@@ -193,18 +224,16 @@ export function AdminMemberCards(props) {
 		<div>
 			<Header size='medium'>Edit Member Cards</Header>
 
-			<Form onSubmit={handleSubmit}>
-				<Header size='small'>Add a Card</Header>
+			{result.member.photo_large ?
+				<p>
+					<Button onClick={(e) => getCardPhoto(e)}>Add a Card</Button>
+				</p>
+			:
+				<p>No card image, member photo missing!</p>
+			}
 
-				{result.member.photo_large ?
-					<p>
-						<Button onClick={(e) => getCardPhoto(e)}>View card image</Button>
-					</p>
-				:
-					<p>No card image, member photo missing!</p>
-				}
-
-				{cardPhoto && <>
+			{cardPhoto &&
+				<Form onSubmit={handleSubmit}>
 					<p>
 						<Image rounded size='medium' src={cardPhoto} />
 					</p>
@@ -219,41 +248,41 @@ export function AdminMemberCards(props) {
 						<li>Scan card, add the number</li>
 						<li><b>Have them test their card</b></li>
 					</ol>
-				</>}
 
-				<Form.Group widths='equal'>
-					<Form.Input
-						label='Card Number'
-						fluid
-						{...makeProps('card_number')}
-					/>
-					<Form.Select
-						label='Card Status'
-						options={statusOptions}
-						fluid
-						{...makeProps('active_status')}
-						onChange={handleValues}
-					/>
-					<Form.Input
-						label='Optional Note'
-						fluid
-						{...makeProps('notes')}
-					/>
-				</Form.Group>
+					<Form.Group widths='equal'>
+						<Form.Input
+							label='Card Number (Listening...)'
+							fluid
+							{...makeProps('card_number')}
+						/>
+						<Form.Select
+							label='Card Status'
+							options={statusOptions}
+							fluid
+							{...makeProps('active_status')}
+							onChange={handleValues}
+						/>
+						<Form.Input
+							label='Optional Note'
+							fluid
+							{...makeProps('notes')}
+						/>
+					</Form.Group>
 
-				<Form.Checkbox
-					label='Confirmed that the member has been given a tour and knows the alarm code'
-					required
-					{...makeProps('given_tour')}
-					onChange={handleCheck}
-					checked={input.given_tour}
-				/>
+					<Form.Checkbox
+						label='Confirmed that the member has been given a tour and knows the alarm code'
+						required
+						{...makeProps('given_tour')}
+						onChange={handleCheck}
+						checked={input.given_tour}
+					/>
 
-				<Form.Button disabled={!input.given_tour} loading={loading} error={error.non_field_errors}>
-					Submit
-				</Form.Button>
-				{success && <div>Success!</div>}
-			</Form>
+					<Form.Button disabled={!input.given_tour} loading={loading} error={error.non_field_errors}>
+						Submit
+					</Form.Button>
+					{success && <div>Success!</div>}
+				</Form>
+			}
 
 			<Header size='small'>Current Cards</Header>
 
