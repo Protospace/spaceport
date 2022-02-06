@@ -119,10 +119,6 @@ DATABASES = {
             'timeout': 20,  # increased because generate_backups.py blocks
         },
     },
-    'old_portal': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'old_portal.sqlite3'),
-    }
 }
 
 CACHES = {
