@@ -671,7 +671,7 @@ class StatsViewSet(viewsets.ViewSet, List):
 
         logging.debug('Device %s data: %s', device, data)
 
-        if device == 'TROTECS300' and data and int(data) > 3:
+        if device == 'TROTECS300' and data and int(data) > 4:
             should_count = True
         else:
             should_count = False
