@@ -16,10 +16,15 @@ import datetime, time
 from . import models, fields, utils, utils_ldap, utils_auth, utils_stats
 from .. import settings, secrets
 
-#class UsageSerializer(serializers.ModelSerializer):
-#    class Meta:
-#        model = models.UsageTrack
-#        fields = '__all__'
+class UsageSerializer(serializers.ModelSerializer):
+    first_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Usage
+        fields = '__all__'
+
+    def get_first_name(self, obj):
+        return obj.user.member.preferred_name
 
 class TransactionSerializer(serializers.ModelSerializer):
     # fields directly from old portal. replace with slugs we want

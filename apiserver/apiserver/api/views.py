@@ -683,6 +683,33 @@ class StatsViewSet(viewsets.ViewSet, List):
 
         return Response(200)
 
+    @action(detail=False, methods=['get'])
+    def usage_data(self, request):
+        if 'device' not in request.query_params:
+            raise exceptions.ValidationError(dict(device='This field is required.'))
+
+        if not utils.is_request_from_protospace(request):
+            raise exceptions.PermissionDenied()
+
+        device = request.query_params['device']
+        last_session = models.Usage.objects.filter(device=device).last()
+
+        if not last_session:
+            raise exceptions.ValidationError(dict(device='Session not found.'))
+
+        serializer = serializers.UsageSerializer(last_session)
+
+        try:
+            track = cache.get('track', {})[device]
+        except KeyError:
+            track = False
+
+        return Response(dict(
+            track=track,
+            session=serializer.data
+        ))
+
+
     @action(detail=False, methods=['post'])
     def autoscan(self, request):
         if 'autoscan' not in request.data:

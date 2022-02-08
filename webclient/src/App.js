@@ -21,6 +21,7 @@ import { Courses, CourseDetail } from './Courses.js';
 import { ClassFeed, Classes, ClassDetail } from './Classes.js';
 import { Members, MemberDetail } from './Members.js';
 import { Charts } from './Charts.js';
+import { Usage } from './Usage.js';
 import { Auth } from './Auth.js';
 import { Subscribe } from './PayPal.js';
 import { PasswordReset, ConfirmReset } from './PasswordReset.js';
@@ -115,6 +116,10 @@ function App() {
 			<Switch>
 				<Route exact path='/classfeed'>
 					<ClassFeed />
+				</Route>
+
+				<Route exact path='/usage/:name'>
+					<Usage />
 				</Route>
 
 				<Route path='/'>

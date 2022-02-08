@@ -133,6 +133,24 @@ body {
 	margin-top: 1rem;
 }
 
+.usage {
+	height: 100vh;
+	background-color: black;
+	color: white;
+	padding: 0.5em;
+	font-size: 3em;
+}
+
+.usage .ui.header {
+	color: white;
+}
+
+.usage .stat {
+	font-size: 2em;
+	margin-bottom: 0.75em;
+}
+
+
 .footer {
 	margin-top: -20rem;
 	background: black;
