@@ -30,17 +30,12 @@ def send_welcome_email(member):
     with open(EMAIL_DIR + 'welcome.html', 'r') as f:
         email_html = replace_fields(f.read())
 
-    try:
-        send_mail(
-            subject='Welcome to Protospace!',
-            message=email_text,
-            from_email=None,  # defaults to DEFAULT_FROM_EMAIL
-            recipient_list=[member.user.email, 'portal@tannercollin.com'],
-            html_message=email_html,
-        )
+    send_mail(
+        subject='Welcome to Protospace!',
+        message=email_text,
+        from_email=None,  # defaults to DEFAULT_FROM_EMAIL
+        recipient_list=[member.user.email],
+        html_message=email_html,
+    )
 
-        logger.info('Sent welcome email:\n' + email_text)
-    except smtplib.SMTPException as e:
-        msg = 'Problem sending welcome email to ' + member.user.email + ': ' + str(e)
-        utils.alert_tanner(msg)
-        logger.exception(msg)
+    logger.info('Sent welcome email:\n' + email_text)

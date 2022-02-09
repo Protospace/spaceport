@@ -346,7 +346,7 @@ def register_user(data, user):
     if data['request_id']: utils_stats.set_progress(data['request_id'], 'Sending welcome email...')
     try:
         utils_email.send_welcome_email(user.member)
-    except BaseException as e:  # TODO: remove, just for testing
+    except BaseException as e:
         msg = 'Problem sending welcome email: ' + str(e)
         logger.exception(msg)
         alert_tanner(msg)
