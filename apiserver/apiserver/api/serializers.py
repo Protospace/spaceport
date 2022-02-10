@@ -792,4 +792,9 @@ class MyLoginSerializer(LoginSerializer):
         if not User.objects.filter(username=username).exists():
             raise ValidationError(dict(username='Username not found. Try "first.last" or "first.middle.last".'))
 
-        return super().authenticate(**kwargs)
+        user = super().authenticate(**kwargs)
+
+        if not user:
+            raise ValidationError(dict(password='Incorrect password. Check caps lock.'))
+
+        return user
