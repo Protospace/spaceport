@@ -855,6 +855,9 @@ class PasswordResetConfirmView(PasswordResetConfirmView):
 class SpaceportAuthView(LoginView):
     serializer_class = serializers.SpaceportAuthSerializer
 
+class MyLoginView(LoginView):
+    serializer_class = serializers.MyLoginSerializer
+
 
 @api_view()
 def null_view(request, *args, **kwargs):

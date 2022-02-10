@@ -772,3 +772,24 @@ class SpaceportAuthSerializer(LoginSerializer):
                 user.member.save()
 
         return user
+
+class MyLoginSerializer(LoginSerializer):
+    def authenticate(self, **kwargs):
+        username = kwargs.get('username', '')
+
+        if 'your' in username and 'own' in username and 'name' in username:
+            raise ValidationError(dict(username='*server explodes*'))
+
+        if ' ' in username:
+            raise ValidationError(dict(username='Username shouldn\'t have spaces.'))
+
+        if 'first.last' in username:
+            raise ValidationError(dict(username='Don\'t literally try "first.last", use your own name.'))
+
+        if 'first.middle.last' in username:
+            raise ValidationError(dict(username='Don\'t literally try "first.middle.last", use your own name.'))
+
+        if not User.objects.filter(username=username).exists():
+            raise ValidationError(dict(username='Username not found. Try "first.last" or "first.middle.last".'))
+
+        return super().authenticate(**kwargs)
