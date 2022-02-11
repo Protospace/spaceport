@@ -766,10 +766,10 @@ class StatsViewSet(viewsets.ViewSet, List):
 
         today_total = device_uses.filter(
             user=user, started_at__gte=today_start, deleted_at__isnull=True,
-        ).aggregate(Sum('num_seconds'))['num_seconds__sum'] + running_cut_time
+        ).aggregate(Sum('num_seconds'))['num_seconds__sum'] or 0 + running_cut_time
         month_total = device_uses.filter(
             user=user, started_at__gte=month_start, deleted_at__isnull=True,
-        ).aggregate(Sum('num_seconds'))['num_seconds__sum'] + running_cut_time
+        ).aggregate(Sum('num_seconds'))['num_seconds__sum'] or 0 + running_cut_time
 
         try:
             track = cache.get('track', {})[device]
