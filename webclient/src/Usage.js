@@ -44,8 +44,8 @@ export function Usage(props) {
 		});
 	};
 
-	const inUse = usage && moment().unix() - usage.track.time < 300;
-	const showUsage = usage && inUse && usage.track.username === usage.session.username;
+	const inUse = usage && moment().unix() - usage.track.time <= 60;
+	const showUsage = usage && inUse && usage.track.username === usage.username;
 
 	const now = moment();
 
@@ -61,28 +61,41 @@ export function Usage(props) {
 
 				{showUsage ?
 					<>
-						<Header size='medium'>Hello,</Header>
-
 						<p className='stat'>
-							{usage.session.first_name}
+							{usage.first_name}
 						</p>
 
-						<Header size='medium'>Session Time</Header>
+						<div style={{ backgroundColor: usage.session_time > 10800 ? '#cc0000' : '' }}>
+							<Header size='medium'>Session Time</Header>
+
+							<p className='stat'>
+								{parseInt(usage.session_time / 60)} mins
+							</p>
+						</div>
+
+						<Header size='medium'>Job #{usage.last_use_id} Time</Header>
 
 						<p className='stat'>
-							{parseInt(moment.duration(moment(now).diff(usage.session.start_time)).asMinutes())} mins
+							{parseInt(usage.last_use_time / 60)} mins
 						</p>
 
-						<Header size='medium'>Laser Time</Header>
+						<Header size='medium'>Today Total</Header>
 
 						<p className='stat'>
-							{parseInt(usage.session.num_seconds / 60)} mins
+							{parseInt(usage.today_total / 60)} mins
+						</p>
+
+						<Header size='medium'>Month Total</Header>
+
+						<p className='stat'>
+							{parseInt(usage.month_total / 60)} mins
 						</p>
 					</>
 				:
 					<>
 						<Header size='large'>{title} Usage</Header>
-						<p>Waiting for session</p>
+						<p/>
+						<p>Waiting for job</p>
 					</>
 				}
 

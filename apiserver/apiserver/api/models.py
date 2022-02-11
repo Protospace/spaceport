@@ -171,13 +171,16 @@ class Usage(models.Model):
     username = models.CharField(max_length=64, blank=True)  # incase of LDAP-Spaceport mismatch
 
     device = models.CharField(max_length=64)
-    start_time = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    started_at = models.DateTimeField(auto_now_add=True)
+    finished_at = models.DateTimeField(null=True)
+    deleted_at = models.DateTimeField(null=True)
+
     num_seconds = models.IntegerField()
+    num_reports = models.IntegerField()
     memo = models.TextField(blank=True)
     should_bill = models.BooleanField(default=True)
 
-    history = HistoricalRecords(excluded_fields=['num_seconds', 'updated_at'])
+    history = HistoricalRecords(excluded_fields=['num_reports'])
 
 class HistoryIndex(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)

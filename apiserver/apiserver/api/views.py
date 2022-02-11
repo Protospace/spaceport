@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404, redirect
 from django.db import transaction
-from django.db.models import Max, F, Count, Q
+from django.db.models import Max, F, Count, Q, Sum
 from django.db.utils import OperationalError
 from django.http import HttpResponse, Http404, FileResponse
 from django.core.files.base import File
@@ -612,7 +612,7 @@ class StatsViewSet(viewsets.ViewSet, List):
         track = cache.get('track', {})
 
         devicename = request.data['name']
-        username = request.data['username']
+        username = request.data['username'].lower()
         first_name = username.split('.')[0].title()
 
         track[devicename] = dict(
@@ -626,15 +626,11 @@ class StatsViewSet(viewsets.ViewSet, List):
 
     @action(detail=False, methods=['post'])
     def usage(self, request):
-        #if 'seconds' not in request.data:
-        #    raise exceptions.ValidationError(dict(seconds='This field is required.'))
-
         if 'device' not in request.data:
             raise exceptions.ValidationError(dict(device='This field is required.'))
 
         device = request.data['device']
         data = request.data.get('data', None)
-        seconds = request.data.get('seconds', 20)
 
         if 'username' in request.data:
             username = request.data['username']
@@ -644,42 +640,84 @@ class StatsViewSet(viewsets.ViewSet, List):
                 username = track[device]['username']
             except KeyError:
                 msg = 'Usage tracker problem finding username for device: {}'.format(device)
-                #utils.alert_tanner(msg)
+                utils.alert_tanner(msg)
                 logger.error(msg)
                 username = ''
 
-
-        last_session = models.Usage.objects.filter(device=device).last()
-        if not last_session or last_session.username != username:
-            try:
-                user = User.objects.get(username__iexact=username)
-            except User.DoesNotExist:
-                msg = 'Usage trackerproblem finding user for username: {}'.format(username or '[no username]')
-                #utils.alert_tanner(msg)
-                logger.error(msg)
-                user = None
-
-            last_session = models.Usage.objects.create(
-                user=user,
-                username=username,
-                device=device,
-                num_seconds=0,
-                memo='',
-            )
-            logging.info('New %s session created for: %s', device, username or '[no username]')
-
-
         logging.debug('Device %s data: %s', device, data)
 
-        if device == 'TROTECS300' and data and int(data) > 4:
+        if device == 'TROTECS300' and data and int(data) > 3:
             should_count = True
         else:
             should_count = False
 
+        last_use = models.Usage.objects.filter(
+            device=device,
+            deleted_at__isnull=True,
+        ).last()
+
         if should_count:
-            logging.debug('Counting %s seconds.', seconds)
-            last_session.num_seconds = F('num_seconds') + seconds
-            last_session.save(update_fields=['num_seconds'])
+            start_new_use = not last_use or last_use.finished_at or last_use.username != username
+            if start_new_use:
+                try:
+                    user = User.objects.get(username__iexact=username)
+                except User.DoesNotExist:
+                    msg = 'Usage tracker problem finding user for username: {}'.format(username or '[no username]')
+                    utils.alert_tanner(msg)
+                    logger.error(msg)
+                    user = None
+
+                last_use = models.Usage.objects.create(
+                    user=user,
+                    username=username,
+                    device=device,
+                    num_reports=0,
+                    memo='',
+                    finished_at=None,
+                    num_seconds=0,
+                )
+                logging.info('New %s usage #%s created for: %s', device, last_use.id, username or '[no username]')
+
+            last_use.num_reports = F('num_reports') + 1
+            last_use.save()
+        else:
+            if last_use and not last_use.finished_at:
+                time_now = now()
+                duration = time_now - last_use.started_at
+                logging.info('Finishing %s usage #%s, duration: %s', device, last_use.id, duration)
+                last_use.finished_at = time_now
+                last_use.num_seconds = duration.seconds
+                last_use.save()
+
+        if not last_use:
+            return Response(200)
+
+        if not last_use.finished_at:
+            return Response(200)
+
+        # perform some sanity-checks on finished uses
+
+        if last_use.device == 'TROTECS300':
+            estimated_seconds = last_use.num_reports * 20
+        else:
+            return Response(200)
+
+        if estimated_seconds < 60:
+            logging.info('Finished %s usage #%s was less than a minute, soft deleting.', device, last_use.id)
+            last_use.memo = 'Soft deleted reason: less than a minute'
+            last_use.deleted_at = now()
+            last_use.save()
+        elif abs(last_use.num_seconds - estimated_seconds) > 300:
+            logging.info(
+                'Finished %s usage #%s time %ss mismatches estimate %ss, soft deleting.',
+                device,
+                last_use.id,
+                last_use.num_seconds,
+                estimated_seconds
+            )
+            last_use.memo = 'Soft deleted reason: time {}s mismatches estimate {}s'.format(last_use.num_seconds, estimated_seconds)
+            last_use.deleted_at = now()
+            last_use.save()
 
         return Response(200)
 
@@ -692,12 +730,46 @@ class StatsViewSet(viewsets.ViewSet, List):
             raise exceptions.PermissionDenied()
 
         device = request.query_params['device']
-        last_session = models.Usage.objects.filter(device=device).last()
+        device_uses = models.Usage.objects.filter(device=device)
 
-        if not last_session:
+        last_use = device_uses.last()
+
+        if not last_use:
             raise exceptions.ValidationError(dict(device='Session not found.'))
 
-        serializer = serializers.UsageSerializer(last_session)
+        last_use_id = last_use.id
+        user = last_use.user
+
+        last_use_different_user = device_uses.exclude(
+            user=user,
+        ).last()
+
+        if last_use_different_user:
+            last_different_id = last_use_different_user.id
+        else:
+            last_different_id = -1
+
+        session_uses = device_uses.filter(id__gt=last_different_id)
+
+        time_now = now()
+        session_time = (time_now - session_uses.first().started_at).seconds
+
+        if last_use.finished_at:
+            last_use_time = last_use.num_seconds
+            running_cut_time = 0
+        else:
+            last_use_time = (time_now - last_use.started_at).seconds
+            running_cut_time = last_use_time
+
+        today_start = utils.now_alberta_tz().replace(hour=0, minute=0, second=0)
+        month_start = today_start.replace(day=1)
+
+        today_total = device_uses.filter(
+            user=user, started_at__gte=today_start
+        ).aggregate(Sum('num_seconds'))['num_seconds__sum'] + running_cut_time
+        month_total = device_uses.filter(
+            user=user, started_at__gte=month_start
+        ).aggregate(Sum('num_seconds'))['num_seconds__sum'] + running_cut_time
 
         try:
             track = cache.get('track', {})[device]
@@ -705,8 +777,14 @@ class StatsViewSet(viewsets.ViewSet, List):
             track = False
 
         return Response(dict(
+            username=last_use.user.username,
+            first_name=last_use.user.member.preferred_name,
             track=track,
-            session=serializer.data
+            session_time=session_time,
+            last_use_time=last_use_time,
+            last_use_id=last_use_id,
+            today_total=today_total,
+            month_total=month_total,
         ))
 
 
