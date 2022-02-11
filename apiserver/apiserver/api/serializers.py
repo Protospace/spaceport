@@ -781,7 +781,7 @@ class MyLoginSerializer(LoginSerializer):
             raise ValidationError(dict(username='*server explodes*'))
 
         if ' ' in username:
-            raise ValidationError(dict(username='Username shouldn\'t have spaces.'))
+            raise ValidationError(dict(username='Username shouldn\'t have spaces. Try "first.last" or "first.middle.last".'))
 
         if 'first.last' in username:
             raise ValidationError(dict(username='Don\'t literally try "first.last", use your own name.'))
