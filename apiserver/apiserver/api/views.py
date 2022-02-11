@@ -707,17 +707,17 @@ class StatsViewSet(viewsets.ViewSet, List):
             last_use.memo = 'Soft deleted reason: less than a minute'
             last_use.deleted_at = now()
             last_use.save()
-        elif abs(last_use.num_seconds - estimated_seconds) > 300:
-            logging.info(
-                'Finished %s usage #%s time %ss mismatches estimate %ss, soft deleting.',
-                device,
-                last_use.id,
-                last_use.num_seconds,
-                estimated_seconds
-            )
-            last_use.memo = 'Soft deleted reason: time {}s mismatches estimate {}s'.format(last_use.num_seconds, estimated_seconds)
-            last_use.deleted_at = now()
-            last_use.save()
+        #elif abs(last_use.num_seconds - estimated_seconds) > 300:
+        #    logging.info(
+        #        'Finished %s usage #%s time %ss mismatches estimate %ss, soft deleting.',
+        #        device,
+        #        last_use.id,
+        #        last_use.num_seconds,
+        #        estimated_seconds
+        #    )
+        #    last_use.memo = 'Soft deleted reason: time {}s mismatches estimate {}s'.format(last_use.num_seconds, estimated_seconds)
+        #    last_use.deleted_at = now()
+        #    last_use.save()
 
         return Response(200)
 
