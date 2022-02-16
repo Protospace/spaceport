@@ -380,7 +380,7 @@ export function Charts(props) {
 			<p>Retained Count: number of those signups who are still a member currently.</p>
 
 
-			<Header size='medium'>Dust Level</Header>
+			<Header size='medium'>Protodust Level</Header>
 
 			<p>Averaged every 15 minutes for the past week. They are cheap sensors so don't trust the absolute value of the readings.</p>
 
@@ -390,7 +390,7 @@ export function Charts(props) {
 					<ResponsiveContainer width='100%' height={300}>
 						<LineChart data={classroomDustLevel} syncId={1}>
 							<XAxis dataKey='time' tickFormatter={(t) => moment(t).format('ddd h:mm a')} minTickGap={10} />
-							<YAxis />
+							<YAxis domain={[0, 60]} />
 							<CartesianGrid strokeDasharray='3 3'/>
 							<Tooltip formatter={v => v.toFixed(2) + ' μg/m³'} labelFormatter={t => 'Time: ' + moment(t).format('ddd h:mm a')}  />
 							<Legend />
@@ -410,7 +410,7 @@ export function Charts(props) {
 					<ResponsiveContainer width='100%' height={300}>
 						<LineChart data={woodshopDustLevel} syncId={1}>
 							<XAxis dataKey='time' tickFormatter={(t) => moment(t).format('ddd h:mm a')} minTickGap={10} />
-							<YAxis />
+							<YAxis domain={[0, 60]} />
 							<CartesianGrid strokeDasharray='3 3'/>
 							<Tooltip formatter={v => v.toFixed(2) + ' μg/m³'} labelFormatter={t => 'Time: ' + moment(t).format('ddd h:mm a')}  />
 							<Legend />
