@@ -187,7 +187,7 @@ export function Home(props) {
 
 	const getStat = (x) => stats && stats[x] ? stats[x] : 'Unknown';
 	const getZeroStat = (x) => stats && stats[x] ? stats[x] : '0';
-	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz('America/Edmonton').format('ll') : 'Unknown';
+	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz('America/Edmonton').format('MMM Do @ LT') : 'Unknown';
 
 	const mcPlayers = stats && stats['minecraft_players'] ? stats['minecraft_players'] : [];
 	const mumbleUsers = stats && stats['mumble_users'] ? stats['mumble_users'] : [];
