@@ -13,7 +13,13 @@ export const scene = ({ ref }) => {
 
 	var scene = new THREE.Scene();
 
-	const renderer = new THREE.WebGLRenderer({ antialias: true });
+	let renderer = null;
+	try {
+		renderer = new THREE.WebGLRenderer({ antialias: true });
+	} catch (error) {
+		console.log('Problem creating WebGLRenderer:', error);
+		return;
+	}
 
 	const width = ref.current.clientWidth;
 	const height = ref.current.clientHeight;
