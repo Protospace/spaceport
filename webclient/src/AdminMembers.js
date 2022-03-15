@@ -314,7 +314,7 @@ export function AdminMemberPause(props) {
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
-	const [yousure, setYousure] = useState(false);
+	const [told, setTold] = useState(false);
 	const { id } = useParams();
 
 	useEffect(() => {
@@ -322,25 +322,20 @@ export function AdminMemberPause(props) {
 	}, [result.member]);
 
 	const handlePause = (e) => {
-		if (yousure) {
-			if (loading) return;
-			setLoading(true);
-			setSuccess(false);
-			requester('/members/' + id + '/pause/', 'POST', token, {})
-			.then(res => {
-				setYousure(false);
-				setSuccess(true);
-				setError(false);
-				refreshResult();
-			})
-			.catch(err => {
-				setLoading(false);
-				console.log(err);
-				setError(true);
-			});
-		} else {
-			setYousure(true);
-		}
+		if (loading) return;
+		setLoading(true);
+		setSuccess(false);
+		requester('/members/' + id + '/pause/', 'POST', token, {})
+		.then(res => {
+			setSuccess(true);
+			setError(false);
+			refreshResult();
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+			setError(true);
+		});
 	};
 
 	const handleUnpause = (e) => {
@@ -372,9 +367,21 @@ export function AdminMemberPause(props) {
 						Unpause
 					</Button>
 				:
-					<Button onClick={handlePause} loading={loading}>
-						{yousure ? 'You Sure?' : 'Pause'}
-					</Button>
+					<>
+						<p>
+							<Form.Checkbox
+								name='told_subscriptions'
+								value={told}
+								label='Told member to stop any PayPal subscriptions'
+								required
+								onChange={(e, v) => setTold(v.checked)}
+							/>
+						</p>
+
+						<Button onClick={handlePause} loading={loading} disabled={!told}>
+							Pause
+						</Button>
+					</>
 				}
 			</p>
 
