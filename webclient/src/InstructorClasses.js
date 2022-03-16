@@ -261,6 +261,7 @@ function InstructorClassEditor(props) {
 					timeConstraints={{ minutes: { step: 15 } }}
 					value={ input.datetime ? moment.utc(input.datetime).tz('America/Edmonton') : (new Date()).setMinutes(0) }
 					onChange={handleDatetime}
+					input={false}
 				/>
 				{error.datetime &&
 					<Label pointing prompt>
