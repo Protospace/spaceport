@@ -151,6 +151,12 @@ body {
 	margin-bottom: 0.5em;
 }
 
+.nowrap-stat {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 
 .footer {
 	margin-top: -20rem;

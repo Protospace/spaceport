@@ -189,6 +189,19 @@ export function Home(props) {
 	const getZeroStat = (x) => stats && stats[x] ? stats[x] : '0';
 	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz('America/Edmonton').format('MMM Do @ LT') : 'Unknown';
 
+	const getNextStat = (x) => {
+		if (stats && stats[x]) {
+			const datetime = moment.utc(stats[x].datetime).tz('America/Edmonton');
+			if (datetime.isSame(moment().tz('America/Edmonton'), 'day') ) {
+				return <>{datetime.format('LT')} | <Link to={'/classes/' + stats[x].id}>{stats[x].name}</Link></>;
+			} else {
+				return <>{datetime.format('MMM Do')} | <Link to={'/classes/' + stats[x].id}>{stats[x].name}</Link></>;
+			}
+		} else {
+			return 'Unknown';
+		}
+	};
+
 	const mcPlayers = stats && stats['minecraft_players'] ? stats['minecraft_players'] : [];
 	const mumbleUsers = stats && stats['mumble_users'] ? stats['mumble_users'] : [];
 
@@ -239,8 +252,9 @@ export function Home(props) {
 								<Header size='medium'>Protospace Stats</Header>
 								<p>Next member meeting: {getDateStat('next_meeting')}</p>
 								<p>Next monthly clean: {getDateStat('next_clean')}</p>
+								<p className='nowrap-stat'>Next class: {getNextStat('next_class')}</p>
+								<p className='nowrap-stat'>Last class: {getNextStat('prev_class')}</p>
 								<p>Member count: {getStat('member_count')} <Link to='/charts'>[more]</Link></p>
-								<p>Green members: {getStat('green_count')}</p>
 								<p>Card scans today: {getZeroStat('card_scans')}</p>
 
 								<p>
