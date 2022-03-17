@@ -776,9 +776,16 @@ class StatsViewSet(viewsets.ViewSet, List):
         except KeyError:
             track = False
 
+        if last_use.user:
+            username = last_use.user.username
+            first_name = last_use.user.member.preferred_name
+        else:
+            username = last_use.username
+            first_name = username.split('.')[0].title()
+
         return Response(dict(
-            username=last_use.user.username,
-            first_name=last_use.user.member.preferred_name,
+            username=username,
+            first_name=first_name,
             track=track,
             session_time=session_time,
             last_use_time=last_use_time,
