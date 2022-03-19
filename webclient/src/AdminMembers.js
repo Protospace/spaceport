@@ -314,7 +314,8 @@ export function AdminMemberPause(props) {
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
-	const [told, setTold] = useState(false);
+	const [told1, setTold1] = useState(false);
+	const [told2, setTold2] = useState(false);
 	const { id } = useParams();
 
 	useEffect(() => {
@@ -336,6 +337,8 @@ export function AdminMemberPause(props) {
 			console.log(err);
 			setError(true);
 		});
+		setTold1(false);
+		setTold2(false);
 	};
 
 	const handleUnpause = (e) => {
@@ -371,14 +374,23 @@ export function AdminMemberPause(props) {
 						<p>
 							<Form.Checkbox
 								name='told_subscriptions'
-								value={told}
+								value={told1}
 								label='Told member to stop any PayPal subscriptions'
 								required
-								onChange={(e, v) => setTold(v.checked)}
+								onChange={(e, v) => setTold1(v.checked)}
+							/>
+						</p>
+						<p>
+							<Form.Checkbox
+								name='told_shelves'
+								value={told2}
+								label='Told member to clear any shelves'
+								required
+								onChange={(e, v) => setTold2(v.checked)}
 							/>
 						</p>
 
-						<Button onClick={handlePause} loading={loading} disabled={!told}>
+						<Button onClick={handlePause} loading={loading} disabled={!told1 || !told2}>
 							Pause
 						</Button>
 					</>
