@@ -259,7 +259,11 @@ function InstructorClassEditor(props) {
 				<label>Time and Date</label>
 				<Datetime
 					timeConstraints={{ minutes: { step: 15 } }}
-					value={ input.datetime ? moment.utc(input.datetime).tz('America/Edmonton') : (new Date()).setMinutes(0) }
+					value={ input.datetime ?
+						moment.utc(input.datetime).tz('America/Edmonton')
+					:
+						moment().tz('America/Edmonton').set({ minute: 0 })
+					}
 					onChange={handleDatetime}
 					input={false}
 				/>
