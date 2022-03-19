@@ -18,6 +18,8 @@ function MemberInfo(props) {
 	const lastTrain = user.training?.sort((a, b) => a.session.datetime < b.session.datetime ? 1 : -1).slice(0,3);
 	const lastCard = user.cards?.sort((a, b) => a.last_seen < b.last_seen)[0];
 
+	const unpaidTraining = user.training?.filter(x => x.attendance_status === 'Waiting for payment');
+
 	return (
 		<div>
 			<Grid stackable>
@@ -55,7 +57,7 @@ function MemberInfo(props) {
 				</Grid.Column>
 			</Grid>
 
-			{!member.photo_medium && <Message>
+			{!lastTrans.length && <Message>
 				<Message.Header>Welcome, new member!</Message.Header>
 				<p>
 					<a href={staticUrl + '/' + member.member_forms} target='_blank'>
@@ -84,6 +86,14 @@ function MemberInfo(props) {
 			</React.Fragment>}
 
 			<Header size='medium'>Latest Training</Header>
+
+			{unpaidTraining.map(x =>
+				<Message warning>
+					<Message.Header>Please pay your course fee!</Message.Header>
+					<p>Pay ${x.session.cost} for <Link to={'/classes/'+x.session.id}>{x.session.course_data.name}</Link> to avoid losing your spot.</p>
+				</Message>
+			)}
+
 			<BasicTable>
 				<Table.Body>
 					{lastTrain.length ?
@@ -158,7 +168,7 @@ function MemberInfo(props) {
 				</Table.Body>
 			</BasicTable>
 
-			{member.photo_medium && <p>
+			{!!lastTrans.length && <p>
 				<a href={staticUrl + '/' + member.member_forms} target='_blank'>
 					View application forms
 				</a>
