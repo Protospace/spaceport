@@ -260,8 +260,8 @@ export function Home(props) {
 
 							<div>
 								<Header size='medium'>Protospace Stats</Header>
-								<p>Next member meeting: {getDateStat('next_meeting')}</p>
-								<p>Next monthly clean: {getDateStat('next_clean')}</p>
+								<p>Next meeting: {getDateStat('next_meeting')}</p>
+								<p>Next clean: {getDateStat('next_clean')}</p>
 								<p className='nowrap-stat'>Next class: {getNextStat('next_class')}</p>
 								<p className='nowrap-stat'>Last class: {getNextStat('prev_class')}</p>
 								<p>Member count: {getStat('member_count')} <Link to='/charts'>[more]</Link></p>
