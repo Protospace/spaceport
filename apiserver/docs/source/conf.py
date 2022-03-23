@@ -14,8 +14,6 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-from recommonmark.parser import CommonMarkParser
-
 # -- Project information -----------------------------------------------------
 
 project = 'Spaceport'
@@ -29,13 +27,13 @@ author = 'Tanner Collin'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'recommonmark',
+    'myst_parser',
 ]
 
 source_suffix = ['.rst', '.md']
 
 source_parsers = {
-    '.md': 'CommonMarkParser',
+    '.md': 'markdown',
 }
 
 known_url_schemes = ['http', 'https']
