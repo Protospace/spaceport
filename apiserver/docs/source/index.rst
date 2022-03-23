@@ -10,7 +10,6 @@ Spaceport Documentation
    :maxdepth: 2
    :caption: Contents:
 
-   specs
    dev
    apioverview
    api
