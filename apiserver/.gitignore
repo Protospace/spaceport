@@ -115,3 +115,7 @@ backups/
 secrets.py
 old_counts.csv
 scans.csv
+output.*
+out.*
+*.csv
+*.txt
