@@ -182,6 +182,8 @@ export function InstructorCourseList(props) {
 				<Form onSubmit={handleSubmit}>
 					<Header size='small'>Add a Course</Header>
 
+					<p>Documentation: <a href='https://wiki.protospace.ca/Be_a_Course_Instructor' target='_blank' rel='noopener noreferrer'>https://wiki.protospace.ca/Be_a_Course_Instructor</a></p>
+
 					<InstructorCourseEditor input={input} setInput={setInput} error={error} />
 
 					<Form.Checkbox

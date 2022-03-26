@@ -400,6 +400,8 @@ export function InstructorClassList(props) {
 						<Form onSubmit={handleSubmit}>
 							<Header size='small'>Add a Class</Header>
 
+							<p>Documentation: <a href='https://wiki.protospace.ca/Be_a_Course_Instructor' target='_blank' rel='noopener noreferrer'>https://wiki.protospace.ca/Be_a_Course_Instructor</a></p>
+
 							<InstructorClassEditor input={input} setInput={setInput} error={error} />
 
 							<Form.Button loading={loading} error={error.non_field_errors}>
