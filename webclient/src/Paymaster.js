@@ -184,7 +184,7 @@ export function Paymaster(props) {
 					<PayPalSubscribe
 						amount={locker}
 						name='Protospace Locker'
-						custom={JSON.stringify({ memo: 'Locker Rental', category: 'OnAcct', member: user.member.id })}
+						custom={JSON.stringify({ memo: 'Locker Rental', category: 'Purchases', member: user.member.id })}
 					/>
 				</Grid.Column>
 			</Grid>

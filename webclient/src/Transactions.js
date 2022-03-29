@@ -53,11 +53,11 @@ export function TransactionEditor(props) {
 
 	const categoryOptions = [
 		{ key: '0', text: 'Membership Dues', value: 'Membership' },
-		{ key: '1', text: 'Payment On Account (ie. Course Fee)', value: 'OnAcct' },
-		{ key: '2', text: 'Snack / Pop / Coffee', value: 'Snacks' },
-		{ key: '3', text: 'Donations', value: 'Donation' },
+		{ key: '1', text: 'Course Fee', value: 'OnAcct' },
+		{ key: '2', text: 'Snacks / Pop / Coffee', value: 'Snacks' },
+		{ key: '3', text: 'Donation', value: 'Donation' },
 		{ key: '4', text: 'Consumables (Explain in memo)', value: 'Consumables' },
-		{ key: '5', text: 'Purchase of Locker / Goods / Merch / Stock', value: 'Purchases' },
+		{ key: '5', text: 'Purchase of Locker / Materials / Stock', value: 'Purchases' },
 		//{ key: '6', text: 'Auction, Garage Sale, Nearly Free Shelf', value: 'Garage Sale' },
 		{ key: '7', text: 'Reimbursement (Enter a negative value)', value: 'Reimburse' },
 		{ key: '8', text: 'Other (Explain in memo)', value: 'Other' },
