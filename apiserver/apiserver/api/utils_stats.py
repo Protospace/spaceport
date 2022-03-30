@@ -30,6 +30,7 @@ DEFAULTS = {
     'track': {},
     'alarm': {},
     'sign': '',
+    'link': '',
     'autoscan': '',
 }
 
