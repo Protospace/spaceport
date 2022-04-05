@@ -138,7 +138,7 @@ function App() {
 					<Menu>
 						<Container>
 							<Menu.Item
-								content='Home'
+								icon='home'
 								as={Link}
 								to='/'
 							/>
@@ -212,9 +212,9 @@ function App() {
 
 							{user && <Menu.Menu position='right'>
 								<Menu.Item
-									content={yousure ? 'You Sure?' : 'Log Out'}
+									content={yousure ? 'Sign out?' : ''}
 									onClick={logout}
-									icon='cancel'
+									icon='sign out'
 								/>
 								<Menu.Item fitted content='' />
 							</Menu.Menu>}
