@@ -1,7 +1,7 @@
 # API Server Development Setup
 
-This guide assumes you are using Debian GNU/Linux 10 or Ubuntu 20.04 LTS. If you
-aren't, just spin up a VPN with the correct version. Things break if you don't.
+This guide assumes you are using Debian GNU/Linux 11 or Ubuntu 20.04 LTS. If you
+aren't, just spin up a VM with the correct version. Things break if you don't.
 
 ## Install Dependencies
 
@@ -25,8 +25,11 @@ $ source env/bin/activate
 (env) $ pip install -r requirements.txt
 ```
 
+You need to make sure the Python virtual environment `(env)` is enabled whenever
+you run the API server.
+
 Copy the secrets file and optionally fill out values depending on which
-[[integrations]] you wish to enable.
+[[integrations]] you wish to enable. It runs fine by default.
 
 ```
 (env) $ cp apiserver/secrets.py.example apiserver/secrets.py
@@ -43,7 +46,8 @@ Set up the database:
 (env) $ python manage.py migrate
 ```
 
-Create a super user so you can manage who's director or staff:
+Create a super user so you can manage who's a director or staff. This is a special
+account and is not treated as a member.
 
 ```
 (env) $ python manage.py createsuperuser --email admin@example.com --username admin
@@ -55,6 +59,9 @@ Run the development server:
 
 ```
 $ source env/bin/activate
-(env) $ DEBUG=true python manage.py runserver
+(env) $ DEBUG=true BINDALL=true python manage.py runserver 0.0.0.0:8000
 ```
 
+The development server is now listening on port 8000. You can connect to it by
+opening `http://<ip address>:8000/` in your web browser. If it's running
+locally, that would be [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
