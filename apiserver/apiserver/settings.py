@@ -29,6 +29,7 @@ SECRET_KEY = secrets.DJANGO_SECRET_KEY or 'OaOBN2E+brpoRyDMlTD9eTE5PgBtkkl+L7Bzt
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG_ENV = os.environ.get('DEBUG', False)
+BINDALL_ENV = os.environ.get('BINDALL', False)
 DEBUG = DEBUG_ENV or False
 
 
@@ -44,11 +45,12 @@ if DEBUG:
     ALLOWED_HOSTS += [
         'localhost',
         '127.0.0.1',
-        'spaceport-api.dns.t0.vc',
         'api.spaceport.dns.t0.vc',
-        'api.my.dns.t0.vc',
-        'api.my.protospace.ca',
     ]
+
+if BINDALL_ENV:
+    ALLOWED_HOSTS = ['*']
+
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
