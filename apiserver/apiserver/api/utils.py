@@ -299,12 +299,26 @@ def create_new_member(data, user):
 
     models.Member.objects.create(
         user=user,
-        first_name=data['first_name'].title().strip(),
-        last_name=data['last_name'].title().strip(),
-        preferred_name=data['first_name'].title().strip(),
+        first_name=data['first_name'],
+        last_name=data['last_name'],
+        preferred_name=data['first_name'],
     )
 
 def register_user(data, user):
+    data = data.copy()
+    data['first_name'] = data['first_name'].title().strip()
+    data['last_name'] = data['last_name'].title().strip()
+
+    if 'test' in data['username']:
+        msg = 'Someone created a test account: {} {} {} {}'.format(
+            data['username'],
+            data['first_name'],
+            data['last_name'],
+            data['email'],
+        )
+        logger.info(msg)
+        alert_tanner(msg)
+
     try:
         logger.info('Creating new member...')
         create_new_member(data, user)
@@ -350,6 +364,7 @@ def register_user(data, user):
         msg = 'Problem sending welcome email: ' + str(e)
         logger.exception(msg)
         alert_tanner(msg)
+
 
     if data['request_id']: utils_stats.set_progress(data['request_id'], 'Done!')
     time.sleep(1)
