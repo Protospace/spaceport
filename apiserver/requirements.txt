@@ -10,6 +10,7 @@ commonmark==0.9.1
 defusedxml==0.6.0
 Django==3.1.14
 django-allauth==0.41.0
+django-cors-headers==3.11.0
 django-rest-auth==0.9.5
 django-simple-history==2.8.0
 djangorestframework==3.11.2

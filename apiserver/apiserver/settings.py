@@ -50,11 +50,13 @@ if DEBUG:
 
 if BINDALL_ENV:
     ALLOWED_HOSTS = ['*']
-
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+else:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
 SECURE_REFERRER_POLICY = 'same-origin'
 
 # Application definition
@@ -65,7 +67,6 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     'django.contrib.sites',
     'rest_framework',
     'rest_framework.authtoken',
@@ -88,6 +89,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
 ]
+
+if BINDALL_ENV:
+    INSTALLED_APPS += [
+        'corsheaders',
+    ]
+    MIDDLEWARE += [
+        'corsheaders.middleware.CorsMiddleware',
+    ]
+    CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'apiserver.urls'
 
@@ -177,7 +187,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 if DEBUG:
-    STATIC_URL = '/static/'
+    MEDIA_URL = 'static/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'data/static')
 else:
     STATIC_URL = 'https://static.{}/'.format(PRODUCTION_HOST)
     STATIC_ROOT = os.path.join(BASE_DIR, 'data/static')

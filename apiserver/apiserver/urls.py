@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
@@ -48,9 +49,11 @@ if secrets.IPN_RANDOM:
 
 if secrets.ADMIN_RANDOM:
     ADMIN_ROUTE = '{}/admin/'.format(secrets.ADMIN_RANDOM)
-    urlpatterns.append(path(ADMIN_ROUTE, admin.site.urls))
+else:
+    ADMIN_ROUTE = 'admin/'
+urlpatterns.append(path(ADMIN_ROUTE, admin.site.urls))
 
 if settings.DEBUG:
     urlpatterns += [
         path('api-auth/', include('rest_framework.urls')),
-    ]
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

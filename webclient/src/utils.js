@@ -3,9 +3,15 @@ import { Table } from 'semantic-ui-react';
 
 export const randomString = () => Math.random().toString(36).substr(2, 10);
 
-export const siteUrl = window.location.protocol + '//' + window.location.hostname;
-export const apiUrl = window.location.protocol + '//api.' + window.location.hostname;
-export const staticUrl = window.location.protocol + '//static.' + window.location.hostname;
+export const siteUrl = window.location.toString();
+export const apiUrl = window.location.port ?
+	'http://' + window.location.hostname + ':8000'
+:
+	window.location.protocol + '//api.' + window.location.hostname;
+export const staticUrl = window.location.port ?
+	'http://' + window.location.hostname + ':8000/static'
+:
+	window.location.protocol + '//static.' + window.location.hostname;
 
 export const isAdmin = (user) => user.is_staff || user.member.is_director || user.member.is_staff;
 export const isInstructor = (user) => isAdmin(user) || user.member.is_instructor;
