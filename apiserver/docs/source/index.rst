@@ -10,7 +10,6 @@ Spaceport Documentation
    :maxdepth: 2
    :caption: Contents:
 
-   dev
    api
    ldap
    dev_apiserver
