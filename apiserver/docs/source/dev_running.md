@@ -12,7 +12,8 @@ IP if your virtual machine or server is.
 Open the web client [http://127.0.0.1:3000/](http://127.0.0.1:3000/) in your browser.
 
 Fill out the "Sign Up to Spaceport" form. If you see a "Please Visit Protospace"
-warning, this means the web client can't talk to the API server properly.
+warning, this means the web client can't talk to the API server properly. Hit
+Sign Up and finish the registration.
 
 Navigate to [http://127.0.0.1:8000/admin/api/member/1/change/](http://127.0.0.1:8000/admin/api/member/1/change/) and log in with the
 super user credentials you created during the API server setup.

@@ -1,6 +1,6 @@
 # Spaceport API
 
-The current API URL is: https://api.my.protospace.ca/
+The current API URL is: [https://api.my.protospace.ca/](https://api.my.protospace.ca/).
 
 JSON is returned by all API responses including errors and HTTP response status
 codes are to designate success and failure.
