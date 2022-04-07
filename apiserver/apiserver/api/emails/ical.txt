@@ -1,0 +1,5 @@
+Hi [name],
+
+Please find attached the iCalendar file for [class] on [date].
+
+Spaceport

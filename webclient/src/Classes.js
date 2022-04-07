@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-r
 import './light.css';
 import { Label, Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
-import { isAdmin, isInstructor, getInstructor, BasicTable, requester } from './utils.js';
+import { apiUrl, isAdmin, isInstructor, getInstructor, BasicTable, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { InstructorClassDetail, InstructorClassAttendance } from './InstructorClasses.js';
 import { PayPalPayNow } from './PayPal.js';
@@ -287,6 +287,52 @@ export function Classes(props) {
 	);
 };
 
+
+export function ICalButtons(props) {
+	const { token, clazz } = props;
+	const [loading, setLoading] = useState(false);
+	const [success, setSuccess] = useState(false);
+	const [error, setError] = useState(false);
+
+	const handleDownload = (e) => {
+		e.preventDefault();
+		window.location = apiUrl + '/sessions/' + clazz.id + '/download_ical/';
+	}
+
+	const handleEmail = (e) => {
+		e.preventDefault();
+		if (loading) return;
+		setLoading(true);
+		setSuccess(false);
+		requester('/sessions/' + clazz.id + '/email_ical/', 'POST', token, {})
+		.then(res => {
+			setLoading(false);
+			setSuccess(true);
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+			setError(true);
+		});
+	};
+
+	return (
+		<>
+			<Button compact onClick={handleDownload}>
+				Download
+			</Button>
+			{success ?
+				<span>&nbsp;&nbsp;Sent!</span>
+			:
+				<Button compact loading={loading} onClick={handleEmail}>
+					Email
+				</Button>
+			}
+			{error && <span>Error.</span>}
+		</>
+	);
+};
+
 export function ClassDetail(props) {
 	const [clazz, setClass] = useState(false);
 	const [refreshCount, refreshClass] = useReducer(x => x + 1, 0);
@@ -388,6 +434,10 @@ export function ClassDetail(props) {
 								<Table.Row>
 									<Table.Cell>Students:</Table.Cell>
 									<Table.Cell>{clazz.student_count} {!!clazz.max_students && '/ '+clazz.max_students}</Table.Cell>
+								</Table.Row>
+								<Table.Row>
+									<Table.Cell>iCalendar:</Table.Cell>
+									<Table.Cell><ICalButtons token={token} clazz={clazz} /></Table.Cell>
 								</Table.Row>
 							</Table.Body>
 						</BasicTable>

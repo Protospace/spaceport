@@ -18,11 +18,12 @@ from rest_auth.views import PasswordChangeView, PasswordResetView, PasswordReset
 from rest_auth.registration.views import RegisterView
 from fuzzywuzzy import fuzz, process
 from collections import OrderedDict
+import icalendar
 import datetime, time
 
 import requests
 
-from . import models, serializers, utils, utils_paypal, utils_stats, utils_ldap
+from . import models, serializers, utils, utils_paypal, utils_stats, utils_ldap, utils_email
 from .permissions import (
     is_admin_director,
     AllowMetadata,
@@ -273,6 +274,45 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
 
     def perform_create(self, serializer):
         serializer.save(instructor=self.request.user)
+
+    def generate_ical(self, session):
+        cal = icalendar.Calendar()
+        cal.add('prodid', '-//Protospace//Spaceport//')
+        cal.add('version', '2.0')
+
+        event = icalendar.Event()
+        event.add('summary', session.course.name)
+        event.add('dtstart', session.datetime)
+        event.add('dtend', session.datetime + datetime.timedelta(hours=1))
+        event.add('dtstamp', now())
+
+        cal.add_component(event)
+
+        return cal.to_ical()
+
+    @action(detail=True, methods=['get'])
+    def download_ical(self, request, pk=None):
+        session = get_object_or_404(models.Session, id=pk)
+        user = self.request.user
+
+        ical_file = self.generate_ical(session).decode()
+
+        response = FileResponse(ical_file, filename='event.ics')
+        response['Content-Type'] = 'text/calendar'
+        response['Content-Disposition'] = 'attachment; filename="event.ics"'
+
+        return response
+
+    @action(detail=True, methods=['post'])
+    def email_ical(self, request, pk=None):
+        session = get_object_or_404(models.Session, id=pk)
+        user = self.request.user
+
+        ical_file = self.generate_ical(session).decode()
+
+        utils_email.send_ical_email(user.member, session, ical_file)
+
+        return Response(200)
 
 
 class TrainingViewSet(Base, Retrieve, Create, Update):

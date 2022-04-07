@@ -5,7 +5,7 @@ import os
 import smtplib
 from datetime import datetime, timedelta
 
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 
 from . import utils
 from .. import settings
@@ -39,3 +39,29 @@ def send_welcome_email(member):
     )
 
     logger.info('Sent welcome email:\n' + email_text)
+
+def send_ical_email(member, session, ical_file):
+    def replace_fields(text):
+        return text.replace(
+            '[name]', member.first_name,
+        ).replace(
+            '[class]', session.course.name,
+        ).replace(
+            '[date]', session.datetime.strftime('%A, %B %d'),
+        )
+
+    with open(EMAIL_DIR + 'ical.txt', 'r') as f:
+        email_text = replace_fields(f.read())
+
+    with open(EMAIL_DIR + 'ical.html', 'r') as f:
+        email_html = replace_fields(f.read())
+
+    subject = 'Protospace ' + session.course.name
+    from_email = None  # defaults to DEFAULT_FROM_EMAIL
+    to = member.user.email
+    msg = EmailMultiAlternatives(subject, email_text, from_email, [to])
+    msg.attach_alternative(email_html, "text/html")
+    msg.attach('event.ics', ical_file, 'text/calendar')
+    msg.send()
+
+    logger.info('Sent ical email:\n' + email_text)
