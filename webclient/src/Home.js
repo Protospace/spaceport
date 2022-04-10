@@ -34,7 +34,7 @@ function MemberInfo(props) {
 					<Header size='large'>{member.preferred_name} {member.last_name}</Header>
 
 					{member.is_allowed_entry ?
-						<p>You are allowed entry into Protospace ✅</p>
+						<></>
 					:
 						<p>You are not allowed entry into Protospace ❌</p>
 					}
