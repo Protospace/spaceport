@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { BrowserRouter as Router, Switch, Route, Link, useParams, useLocation } from 'react-router-dom';
 import { Container, Icon } from 'semantic-ui-react';
 
 import { scene } from './spaceport/scene';
@@ -16,11 +17,13 @@ export const Footer = () => {
 		<div className="footer" ref={footerRef}>
 			<Container className="footer-content">
 				<p>
-					<img
-						alt="site logo"
-						src="/logo-short.svg"
-						className="logo"
-					/>
+					<Link to='/debug'>
+						<img
+							alt="site logo"
+							src="/logo-short.svg"
+							className="logo"
+						/>
+					</Link>
 				</p>
 
 				<p className="text">

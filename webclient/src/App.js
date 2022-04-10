@@ -26,6 +26,7 @@ import { Auth } from './Auth.js';
 import { Subscribe } from './PayPal.js';
 import { PasswordReset, ConfirmReset } from './PasswordReset.js';
 import { NotFound, PleaseLogin } from './Misc.js';
+import { Debug } from './Debug.js';
 import { Footer } from './Footer.js';
 
 const APP_VERSION = 3;  // TODO: automate this
@@ -227,6 +228,10 @@ function App() {
 
 					<div className='topPadding'>
 						<Switch>
+							<Route path='/debug'>
+								<Debug token={token} user={user} />
+							</Route>
+
 							<Route path='/password/reset/confirm/:uid/:token'>
 								<ConfirmReset />
 							</Route>
