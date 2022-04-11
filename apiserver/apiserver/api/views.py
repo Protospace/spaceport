@@ -178,7 +178,6 @@ class MemberViewSet(Base, Retrieve, Update):
         member = serializer.save()
         utils.tally_membership_months(member)
         utils.gen_member_forms(member)
-        utils.gen_search_strings()
 
     @action(detail=True, methods=['post'])
     def pause(self, request, pk=None):

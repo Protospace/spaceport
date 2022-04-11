@@ -31,6 +31,8 @@ class Command(BaseCommand):
 
         utils_stats.calc_card_scans()
 
+        utils.gen_search_strings()
+
 
     def handle(self, *args, **options):
         self.stdout.write('{} - Beginning hourly tasks'.format(str(now())))
