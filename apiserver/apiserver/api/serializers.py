@@ -81,9 +81,11 @@ class TransactionSerializer(serializers.ModelSerializer):
 
         if validated_data['account_type'] != 'Clearing':
             if validated_data['amount'] == 0:
-                raise ValidationError(dict(account_type='You can\'t have a $0.00 {} transaction. Do you want "Membership Adjustment"?'.format(validated_data['account_type'])))
-            elif validated_data['amount'] < 0.1:
-                raise ValidationError(dict(amount='Don\'t try and trick me.'))
+                raise ValidationError(dict(account_type='Can\'t have a $0.00 {} transaction. Do you want "Membership Adjustment"?'.format(validated_data['account_type'])))
+
+        if validated_data['category'] != 'Reimburse':
+            if validated_data['amount'] < 0:
+                raise ValidationError(dict(category='Can\'t have a negative {} transaction. Do you want "Reimbursement"?'.format(validated_data['category'])))
 
         if validated_data['account_type'] == 'PayPal':
             msg = 'Manual PayPal transaction added:\n' + str(validated_data)
