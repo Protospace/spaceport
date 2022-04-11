@@ -110,9 +110,9 @@ def tally_membership_months(member, fake_date=None):
             member.paused_date = expire_date
 
         member.save()
-        logging.debug('Tallied %s: updated.', member)
+        logging.debug('Tallied %s membership months: updated.', member)
     else:
-        logging.debug('Tallied %s: no changes.', member)
+        logging.debug('Tallied %s membership months: no changes.', member)
 
     return True
 
