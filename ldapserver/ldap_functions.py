@@ -125,21 +125,15 @@ def set_password(username, password):
     try:
         logger.info('Setting password for: ' + username)
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
-        criteria = '(&(objectClass=user)(sAMAccountName={})(!(objectClass=computer)))'.format(username)
-        results = ldap_conn.search_s(secrets.BASE_MEMBERS, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName','email'] )
+        user_dn = find_user(username)
 
-        if len(results) != 1:
-            abort(HTTP_NOTFOUND)
-
-        dn = results[0][0]
-
-        logger.info('  Dn found: ' + dn)
+        logger.info('  Dn found: ' + user_dn)
 
         # set password
         pass_quotes = '"{}"'.format(password)
         pass_uni = pass_quotes.encode('utf-16-le')
         change_des = [(ldap.MOD_REPLACE, 'unicodePwd', [pass_uni])]
-        result = ldap_conn.modify_s(dn, change_des)
+        result = ldap_conn.modify_s(user_dn, change_des)
 
         logger.info('  Set password result: ' + str(result))
     finally:
