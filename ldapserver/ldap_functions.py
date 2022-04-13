@@ -387,6 +387,8 @@ if __name__ == '__main__':
     #print(list_group('Trotec Users'))
     #print(dump_users())
 
+    #print(set_account_enabled('tanner.collin', True))
+
     #users = list_group('Laser Users')
     #import json
     #print(json.dumps(users, indent=4))
