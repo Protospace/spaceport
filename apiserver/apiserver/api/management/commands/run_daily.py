@@ -32,11 +32,11 @@ class Command(BaseCommand):
             'protospace_instructors': [],
         }
 
-        for user in User.objects.exclude(member__discourse_username__exact=''):
-            username = user.member.discourse_username
+        for member in models.Member.objects.exclude(discourse_username__exact=''):
+            username = member.discourse_username
 
             # handle non-member vs. member
-            if user.member.paused_date:
+            if member.paused_date:
                 add_to_group['protospace_members_former'].append(username)
                 remove_from_group['directors_current'].append(username)
                 remove_from_group['protospace_members'].append(username)
@@ -49,13 +49,13 @@ class Command(BaseCommand):
                 remove_from_group['protospace_members_former'].append(username)
 
             # handle directors
-            if user.member.is_director:
+            if member.is_director:
                 add_to_group['directors_current'].append(username)
             else:
                 remove_from_group['directors_current'].append(username)
 
             # handle instructors
-            if user.member.is_instructor:
+            if member.is_instructor:
                 add_to_group['protospace_instructors'].append(username)
             else:
                 remove_from_group['protospace_instructors'].append(username)
