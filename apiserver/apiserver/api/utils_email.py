@@ -42,12 +42,14 @@ def send_welcome_email(member):
 
 def send_ical_email(member, session, ical_file):
     def replace_fields(text):
+        date = session.datetime.astimezone(utils.TIMEZONE_CALGARY).strftime('%A, %B %d')
+
         return text.replace(
             '[name]', member.first_name,
         ).replace(
             '[class]', session.course.name,
         ).replace(
-            '[date]', session.datetime.strftime('%A, %B %d'),
+            '[date]', date
         )
 
     with open(EMAIL_DIR + 'ical.txt', 'r') as f:

@@ -26,12 +26,13 @@ from .. import settings
 
 STATIC_FOLDER = 'data/static/'
 
+TIMEZONE_CALGARY = pytz.timezone('America/Edmonton')
 
 def today_alberta_tz():
-    return datetime.now(pytz.timezone('America/Edmonton')).date()
+    return datetime.now(TIMEZONE_CALGARY).date()
 
 def now_alberta_tz():
-    return datetime.now(pytz.timezone('America/Edmonton'))
+    return datetime.now(TIMEZONE_CALGARY)
 
 def alert_tanner(message):
     try:

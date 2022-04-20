@@ -7,12 +7,8 @@ import requests
 from django.db.models import Prefetch
 from django.core.cache import cache
 from django.utils.timezone import now, pytz
-from apiserver.api import models
+from apiserver.api import models, utils
 from apiserver import secrets
-
-tz = pytz.timezone('America/Edmonton')
-def today_alberta_tz():
-    return datetime.now(tz).date()
 
 DEFAULTS = {
     'last_card_change': time.time(),
@@ -87,7 +83,7 @@ def calc_member_counts():
     paused_count = members.count() - member_count
     green_count = num_current + num_prepaid
 
-    six_months_ago = today_alberta_tz() - timedelta(days=183)
+    six_months_ago = utils.today_alberta_tz() - timedelta(days=183)
     six_month_plus_count = not_paused.filter(application_date__lte=six_months_ago).count()
 
     vetted_count = not_paused.filter(vetted_date__isnull=False).count()
@@ -121,7 +117,7 @@ def calc_member_counts():
     )
 
 def calc_signup_counts():
-    month_beginning = today_alberta_tz().replace(day=1)
+    month_beginning = utils.today_alberta_tz().replace(day=1)
 
     members = models.Member.objects
     new_members = members.filter(application_date__gte=month_beginning)
@@ -182,9 +178,9 @@ def check_mumble_server():
     return []
 
 def calc_card_scans():
-    date = today_alberta_tz()
+    date = utils.today_alberta_tz()
     dt = datetime.combine(date, datetime.min.time())
-    midnight = tz.localize(dt)
+    midnight = utils.TIMEZONE_CALGARY.localize(dt)
 
     cards = models.Card.objects
     count = cards.filter(last_seen__gte=midnight).count()
