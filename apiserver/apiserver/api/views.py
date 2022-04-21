@@ -720,9 +720,6 @@ class StatsViewSet(viewsets.ViewSet, List):
                     num_seconds=0,
                 )
                 logging.info('New %s usage #%s created for: %s', device, last_use.id, username or '[no username]')
-
-            last_use.num_reports = F('num_reports') + 1
-            last_use.save()
         else:
             if last_use and not last_use.finished_at:
                 time_now = now()
@@ -731,36 +728,6 @@ class StatsViewSet(viewsets.ViewSet, List):
                 last_use.finished_at = time_now
                 last_use.num_seconds = duration.seconds
                 last_use.save()
-
-        if not last_use:
-            return Response(200)
-
-        if not last_use.finished_at:
-            return Response(200)
-
-        # perform some sanity-checks on finished uses
-
-        if last_use.device == 'TROTECS300':
-            estimated_seconds = last_use.num_reports * 20
-        else:
-            return Response(200)
-
-        if estimated_seconds < 60:
-            logging.info('Finished %s usage #%s was less than a minute, soft deleting.', device, last_use.id)
-            last_use.memo = 'Soft deleted reason: less than a minute'
-            last_use.deleted_at = now()
-            last_use.save()
-        #elif abs(last_use.num_seconds - estimated_seconds) > 300:
-        #    logging.info(
-        #        'Finished %s usage #%s time %ss mismatches estimate %ss, soft deleting.',
-        #        device,
-        #        last_use.id,
-        #        last_use.num_seconds,
-        #        estimated_seconds
-        #    )
-        #    last_use.memo = 'Soft deleted reason: time {}s mismatches estimate {}s'.format(last_use.num_seconds, estimated_seconds)
-        #    last_use.deleted_at = now()
-        #    last_use.save()
 
         return Response(200)
 
