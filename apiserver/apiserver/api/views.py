@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.db import transaction
 from django.db.models import Max, F, Count, Q, Sum
 from django.db.utils import OperationalError
-from django.http import HttpResponse, Http404, FileResponse
+from django.http import HttpResponse, Http404, FileResponse, HttpResponseServerError
 from django.core.files.base import File
 from django.core.cache import cache
 from django.utils.timezone import now
@@ -563,8 +563,9 @@ class IpnView(views.APIView):
             utils_paypal.process_paypal_ipn(request.data)
         except BaseException as e:
             logger.error('IPN route - {} - {}'.format(e.__class__.__name__, str(e)))
-        finally:
-            return Response(200)
+            return HttpResponseServerError()
+
+        return Response(200)
 
 
 class StatsViewSet(viewsets.ViewSet, List):
