@@ -113,7 +113,7 @@ class SearchViewSet(Base, Retrieve):
                 queryset = queryset.filter(is_director=True)
                 queryset = queryset.order_by('application_date')
             elif sort == 'is_instructor':
-                queryset = queryset.filter(is_instructor=True)
+                queryset = queryset.filter(paused_date__isnull=True, is_instructor=True)
                 queryset = queryset.order_by('application_date')
             elif sort == 'due':
                 queryset = queryset.filter(status='Due')
