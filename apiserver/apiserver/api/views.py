@@ -124,7 +124,9 @@ class SearchViewSet(Base, Retrieve):
             elif sort == 'last_scanned':
                 if self.request.user.member.allow_last_scanned:
                     queryset = queryset.filter(allow_last_scanned=True)
-                    queryset = queryset.order_by('-user__cards__last_seen')
+                    queryset = queryset.annotate(
+                        last_scanned=Max('user__cards__last_seen'),
+                    ).exclude(last_scanned__isnull=True).order_by('-last_scanned')
                 else:
                     queryset = []
             elif sort == 'everyone':
