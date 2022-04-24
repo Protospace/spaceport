@@ -51,6 +51,7 @@ export function AdminVetting(props) {
 	const [vetting, setVetting] = useState(vettingCache);
 	const [refreshCount, refreshVetting] = useReducer(x => x + 1, 0);
 	const [error, setError] = useState(false);
+	const [showAll, setShowAll] = useState(false);
 
 	useEffect(() => {
 		requester('/vetting/', 'GET', token)
@@ -62,6 +63,8 @@ export function AdminVetting(props) {
 			console.log(err);
 		});
 	}, [refreshCount]);
+
+	const displayAll = (vetting && vetting.length <= 5) || showAll;
 
 	return (
 		<div>
@@ -80,7 +83,7 @@ export function AdminVetting(props) {
 							</Table.Header>
 
 							<Table.Body>
-								{vetting.map(x =>
+								{(displayAll ? vetting : vetting.slice(0,5)).map(x =>
 									<Table.Row key={x.id}>
 										<Table.Cell><Link to={'/members/'+x.id}>{x.first_name} {x.last_name}</Link></Table.Cell>
 										<Table.Cell><a href={'mailto:'+x.email}>Email</a></Table.Cell>
@@ -95,8 +98,16 @@ export function AdminVetting(props) {
 							</Table.Body>
 						</Table>
 
+						<p>{displayAll ? '' : '5 / '}{vetting.length} members</p>
+
 						<p>
-							&#8627; <a href={'mailto:'+vetting.map(x => x.email).join(',')}>Email All</a>
+							{displayAll ?
+								<>
+									&#8627; <a href={'mailto:'+vetting.map(x => x.email).join(',')}>Email All</a>
+								</>
+							:
+								<Button onClick={() => setShowAll(true)}>Show All</Button>
+							}
 						</p>
 					</>
 				:
