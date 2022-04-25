@@ -18,8 +18,11 @@ from rest_auth.views import PasswordChangeView, PasswordResetView, PasswordReset
 from rest_auth.registration.views import RegisterView
 from fuzzywuzzy import fuzz, process
 from collections import OrderedDict
+from dateutil import relativedelta
 import icalendar
 import datetime, time
+import io
+import csv
 
 import requests
 
@@ -935,6 +938,44 @@ class VettingViewSet(Base, List):
         queryset = queryset.filter(current_start_date__lte=four_weeks_ago)
 
         return queryset.order_by('-current_start_date')
+
+
+class UsageViewSet(Base):
+    permission_classes = [AllowMetadata | IsAdmin]
+
+    # TODO: add filtering by device
+    @action(detail=False, methods=['get'])
+    def csv(self, request):
+        usages = models.Usage.objects.order_by('id')
+        month = self.request.query_params.get('month', None)
+
+        if month:
+            try:
+                dt = datetime.datetime.strptime(month, '%Y-%m')
+                dt = utils.TIMEZONE_CALGARY.localize(dt)
+            except ValueError:
+                raise exceptions.ValidationError(dict(month='Should be YYYY-MM.'))
+
+            usages = usages.filter(
+                started_at__gte=dt,
+                started_at__lt=dt + relativedelta.relativedelta(months=1),
+            )
+
+        response = HttpResponse(
+            content_type='text/csv',
+        )
+        response['Content-Disposition'] = 'attachment; filename="usage-{}.csv"'.format(month or 'all')
+
+        fieldnames = ['id', 'user__username', 'device', 'started_at', 'finished_at', 'num_seconds']
+        writer = csv.DictWriter(response, fieldnames=fieldnames)
+
+        writer.writeheader()
+        for u in usages.values(*fieldnames):
+            u['started_at'] = u['started_at'].astimezone(utils.TIMEZONE_CALGARY)
+            u['finished_at'] = u['finished_at'].astimezone(utils.TIMEZONE_CALGARY)
+            writer.writerow(u)
+
+        return response
 
 
 class RegistrationView(RegisterView):
