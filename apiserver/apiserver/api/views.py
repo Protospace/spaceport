@@ -781,10 +781,10 @@ class StatsViewSet(viewsets.ViewSet, List):
         month_start = today_start.replace(day=1)
 
         today_total = device_uses.filter(
-            user=user, started_at__gte=today_start, deleted_at__isnull=True,
+            user=user, started_at__gte=today_start,
         ).aggregate(Sum('num_seconds'))['num_seconds__sum'] or 0 + running_cut_time
         month_total = device_uses.filter(
-            user=user, started_at__gte=month_start, deleted_at__isnull=True,
+            user=user, started_at__gte=month_start,
         ).aggregate(Sum('num_seconds'))['num_seconds__sum'] or 0 + running_cut_time
 
         try:
