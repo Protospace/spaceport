@@ -9,6 +9,7 @@
 		"abort-controller": "^3.0.0",
 		"blueimp-load-image": "^5.13.0",
 		"darkmode-js": "~1.5.5",
+		"downloadjs": "^1.4.7",
 		"lodash": "^4.17.19",
 		"moment": "~2.24.0",
 		"moment-timezone": "~0.5.28",

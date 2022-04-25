@@ -2,7 +2,9 @@ import React, { useState, useEffect, useReducer } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import * as Datetime from 'react-datetime';
 import moment from 'moment-timezone';
+import download from 'downloadjs';
 import { apiUrl, statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound } from './Misc.js';
 
@@ -270,6 +272,67 @@ export function AdminBackups(props) {
 	);
 };
 
+export function AdminUsage(props) {
+	const { token, user } = props;
+	const [input, setInput] = useState({ month: moment() });
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(false);
+
+	const handleDatetime = (v) => setInput({ ...input, month: v });
+
+	const handleDownload = (month) => {
+		if (loading) return;
+		setLoading(true);
+		const query = month ? '?month=' + month : '';
+		requester('/usage/csv/' + query, 'GET', token)
+		.then(res => {
+			setLoading(false);
+			setError(false);
+			return res.blob();
+		})
+		.then(blob => {
+			download(blob, 'usage-'+(month || 'all')+'.csv');
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+			setError(true);
+		});
+	};
+
+
+	const handleSubmit = (e) => {
+		const month = input.month.format('YYYY-MM');
+		handleDownload(month)
+	};
+
+	return (
+		<div>
+			<Form onSubmit={handleSubmit}>
+				<label>Month</label>
+				<Form.Group>
+					<Form.Field>
+						<Datetime
+							dateFormat='YYYY-MM'
+							timeFormat={false}
+							value={input.month}
+							onChange={handleDatetime}
+						/>
+					</Form.Field>
+
+					<Form.Button loading={loading}>
+						Download
+					</Form.Button>
+				</Form.Group>
+			</Form>
+
+			<Form.Button loading={loading} onClick={() => handleDownload(null)}>
+				Download All
+			</Form.Button>
+		</div>
+	);
+};
+
 export function Admin(props) {
 	return (
 		<Container>
@@ -279,11 +342,18 @@ export function Admin(props) {
 			<p>Members who are Current or Due, and past their probationary period.</p>
 			<AdminVetting {...props} />
 
+
 			<Header size='medium'>Member Data Backup</Header>
 			<p>Spaceport backups are created daily. 14 days are kept on the server.</p>
 
 			<Header size='small'>Backup Downloads</Header>
 			<AdminBackups />
+
+
+			<Header size='medium'>Trotec Device Usage</Header>
+			<p>All times are in Mountain time.</p>
+			<AdminUsage {...props} />
+
 
 			<Header size='medium'>History</Header>
 			<p>Last 50 database changes:</p>
