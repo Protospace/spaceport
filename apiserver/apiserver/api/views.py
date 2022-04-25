@@ -673,6 +673,7 @@ class StatsViewSet(viewsets.ViewSet, List):
 
         return Response(200)
 
+    # TODO: keep track of last report to ensure PS internet didn't cut out
     @action(detail=False, methods=['post'])
     def usage(self, request):
         if 'device' not in request.data:
@@ -681,12 +682,15 @@ class StatsViewSet(viewsets.ViewSet, List):
         device = request.data['device']
         data = request.data.get('data', None)
 
+        username_isfrom_track = False
+
         if 'username' in request.data:
             username = request.data['username']
         else:
             track = cache.get('track', {})
             try:
                 username = track[device]['username']
+                username_isfrom_track = True
             except KeyError:
                 msg = 'Usage tracker problem finding username for device: {}'.format(device)
                 utils.alert_tanner(msg)
@@ -708,6 +712,12 @@ class StatsViewSet(viewsets.ViewSet, List):
         if should_count:
             start_new_use = not last_use or last_use.finished_at or last_use.username != username
             if start_new_use:
+                if username_isfrom_track and time.time() - track[device]['time'] > 300:
+                    msg = 'Usage tracker problem expired username {} for device: {}'.format(username, device)
+                    utils.alert_tanner(msg)
+                    logger.error(msg)
+                    username = ''
+
                 try:
                     user = User.objects.get(username__iexact=username)
                 except User.DoesNotExist:
