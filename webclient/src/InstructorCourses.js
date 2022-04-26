@@ -83,7 +83,7 @@ export function InstructorCourseDetail(props) {
 		if (loading) return;
 		setLoading(true);
 		setSuccess(false);
-		const data = { ...input, is_old: false };
+		const data = { ...input, is_old: false, sessions: null };
 		requester('/courses/'+id+'/', 'PUT', token, data)
 		.then(res => {
 			setSuccess(true);
