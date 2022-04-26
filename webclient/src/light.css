@@ -132,6 +132,16 @@ body {
 .coursetags .ui.tag.label {
 	margin-top: 1rem;
 }
+.newclasstable {
+	margin: 0 -1.5rem 0 -0.5rem;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.newclasstable .ui.tag.label {
+	padding-left: 1rem;
+	padding-right: 0.5rem;
+}
 
 .usage {
 	height: 100vh;

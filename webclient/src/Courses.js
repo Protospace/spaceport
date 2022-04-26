@@ -24,7 +24,7 @@ export const tags = {
 	Misc: 'grey',
 };
 
-let courseCache = false;
+export let courseCache = false;
 let tagFilterCache = false;
 
 export function Courses(props) {

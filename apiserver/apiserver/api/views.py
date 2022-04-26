@@ -234,6 +234,8 @@ class CardViewSet(Base, Create, Retrieve, Update, Destroy):
         utils_stats.changed_card()
 
 
+# TODO: return nested list of sessions, limited with Prefetch:
+#       https://stackoverflow.com/a/58689019
 class CourseViewSet(Base, List, Retrieve, Create, Update):
     permission_classes = [AllowMetadata | IsAuthenticatedOrReadOnly, IsAdminOrReadOnly | IsInstructorOrReadOnly]
     queryset = models.Course.objects.annotate(date=Max('sessions__datetime')).order_by('-date')

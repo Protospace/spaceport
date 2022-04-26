@@ -6,6 +6,7 @@ import moment from 'moment-timezone';
 import { apiUrl, isAdmin, isInstructor, getInstructor, BasicTable, requester } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { InstructorClassDetail, InstructorClassAttendance } from './InstructorClasses.js';
+import { courseCache } from './Courses.js';
 import { PayPalPayNow } from './PayPal.js';
 import { tags } from './Courses.js';
 
@@ -61,9 +62,10 @@ function ClassTable(props) {
 };
 
 function NewClassTable(props) {
-	const { classes } = props;
+	const { classes, courses } = props;
 
 	let sortedClasses = [];
+	let seenCourseIds = [];
 	if (classes.length) {
 		for (const clazz of classes) {
 			const course_data = clazz.course_data;
@@ -76,6 +78,9 @@ function NewClassTable(props) {
 					course: course_data,
 					classes: [clazz],
 				});
+				seenCourseIds.push(
+					course_data.id
+				);
 			}
 		}
 	}
@@ -84,17 +89,17 @@ function NewClassTable(props) {
 
 	return (
 		<>
-			<div style={{ margin: '0 -1.5rem 0 -0.5rem', display: 'flex', flexWrap: 'wrap' }}>
+			<div className='newclasstable'>
 				{sortedClasses.map(x =>
 					<Segment style={{ margin: '1rem 1rem 0 0', width: '22rem' }}>
-						<Header size='medium'>
+						<Header size='small'>
 							<Link to={'/courses/'+x.course.id}>
 								{x.course.name}
 							</Link>
 						</Header>
 
 						{!!x.course.tags && x.course.tags.split(',').map(name =>
-							<Label color={tags[name]} tag>
+							<Label color={tags[name]} tag size='small'>
 								{name}
 							</Label>
 						)}
@@ -134,6 +139,22 @@ function NewClassTable(props) {
 								)}
 							</Table.Body>
 						</Table>
+					</Segment>
+				)}
+
+				{courses.filter(x => !seenCourseIds.includes(x.id)).map(x =>
+					<Segment style={{ margin: '1rem 1rem 0 0', width: '22rem' }}>
+						<Header size='small'>
+							<Link to={'/courses/'+x.id}>
+								{x.name}
+							</Link>
+						</Header>
+
+						{!!x.tags && x.tags.split(',').map(name =>
+							<Label color={tags[name]} tag>
+								{name}
+							</Label>
+						)}
 					</Segment>
 				)}
 			</div>
@@ -184,9 +205,21 @@ export function ClassFeed(props) {
 
 export function Classes(props) {
 	const [classes, setClasses] = useState(classesCache);
+	const [courses, setCourses] = useState(courseCache);
 	const [sortByCourse, setSortByCourse] = useState(sortCache);
 	const [tagFilter, setTagFilter] = useState(tagFilterCache);
 	const { token, user } = props;
+
+	useEffect(() => {
+		requester('/courses/', 'GET', token)
+		.then(res => {
+			setCourses(res.results);
+			courseCache = res.results;
+		})
+		.catch(err => {
+			console.log(err);
+		});
+	}, []);
 
 	useEffect(() => {
 		requester('/sessions/', 'GET', token)
@@ -201,7 +234,8 @@ export function Classes(props) {
 
 	const byTeaching = (x) => x.instructor_id === user.member.id;
 	const byDate = (a, b) => a.datetime > b.datetime ? 1 : -1;
-	const byTag = (x) => tagFilter ? x.course_data.tags.includes(tagFilter) : true;
+	const classesByTag = (x) => tagFilter ? x.course_data.tags.includes(tagFilter) : true;
+	const coursesByTag = (x) => tagFilter ? x.tags.includes(tagFilter) : true;
 
 	return (
 		<Container>
@@ -268,11 +302,14 @@ export function Classes(props) {
 			</p>
 
 
-			{classes.length ?
+			{classes.length && courses.length ?
 				sortByCourse ?
-					<NewClassTable classes={classes.filter(byTag)} />
+					<NewClassTable
+						classes={classes.filter(classesByTag)}
+						courses={courses.filter(coursesByTag)}
+					/>
 				:
-					<ClassTable classes={classes.slice().filter(byTag).sort(byDate)} />
+					<ClassTable classes={classes.slice().filter(classesByTag).sort(byDate)} />
 			:
 				<p>Loading...</p>
 			}
