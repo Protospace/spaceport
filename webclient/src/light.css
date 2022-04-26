@@ -138,9 +138,15 @@ body {
 	flex-wrap: wrap;
 }
 
-.newclasstable .ui.tag.label {
+.ui.tag.label {
 	padding-left: 1rem;
 	padding-right: 0.5rem;
+}
+
+.labelbox {
+	display: inline;
+	padding: 0.55rem 0.1rem;
+	border: 2px solid black;
 }
 
 .usage {

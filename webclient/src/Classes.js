@@ -155,6 +155,9 @@ function NewClassTable(props) {
 								{name}
 							</Label>
 						)}
+
+						<p/>
+						<p>No upcoming classes.</p>
 					</Segment>
 				)}
 			</div>
@@ -275,32 +278,42 @@ export function Classes(props) {
 			<p>
 				Filter by tag:
 				<div className='coursetags'>
-					{Object.entries(tags).map(([name, color]) =>
+					<div
+						className='labelbox'
+						style={{borderColor: tagFilter === false ? 'black' : 'transparent'}}
+					>
 						<Label
 							onClick={() => {
-								setTagFilter(name);
-								tagFilterCache = name;
+								setTagFilter(false);
+								tagFilterCache = false;
 							}}
 							as='a'
-							color={color}
 							tag
 						>
-							{name}
+							No Filter
 						</Label>
+					</div>
+
+					{Object.entries(tags).map(([name, color]) =>
+						<div
+							className='labelbox'
+							style={{borderColor: tagFilter === name ? 'black' : 'transparent'}}
+						>
+							<Label
+								onClick={() => {
+									setTagFilter(name);
+									tagFilterCache = name;
+								}}
+								as='a'
+								color={color}
+								tag
+							>
+								{name}
+							</Label>
+						</div>
 					)}
 				</div>
 			</p>
-			<p>
-				{tagFilter && <Button
-					onClick={() => {
-						setTagFilter(false);
-						tagFilterCache = false;
-					}}
-				>
-					Clear {tagFilter} filter
-				</Button>}
-			</p>
-
 
 			{classes.length && courses.length ?
 				sortByCourse ?
