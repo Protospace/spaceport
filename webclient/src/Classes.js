@@ -86,7 +86,7 @@ function NewClassTable(props) {
 		<>
 			<div style={{ margin: '0 -1.5rem 0 -0.5rem', display: 'flex', flexWrap: 'wrap' }}>
 				{sortedClasses.map(x =>
-					<Segment style={{ margin: '1rem 1rem 0 0', width: '30rem' }}>
+					<Segment style={{ margin: '1rem 1rem 0 0', width: '22rem' }}>
 						<Header size='medium'>
 							<Link to={'/courses/'+x.course.id}>
 								{x.course.name}
@@ -99,12 +99,10 @@ function NewClassTable(props) {
 							</Label>
 						)}
 
-
 						<Table compact unstackable singleLine basic='very'>
 							<Table.Header>
 								<Table.Row>
 									<Table.HeaderCell>Date</Table.HeaderCell>
-									<Table.HeaderCell>Time</Table.HeaderCell>
 									<Table.HeaderCell>Cost</Table.HeaderCell>
 									<Table.HeaderCell>Students</Table.HeaderCell>
 								</Table.Row>
@@ -115,15 +113,12 @@ function NewClassTable(props) {
 									<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
 										<Table.Cell>
 											<Link to={'/classes/'+x.id}>
-												&nbsp;{moment.utc(x.datetime).tz('America/Edmonton').format('MMM Do')}
+												{moment.utc(x.datetime).tz('America/Edmonton').format(' MMM Do')}
 											</Link>
+											{' - '}{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}
 										</Table.Cell>
 
-										<Table.Cell>
-											{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}
-										</Table.Cell>
-
-										<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
+										<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost.slice(0,2)}</Table.Cell>
 
 										<Table.Cell>
 											{!!x.max_students ?
@@ -207,8 +202,6 @@ export function Classes(props) {
 	const byTeaching = (x) => x.instructor_id === user.member.id;
 	const byDate = (a, b) => a.datetime > b.datetime ? 1 : -1;
 	const byTag = (x) => tagFilter ? x.course_data.tags.includes(tagFilter) : true;
-
-	console.log(tagFilter);
 
 	return (
 		<Container>
