@@ -61,3 +61,11 @@
 	mix-blend-mode: difference;
 	background: #21ba4582 !important;
 }
+
+.darkmode--activated .ui.tag.label {
+	mix-blend-mode: difference;
+}
+
+.darkmode--activated .ui.black.tag.label {
+	mix-blend-mode: inherit;
+}
