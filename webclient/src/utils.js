@@ -119,3 +119,30 @@ export const requester = (route, method, token, data, signal=null) => {
 		}
 	});
 }
+
+// from: https://usehooks.com/useWindowSize/
+function useWindowSize() {
+	const [windowSize, setWindowSize] = useState({
+		width: undefined,
+		height: undefined,
+	});
+
+	useEffect(() => {
+		function handleResize() {
+			setWindowSize({
+				width: window.innerWidth,
+				height: window.innerHeight,
+			});
+		}
+		window.addEventListener('resize', handleResize);
+		handleResize();
+		return () => window.removeEventListener('resize', handleResize);
+	}, []);
+
+	return windowSize;
+}
+
+export const useIsMobile = () => {
+	const {width, height} = useWindowSize();
+	return width <= 767;
+}

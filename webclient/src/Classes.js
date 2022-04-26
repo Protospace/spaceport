@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-r
 import './light.css';
 import { Label, Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
-import { apiUrl, isAdmin, isInstructor, getInstructor, BasicTable, requester } from './utils.js';
+import { apiUrl, isAdmin, isInstructor, getInstructor, BasicTable, requester, useIsMobile } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { InstructorClassDetail, InstructorClassAttendance } from './InstructorClasses.js';
 import { courseCache } from './Courses.js';
@@ -12,10 +12,47 @@ import { tags } from './Courses.js';
 
 function ClassTable(props) {
 	const { classes } = props;
+	const isMobile = useIsMobile();
 
 	const now = new Date().toISOString();
 
-	return (
+	return (isMobile ?
+		<Table basic='very'>
+			<Table.Body>
+				{classes.length ?
+					classes.map(x =>
+						<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
+							<Table.Cell>{x.course_data.name}</Table.Cell>
+							<Table.Cell>
+								Date: <Link to={'/classes/'+x.id}>
+									{moment.utc(x.datetime).tz('America/Edmonton').format('ll')}
+								</Link>
+								<span style={{float: 'right'}}>
+									Time: {x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}
+								</span>
+							</Table.Cell>
+							<Table.Cell>
+								Cost: {x.cost === '0.00' ? 'Free' : '$'+x.cost}
+								<span style={{float: 'right'}}>
+									Students: {!!x.max_students ?
+										x.max_students <= x.student_count ?
+											'Full'
+										:
+											x.student_count + ' / ' + x.max_students
+									:
+										x.student_count
+									}
+								</span>
+							</Table.Cell>
+							<Table.Cell>Instructor: {getInstructor(x)}</Table.Cell>
+						</Table.Row>
+					)
+				:
+					<Table.Row>None</Table.Row>
+				}
+			</Table.Body>
+		</Table>
+	:
 		<Table basic='very'>
 			<Table.Header>
 				<Table.Row>
