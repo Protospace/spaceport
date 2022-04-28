@@ -59,6 +59,7 @@ class Member(models.Model):
     monthly_fees = models.IntegerField(default=55, blank=True, null=True)
     is_allowed_entry = models.BooleanField(default=True)
     discourse_username = models.CharField(default='', max_length=40, blank=True, null=True)
+    mediawiki_username = models.CharField(default='', max_length=40, blank=True, null=True)
     allow_last_scanned = models.BooleanField(default=True)
 
     history = HistoricalRecords(excluded_fields=['member_forms'])

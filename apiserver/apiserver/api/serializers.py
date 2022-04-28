@@ -208,6 +208,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'rabbit_cert_date',
             'trotec_cert_date',
             'is_allowed_entry',
+            'mediawiki_username',
         ]
 
     def update(self, instance, validated_data):
@@ -275,6 +276,7 @@ class AdminMemberSerializer(MemberSerializer):
             'old_email',
             'is_director',
             'is_staff',
+            'mediawiki_username',
         ]
 
     def update(self, instance, validated_data):
@@ -624,6 +626,8 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
             first_name=self.user.member.first_name,
         )
 
+        data['username'] = self.user.member.mediawiki_username or self.user.username
+
         if utils_auth.wiki_is_configured():
             if request_id: utils_stats.set_progress(request_id, 'Changing Wiki password...')
             if utils_auth.set_wiki_password(data) != 200:
@@ -686,6 +690,8 @@ class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
             email=self.user.email,
             first_name=self.user.member.first_name,
         )
+
+        data['username'] = self.user.member.mediawiki_username or self.user.username
 
         if utils_auth.wiki_is_configured():
             if request_id: utils_stats.set_progress(request_id, 'Changing Wiki password...')
@@ -761,6 +767,7 @@ class SpaceportAuthSerializer(LoginSerializer):
             data['email'] = user.email
             data['first_name'] = user.member.first_name
 
+            data['username'] = user.member.mediawiki_username or user.username
             utils_auth.set_wiki_password(data)
 
             data['username'] = user.member.discourse_username or user.username

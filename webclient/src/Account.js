@@ -250,8 +250,13 @@ export function AccountForm(props) {
 				{...makeProps('emergency_contact_phone')}
 			/>
 
+			{member.mediawiki_username && <div className='field'>
+				<label>Custom Wiki Username</label>
+				<p>{member.mediawiki_username}</p>
+			</div>}
+
 			{member.discourse_username && <Form.Input
-				label='Forum Username'
+				label='Custom Forum Username'
 				autoComplete='off'
 				{...makeProps('discourse_username')}
 			/>}

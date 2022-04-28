@@ -110,7 +110,7 @@ export function AuthWiki(props) {
 				<Header size='small'>Success!</Header>
 				<p>You can now log into the Wiki:</p>
 				{user && <p>
-					Username: {user.username}<br/>
+					Username: {user.member.mediawiki_username || user.username}<br/>
 					Password: [this Spaceport password]
 				</p>}
 				<p><a href='https://wiki.protospace.ca/index.php?title=Special:UserLogin&returnto=Welcome+to+Protospace' rel='noopener noreferrer'>Protospace Wiki</a></p>
