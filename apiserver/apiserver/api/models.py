@@ -32,9 +32,6 @@ class Member(models.Model):
     birthdate = models.DateField(blank=True, null=True)
     is_minor = models.BooleanField(default=False)
     guardian_name = models.CharField(max_length=32, blank=True, null=True)
-    street_address = models.CharField(default='', max_length=32, null=True)
-    city = models.CharField(default='Calgary, AB', max_length=32)
-    postal_code = models.CharField(max_length=16, null=True)
     public_bio = models.CharField(max_length=512, blank=True)
     private_notes = models.CharField(max_length=512, blank=True)
 

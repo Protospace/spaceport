@@ -170,9 +170,6 @@ class MemberSerializer(serializers.ModelSerializer):
     crop = serializers.CharField(write_only=True, required=False)
     email = fields.UserEmailField(serializers.EmailField)
     phone = serializers.CharField()
-    street_address = serializers.CharField(required=False)
-    city = serializers.CharField(required=False)
-    postal_code = serializers.CharField(required=False)
 
     class Meta:
         model = models.Member
@@ -254,9 +251,6 @@ class MemberSerializer(serializers.ModelSerializer):
 # admin viewing member details
 class AdminMemberSerializer(MemberSerializer):
     phone = serializers.CharField(required=False)
-    street_address = serializers.CharField(required=False)
-    city = serializers.CharField(required=False)
-    postal_code = serializers.CharField(required=False)
     monthly_fees = serializers.ChoiceField([10, 30, 35, 50, 55])
 
     class Meta:
