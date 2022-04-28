@@ -82,7 +82,7 @@ function MemberInfo(props) {
 
 				<p>Click "Checkout as Guest" if you don't have a PayPal account.</p>
 
-				<QRCode value={siteUrl + '/subscribe?monthly_fees=' + user.member.monthly_fees + '&id=' + user.member.id} />
+				<QRCode value={siteUrl + 'subscribe?monthly_fees=' + user.member.monthly_fees + '&id=' + user.member.id} />
 			</React.Fragment>}
 
 			<Header size='medium'>Latest Training</Header>
