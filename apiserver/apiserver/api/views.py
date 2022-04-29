@@ -624,6 +624,9 @@ class StatsViewSet(viewsets.ViewSet, List):
         try:
             sign = request.data['sign'][:500]
 
+            sign = sign.replace('‘', '\'').replace('’', '\'')
+            sign = sign.replace('“', '"').replace('”', '"')
+
             if sign.startswith('https://') or sign.startswith('http://'):
                 cache.set('link', sign)
             else:
