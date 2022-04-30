@@ -60,37 +60,7 @@ export function Usage(props) {
 				}
 
 				{showUsage ?
-					<>
-						<p className='stat'>
-							{usage.first_name}
-						</p>
-
-						<div style={{ backgroundColor: usage.session_time > 10800 ? '#cc0000' : '' }}>
-							<Header size='medium'>Session Time</Header>
-
-							<p className='stat'>
-								{parseInt(usage.session_time / 60)} mins
-							</p>
-						</div>
-
-						<Header size='medium'>Job #{usage.last_use_id} Time</Header>
-
-						<p className='stat'>
-							{parseInt(usage.last_use_time / 60)} mins
-						</p>
-
-						<Header size='medium'>Today Total</Header>
-
-						<p className='stat'>
-							{parseInt(usage.today_total / 60)} mins
-						</p>
-
-						<Header size='medium'>Month Total</Header>
-
-						<p className='stat'>
-							{parseInt(usage.month_total / 60)} mins
-						</p>
-					</>
+					<TrotecUsage usage={usage} />
 				:
 					<>
 						<Header size='large'>{title} Usage</Header>
@@ -103,3 +73,57 @@ export function Usage(props) {
 		</Container>
 	);
 };
+
+export function TrotecUsage(props) {
+	const { usage } = props;
+
+	const today_total = parseInt(usage.today_total / 60);
+	const month_total = parseInt(usage.month_total / 60);
+	const free_time = 360;
+
+	return (
+		<>
+			<p className='stat'>
+				{usage.first_name}
+			</p>
+
+			<div style={{ backgroundColor: usage.session_time > 10800 ? '#cc0000' : '' }}>
+				<Header size='medium'>Session Time</Header>
+
+				<p className='stat'>
+					{parseInt(usage.session_time / 60)} mins
+				</p>
+			</div>
+
+			<Header size='medium'>Laser-firing Time Today</Header>
+
+			<p className='stat'>
+				{today_total} mins
+			</p>
+
+			<Header size='medium'>Laser-firing Time Month</Header>
+
+			<p className='stat'>
+				{month_total} mins
+			</p>
+
+			{month_total <= free_time ?
+				<>
+					<Header size='medium'>Free Time Remaining</Header>
+
+					<p className='stat'>
+						{free_time - month_total} mins
+					</p>
+				</>
+			:
+				<>
+					<Header size='medium'>Current Month Bill</Header>
+
+					<p className='stat'>
+						${((month_total - free_time) * 0.5).toFixed(2)}
+					</p>
+				</>
+			}
+		</>
+	);
+}
