@@ -13,7 +13,7 @@ export const tags = {
 	Laser: 'red',
 	Wood: 'brown',
 	CNC: 'orange',
-	Niche: 'yellow',
+	Crafts: 'yellow',
 	//name: 'olive',
 	Electronics: 'green',
 	Computers: 'teal',
