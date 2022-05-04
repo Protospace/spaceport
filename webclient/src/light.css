@@ -132,10 +132,22 @@ body {
 .coursetags .ui.tag.label {
 	margin-top: 1rem;
 }
+
 .newclasstable {
 	margin: 0 -1.5rem 0 -0.5rem;
 	display: flex;
 	flex-wrap: wrap;
+}
+
+.newclasstable .byline {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.newclasstable .byline .interest {
+	display: inline;
+	margin-left: auto;
 }
 
 .ui.tag.label {

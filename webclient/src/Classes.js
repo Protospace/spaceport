@@ -98,8 +98,112 @@ function ClassTable(props) {
 	);
 };
 
+function NewClassTableCourse(props) {
+	const {course, classes, token, user, refreshUser} = props;
+	const [error, setError] = useState(false);
+	const [loading, setLoading] = useState(false);
+
+	const handleInterest = () => {
+		if (loading) return;
+		setLoading(true);
+		const data = { course: course.id };
+		requester('/interest/', 'POST', token, data)
+		.then(res => {
+			setError(false);
+			refreshUser();
+		})
+		.catch(err => {
+			console.log(err);
+			setError(true);
+		});
+	};
+
+	const now = new Date().toISOString();
+
+	return (
+		<Segment style={{ margin: '1rem 1rem 0 0', width: '22rem' }}>
+			<Header size='small'>
+				<Link to={'/courses/'+course.id}>
+					{course.name}
+				</Link>
+			</Header>
+
+			<div className='byline'>
+				<div className='tags'>
+					{!!course.tags && course.tags.split(',').map(name =>
+						<Label color={tags[name]} tag size='small'>
+							{name}
+						</Label>
+					)}
+				</div>
+
+				{user &&
+					<div className='interest'>
+						{user.interests.includes(course.id) ?
+							'Interested ✅'
+						:
+							<Button
+								size='tiny'
+								loading={loading}
+								onClick={handleInterest}
+							>
+								Interest&nbsp;+
+							</Button>
+						}
+					</div>
+				}
+			</div>
+
+			{error && <p>Error.</p>}
+
+			{classes ?
+				<Table compact unstackable singleLine basic='very'>
+					<Table.Header>
+						<Table.Row>
+							<Table.HeaderCell>Date</Table.HeaderCell>
+							<Table.HeaderCell>Cost</Table.HeaderCell>
+							<Table.HeaderCell>Students</Table.HeaderCell>
+						</Table.Row>
+					</Table.Header>
+
+					<Table.Body>
+						{classes.map(x =>
+							<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
+								<Table.Cell>
+									<Link to={'/classes/'+x.id}>
+										{moment.utc(x.datetime).tz('America/Edmonton').format(' MMM Do')}
+									</Link>
+									{' - '}{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}
+								</Table.Cell>
+
+								<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost.slice(0,2)}</Table.Cell>
+
+								<Table.Cell>
+									{!!x.max_students ?
+										x.max_students <= x.student_count ?
+											'Full'
+										:
+											x.student_count + ' / ' + x.max_students
+									:
+										x.student_count
+									}
+								</Table.Cell>
+							</Table.Row>
+						)}
+					</Table.Body>
+				</Table>
+			:
+				<>
+					<p/>
+					<p>No upcoming classes.</p>
+				</>
+			}
+		</Segment>
+	);
+}
+
 function NewClassTable(props) {
-	const { classes, courses } = props;
+	const { classes, courses, token, user, refreshUser } = props;
 
 	let sortedClasses = [];
 	let seenCourseIds = [];
@@ -122,80 +226,15 @@ function NewClassTable(props) {
 		}
 	}
 
-	const now = new Date().toISOString();
-
 	return (
 		<>
 			<div className='newclasstable'>
 				{sortedClasses.map(x =>
-					<Segment style={{ margin: '1rem 1rem 0 0', width: '22rem' }}>
-						<Header size='small'>
-							<Link to={'/courses/'+x.course.id}>
-								{x.course.name}
-							</Link>
-						</Header>
-
-						{!!x.course.tags && x.course.tags.split(',').map(name =>
-							<Label color={tags[name]} tag size='small'>
-								{name}
-							</Label>
-						)}
-
-						<Table compact unstackable singleLine basic='very'>
-							<Table.Header>
-								<Table.Row>
-									<Table.HeaderCell>Date</Table.HeaderCell>
-									<Table.HeaderCell>Cost</Table.HeaderCell>
-									<Table.HeaderCell>Students</Table.HeaderCell>
-								</Table.Row>
-							</Table.Header>
-
-							<Table.Body>
-								{x.classes.map(x =>
-									<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
-										<Table.Cell>
-											<Link to={'/classes/'+x.id}>
-												{moment.utc(x.datetime).tz('America/Edmonton').format(' MMM Do')}
-											</Link>
-											{' - '}{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}
-										</Table.Cell>
-
-										<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost.slice(0,2)}</Table.Cell>
-
-										<Table.Cell>
-											{!!x.max_students ?
-												x.max_students <= x.student_count ?
-													'Full'
-												:
-													x.student_count + ' / ' + x.max_students
-											:
-												x.student_count
-											}
-										</Table.Cell>
-									</Table.Row>
-								)}
-							</Table.Body>
-						</Table>
-					</Segment>
+					<NewClassTableCourse course={x.course} classes={x.classes} token={token} user={user} refreshUser={refreshUser} />
 				)}
 
 				{courses.filter(x => !seenCourseIds.includes(x.id)).map(x =>
-					<Segment style={{ margin: '1rem 1rem 0 0', width: '22rem' }}>
-						<Header size='small'>
-							<Link to={'/courses/'+x.id}>
-								{x.name}
-							</Link>
-						</Header>
-
-						{!!x.tags && x.tags.split(',').map(name =>
-							<Label color={tags[name]} tag>
-								{name}
-							</Label>
-						)}
-
-						<p/>
-						<p>No upcoming classes.</p>
-					</Segment>
+					<NewClassTableCourse course={x} classes={false} token={token} user={user} refreshUser={refreshUser} />
 				)}
 			</div>
 		</>
@@ -248,7 +287,7 @@ export function Classes(props) {
 	const [courses, setCourses] = useState(courseCache);
 	const [sortByCourse, setSortByCourse] = useState(sortCache);
 	const [tagFilter, setTagFilter] = useState(tagFilterCache);
-	const { token, user } = props;
+	const { token, user, refreshUser } = props;
 
 	useEffect(() => {
 		requester('/courses/', 'GET', token)
@@ -357,6 +396,9 @@ export function Classes(props) {
 					<NewClassTable
 						classes={classes.filter(classesByTag)}
 						courses={courses.filter(coursesByTag)}
+						token={token}
+						user={user}
+						refreshUser={refreshUser}
 					/>
 				:
 					<ClassTable classes={classes.slice().filter(classesByTag).sort(byDate)} />

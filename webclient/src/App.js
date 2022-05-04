@@ -260,7 +260,7 @@ function App() {
 							</Route>
 
 							<Route exact path='/classes'>
-								<Classes token={token} user={user} />
+								<Classes token={token} user={user} refreshUser={refreshUser} />
 							</Route>
 
 							{user && user.member.set_details ?

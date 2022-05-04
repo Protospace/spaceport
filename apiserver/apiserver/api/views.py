@@ -992,6 +992,24 @@ class UsageViewSet(Base):
 
         return response
 
+class InterestViewSet(Base, Retrieve, Create):
+    permission_classes = [AllowMetadata | IsAuthenticated]
+    queryset = models.Interest.objects.all()
+    serializer_class = serializers.InterestSerializer
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        course = self.request.data['course']
+
+        interest = models.Interest.objects.filter(user=user, course=course, satisfied_by__isnull=True)
+        if interest.exists():
+            raise exceptions.ValidationError(dict(non_field_errors='Already interested'))
+
+        serializer.save(
+            user=user,
+            satisfied_by=None
+        )
+
 
 class RegistrationView(RegisterView):
     serializer_class = serializers.MyRegisterSerializer

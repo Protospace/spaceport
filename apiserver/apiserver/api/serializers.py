@@ -521,10 +521,18 @@ class UserTrainingSerializer(serializers.ModelSerializer):
         exclude = ['user']
         depth = 2
 
+class InterestSerializer(serializers.ModelSerializer):
+    course = serializers.PrimaryKeyRelatedField(queryset=models.Course.objects.all())
+    class Meta:
+        model = models.Interest
+        fields = '__all__'
+        read_only_fields = ['user', 'satisfied_by']
+
 class UserSerializer(serializers.ModelSerializer):
     training = UserTrainingSerializer(many=True)
     member = MemberSerializer()
     transactions = serializers.SerializerMethodField()
+    interests = serializers.SerializerMethodField()
     door_code = serializers.SerializerMethodField()
     wifi_pass = serializers.SerializerMethodField()
     app_version = serializers.SerializerMethodField()
@@ -543,6 +551,7 @@ class UserSerializer(serializers.ModelSerializer):
             'wifi_pass',
             'app_version',
             #'usages',
+            'interests',
         ]
         depth = 1
 
@@ -553,6 +562,13 @@ class UserSerializer(serializers.ModelSerializer):
         serializer = TransactionSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
+
+    def get_interests(self, obj):
+        interests = models.Interest.objects.filter(
+            user=obj,
+            satisfied_by__isnull=True
+        )
+        return [x.course.id for x in interests]
 
     def get_door_code(self, obj):
         if not obj.member.paused_date and obj.cards.count():

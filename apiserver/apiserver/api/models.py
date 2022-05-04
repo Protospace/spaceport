@@ -142,6 +142,13 @@ class Training(models.Model):
 
     history = HistoricalRecords()
 
+class Interest(models.Model):
+    user = models.ForeignKey(User, related_name='interests', null=True, on_delete=models.SET_NULL)
+    course = models.ForeignKey(Course, related_name='courses', null=True, on_delete=models.SET_NULL)
+
+    satisfied_by = models.ForeignKey(Session, related_name='satisfies', null=True, on_delete=models.SET_NULL)
+
+
 class MetaInfo(models.Model):
     backup_id = models.TextField()
 
