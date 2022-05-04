@@ -67,3 +67,29 @@ def send_ical_email(member, session, ical_file):
     msg.send()
 
     logger.info('Sent ical email:\n' + email_text)
+
+def send_interest_email(interest):
+    def replace_fields(text):
+        return text.replace(
+            '[name]', interest.user.member.first_name,
+        ).replace(
+            '[course]', interest.course.name,
+        ).replace(
+            '[link]', 'https://my.protospace.ca/courses/' + str(interest.course.id),
+        )
+
+    with open(EMAIL_DIR + 'interest.txt', 'r') as f:
+        email_text = replace_fields(f.read())
+
+    with open(EMAIL_DIR + 'interest.html', 'r') as f:
+        email_html = replace_fields(f.read())
+
+    send_mail(
+        subject='Protospace class scheduled',
+        message=email_text,
+        from_email=None,  # defaults to DEFAULT_FROM_EMAIL
+        recipient_list=[interest.user.email],
+        html_message=email_html,
+    )
+
+    logger.info('Sent interest email:\n' + email_text)

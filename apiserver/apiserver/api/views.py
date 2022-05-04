@@ -285,7 +285,19 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
             return serializers.SessionSerializer
 
     def perform_create(self, serializer):
-        serializer.save(instructor=self.request.user)
+        session = serializer.save(instructor=self.request.user)
+        interests = models.Interest.objects.filter(course=session.course, satisfied_by__isnull=True)
+
+        for interest in interests:
+            try:
+                utils_email.send_interest_email(interest)
+            except BaseException as e:
+                msg = 'Problem interest email: ' + str(e)
+                logger.exception(msg)
+                alert_tanner(msg)
+
+        num_satisfied = interests.update(satisfied_by=session)
+        logging.info('Satisfied %s interests.', num_satisfied)
 
     def generate_ical(self, session):
         cal = icalendar.Calendar()

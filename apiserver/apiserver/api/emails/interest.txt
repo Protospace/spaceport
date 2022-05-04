@@ -1,0 +1,11 @@
+Hi [name],
+
+There's been a class scheduled for [course] that you expressed interest in.
+
+You can find the class on its course page here:
+[link]
+
+Your "interest" in this course is now removed and you won't receive any more
+notifications about its classes until you press the "Interest +" button again.
+
+Spaceport
