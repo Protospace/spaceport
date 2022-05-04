@@ -98,6 +98,7 @@ export function Courses(props) {
 					<Table.Header>
 						<Table.Row>
 							<Table.HeaderCell>Name</Table.HeaderCell>
+							<Table.HeaderCell>Interest</Table.HeaderCell>
 							<Table.HeaderCell></Table.HeaderCell>
 						</Table.Row>
 					</Table.Header>
@@ -108,6 +109,9 @@ export function Courses(props) {
 								<Table.Row key={x.id}>
 									<Table.Cell>
 										<Link to={'/courses/'+x.id}>{x.name}</Link>
+									</Table.Cell>
+									<Table.Cell>
+										{x.num_interested}
 									</Table.Cell>
 									<Table.Cell>
 										{!!x.tags && x.tags.split(',').map(name =>

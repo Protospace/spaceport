@@ -462,9 +462,11 @@ class StudentTrainingSerializer(TrainingSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
+    num_interested = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = models.Course
-        fields = ['id', 'name', 'is_old', 'description', 'tags']
+        fields = ['id', 'name', 'is_old', 'description', 'tags', 'num_interested']
 
 class SessionSerializer(serializers.ModelSerializer):
     student_count = serializers.SerializerMethodField()

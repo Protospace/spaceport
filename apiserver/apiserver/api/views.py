@@ -238,7 +238,13 @@ class CardViewSet(Base, Create, Retrieve, Update, Destroy):
 #       https://stackoverflow.com/a/58689019
 class CourseViewSet(Base, List, Retrieve, Create, Update):
     permission_classes = [AllowMetadata | IsAuthenticatedOrReadOnly, IsAdminOrReadOnly | IsInstructorOrReadOnly]
-    queryset = models.Course.objects.annotate(date=Max('sessions__datetime')).order_by('-date')
+    queryset = models.Course.objects.annotate(
+        date=Max('sessions__datetime'),
+        num_interested=Count('interests', filter=Q(interests__satisfied_by__isnull=True), distinct=True),
+    ).order_by(
+        '-num_interested',
+        '-date',
+    )
 
     def get_serializer_class(self):
         if self.action == 'list':
