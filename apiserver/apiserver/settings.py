@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django_extensions',
     'rest_framework',
     'rest_framework.authtoken',
     'apiserver.api',
@@ -294,6 +295,8 @@ if DEBUG: logger.info('Debug mode ON')
 logger.info('Test logging for each thread')
 
 APP_VERSION = 3  # TODO: automate this
+
+SHELL_PLUS = 'ipython'
 
 #import logging_tree
 #logging_tree.printout()
