@@ -139,7 +139,7 @@ function NewClassTableCourse(props) {
 
 				{user &&
 					<div className='interest'>
-						{user.interests.includes(course.id) ?
+						{user.interests.filter(x => !x.satisfied_by).map(x => x.course).includes(course.id) ?
 							'Interested ✅'
 						:
 							<Button

@@ -292,7 +292,7 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
             try:
                 utils_email.send_interest_email(interest)
             except BaseException as e:
-                msg = 'Problem interest email: ' + str(e)
+                msg = 'Problem sending interest email: ' + str(e)
                 logger.exception(msg)
                 alert_tanner(msg)
 

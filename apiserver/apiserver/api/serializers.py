@@ -534,7 +534,7 @@ class UserSerializer(serializers.ModelSerializer):
     training = UserTrainingSerializer(many=True)
     member = MemberSerializer()
     transactions = serializers.SerializerMethodField()
-    interests = serializers.SerializerMethodField()
+    interests = InterestSerializer(many=True)
     door_code = serializers.SerializerMethodField()
     wifi_pass = serializers.SerializerMethodField()
     app_version = serializers.SerializerMethodField()
@@ -564,13 +564,6 @@ class UserSerializer(serializers.ModelSerializer):
         serializer = TransactionSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
-
-    def get_interests(self, obj):
-        interests = models.Interest.objects.filter(
-            user=obj,
-            satisfied_by__isnull=True
-        )
-        return [x.course.id for x in interests]
 
     def get_door_code(self, obj):
         if not obj.member.paused_date and obj.cards.count():

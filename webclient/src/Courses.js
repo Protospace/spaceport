@@ -111,7 +111,9 @@ export function Courses(props) {
 										<Link to={'/courses/'+x.id}>{x.name}</Link>
 									</Table.Cell>
 									<Table.Cell>
-										{x.num_interested}
+										{!!x.num_interested &&
+											<>{x.num_interested} member{x.num_interested !== 1 && 's'}</>
+										}
 									</Table.Cell>
 									<Table.Cell>
 										{!!x.tags && x.tags.split(',').map(name =>
