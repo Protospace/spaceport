@@ -735,7 +735,7 @@ class StatsViewSet(viewsets.ViewSet, List):
         if should_count:
             start_new_use = not last_use or last_use.finished_at or last_use.username != username
             if start_new_use:
-                if username_isfrom_track and time.time() - track[device]['time'] > 300:
+                if username_isfrom_track and time.time() - track[device]['time'] > 20*60:
                     msg = 'Usage tracker problem expired username {} for device: {}'.format(username, device)
                     utils.alert_tanner(msg)
                     logger.error(msg)
@@ -775,7 +775,10 @@ class StatsViewSet(viewsets.ViewSet, List):
         if 'device' not in request.query_params:
             raise exceptions.ValidationError(dict(device='This field is required.'))
 
-        if not utils.is_request_from_protospace(request):
+        if not (
+            is_admin_director(self.request.user) or
+            utils.is_request_from_protospace(request)
+        ):
             raise exceptions.PermissionDenied()
 
         device = request.query_params['device']
@@ -814,11 +817,15 @@ class StatsViewSet(viewsets.ViewSet, List):
         month_start = today_start.replace(day=1)
 
         today_total = device_uses.filter(
-            user=user, started_at__gte=today_start,
-        ).aggregate(Sum('num_seconds'))['num_seconds__sum'] or 0 + running_cut_time
+            user=user, started_at__gte=today_start, should_bill=True,
+        ).aggregate(Sum('num_seconds'))['num_seconds__sum'] or 0
+
         month_total = device_uses.filter(
-            user=user, started_at__gte=month_start,
-        ).aggregate(Sum('num_seconds'))['num_seconds__sum'] or 0 + running_cut_time
+            user=user, started_at__gte=month_start, should_bill=True,
+        ).aggregate(Sum('num_seconds'))['num_seconds__sum'] or 0
+
+        today_total += running_cut_time
+        month_total += running_cut_time
 
         try:
             track = cache.get('track', {})[device]
@@ -979,9 +986,9 @@ class UsageViewSet(Base):
     # TODO: add filtering by device
     @action(detail=False, methods=['get'])
     def csv(self, request):
-        usages = models.Usage.objects.order_by('id')
-        month = self.request.query_params.get('month', None)
+        usages = models.Usage.objects.order_by('id').filter(should_bill=True)
 
+        month = self.request.query_params.get('month', None)
         if month:
             try:
                 dt = datetime.datetime.strptime(month, '%Y-%m')
@@ -1005,7 +1012,8 @@ class UsageViewSet(Base):
         writer.writeheader()
         for u in usages.values(*fieldnames):
             u['started_at'] = u['started_at'].astimezone(utils.TIMEZONE_CALGARY)
-            u['finished_at'] = u['finished_at'].astimezone(utils.TIMEZONE_CALGARY)
+            if u['finished_at']:
+                u['finished_at'] = u['finished_at'].astimezone(utils.TIMEZONE_CALGARY)
             writer.writerow(u)
 
         return response
