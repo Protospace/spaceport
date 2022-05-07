@@ -24,7 +24,7 @@ export const tags = {
 	Misc: 'grey',
 };
 
-export let courseCache = false;
+let courseCache = false;
 let tagFilterCache = false;
 
 export function Courses(props) {
@@ -53,45 +53,45 @@ export function Courses(props) {
 				<InstructorCourseList courses={courses} setCourses={setCourses} {...props} />
 			</Segment>}
 
-			<p>
-				Filter by tag:
-				<div className='coursetags'>
+			<p>Filter by tag:</p>
+
+			<div className='coursetags'>
+				<div
+					className='labelbox'
+					style={{borderColor: tagFilter === false ? 'black' : 'transparent'}}
+				>
+					<Label
+						onClick={() => {
+							setTagFilter(false);
+							tagFilterCache = false;
+						}}
+						as='a'
+						tag
+					>
+						No Filter
+					</Label>
+				</div>
+
+				{Object.entries(tags).map(([name, color]) =>
 					<div
+						key={name}
 						className='labelbox'
-						style={{borderColor: tagFilter === false ? 'black' : 'transparent'}}
+						style={{borderColor: tagFilter === name ? 'black' : 'transparent'}}
 					>
 						<Label
 							onClick={() => {
-								setTagFilter(false);
-								tagFilterCache = false;
+								setTagFilter(name);
+								tagFilterCache = name;
 							}}
 							as='a'
+							color={color}
 							tag
 						>
-							No Filter
+							{name}
 						</Label>
 					</div>
-
-					{Object.entries(tags).map(([name, color]) =>
-						<div
-							className='labelbox'
-							style={{borderColor: tagFilter === name ? 'black' : 'transparent'}}
-						>
-							<Label
-								onClick={() => {
-									setTagFilter(name);
-									tagFilterCache = name;
-								}}
-								as='a'
-								color={color}
-								tag
-							>
-								{name}
-							</Label>
-						</div>
-					)}
-				</div>
-			</p>
+				)}
+			</div>
 
 			{courses ?
 				<Table basic='very'>
@@ -117,7 +117,7 @@ export function Courses(props) {
 									</Table.Cell>
 									<Table.Cell>
 										{!!x.tags && x.tags.split(',').map(name =>
-											<Label color={tags[name]} tag>
+											<Label key={name} color={tags[name]} tag>
 												{name}
 											</Label>
 										)}

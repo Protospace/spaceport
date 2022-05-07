@@ -6,7 +6,6 @@ import moment from 'moment-timezone';
 import { apiUrl, isAdmin, isInstructor, getInstructor, BasicTable, requester, useIsMobile } from './utils.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { InstructorClassDetail, InstructorClassAttendance } from './InstructorClasses.js';
-import { courseCache } from './Courses.js';
 import { PayPalPayNow } from './PayPal.js';
 import { tags } from './Courses.js';
 
@@ -131,7 +130,7 @@ function NewClassTableCourse(props) {
 			<div className='byline'>
 				<div className='tags'>
 					{!!course.tags && course.tags.split(',').map(name =>
-						<Label color={tags[name]} tag size='small'>
+						<Label key={name} color={tags[name]} tag size='small'>
 							{name}
 						</Label>
 					)}
@@ -230,11 +229,25 @@ function NewClassTable(props) {
 		<>
 			<div className='newclasstable'>
 				{sortedClasses.map(x =>
-					<NewClassTableCourse course={x.course} classes={x.classes} token={token} user={user} refreshUser={refreshUser} />
+					<NewClassTableCourse
+						key={x.course.id}
+						course={x.course}
+						classes={x.classes}
+						token={token}
+						user={user}
+						refreshUser={refreshUser}
+					/>
 				)}
 
 				{courses.filter(x => !seenCourseIds.includes(x.id)).map(x =>
-					<NewClassTableCourse course={x} classes={false} token={token} user={user} refreshUser={refreshUser} />
+					<NewClassTableCourse
+						key={x.id}
+						course={x}
+						classes={false}
+						token={token}
+						user={user}
+						refreshUser={refreshUser}
+					/>
 				)}
 			</div>
 		</>
@@ -284,7 +297,7 @@ export function ClassFeed(props) {
 
 export function Classes(props) {
 	const [classes, setClasses] = useState(classesCache);
-	const [courses, setCourses] = useState(courseCache);
+	const [courses, setCourses] = useState(false);
 	const [sortByCourse, setSortByCourse] = useState(sortCache);
 	const [tagFilter, setTagFilter] = useState(tagFilterCache);
 	const { token, user, refreshUser } = props;
@@ -293,7 +306,6 @@ export function Classes(props) {
 		requester('/courses/', 'GET', token)
 		.then(res => {
 			setCourses(res.results);
-			courseCache = res.results;
 		})
 		.catch(err => {
 			console.log(err);
@@ -351,45 +363,45 @@ export function Classes(props) {
 				</Button>
 			</p>
 
-			<p>
-				Filter by tag:
-				<div className='coursetags'>
+			<p>Filter by tag:</p>
+
+			<div className='coursetags'>
+				<div
+					className='labelbox'
+					style={{borderColor: tagFilter === false ? 'black' : 'transparent'}}
+				>
+					<Label
+						onClick={() => {
+							setTagFilter(false);
+							tagFilterCache = false;
+						}}
+						as='a'
+						tag
+					>
+						No Filter
+					</Label>
+				</div>
+
+				{Object.entries(tags).map(([name, color]) =>
 					<div
+						key={name}
 						className='labelbox'
-						style={{borderColor: tagFilter === false ? 'black' : 'transparent'}}
+						style={{borderColor: tagFilter === name ? 'black' : 'transparent'}}
 					>
 						<Label
 							onClick={() => {
-								setTagFilter(false);
-								tagFilterCache = false;
+								setTagFilter(name);
+								tagFilterCache = name;
 							}}
 							as='a'
+							color={color}
 							tag
 						>
-							No Filter
+							{name}
 						</Label>
 					</div>
-
-					{Object.entries(tags).map(([name, color]) =>
-						<div
-							className='labelbox'
-							style={{borderColor: tagFilter === name ? 'black' : 'transparent'}}
-						>
-							<Label
-								onClick={() => {
-									setTagFilter(name);
-									tagFilterCache = name;
-								}}
-								as='a'
-								color={color}
-								tag
-							>
-								{name}
-							</Label>
-						</div>
-					)}
-				</div>
-			</p>
+				)}
+			</div>
 
 			{classes.length && courses.length ?
 				sortByCourse ?

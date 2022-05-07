@@ -108,7 +108,11 @@ function MemberInfo(props) {
 					:
 						<Table.Row><Table.Cell>None, please sign up for an <Link to={'/courses/249/'}>Orientation</Link></Table.Cell></Table.Row>
 					}
-					{user.training.length > 3 && <Link to='/training'>[more]</Link>}
+					{user.training.length > 3 &&
+						<Table.Row><Table.Cell>
+							<Link to='/training'>[more]</Link>
+						</Table.Cell></Table.Row>
+					}
 				</Table.Body>
 			</BasicTable>
 
@@ -128,7 +132,11 @@ function MemberInfo(props) {
 					:
 						<Table.Row><Table.Cell>None</Table.Cell></Table.Row>
 					}
-					{user.transactions.length > 3 && <Link to='/transactions'>[more]</Link>}
+					{user.transactions.length > 3 &&
+						<Table.Row><Table.Cell>
+							<Link to='/transactions'>[more]</Link>
+						</Table.Cell></Table.Row>
+					}
 				</Table.Body>
 			</BasicTable>
 
