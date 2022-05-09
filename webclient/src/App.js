@@ -213,7 +213,7 @@ function App() {
 
 							{user && <Menu.Menu position='right'>
 								<Menu.Item
-									content={yousure ? 'Sign out?' : ''}
+									content={yousure ? 'Log out?' : ''}
 									onClick={logout}
 									icon='sign out'
 								/>
