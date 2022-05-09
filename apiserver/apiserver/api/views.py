@@ -286,6 +286,13 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
 
     def perform_create(self, serializer):
         session = serializer.save(instructor=self.request.user)
+
+        # ensure session datetime is at least 1 day in the future
+        # before sending interest emails
+        if session.datetime < now() + datetime.timedelta(days=1):
+            logging.info('Session is in the past or too soon, not sending interest emails.')
+            return
+
         interests = models.Interest.objects.filter(course=session.course, satisfied_by__isnull=True)
 
         for interest in interests:
