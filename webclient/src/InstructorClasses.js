@@ -359,7 +359,7 @@ export function InstructorClassList(props) {
 		requester('/sessions/', 'POST', token, data)
 		.then(res => {
 			setSuccess(res.id);
-			setInput({});
+			setInput({ max_students: null });
 			setLoading(false);
 			setError(false);
 			setOpen(false);
