@@ -228,7 +228,8 @@ export function InstructorClassAttendance(props) {
 };
 
 function InstructorClassEditor(props) {
-	const { input, setInput, error, editing } = props;
+	const { input, setInput, error, editing, token } = props;
+	const [editInstructor, setEditInstructor] = useState(false);
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
@@ -245,6 +246,38 @@ function InstructorClassEditor(props) {
 
 	return (
 		<div className='class-editor'>
+			{editing &&
+				(editInstructor ?
+					<>
+						<Form.Field error={error.instructor_id}>
+							<label>Instructor (search)</label>
+							<MembersDropdown
+								token={token}
+								{...makeProps('instructor_id')}
+								onChange={handleValues}
+								initial={input.instructor_name}
+							/>
+							{error.instructor_id && <Label pointing prompt>
+								{error.instructor_id}
+							</Label>}
+						</Form.Field>
+
+						<Message info>
+							<Message.Header>Are you sure?</Message.Header>
+							<p>Only the new instructor will be able to edit this class.</p>
+						</Message>
+					</>
+				:
+					<Button
+						onClick={() => setEditInstructor(true)}
+					>
+						Change instructor
+					</Button>
+				)
+			}
+
+			<p/>
+
 			<Form.Input
 				label='Cost ($) — 0 for free'
 				{...makeProps('cost')}
@@ -326,7 +359,7 @@ export function InstructorClassDetail(props) {
 				<Form onSubmit={handleSubmit}>
 					<Header size='small'>Edit Class</Header>
 
-					<InstructorClassEditor editing input={input} setInput={setInput} error={error} />
+					<InstructorClassEditor editing input={input} setInput={setInput} error={error} token={token} />
 
 					<Form.Button loading={loading} error={error.non_field_errors}>
 						Submit
@@ -402,7 +435,7 @@ export function InstructorClassList(props) {
 
 							<p>Documentation: <a href='https://wiki.protospace.ca/Be_a_Course_Instructor' target='_blank' rel='noopener noreferrer'>https://wiki.protospace.ca/Be_a_Course_Instructor</a></p>
 
-							<InstructorClassEditor input={input} setInput={setInput} error={error} />
+							<InstructorClassEditor input={input} setInput={setInput} error={error} token={token} />
 
 							<Form.Button loading={loading} error={error.non_field_errors}>
 								Submit

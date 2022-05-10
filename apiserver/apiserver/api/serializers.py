@@ -15,6 +15,7 @@ import datetime, time
 
 from . import models, fields, utils, utils_ldap, utils_auth, utils_stats
 from .. import settings, secrets
+from .permissions import is_admin_director
 
 class UsageSerializer(serializers.ModelSerializer):
     first_name = serializers.SerializerMethodField()
@@ -482,7 +483,7 @@ class SessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Session
         fields = '__all__'
-        read_only_fields = ['old_instructor', 'instructor']
+        read_only_fields = ['old_instructor']
 
     def get_student_count(self, obj):
         return len([x for x in obj.students.all() if x.attendance_status != 'Withdrawn'])
@@ -502,6 +503,17 @@ class SessionSerializer(serializers.ModelSerializer):
             return obj.instructor.member.id
         else:
             return None
+
+    def update(self, instance, validated_data):
+        if not self.initial_data.get('instructor_id', None):
+            raise ValidationError(dict(instructor_id='This field is required.'))
+
+        member = get_object_or_404(models.Member, id=self.initial_data['instructor_id'])
+        if not (is_admin_director(member.user) or member.is_instructor):
+            raise ValidationError(dict(instructor_id='Member is not an instructor.'))
+
+        validated_data['instructor'] = member.user
+        return super().update(instance, validated_data)
 
 class SessionListSerializer(SessionSerializer):
     students = None
