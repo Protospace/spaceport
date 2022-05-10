@@ -120,7 +120,7 @@ function App() {
 				</Route>
 
 				<Route exact path='/usage/:name'>
-					<Usage />
+					<Usage token={token} />
 				</Route>
 
 				<Route path='/'>

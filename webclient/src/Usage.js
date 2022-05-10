@@ -10,6 +10,7 @@ const deviceNames = {
 };
 
 export function Usage(props) {
+	const { token } = props;
 	const { name } = useParams();
 	const title = deviceNames[name].title;
 	const device = deviceNames[name].device;
@@ -18,7 +19,7 @@ export function Usage(props) {
 	const ref = useRef(null);
 
 	const getUsage = () => {
-		requester('/stats/usage_data/?device='+device, 'GET', '')
+		requester('/stats/usage_data/?device='+device, 'GET', token)
 		.then(res => {
 			setUsage(res);
 		})
