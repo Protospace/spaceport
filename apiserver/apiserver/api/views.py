@@ -334,7 +334,7 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
 
         return response
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def email_ical(self, request, pk=None):
         session = get_object_or_404(models.Session, id=pk)
         user = self.request.user
