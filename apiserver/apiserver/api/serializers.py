@@ -457,6 +457,11 @@ class TrainingSerializer(serializers.ModelSerializer):
     def get_student_id(self, obj):
         return obj.user.member.id
 
+    def update(self, instance, validated_data):
+        if validated_data['attendance_status'] == 'Waiting for payment' and instance.paid_date:
+            validated_data['attendance_status'] = 'Confirmed'
+        return super().update(instance, validated_data)
+
 
 class StudentTrainingSerializer(TrainingSerializer):
     attendance_status = serializers.ChoiceField(['Waiting for payment', 'Withdrawn'])
