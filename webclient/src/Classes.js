@@ -609,9 +609,13 @@ export function ClassDetail(props) {
 										}
 									</p>
 
-									{userTraining.attendance_status === 'Waiting for payment' &&
+									{clazz.cost != '0.00' && !userTraining.paid_date && userTraining.attendance_status !== 'Withdrawn' &&
 										<div>
-											<p>Please pay the course fee of ${clazz.cost} to confirm your attendance.</p>
+											{userTraining.attendance_status === 'Waiting for payment' ?
+												<p>Please pay the course fee of ${clazz.cost} to confirm your attendance:</p>
+											:
+												<p>In case you haven't paid the course fee of ${clazz.cost} yet, you can do that here:</p>
+											}
 											<PayPalPayNow
 												amount={clazz.cost}
 												name={clazz.course_data.name}
