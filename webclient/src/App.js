@@ -27,6 +27,7 @@ import { Subscribe } from './PayPal.js';
 import { PasswordReset, ConfirmReset } from './PasswordReset.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { Debug } from './Debug.js';
+import { Garden } from './Garden.js';
 import { Footer } from './Footer.js';
 
 const APP_VERSION = 3;  // TODO: automate this
@@ -261,6 +262,10 @@ function App() {
 
 							<Route exact path='/classes'>
 								<Classes token={token} user={user} refreshUser={refreshUser} />
+							</Route>
+
+							<Route path='/garden'>
+								<Garden />
 							</Route>
 
 							{user && user.member.set_details ?

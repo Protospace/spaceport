@@ -857,13 +857,24 @@ class StatsViewSet(viewsets.ViewSet, List):
             month_total=month_total,
         ))
 
-
     @action(detail=False, methods=['post'])
     def autoscan(self, request):
         if 'autoscan' not in request.data:
             raise exceptions.ValidationError(dict(autoscan='This field is required.'))
 
         cache.set('autoscan', request.data['autoscan'])
+        return Response(200)
+
+    @action(detail=False, methods=['post'])
+    def garden(self, request):
+        if 'photo' not in request.data:
+            raise exceptions.ValidationError(dict(photo='This field is required.'))
+
+        photo = request.data['photo']
+        medium, large = utils.process_garden_image(photo)
+
+        logging.debug('Wrote garden images to %s and %s', medium, large)
+
         return Response(200)
 
 

@@ -36,16 +36,18 @@ export function SignForm(props) {
 		<Form onSubmit={handleSubmit}>
 			<p>Send a message to the sign:</p>
 
-			<Form.Input
-				name='sign'
-				onChange={handleChange}
-				value={sign}
-				error={error.sign}
-			/>
+			<Form.Group>
+				<Form.Input
+					name='sign'
+					onChange={handleChange}
+					value={sign}
+					error={error.sign}
+				/>
 
-			<Form.Button loading={loading} error={error.non_field_errors}>
-				Submit
-			</Form.Button>
+				<Form.Button loading={loading} error={error.non_field_errors}>
+					Submit
+				</Form.Button>
+			</Form.Group>
 			{success && <div>Success!</div>}
 		</Form>
 	);

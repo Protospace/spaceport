@@ -351,6 +351,12 @@ export function Home(props) {
 
 							<SignForm token={token} />
 
+							<p>Protogarden:</p>
+
+							<Link to='/garden'>
+								<Image src={staticUrl + '/garden-medium.jpg'} />
+							</Link>
+
 						</Segment>
 					}
 				</Grid.Column>

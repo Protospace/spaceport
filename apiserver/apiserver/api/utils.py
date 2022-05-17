@@ -192,6 +192,42 @@ def process_image_upload(upload, crop):
     return small, medium, large
 
 
+GARDEN_MEDIUM_SIZE = 500
+
+def process_garden_image(upload):
+    try:
+        pic = Image.open(upload)
+    except OSError:
+        raise serializers.ValidationError(dict(non_field_errors='Invalid image file.'))
+
+    logging.debug('Detected format: %s', pic.format)
+
+    if pic.format == 'PNG':
+        ext = '.png'
+    elif pic.format == 'JPEG':
+        ext = '.jpg'
+    else:
+        raise serializers.ValidationError(dict(non_field_errors='Image must be a jpg or png.'))
+
+    pic = ImageOps.exif_transpose(pic)
+
+    draw = ImageDraw.Draw(pic)
+
+    timestamp = now_alberta_tz().strftime('%a %b %-d, %Y  %-I:%M %p')
+
+    font = ImageFont.truetype('DejaVuSans.ttf', 60)
+    draw.text((10, 10), timestamp, (0,0,0), font=font)
+
+    large = 'garden-large' + ext
+    pic.save(STATIC_FOLDER + large)
+
+    medium = 'garden-medium' + ext
+    pic.thumbnail([GARDEN_MEDIUM_SIZE, GARDEN_MEDIUM_SIZE], Image.ANTIALIAS)
+    pic.save(STATIC_FOLDER + medium)
+
+    return medium, large
+
+
 CARD_TEMPLATE_FILE = 'misc/member_card_template.jpg'
 CARD_PHOTO_SIZE = 425
 CARD_PHOTO_MARGIN_TOP = 75
