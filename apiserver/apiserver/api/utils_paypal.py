@@ -221,8 +221,8 @@ def check_training(data, training_id, amount):
 
     training = trainings.get(id=training_id)
 
-    if training.attendance_status != 'Waiting for payment':
-        return False
+    #if training.attendance_status != 'Waiting for payment':
+    #    return False
 
     if not training.session:
         return False
