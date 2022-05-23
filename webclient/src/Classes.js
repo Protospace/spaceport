@@ -472,6 +472,7 @@ export function ClassDetail(props) {
 	const [refreshCount, refreshClass] = useReducer(x => x + 1, 0);
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [override, setOverride] = useState(false);
 	const { token, user, refreshUser } = props;
 	const { id } = useParams();
 	const userTraining = clazz && clazz.students.find(x => x.user == user.id);
@@ -520,7 +521,8 @@ export function ClassDetail(props) {
 		setLoading(false);
 	}, [userTraining]);
 
-	// TODO: calculate yesterday and lock signups
+	const now = new Date().toISOString();
+	const signupDisabled = clazz && clazz.datetime < now && !override;
 
 	return (
 		<Container>
@@ -631,9 +633,26 @@ export function ClassDetail(props) {
 									((clazz.max_students && clazz.student_count >= clazz.max_students) ?
 										<p>The class is full.</p>
 									:
-										<Button loading={loading} onClick={handleSignup}>
-											Sign me up!
-										</Button>
+										<>
+											{clazz.datetime < now &&
+												<>
+													<p>This class has already ran.</p>
+													<p>
+														<Form.Checkbox
+															name='override'
+															value={override}
+															label='Let me sign up anyway'
+															required
+															onChange={(e, v) => setOverride(v.checked)}
+														/>
+													</p>
+												</>
+											}
+
+											<Button loading={loading} onClick={handleSignup} disabled={signupDisabled}>
+												Sign me up!
+											</Button>
+										</>
 									)
 								)
 							)
