@@ -140,8 +140,24 @@ export function Courses(props) {
 export function CourseDetail(props) {
 	const [course, setCourse] = useState(false);
 	const [error, setError] = useState(false);
-	const { token, user } = props;
+	const [loading, setLoading] = useState(false);
+	const { token, user, refreshUser } = props;
 	const { id } = useParams();
+
+	const handleInterest = () => {
+		if (loading) return;
+		setLoading(true);
+		const data = { course: course.id };
+		requester('/interest/', 'POST', token, data)
+		.then(res => {
+			setError(false);
+			refreshUser();
+		})
+		.catch(err => {
+			console.log(err);
+			setError(true);
+		});
+	};
 
 	useEffect(() => {
 		requester('/courses/'+id+'/', 'GET', token)
@@ -162,6 +178,30 @@ export function CourseDetail(props) {
 				course ?
 					<div>
 						<Header size='large'>{course.name}</Header>
+
+						<p>
+							{!!course.tags && course.tags.split(',').map(name =>
+								<Label key={name} color={tags[name]} tag size='small'>
+									{name}
+								</Label>
+							)}
+						</p>
+
+						{user &&
+							<p>
+								{user.interests.filter(x => !x.satisfied_by).map(x => x.course).includes(course.id) ?
+									'Interested ✅'
+								:
+									<Button
+										size='tiny'
+										loading={loading}
+										onClick={handleInterest}
+									>
+										Interest&nbsp;+
+									</Button>
+								}
+							</p>
+						}
 
 						{isInstructor(user) && <Segment padded>
 							<InstructorCourseDetail course={course} setCourse={setCourse} {...props} />

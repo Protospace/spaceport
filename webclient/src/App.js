@@ -294,7 +294,7 @@ function App() {
 									</Route>
 
 									<Route path='/courses/:id'>
-										<CourseDetail token={token} user={user} />
+										<CourseDetail token={token} user={user} refreshUser={refreshUser} />
 									</Route>
 
 									<Route path='/courses'>
