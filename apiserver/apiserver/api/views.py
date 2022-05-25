@@ -173,12 +173,6 @@ class MemberViewSet(Base, Retrieve, Update):
         else:
             return serializers.MemberSerializer
 
-    def perform_create(self, serializer):
-        member = serializer.save()
-        utils.tally_membership_months(member)
-        utils.gen_member_forms(member)
-        utils.gen_search_strings()
-
     def perform_update(self, serializer):
         member = serializer.save()
         utils.tally_membership_months(member)

@@ -404,7 +404,8 @@ def register_user(data, user):
 
 
     if data['request_id']: utils_stats.set_progress(data['request_id'], 'Done!')
-    time.sleep(1)
+
+    gen_search_strings()
 
 
 BLANK_FORM = 'misc/blank_member_form.pdf'
