@@ -651,14 +651,6 @@ class StatsViewSet(viewsets.ViewSet, List):
             else:
                 cache.set('sign', sign)
 
-                if secrets.SIGN_TOKEN:
-                    try:
-                        post_data = dict(access_token=secrets.SIGN_TOKEN, args=sign)
-                        r = requests.post('https://api.particle.io/v1/devices/200042000647343232363230/text/', data=post_data, timeout=5)
-                        r.raise_for_status()
-                    except:
-                        raise exceptions.ValidationError(dict(sign='Something went wrong :('))
-
             return Response(200)
         except KeyError:
             raise exceptions.ValidationError(dict(sign='This field is required.'))
