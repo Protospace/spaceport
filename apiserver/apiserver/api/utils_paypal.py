@@ -121,6 +121,7 @@ def build_tx(data):
         info_source='PayPal IPN',
         payment_method=data.get('payment_type', 'unknown'),
         paypal_payer_id=data.get('payer_id', 'unknown'),
+        paypal_subscr_id=data.get('subscr_id', ''),
         paypal_txn_id=data.get('txn_id', 'unknown'),
         paypal_txn_type=data.get('txn_type', 'unknown'),
         reference_number=data.get('txn_id', 'unknown'),
@@ -261,6 +262,34 @@ def create_category_tx(data, member, custom_json):
         user=user,
     )
 
+def add_hint(data, user):
+    hints = models.PayPalHint.objects
+    hints.update_or_create(
+        account=data.get('payer_id', 'unknown'),
+        defaults=dict(user=user),
+    )
+
+    if 'subscr_id' in data:
+        hints.update_or_create(
+            account=data['subscr_id'],
+            defaults=dict(user=user),
+        )
+
+def get_hint(data):
+    hints = models.PayPalHint.objects
+    if 'subscr_id' in data:
+        try:
+            return hints.get(account=data['subscr_id']).user
+        except models.PayPalHint.DoesNotExist:
+            logger.info('IPN - No PayPalHint found for %s', data['subscr_id'])
+
+    try:
+        return hints.get(account=data['payer_id']).user
+    except models.PayPalHint.DoesNotExist:
+        logger.info('IPN - No PayPalHint found for %s', data['payer_id'])
+
+    return False
+
 
 def process_paypal_ipn(data):
     '''
@@ -298,7 +327,6 @@ def process_paypal_ipn(data):
 
     transactions = models.Transaction.objects
     members = models.Member.objects
-    hints = models.PayPalHint.objects
 
     if 'txn_id' not in data:
         logger.info('IPN - Missing transaction ID, ignoring')
@@ -321,18 +349,10 @@ def process_paypal_ipn(data):
         if tx:
             logger.info('IPN - Training matched, adding hint and returning')
             update_ipn(ipn, 'Accepted, training')
-            hints.update_or_create(
-                account=data.get('payer_id', 'unknown'),
-                defaults=dict(user=tx.user),
-            )
+            add_hint(data, tx.user)
             return tx
 
-    user = False
-
-    try:
-        user = hints.get(account=data['payer_id']).user
-    except models.PayPalHint.DoesNotExist:
-        logger.info('IPN - No PayPalHint found for %s', data['payer_id'])
+    user = get_hint(data)
 
     if not user and 'member' in custom_json:
         member_id = custom_json['member']
@@ -348,10 +368,7 @@ def process_paypal_ipn(data):
 
     member = user.member
 
-    hints.update_or_create(
-        account=data.get('payer_id', 'unknown'),
-        defaults=dict(user=user),
-    )
+    add_hint(data, user)
 
     if custom_json.get('category', False) in ['Snacks', 'OnAcct', 'Donation', 'Consumables']:
         logger.info('IPN - Category matched')

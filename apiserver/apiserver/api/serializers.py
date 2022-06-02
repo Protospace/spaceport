@@ -71,6 +71,7 @@ class TransactionSerializer(serializers.ModelSerializer):
             'paypal_txn_id',
             'paypal_txn_type',
             'paypal_payer_id',
+            'paypal_subscr_id',
         ]
 
     def create(self, validated_data):

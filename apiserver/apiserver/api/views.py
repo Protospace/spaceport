@@ -474,6 +474,11 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
                 account=tx.paypal_payer_id,
                 defaults=dict(user=tx.user),
             )
+        if tx.paypal_subscr_id:
+            models.PayPalHint.objects.update_or_create(
+                account=tx.paypal_subscr_id,
+                defaults=dict(user=tx.user),
+            )
 
     def perform_create(self, serializer):
         serializer.save(recorder=self.request.user)
