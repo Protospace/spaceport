@@ -407,6 +407,8 @@ def register_user(data, user):
 
     gen_search_strings()
 
+    cache.set('sign', 'Welcome to Protospace, {}!'.format(data['first_name']))
+
 
 BLANK_FORM = 'misc/blank_member_form.pdf'
 def gen_member_forms(member):
