@@ -202,38 +202,42 @@ def set_discourse_password(username, password, first_name, email):
                 abort(400)
 
 
-    logger.info('Creating Discourse user for: ' + username)
+    user_exists = username in discourse_usernames
 
-    data = {
-        'name': first_name,
-        'username': username,
-        'password': password,
-        'email': email,
-        'active': True,
-        'approved': True,
-        'user_fields[10]': 'Spaceport auth'
-    }
-    response = discourse_api_post('https://forum.protospace.ca/users.json', data)
-    response = response.json()
-    logger.info('Response: %s', response)
+    if not user_exists:
+        logger.info('Creating Discourse user for: ' + username)
 
-    if response['success']:
+        data = {
+            'name': first_name,
+            'username': username,
+            'password': password,
+            'email': email,
+            'active': True,
+            'approved': True,
+            'user_fields[10]': 'Spaceport auth',
+            'user_fields[11]': 'other',
+        }
+        response = discourse_api_post('https://forum.protospace.ca/users.json', data)
+        response = response.json()
+        logger.info('Response: %s', response)
+
         logger.info('Skipping set password')
         return True
 
-    logger.info('User exists, setting Discourse password for: ' + username)
-
-    script = 'User.find_by(username: "{}").update!(password: "{}")'.format(username, password)
-    result, output = discourse_rails_script(script)
-
-    if 'Password is the same' in result.stderr:
-        logger.info('Output: Password is the same as your current password. (ActiveRecord::RecordInvalid)')
-        return True
     else:
-        logger.info('Output: ' + output)
+        logger.info('User exists, setting Discourse password for: ' + username)
 
-    if result.stderr:
-        abort(400)
+        script = 'User.find_by(username: "{}").update!(password: "{}")'.format(username, password)
+        result, output = discourse_rails_script(script)
+
+        if 'Password is the same' in result.stderr:
+            logger.info('Output: Password is the same as your current password. (ActiveRecord::RecordInvalid)')
+            return True
+        else:
+            logger.info('Output: ' + output)
+
+        if result.stderr:
+            abort(400)
 
 
 def add_discourse_group_members(group_name, usernames):
