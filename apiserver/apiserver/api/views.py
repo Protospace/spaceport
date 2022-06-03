@@ -474,11 +474,13 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
                 account=tx.paypal_payer_id,
                 defaults=dict(user=tx.user),
             )
+            logger.info('Set PayPalHint for %s to %s', tx.paypal_payer_id, tx.user.username)
         if tx.paypal_subscr_id:
             models.PayPalHint.objects.update_or_create(
                 account=tx.paypal_subscr_id,
                 defaults=dict(user=tx.user),
             )
+            logger.info('Set PayPalHint for %s to %s', tx.paypal_subscr_id, tx.user.username)
 
     def perform_create(self, serializer):
         serializer.save(recorder=self.request.user)

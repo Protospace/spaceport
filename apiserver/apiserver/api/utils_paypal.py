@@ -268,23 +268,29 @@ def add_hint(data, user):
         account=data.get('payer_id', 'unknown'),
         defaults=dict(user=user),
     )
+    logger.info('IPN - Set PayPalHint for %s to %s', data['payer_id'], user.username)
 
     if 'subscr_id' in data:
         hints.update_or_create(
             account=data['subscr_id'],
             defaults=dict(user=user),
         )
+        logger.info('IPN - Set PayPalHint for %s to %s', data['subscr_id'], user.username)
 
 def get_hint(data):
     hints = models.PayPalHint.objects
     if 'subscr_id' in data:
         try:
-            return hints.get(account=data['subscr_id']).user
+            res = hints.get(account=data['subscr_id']).user
+            logger.info('IPN - Good PayPalHint found for %s', data['subscr_id'])
+            return res
         except models.PayPalHint.DoesNotExist:
             logger.info('IPN - No PayPalHint found for %s', data['subscr_id'])
 
     try:
-        return hints.get(account=data['payer_id']).user
+        res = hints.get(account=data['payer_id']).user
+        logger.info('IPN - Good PayPalHint found for %s', data['payer_id'])
+        return res
     except models.PayPalHint.DoesNotExist:
         logger.info('IPN - No PayPalHint found for %s', data['payer_id'])
 
