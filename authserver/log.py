@@ -45,7 +45,7 @@ LOG_DICT = {
         },
     },
     'root': {
-        'level': 'DEBUG',
+        'level': 'INFO',
         'handlers': ['wsgi']
     }
 }
