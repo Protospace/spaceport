@@ -235,7 +235,8 @@ def check_training(data, training_id, amount):
 
     member = training.user.member
 
-    training.attendance_status = 'Confirmed'
+    if training.attendance_status == 'Waiting for payment':
+        training.attendance_status = 'Confirmed'
     training.paid_date = datetime.date.today()
     training.save()
 
