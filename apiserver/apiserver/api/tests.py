@@ -1,7 +1,3 @@
-import django, sys, os
-os.environ['DJANGO_SETTINGS_MODULE'] = 'apiserver.settings'
-django.setup()
-
 from django.test import TestCase
 import datetime
 from dateutil import relativedelta
