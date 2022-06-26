@@ -9,12 +9,6 @@ from rest_framework.exceptions import ValidationError
 
 from apiserver.api import utils, utils_paypal, models
 
-testing_member, _ = models.Member.objects.get_or_create(
-    first_name='unittest',
-    preferred_name='unittest',
-    last_name='tester',
-)
-
 class TestMonthsSpanned(TestCase):
     def test_num_months_spanned_one_month(self):
         date2 = datetime.date(2020, 1, 10)
@@ -201,10 +195,27 @@ class TestCalcStatus(TestCase):
 
 
 class TestTallyMembership(TestCase):
+    def get_user(self):
+        testing_user, _ = models.User.objects.get_or_create(
+            first_name='unittest',
+            username='unittest',
+            last_name='tester',
+            email='unittest@unittest.com'
+        )
+        return testing_user
+
     def get_member_clear_transactions(self):
-        member = testing_member
-        member.paused_date = None
-        member.expire_date = None
+        testing_user = self.get_user()
+
+        member, _ = models.Member.objects.get_or_create(
+            first_name=testing_user.first_name,
+            preferred_name=testing_user.first_name,
+            last_name=testing_user.last_name,
+            user=testing_user,
+            paused_date=None,
+            expire_date=None
+        )
+
         return member
 
     def test_tally_membership_months_prepaid(self):
@@ -220,6 +231,7 @@ class TestTallyMembership(TestCase):
             models.Transaction.objects.create(
                 amount=0,
                 member_id=member.id,
+                user=member.user,
                 number_of_membership_months=1,
             )
 
@@ -241,6 +253,7 @@ class TestTallyMembership(TestCase):
             models.Transaction.objects.create(
                 amount=0,
                 member_id=member.id,
+                user=member.user,
                 number_of_membership_months=1,
             )
 
@@ -262,6 +275,7 @@ class TestTallyMembership(TestCase):
             models.Transaction.objects.create(
                 amount=0,
                 member_id=member.id,
+                user=member.user,
                 number_of_membership_months=1,
             )
 
@@ -283,6 +297,7 @@ class TestTallyMembership(TestCase):
             models.Transaction.objects.create(
                 amount=0,
                 member_id=member.id,
+                user=member.user,
                 number_of_membership_months=1,
             )
 
@@ -304,6 +319,7 @@ class TestTallyMembership(TestCase):
             models.Transaction.objects.create(
                 amount=0,
                 member_id=member.id,
+                user=member.user,
                 number_of_membership_months=1,
             )
 
