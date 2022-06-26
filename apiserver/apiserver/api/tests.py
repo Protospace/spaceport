@@ -200,40 +200,6 @@ class TestCalcStatus(TestCase):
         self.assertEqual(status, 'Former Member')
 
 
-class TestFakeMonths(TestCase):
-    def test_fake_missing_membership_months_one_month(self):
-        testing_member.current_start_date = datetime.date(2018, 6, 6)
-        testing_member.expire_date = datetime.date(2018, 7, 6)
-
-        tx, count = utils.fake_missing_membership_months(testing_member)
-
-        self.assertEqual(count, 1)
-
-    def test_fake_missing_membership_months_one_and_half_month(self):
-        testing_member.current_start_date = datetime.date(2018, 6, 1)
-        testing_member.expire_date = datetime.date(2018, 7, 15)
-
-        tx, count = utils.fake_missing_membership_months(testing_member)
-
-        self.assertEqual(count, 1)
-
-    def test_fake_missing_membership_months_one_year(self):
-        testing_member.current_start_date = datetime.date(2018, 6, 6)
-        testing_member.expire_date = datetime.date(2019, 6, 6)
-
-        tx, count = utils.fake_missing_membership_months(testing_member)
-
-        self.assertEqual(count, 12)
-
-    def test_fake_missing_membership_months_same_month(self):
-        testing_member.current_start_date = datetime.date(2018, 6, 6)
-        testing_member.expire_date = datetime.date(2018, 6, 16)
-
-        tx, count = utils.fake_missing_membership_months(testing_member)
-
-        self.assertEqual(count, 0)
-
-
 class TestTallyMembership(TestCase):
     def get_member_clear_transactions(self):
         member = testing_member
