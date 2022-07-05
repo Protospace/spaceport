@@ -294,6 +294,7 @@ clean = Cleaner(tags=ALLOWED_TAGS).clean
 
 
 def is_request_from_protospace(request):
+    # TODO: pull to config
     whitelist = ['24.66.110.96', '205.233.15.76', '205.233.15.69']
 
     if settings.DEBUG:
@@ -346,6 +347,8 @@ def register_user(data, user):
     data['first_name'] = data['first_name'].title().strip()
     data['last_name'] = data['last_name'].title().strip()
 
+    # Sometimes during demos, a user makes a fake account then then has to be cleaned out
+    # Notify me that this has happened so I can go clean out the database
     if 'test' in data['username']:
         msg = 'Someone created a test account: {} {} {} {}'.format(
             data['username'],
