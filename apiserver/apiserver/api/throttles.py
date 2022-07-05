@@ -26,7 +26,10 @@ class LoggingThrottle(throttling.BaseThrottle):
             return True
 
         if request.data:
-            data = request.data.dict()
+            if type(request.data) is not dict:
+                data = request.data.dict()
+            else:
+                data = request.data
             for key in ['password', 'password1', 'password2', 'old_password', 'new_password1', 'new_password2']:
                 if key in data:
                     data[key] = '[CENSORED]'
