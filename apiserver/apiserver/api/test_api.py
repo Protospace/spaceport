@@ -6,15 +6,15 @@ import json
 from parameterized import parameterized
 
 data = {
-                "username": "registrationtc", 
-                "email": "unittest@email.com",
-                "password1": "unittest",
-                "password2": "unittest",
-                "first_name": "John",
-                "last_name": "Doe",
+        "username": "registrationtc",
+        "email": "unittest@email.com",
+        "password1": "unittest",
+        "password2": "unittest",
+        "first_name": "John",
+        "last_name": "Doe",
 
-                # need to fake this for updating progress
-                "request_id": "lol"
+        # need to fake this for updating progress
+        "request_id": "lol"
         }
 
 
