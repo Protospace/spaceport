@@ -84,7 +84,7 @@ def discourse_api_delete(url, data={}):
 
 def discourse_rails_script(script):
     result = subprocess.run(['docker', 'exec', '-i', secrets.DISCOURSE_CONTAINER, 'rails', 'runner', script],
-            shell=False, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            shell=False, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
     output = result.stdout or result.stderr
     output = output.strip() or 'No complaints'
     return result, output
