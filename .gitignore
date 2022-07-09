@@ -1,0 +1,7 @@
+# data directory contains artifacts created and managed by containers
+# they are not relevant to version control, so exclude them
+data/*
+
+# include the readme file so the directory is included when the repository is cloned
+# this avoids the 'directory doesnt exist' error during container creation for containers that need a data mount
+!data/README.md

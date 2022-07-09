@@ -1,0 +1,79 @@
+version: "3.3"
+
+networks:
+  extnet:
+    external: true
+
+services:
+  #   forum:
+  #     # TODO: review this, figure out how to bootstrap service https://github.com/discourse/discourse_docker
+  #     # see version of live site here: https://forum.protospace.ca/admin
+  #     image: discourse/base:2.0.20220422-0046-slim
+  # 
+  #   wiki:
+  #     # see version of live site here: https://wiki.protospace.ca/Special:Version
+  #     image: mediawiki:1.34.0
+
+  samba:
+    # docker-compose examplse provided here: https://hub.docker.com/r/torkalis/samba-domain
+    # docker-compose reference here: https://docs.docker.com/compose/compose-file/
+    image: torkalis/samba-domain
+    volumes:
+      # TODO: mount this in some other way, we dont know for sure /etc/localtime exists on the host
+      - /etc/localtime:/etc/localtime:ro
+      - ./data/samba/data/:/var/lib/samba
+      - ./data/samba/config/samba:/etc/samba/external
+    environment:
+      - DOMAIN=CORP.EXAMPLE.COM
+      - DOMAINPASS=Passw0rd#
+      - DNSFORWARDER=192.168.3.1
+      - HOSTIP=192.168.3.222
+    networks:
+      - extnet
+        # these are a lot of privileged portbindings...
+        # ignore for now, i dont want to troubleshoot them
+        # TODO: access through a network adapter instead of binding to host
+        #    ports:
+        #      - 192.168.3.222:53:53
+        #      - 192.168.3.222:53:53/udp
+        #      - 192.168.3.222:88:88
+        #      - 192.168.3.222:88:88/udp
+        #      - 192.168.3.222:135:135
+        #      - 192.168.3.222:137-138:137-138/udp
+        #      - 192.168.3.222:139:139
+        #      - 192.168.3.222:389:389
+        #      - 192.168.3.222:389:389/udp
+        #      - 192.168.3.222:445:445
+        #      - 192.168.3.222:464:464
+        #      - 192.168.3.222:464:464/udp
+        #      - 192.168.3.222:636:636
+        #      - 192.168.3.222:1024-1044:1024-1044
+        #      - 192.168.3.222:3268-3269:3268-3269
+    dns_search:
+      - corp.example.com
+    dns:
+      - 192.168.3.222
+      - 192.168.3.1
+    extra_hosts:
+      - localdc.corp.example.com:192.168.3.222
+    hostname: localdc
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    privileged: true
+    restart: always
+
+  ldapserver:
+    build:
+      context: ./ldapserver
+    volumes:
+      # mount in entire directory so it updates as we change code outside the container
+      - ./ldapserver:/ldapserver
+      # mount in dev secrets
+      - ./ldapserver/secrets.dev.py:/ldapserver/secrets.py
+    ports:
+      - "5000:5000"
+    networks:
+      # share a network with samba to access AD services
+      - extnet
