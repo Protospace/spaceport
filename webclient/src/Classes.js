@@ -452,8 +452,15 @@ export function ICalButtons(props) {
 
 	const addToGoogleCalendar = (e) => {
 		e.preventDefault();
-		// TODO: fill in URL from clazz properties
-		window.open('https://www.google.com/calendar/render?action=TEMPLATE&text=Title&dates=20190227/20190228', '_blank');
+
+		// construct and set the dates format that google calendar links require
+		let starttime = moment(clazz.datetime);
+		let endtime = starttime.clone().add(1, 'hour');
+		const datestringfmt = 'YYYYMMDDTkkmmss';
+		let dates = `${starttime.format(datestringfmt)}/${endtime.format(datestringfmt)}`
+
+		// send user to google calendar
+		window.location = `https://www.google.com/calendar/render?action=TEMPLATE&text=${clazz.course_data.name}&dates=${dates}`;
 	};
 
 	const options = [
@@ -461,43 +468,44 @@ export function ICalButtons(props) {
 		{ key: 'download', icon: 'download', text: 'Download ICS Event', value: 'download', action: handleDownload },
 		{ key: 'google', icon: 'google', text: 'Add to Google Calendar', value: 'google', action: addToGoogleCalendar },
 	];
-	// TODO: get default option from local storage or default to 0
-	const [selectedOption, setOption] = useState(options[0]);
+
+	// get default option from local storage or default to first item in options list
+	const pref = 'calendarPreference';
+	let defaultSelection =  options[0];
+	let savedPreference = localStorage.getItem(pref);
+	if (savedPreference != null) defaultSelection = options.filter(x => x.value === savedPreference)[0];
+
+	const [selectedOption, setOption] = useState(defaultSelection);
 
 	const onClick = (e, data) => {
 		let newOption = options.filter(x => x.value === data.value)[0];
 		setOption(newOption);
+
+		// set the option as users preference
+		localStorage.setItem(pref, newOption.value);
 	};
 
 	return (
-		<Button.Group>
-			<Button 
-				loading={loading}
-				onClick={selectedOption.action}>
-					<Icon name={selectedOption.icon} />{selectedOption.text}
-			</Button>
-			<Dropdown
-				className='button icon'
-		      		floating
-		      		onChange={onClick}
-		      		options={options}
-		      		trigger={<></>}
-			/>
-		</Button.Group>
-		// TODO: reimplement success prompt
-		/*<>
-			<Button compact onClick={handleDownload}>
-				Download
-			</Button>
-			{success ?
-				<span>&nbsp;&nbsp;Sent!</span>
-			:
-				<Button compact loading={loading} onClick={handleEmail}>
-					Email
+		<>
+		{success ?
+			<span>&nbsp;&nbsp;Sent!</span>
+		:
+			<Button.Group>
+				<Button
+					loading={loading}
+					onClick={selectedOption.action}>
+						<Icon name={selectedOption.icon} />{selectedOption.text}
 				</Button>
-			}
-			{error && <span>Error.</span>}
-		</>*/
+				<Dropdown
+					className='button icon'
+					floating
+					onChange={onClick}
+					options={options}
+					trigger={<></>}
+				/>
+			</Button.Group>
+		}
+		</>
 	);
 };
 
