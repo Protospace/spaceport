@@ -450,8 +450,40 @@ export function ICalButtons(props) {
 		});
 	};
 
+	const addToGoogleCalendar = (e) => {
+		e.preventDefault();
+		// TODO: fill in URL from clazz properties
+		window.location = 'https://www.google.com/calendar/render?action=TEMPLATE&text=Title&dates=20190227/20190228'
+	};
+
+	const options = [
+		{ key: 'email', icon: 'mail outline', text: 'Email ICS Event', value: 'email' },
+		{ key: 'download', icon: 'download', text: 'Download ICS Event', value: 'download' },
+		{ key: 'google', icon: 'google', text: 'Add to Google Calendar', value: 'google' },
+	];
+
+	let selectedOption = options[0];
+
+	const onClick = (e, data) => {
+		selectedOption = options.filter(x => x.value === data.value)[0];
+		console.log(selectedOption);
+		// TODO set state here
+		// setState({selectedOption: selectedOption});
+		// TODO: change the Button onClick handler...based on selected option?
+	};
+
 	return (
-		<>
+		<Button.Group>
+			<Button onClick={handleDownload}><Icon name={selectedOption.icon} />{selectedOption.text}</Button>
+			<Dropdown
+				className='button icon'
+		      		floating
+		      		onChange={onClick}
+		      		options={options}
+		      		trigger={<></>}
+			/>
+		</Button.Group>
+		/*<>
 			<Button compact onClick={handleDownload}>
 				Download
 			</Button>
@@ -463,7 +495,7 @@ export function ICalButtons(props) {
 				</Button>
 			}
 			{error && <span>Error.</span>}
-		</>
+		</>*/
 	);
 };
 
