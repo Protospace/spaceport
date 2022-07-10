@@ -453,28 +453,29 @@ export function ICalButtons(props) {
 	const addToGoogleCalendar = (e) => {
 		e.preventDefault();
 		// TODO: fill in URL from clazz properties
-		window.location = 'https://www.google.com/calendar/render?action=TEMPLATE&text=Title&dates=20190227/20190228'
+		window.open('https://www.google.com/calendar/render?action=TEMPLATE&text=Title&dates=20190227/20190228', '_blank');
 	};
 
 	const options = [
-		{ key: 'email', icon: 'mail outline', text: 'Email ICS Event', value: 'email' },
-		{ key: 'download', icon: 'download', text: 'Download ICS Event', value: 'download' },
-		{ key: 'google', icon: 'google', text: 'Add to Google Calendar', value: 'google' },
+		{ key: 'email', icon: 'mail outline', text: 'Email ICS Event', value: 'email', action: handleEmail },
+		{ key: 'download', icon: 'download', text: 'Download ICS Event', value: 'download', action: handleDownload },
+		{ key: 'google', icon: 'google', text: 'Add to Google Calendar', value: 'google', action: addToGoogleCalendar },
 	];
-
-	let selectedOption = options[0];
+	// TODO: get default option from local storage or default to 0
+	const [selectedOption, setOption] = useState(options[0]);
 
 	const onClick = (e, data) => {
-		selectedOption = options.filter(x => x.value === data.value)[0];
-		console.log(selectedOption);
-		// TODO set state here
-		// setState({selectedOption: selectedOption});
-		// TODO: change the Button onClick handler...based on selected option?
+		let newOption = options.filter(x => x.value === data.value)[0];
+		setOption(newOption);
 	};
 
 	return (
 		<Button.Group>
-			<Button onClick={handleDownload}><Icon name={selectedOption.icon} />{selectedOption.text}</Button>
+			<Button 
+				loading={loading}
+				onClick={selectedOption.action}>
+					<Icon name={selectedOption.icon} />{selectedOption.text}
+			</Button>
 			<Dropdown
 				className='button icon'
 		      		floating
@@ -483,6 +484,7 @@ export function ICalButtons(props) {
 		      		trigger={<></>}
 			/>
 		</Button.Group>
+		// TODO: reimplement success prompt
 		/*<>
 			<Button compact onClick={handleDownload}>
 				Download
