@@ -464,9 +464,9 @@ export function ICalButtons(props) {
 	};
 
 	const options = [
-		{ key: 'email', icon: 'mail outline', text: 'Email ICS Event', value: 'email', action: handleEmail },
-		{ key: 'download', icon: 'download', text: 'Download ICS Event', value: 'download', action: handleDownload },
-		{ key: 'google', icon: 'google', text: 'Add to Google Calendar', value: 'google', action: addToGoogleCalendar },
+		{ key: 'email', icon: 'mail outline', text: 'Email ICS Event', value: 'Email', action: handleEmail },
+		{ key: 'download', icon: 'download', text: 'Download ICS Event', value: 'Download', action: handleDownload },
+		{ key: 'google', icon: 'google', text: 'Add to Google Calendar', value: 'Google', action: addToGoogleCalendar },
 	];
 
 	// get default option from local storage or default to first item in options list
@@ -497,7 +497,7 @@ export function ICalButtons(props) {
 					loading={loading}
 					onClick={selectedOption.action}
 				>
-					<Icon name={selectedOption.icon} />{selectedOption.text}
+					<Icon name={selectedOption.icon} />{selectedOption.value}
 				</Button>
 				<Dropdown
 					className='button icon'
