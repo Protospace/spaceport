@@ -473,7 +473,9 @@ export function ICalButtons(props) {
 	const pref = 'calendarPreference';
 	let defaultSelection =  options[0];
 	let savedPreference = localStorage.getItem(pref);
-	if (savedPreference != null) defaultSelection = options.filter(x => x.value === savedPreference)[0];
+	if (savedPreference != null) {
+		defaultSelection = options.filter(x => x.value === savedPreference)[0];
+	}
 
 	const [selectedOption, setOption] = useState(defaultSelection);
 
@@ -493,8 +495,9 @@ export function ICalButtons(props) {
 			<Button.Group>
 				<Button
 					loading={loading}
-					onClick={selectedOption.action}>
-						<Icon name={selectedOption.icon} />{selectedOption.text}
+					onClick={selectedOption.action}
+				>
+					<Icon name={selectedOption.icon} />{selectedOption.text}
 				</Button>
 				<Dropdown
 					className='button icon'
