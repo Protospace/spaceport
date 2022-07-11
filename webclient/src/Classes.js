@@ -470,21 +470,17 @@ export function ICalButtons(props) {
 	];
 
 	// get default option from local storage or default to first item in options list
-	const pref = 'calendarPreference';
-	let defaultSelection =  options[0];
-	let savedPreference = localStorage.getItem(pref);
-	if (savedPreference != null) {
-		defaultSelection = options.filter(x => x.value === savedPreference)[0];
-	}
+	const calendarValue = localStorage.getItem('calendarPreference') || 'Email';
+	const defaultOption = options.find(x => x.value === calendarValue);
 
-	const [selectedOption, setOption] = useState(defaultSelection);
+	const [selectedOption, setOption] = useState(defaultOption);
 
-	const onClick = (e, data) => {
-		let newOption = options.filter(x => x.value === data.value)[0];
+	const onChange = (e, data) => {
+		const newOption = options.find(x => x.value === data.value);
 		setOption(newOption);
 
 		// set the option as users preference
-		localStorage.setItem(pref, newOption.value);
+		localStorage.setItem('calendarPreference', newOption.value);
 	};
 
 	return (
@@ -502,7 +498,7 @@ export function ICalButtons(props) {
 				<Dropdown
 					className='button icon'
 					floating
-					onChange={onClick}
+					onChange={onChange}
 					options={options}
 					trigger={<></>}
 				/>
