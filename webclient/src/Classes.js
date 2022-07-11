@@ -501,6 +501,7 @@ export function ICalButtons(props) {
 					onChange={onChange}
 					options={options}
 					trigger={<></>}
+					selectOnBlur={false}
 				/>
 			</Button.Group>
 		}
