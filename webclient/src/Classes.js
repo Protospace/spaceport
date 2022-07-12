@@ -450,19 +450,61 @@ export function ICalButtons(props) {
 		});
 	};
 
+	const addToGoogleCalendar = (e) => {
+		e.preventDefault();
+
+		// construct and set the dates format that google calendar links require
+		let starttime = moment(clazz.datetime);
+		let endtime = starttime.clone().add(1, 'hour');
+		const datestringfmt = 'YYYYMMDDTkkmmss';
+		let dates = `${starttime.format(datestringfmt)}/${endtime.format(datestringfmt)}`
+
+		// send user to google calendar
+		window.location = `https://www.google.com/calendar/render?action=TEMPLATE&text=${clazz.course_data.name}&dates=${dates}`;
+	};
+
+	const options = [
+		{ key: 'email', icon: 'mail outline', text: 'Email ICS Event', value: 'Email', action: handleEmail },
+		{ key: 'download', icon: 'download', text: 'Download ICS Event', value: 'Download', action: handleDownload },
+		{ key: 'google', icon: 'google', text: 'Add to Google Calendar', value: 'Google', action: addToGoogleCalendar },
+	];
+
+	// get default option from local storage or default to first item in options list
+	const calendarValue = localStorage.getItem('calendarPreference') || 'Email';
+	const defaultOption = options.find(x => x.value === calendarValue);
+
+	const [selectedOption, setOption] = useState(defaultOption);
+
+	const onChange = (e, data) => {
+		const newOption = options.find(x => x.value === data.value);
+		setOption(newOption);
+
+		// set the option as users preference
+		localStorage.setItem('calendarPreference', newOption.value);
+	};
+
 	return (
 		<>
-			<Button compact onClick={handleDownload}>
-				Download
-			</Button>
-			{success ?
-				<span>&nbsp;&nbsp;Sent!</span>
-			:
-				<Button compact loading={loading} onClick={handleEmail}>
-					Email
+		{success ?
+			<span>&nbsp;&nbsp;Sent!</span>
+		:
+			<Button.Group>
+				<Button
+					loading={loading}
+					onClick={selectedOption.action}
+				>
+					<Icon name={selectedOption.icon} />{selectedOption.value}
 				</Button>
-			}
-			{error && <span>Error.</span>}
+				<Dropdown
+					className='button icon'
+					floating
+					onChange={onChange}
+					options={options}
+					trigger={<></>}
+					selectOnBlur={false}
+				/>
+			</Button.Group>
+		}
 		</>
 	);
 };
