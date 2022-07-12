@@ -614,7 +614,7 @@ export function ClassDetail(props) {
 									<Table.Cell>{clazz.student_count} {!!clazz.max_students && '/ '+clazz.max_students}</Table.Cell>
 								</Table.Row>
 								<Table.Row>
-									<Table.Cell>Invite:</Table.Cell>
+									<Table.Cell>Event:</Table.Cell>
 									<Table.Cell><ICalButtons token={token} clazz={clazz} /></Table.Cell>
 								</Table.Row>
 							</Table.Body>
