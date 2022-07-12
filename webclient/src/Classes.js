@@ -486,7 +486,7 @@ export function ICalButtons(props) {
 	return (
 		<>
 		{success ?
-			<span>&nbsp;&nbsp;Sent!</span>
+			<span>Sent!</span>
 		:
 			<Button.Group>
 				<Button
