@@ -313,7 +313,7 @@ def process_paypal_ipn(data):
         return False
 
     try:
-        custom_json = json.loads(data.get('custom', ''))
+        custom_json = json.loads(data.get('custom', '').replace('`', '"'))
     except (KeyError, ValueError):
         custom_json = {}
 

@@ -13,7 +13,7 @@ export function PayPalPayNow(props) {
 				<input type='hidden' name='lc' value='CA' />
 				<input type='hidden' name='item_name' value={name} />
 				<input type='hidden' name='amount' value={amount} />
-				<input type='hidden' name='custom' value={custom} />
+				<input type='hidden' name='custom' value={custom.replace(/\"/g, '`')} />
 				<input type='hidden' name='currency_code' value='CAD' />
 				<input type='hidden' name='button_subtype' value='services' />
 				<input type='hidden' name='no_note' value='0' />
@@ -40,7 +40,7 @@ export function PayPalSubscribe(props) {
 				<input type='hidden' name='no_note' value='1' />
 				<input type='hidden' name='src' value='1' />
 				<input type='hidden' name='a3' value={amount} />
-				<input type='hidden' name='custom' value={custom} />
+				<input type='hidden' name='custom' value={custom.replace(/\"/g, '`')} />
 				<input type='hidden' name='p3' value='1' />
 				<input type='hidden' name='t3' value='M' />
 				<input type='hidden' name='currency_code' value='CAD' />
@@ -68,7 +68,7 @@ export function PayPalSubscribeDeal(props) {
 				<input type='hidden' name='t1' value='M' />
 				<input type='hidden' name='src' value='1' />
 				<input type='hidden' name='a3' value={amount} />
-				<input type='hidden' name='custom' value={custom} />
+				<input type='hidden' name='custom' value={custom.replace(/\"/g, '`')} />
 				<input type='hidden' name='p3' value='1' />
 				<input type='hidden' name='t3' value='M' />
 				<input type='hidden' name='currency_code' value='CAD' />
