@@ -10,7 +10,7 @@ https://docs.my.protospace.ca
 
 ## Development Setup
 
-https://docs.my.protospace.ca/dev.html
+https://docs.my.protospace.ca/dev_apiserver.html
 
 ## License
 
