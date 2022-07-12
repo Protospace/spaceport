@@ -25,6 +25,12 @@ export function Debug(props) {
 				</Button>
 			</p>
 
+			<p>
+				<Button onClick={() => {localStorage.clear()}}>
+					Clear localStorage
+				</Button>
+			</p>
+
 			<p><Link to='/classfeed'>Classfeed</Link></p>
 
 			<p><Link to='/usage/trotec'>Trotec Usage</Link></p>
