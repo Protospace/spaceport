@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Input, Item, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Container, Header } from 'semantic-ui-react';
 
 export function PayPalPayNow(props) {
 	const { amount, custom, name } = props;
