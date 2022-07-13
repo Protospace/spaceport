@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useReducer, useContext } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 
 let scrollPositions = {};
 let timeout = null;
