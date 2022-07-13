@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import moment from 'moment-timezone';
 import QRCode from 'react-qr-code';
 import './light.css';
-import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Popup, Segment, Table } from 'semantic-ui-react';
+import { Container, Divider, Grid, Header, Icon, Image, Message, Popup, Segment, Table } from 'semantic-ui-react';
 import { statusColor, BasicTable, siteUrl, staticUrl, requester, isAdmin } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 import { AccountForm } from './Account.js';
@@ -189,7 +189,6 @@ export function Home(props) {
 	const { user, token } = props;
 	const [stats, setStats] = useState(JSON.parse(localStorage.getItem('stats', 'false')));
 	const [refreshCount, refreshStats] = useReducer(x => x + 1, 0);
-	const location = useLocation();
 
 	useEffect(() => {
 		requester('/stats/', 'GET', token)
@@ -230,7 +229,7 @@ export function Home(props) {
 
 	const alarmStat = () => stats && stats.alarm && moment().unix() - stats.alarm['time'] < 300 ? stats.alarm['data'] < 270 ? 'Armed' : 'Disarmed' : 'Unknown';
 
-	const doorOpenStat = () => alarmStat() == 'Disarmed' && stats.alarm['data'] > 360 ? ', door open' : '';
+	const doorOpenStat = () => alarmStat() === 'Disarmed' && stats.alarm['data'] > 360 ? ', door open' : '';
 
 	const show_signup = stats?.at_protospace;
 
