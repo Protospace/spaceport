@@ -1,22 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import moment from 'moment-timezone';
 import ReactToPrint from 'react-to-print';
 import './light.css';
-import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Button, Container, Form, Grid, Header, Message, Segment, Table } from 'semantic-ui-react';
 import { MembersDropdown } from './Members.js';
 import { isAdmin, BasicTable, requester } from './utils.js';
-import { NotFound, PleaseLogin } from './Misc.js';
+import { NotFound } from './Misc.js';
 
 export function TransactionEditor(props) {
 	const { token, input, setInput, error, noMemberSearch } = props;
 
-	const [prevInput, setPrevInput] = useState(input);
+	const [ prevInput ] = useState(input);
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
-	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
-	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 
 	const makeProps = (name) => ({
 		name: name,
@@ -104,7 +102,7 @@ export function TransactionEditor(props) {
 				onChange={handleValues}
 			/>
 
-			{ input?.account_type != prevInput?.account_type && input?.account_type == 'PayPal' &&
+			{ input?.account_type !== prevInput?.account_type && input?.account_type === 'PayPal' &&
 				<Message visible warning>
 					<Message.Header>Are you sure?</Message.Header>
 					<p>PayPal transactions should be automatic. Double check there's no duplicate. They may take 24h to appear.</p>
@@ -198,7 +196,7 @@ function EditTransaction(props) {
 };
 
 function ReportTransaction(props) {
-	const { transaction, setTransaction, token, refreshUser } = props;
+	const { transaction, token, refreshUser } = props;
 	const [input, setInput] = useState(transaction);
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -206,9 +204,7 @@ function ReportTransaction(props) {
 	const { id } = useParams();
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
-	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
-	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 
 	const handleSubmit = (e) => {
 		if (loading) return;
@@ -414,7 +410,7 @@ class TransactionPrint extends React.Component {
 export function TransactionDetail(props) {
 	const { token, user } = props;
 	const { id } = useParams();
-	const ownTransaction = user.transactions.find(x => x.id == id);
+	const ownTransaction = user.transactions.find(x => x.id === id);
 	const [transaction, setTransaction] = useState(ownTransaction || false);
 	const [error, setError] = useState(false);
 	const printRef = useRef();
