@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import * as loadImage from 'blueimp-load-image';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import './light.css';
-import { Button, Container, Checkbox, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { BasicTable, staticUrl, requester, randomString } from './utils.js';
-import { LoginForm, SignupForm } from './LoginSignup.js';
+import { Button, Container, Form, Grid, Header, Message, Segment } from 'semantic-ui-react';
+import { requester, randomString } from './utils.js';
 
 function LogoutEverywhere(props) {
 	const { token } = props;
@@ -59,7 +58,6 @@ function ChangePasswordForm(props) {
 	const history = useHistory();
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
-	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
 
 	const handleSubmit = (e) => {

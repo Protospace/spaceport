@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import './light.css';
-import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Button, Checkbox, Dimmer, Form, Header, Icon, Image, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
 import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { TrainingList } from './Training.js';
-import { NotFound } from './Misc.js';
 
 function AdminCardDetail(props) {
 	const { token, result, card } = props;
@@ -17,9 +16,7 @@ function AdminCardDetail(props) {
 	const id = card.id;
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
-	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
-	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 
 	const handleSubmit = (e) => {
 		if (loading) return;
@@ -142,7 +139,6 @@ export function AdminMemberCards(props) {
 	}, [result.member]);
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
-	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
 	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 
@@ -177,7 +173,7 @@ export function AdminMemberCards(props) {
 
 	const checkAutoscan = () => {
 		getAutoscan().then(newScan => {
-			if (newScan != prevAutoscan) {
+			if (newScan !== prevAutoscan) {
 				prevAutoscan = newScan;
 				setInput({ ...input, card_number: newScan });
 			}
@@ -416,7 +412,6 @@ export function AdminMemberForm(props) {
 	}, [result.member]);
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
-	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
 	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 

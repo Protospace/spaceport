@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import './light.css';
-import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Button, Container, Checkbox, Form, Header, Icon, Table } from 'semantic-ui-react';
 import * as Datetime from 'react-datetime';
 import moment from 'moment-timezone';
 import download from 'downloadjs';
-import { apiUrl, statusColor, BasicTable, staticUrl, requester } from './utils.js';
-import { NotFound } from './Misc.js';
+import { apiUrl, statusColor, requester } from './utils.js';
 
 let vettingCache = false;
 let historyCache = false;
@@ -15,7 +14,7 @@ let focusCache = false;
 
 
 export function AdminVet(props) {
-	const { token, user, member, refreshVetting } = props;
+	const { token, member, refreshVetting } = props;
 	const [loading, setLoading] = useState(false);
 	const [yousure, setYousure] = useState(false);
 
@@ -49,7 +48,7 @@ export function AdminVet(props) {
 }
 
 export function AdminVetting(props) {
-	const { token, user } = props;
+	const { token } = props;
 	const [vetting, setVetting] = useState(vettingCache);
 	const [refreshCount, refreshVetting] = useReducer(x => x + 1, 0);
 	const [error, setError] = useState(false);

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import './light.css';
-import { Button, Label, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Button, Label, Container, Header, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
 import { isInstructor, getInstructor, requester } from './utils.js';
-import { NotFound, PleaseLogin } from './Misc.js';
+import { NotFound } from './Misc.js';
 import { InstructorCourseList, InstructorCourseDetail } from './InstructorCourses.js';
 import { InstructorClassList } from './InstructorClasses.js';
 
