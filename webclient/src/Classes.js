@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import './light.css';
-import { Label, Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Label, Button, Container, Dropdown, Form, Header, Icon, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
-import { apiUrl, isAdmin, isInstructor, getInstructor, BasicTable, requester, useIsMobile } from './utils.js';
-import { NotFound, PleaseLogin } from './Misc.js';
+import { apiUrl, isAdmin, getInstructor, BasicTable, requester, useIsMobile } from './utils.js';
+import { NotFound } from './Misc.js';
 import { InstructorClassDetail, InstructorClassAttendance } from './InstructorClasses.js';
 import { PayPalPayNow } from './PayPal.js';
 import { tags } from './Courses.js';
@@ -426,7 +426,7 @@ export function ICalButtons(props) {
 	const { token, clazz } = props;
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
-	const [error, setError] = useState(false);
+	const [setError] = useState(false);
 
 	const handleDownload = (e) => {
 		e.preventDefault();
@@ -517,7 +517,7 @@ export function ClassDetail(props) {
 	const [override, setOverride] = useState(false);
 	const { token, user, refreshUser } = props;
 	const { id } = useParams();
-	const userTraining = clazz && clazz.students.find(x => x.user == user.id);
+	const userTraining = clazz && clazz.students.find(x => x.user === user.id);
 
 	useEffect(() => {
 		requester('/sessions/'+id+'/', 'GET', token)
@@ -637,7 +637,7 @@ export function ClassDetail(props) {
 							</Segment>
 						}
 
-						{clazz.instructor != user.id &&
+						{clazz.instructor !== user.id &&
 							(userTraining ?
 								<div>
 									<p>Status: {userTraining.attendance_status}</p>
@@ -653,7 +653,7 @@ export function ClassDetail(props) {
 										}
 									</p>
 
-									{clazz.cost != '0.00' && !userTraining.paid_date && userTraining.attendance_status !== 'Withdrawn' &&
+									{clazz.cost !== '0.00' && !userTraining.paid_date && userTraining.attendance_status !== 'Withdrawn' &&
 										<div>
 											{userTraining.attendance_status === 'Waiting for payment' ?
 												<p>Please pay the course fee of ${clazz.cost} to confirm your attendance:</p>
