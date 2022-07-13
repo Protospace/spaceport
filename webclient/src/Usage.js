@@ -1,9 +1,8 @@
-import React, { useRef, useState, useEffect, useReducer } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useLocation } from 'react-router-dom';
+import React, { useRef, useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import moment from 'moment-timezone';
-import QRCode from 'react-qr-code';
-import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Popup, Segment, Table } from 'semantic-ui-react';
-import { statusColor, BasicTable, siteUrl, staticUrl, requester, isAdmin } from './utils.js';
+import { Button, Container, Header } from 'semantic-ui-react';
+import { requester } from './utils.js';
 
 const deviceNames = {
 	'trotec': {title: 'Trotec', device: 'TROTECS300'},
@@ -47,8 +46,6 @@ export function Usage(props) {
 
 	const inUse = usage && moment().unix() - usage.track.time <= 60;
 	const showUsage = usage && inUse && usage.track.username === usage.username;
-
-	const now = moment();
 
 	return (
 		<Container>
