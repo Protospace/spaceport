@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './light.css';
-import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Form, Header, Message } from 'semantic-ui-react';
 import { requester, randomString } from './utils.js';
 
 export function LoginForm(props) {
@@ -69,7 +69,6 @@ export function SignupForm(props) {
 	const [error, setError] = useState({});
 	const [progress, setProgress] = useState([]);
 	const [loading, setLoading] = useState(false);
-	const location = useLocation();
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);

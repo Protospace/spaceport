@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Checkbox, Form, Header, Icon, Table } from 'semantic-ui-react';
 import * as Datetime from 'react-datetime';
@@ -51,7 +51,7 @@ export function AdminVetting(props) {
 	const { token } = props;
 	const [vetting, setVetting] = useState(vettingCache);
 	const [refreshCount, refreshVetting] = useReducer(x => x + 1, 0);
-	const [error, setError] = useState(false);
+	const [error] = useState(false);
 	const [showAll, setShowAll] = useState(false);
 
 	useEffect(() => {
@@ -121,11 +121,11 @@ export function AdminVetting(props) {
 }
 
 export function AdminHistory(props) {
-	const { token, user } = props;
+	const { token } = props;
 	const [history, setHistory] = useState(historyCache);
 	const [excludeSystem, setExcludeSystem] = useState(excludeSystemCache);
 	const [focus, setFocus] = useState(focusCache);
-	const [error, setError] = useState(false);
+	const [error] = useState(false);
 
 	const handleExcludeSystem = (e, v) => {
 		setExcludeSystem(v.checked);
@@ -183,7 +183,7 @@ export function AdminHistory(props) {
 											<Table.Cell>{x.changes.map(x => x.field).join(', ')}</Table.Cell>
 										</Table.Row>
 
-										{focus == x.id &&
+										{focus === x.id &&
 											<tr><td colSpan={6}>
 												<p>Object ID: {x.object_id}, <a href={apiUrl+x.revert_url} target='_blank'>Database Revert</a></p>
 												{!!x.changes.length &&
@@ -226,7 +226,7 @@ let backupsCache = false;
 
 export function AdminBackups(props) {
 	const [backups, setBackups] = useState(backupsCache);
-	const [error, setError] = useState(false);
+	const [error] = useState(false);
 
 	useEffect(() => {
 		requester('/backup/', 'GET')
@@ -272,10 +272,10 @@ export function AdminBackups(props) {
 };
 
 export function AdminUsage(props) {
-	const { token, user } = props;
+	const { token } = props;
 	const [input, setInput] = useState({ month: moment() });
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(false);
+	const [setError] = useState(false);
 
 	const handleDatetime = (v) => setInput({ ...input, month: v });
 

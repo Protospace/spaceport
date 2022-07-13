@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useReducer, useContext } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
-import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { apiUrl, statusColor, BasicTable, staticUrl, requester } from './utils.js';
-import { NotFound } from './Misc.js';
+import React from 'react';
+import { Container, Header, Image } from 'semantic-ui-react';
+import { staticUrl } from './utils.js';
 
 export function Garden(props) {
 	return (
