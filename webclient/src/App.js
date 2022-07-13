@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useReducer, useContext } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
+import React, { useState, useEffect, useReducer } from 'react';
+import {  Switch, Route, Link, useHistory } from 'react-router-dom';
 import './semantic-ui/semantic.min.css';
 import './light.css';
 import './dark.css';
-import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Container, Dropdown, Menu } from 'semantic-ui-react';
 import Darkmode from 'darkmode-js';
 import { isAdmin, requester } from './utils.js';
 import { ManageScroll } from './ManageScroll.js';
