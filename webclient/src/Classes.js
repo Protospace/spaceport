@@ -426,7 +426,7 @@ export function ICalButtons(props) {
 	const { token, clazz } = props;
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
-	const [setError] = useState(false);
+	const [error, setError] = useState(false);
 
 	const handleDownload = (e) => {
 		e.preventDefault();
@@ -505,6 +505,7 @@ export function ICalButtons(props) {
 				/>
 			</Button.Group>
 		}
+		{error && <p>Error.</p>}
 		</>
 	);
 };

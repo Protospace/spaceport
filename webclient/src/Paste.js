@@ -56,7 +56,6 @@ function LabelForm(props) {
 	const [input, setInput] = useState({ id: '107', size: '2' });
 	const [label, setLabel] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [setSuccess] = useState(false);
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
@@ -74,7 +73,6 @@ function LabelForm(props) {
 		})
 		.then(res => {
 			setLoading(false);
-			setSuccess(true);
 			setError(false);
 			const imageObjectURL = URL.createObjectURL(res);
 			setLabel(imageObjectURL);
