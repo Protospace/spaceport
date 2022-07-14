@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {  Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './light.css';

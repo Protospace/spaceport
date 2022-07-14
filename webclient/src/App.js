@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import {  Switch, Route, Link, useHistory } from 'react-router-dom';
+import { Switch, Route, Link, useHistory } from 'react-router-dom';
 import './semantic-ui/semantic.min.css';
 import './light.css';
 import './dark.css';

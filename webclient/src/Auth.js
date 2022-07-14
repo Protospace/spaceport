@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {  Route, Link } from 'react-router-dom';
+import { Route, Link } from 'react-router-dom';
 import './light.css';
 import { Container, Form, Header, Image, Message, Segment } from 'semantic-ui-react';
 import { requester } from './utils.js';

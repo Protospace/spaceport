@@ -11,7 +11,7 @@ import { NotFound } from './Misc.js';
 export function TransactionEditor(props) {
 	const { token, input, setInput, error, noMemberSearch } = props;
 
-	const [ prevInput ] = useState(input);
+	const [prevInput] = useState(input);
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
@@ -102,7 +102,7 @@ export function TransactionEditor(props) {
 				onChange={handleValues}
 			/>
 
-			{ input?.account_type !== prevInput?.account_type && input?.account_type === 'PayPal' &&
+			{input?.account_type !== prevInput?.account_type && input?.account_type === 'PayPal' &&
 				<Message visible warning>
 					<Message.Header>Are you sure?</Message.Header>
 					<p>PayPal transactions should be automatic. Double check there's no duplicate. They may take 24h to appear.</p>
