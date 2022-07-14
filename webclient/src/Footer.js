@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { BrowserRouter as Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Container, Icon } from 'semantic-ui-react';
 
 import { scene } from './spaceport/scene';
