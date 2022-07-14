@@ -51,7 +51,7 @@ export function AdminVetting(props) {
 	const { token } = props;
 	const [vetting, setVetting] = useState(vettingCache);
 	const [refreshCount, refreshVetting] = useReducer(x => x + 1, 0);
-	const [error] = useState(false);
+	const [error, setError] = useState(false);
 	const [showAll, setShowAll] = useState(false);
 
 	useEffect(() => {
@@ -62,6 +62,7 @@ export function AdminVetting(props) {
 		})
 		.catch(err => {
 			console.log(err);
+			setError(true);
 		});
 	}, [refreshCount]);
 
@@ -125,7 +126,7 @@ export function AdminHistory(props) {
 	const [history, setHistory] = useState(historyCache);
 	const [excludeSystem, setExcludeSystem] = useState(excludeSystemCache);
 	const [focus, setFocus] = useState(focusCache);
-	const [error] = useState(false);
+	const [error, setError] = useState(false);
 
 	const handleExcludeSystem = (e, v) => {
 		setExcludeSystem(v.checked);
@@ -141,6 +142,7 @@ export function AdminHistory(props) {
 		})
 		.catch(err => {
 			console.log(err);
+			setError(true);
 		});
 	}, [excludeSystem]);
 
@@ -226,7 +228,7 @@ let backupsCache = false;
 
 export function AdminBackups(props) {
 	const [backups, setBackups] = useState(backupsCache);
-	const [error] = useState(false);
+	const [error, setError] = useState(false);
 
 	useEffect(() => {
 		requester('/backup/', 'GET')
@@ -236,6 +238,7 @@ export function AdminBackups(props) {
 		})
 		.catch(err => {
 			console.log(err);
+			setError(true);
 		});
 	}, []);
 
@@ -275,7 +278,7 @@ export function AdminUsage(props) {
 	const { token } = props;
 	const [input, setInput] = useState({ month: moment() });
 	const [loading, setLoading] = useState(false);
-	const [setError] = useState(false);
+	const [error, setError] = useState(false);
 
 	const handleDatetime = (v) => setInput({ ...input, month: v });
 
@@ -328,6 +331,8 @@ export function AdminUsage(props) {
 			<Form.Button loading={loading} onClick={() => handleDownload(null)}>
 				Download All
 			</Form.Button>
+
+			{error && <p>Error.</p>}
 		</div>
 	);
 };
