@@ -420,6 +420,11 @@ export function InstructorClassList(props) {
 		).sort((a, b) => a.datetime > b.datetime ? 1 : -1));
 	}, [input.datetime]);
 
+	const fillSuggestion = (e) => {
+		e.preventDefault();
+		setInput({ ...input, ...course.suggestion });
+	};
+
 	return (
 		<div>
 			<Header size='medium'>Instructor Panel</Header>
@@ -433,6 +438,10 @@ export function InstructorClassList(props) {
 							<Header size='small'>Add a Class</Header>
 
 							<p>Documentation: <a href='https://wiki.protospace.ca/Be_a_Course_Instructor' target='_blank' rel='noopener noreferrer'>https://wiki.protospace.ca/Be_a_Course_Instructor</a></p>
+
+							{course.suggestion &&
+								<p><Button onClick={fillSuggestion}>Suggest</Button> based off previous classes.</p>
+							}
 
 							<InstructorClassEditor input={input} setInput={setInput} error={error} token={token} />
 
