@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './light.css';
-import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Container, Checkbox, Form, Header, Segment } from 'semantic-ui-react';
 import * as Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
 import moment from 'moment';
-import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
+import { requester } from './utils.js';
 import { TransactionList, TransactionEditor } from './Transactions.js';
-import { NotFound } from './Misc.js';
 
 export function AdminReportedTransactions(props) {
-	const { token, user } = props;
+	const { token } = props;
 	const [transactions, setTransactions] = useState(false);
 	const [error, setError] = useState(false);
 
@@ -46,7 +45,7 @@ let transactionsCache = false;
 let excludePayPalCache = false;
 
 export function AdminHistoricalTransactions(props) {
-	const { token, user } = props;
+	const { token } = props;
 	const [input, setInput] = useState({ month: moment() });
 	const [transactions, setTransactions] = useState(transactionsCache);
 	const [excludePayPal, setExcludePayPal] = useState(excludePayPalCache);
@@ -122,7 +121,6 @@ export function AdminHistoricalTransactions(props) {
 
 export function AdminAddTransaction(props) {
 	const { token } = props;
-	const [open, setOpen] = useState(false);
 	const [input, setInput] = useState({ date: moment().format('YYYY-MM-DD'), info_source: 'Web' });
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -178,9 +176,8 @@ export function AdminTransactions(props) {
 }
 
 export function AdminMemberTransactions(props) {
-	const { token, result, refreshResult } = props;
+	const { result } = props;
 	const transactions = result.transactions;
-	const { id } = useParams();
 
 	return (
 		<div>

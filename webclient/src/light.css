@@ -99,6 +99,12 @@ body {
 	padding-top: 1rem;
 }
 
+.ui.floating.dropdown.button.icon {
+	border-left: 1px;
+	border-left-color: #c0c1c2;
+	border-left-style: solid;
+}
+
 .attendance-row {
 	margin-top: 1rem;
 }

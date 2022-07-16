@@ -11,7 +11,7 @@ from rest_auth.registration.serializers import RegisterSerializer
 from rest_auth.serializers import PasswordChangeSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer, LoginSerializer
 from rest_auth.serializers import UserDetailsSerializer
 import re
-import datetime, time
+import datetime, time, calendar
 
 from . import models, fields, utils, utils_ldap, utils_auth, utils_stats
 from .. import settings, secrets
@@ -528,9 +528,79 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     sessions = SessionListSerializer(many=True, read_only=True)
     name = serializers.CharField(max_length=100)
     description = fields.HTMLField(max_length=6000)
+    suggestion = serializers.SerializerMethodField()
     class Meta:
         model = models.Course
         fields = '__all__'
+
+    def get_suggestion(self, obj):
+        def iter_dates():
+            start_of_month = utils.today_alberta_tz().replace(day=1)
+            for i in range(90):
+                yield start_of_month + datetime.timedelta(days=i)
+
+        def iter_matching_dates(weekday, week_num=False):
+            week_num_counts = [0] * 13
+            for date in iter_dates():
+                if date.weekday() == weekday:
+                    week_num_counts[date.month] += 1
+                    if week_num and week_num_counts[date.month] != week_num:
+                        continue
+                    yield date
+
+        def next_date(weekday, week_num=False):
+            for date in iter_matching_dates(weekday, week_num):
+                if date > utils.today_alberta_tz():
+                    return date
+            raise
+
+        def course_is_usually_monthly(course):
+            two_months_ago = utils.today_alberta_tz() - datetime.timedelta(days=61)
+            recent_sessions = obj.sessions.filter(datetime__gte=two_months_ago)
+            if recent_sessions.count() < 3:
+                return True
+            else:
+                return False
+
+        prev_session = obj.sessions.last()
+
+        if obj.id == 273: # monthly clean 10:00 AM 3rd Saturday of each month
+            date = next_date(calendar.SATURDAY, week_num=3)
+            time = datetime.time(10, 0)
+            dt = datetime.datetime.combine(date, time)
+            dt = utils.TIMEZONE_CALGARY.localize(dt)
+            cost = 0
+            max_students = None
+        elif obj.id == 317: # members' meeting 7:00 PM 3rd Thursday of odd months, Wednesday of even months
+            if utils.today_alberta_tz().month % 2 == 0:
+                date = next_date(calendar.WEDNESDAY, week_num=3)
+            else:
+                date = next_date(calendar.THURSDAY, week_num=3)
+            time = datetime.time(19, 0)
+            dt = datetime.datetime.combine(date, time)
+            dt = utils.TIMEZONE_CALGARY.localize(dt)
+            cost = 0
+            max_students = None
+        elif prev_session:
+            prev_session = obj.sessions.last()
+            dt = prev_session.datetime
+
+            if course_is_usually_monthly(obj):
+                offset_weeks = 4
+            else:
+                offset_weeks = 1
+            dt = dt + datetime.timedelta(weeks=offset_weeks)
+
+            five_days_from_now = utils.now_alberta_tz() + datetime.timedelta(days=5)
+            while dt < five_days_from_now:
+                dt = dt + datetime.timedelta(weeks=offset_weeks)
+
+            cost = prev_session.cost
+            max_students = prev_session.max_students
+        else:
+            return None
+
+        return dict(datetime=dt, cost=str(cost), max_students=max_students)
 
 
 class UserTrainingSerializer(serializers.ModelSerializer):

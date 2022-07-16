@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './light.css';
-import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Button, Container, Checkbox, Form, Header, Icon, Table } from 'semantic-ui-react';
 import * as Datetime from 'react-datetime';
 import moment from 'moment-timezone';
 import download from 'downloadjs';
-import { apiUrl, statusColor, BasicTable, staticUrl, requester } from './utils.js';
-import { NotFound } from './Misc.js';
+import { apiUrl, statusColor, requester } from './utils.js';
 
 let vettingCache = false;
 let historyCache = false;
@@ -15,7 +14,7 @@ let focusCache = false;
 
 
 export function AdminVet(props) {
-	const { token, user, member, refreshVetting } = props;
+	const { token, member, refreshVetting } = props;
 	const [loading, setLoading] = useState(false);
 	const [yousure, setYousure] = useState(false);
 
@@ -49,7 +48,7 @@ export function AdminVet(props) {
 }
 
 export function AdminVetting(props) {
-	const { token, user } = props;
+	const { token } = props;
 	const [vetting, setVetting] = useState(vettingCache);
 	const [refreshCount, refreshVetting] = useReducer(x => x + 1, 0);
 	const [error, setError] = useState(false);
@@ -63,6 +62,7 @@ export function AdminVetting(props) {
 		})
 		.catch(err => {
 			console.log(err);
+			setError(true);
 		});
 	}, [refreshCount]);
 
@@ -122,7 +122,7 @@ export function AdminVetting(props) {
 }
 
 export function AdminHistory(props) {
-	const { token, user } = props;
+	const { token } = props;
 	const [history, setHistory] = useState(historyCache);
 	const [excludeSystem, setExcludeSystem] = useState(excludeSystemCache);
 	const [focus, setFocus] = useState(focusCache);
@@ -142,6 +142,7 @@ export function AdminHistory(props) {
 		})
 		.catch(err => {
 			console.log(err);
+			setError(true);
 		});
 	}, [excludeSystem]);
 
@@ -184,7 +185,7 @@ export function AdminHistory(props) {
 											<Table.Cell>{x.changes.map(x => x.field).join(', ')}</Table.Cell>
 										</Table.Row>
 
-										{focus == x.id &&
+										{focus === x.id &&
 											<tr><td colSpan={6}>
 												<p>Object ID: {x.object_id}, <a href={apiUrl+x.revert_url} target='_blank'>Database Revert</a></p>
 												{!!x.changes.length &&
@@ -237,6 +238,7 @@ export function AdminBackups(props) {
 		})
 		.catch(err => {
 			console.log(err);
+			setError(true);
 		});
 	}, []);
 
@@ -273,7 +275,7 @@ export function AdminBackups(props) {
 };
 
 export function AdminUsage(props) {
-	const { token, user } = props;
+	const { token } = props;
 	const [input, setInput] = useState({ month: moment() });
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(false);
@@ -329,6 +331,8 @@ export function AdminUsage(props) {
 			<Form.Button loading={loading} onClick={() => handleDownload(null)}>
 				Download All
 			</Form.Button>
+
+			{error && <p>Error.</p>}
 		</div>
 	);
 };

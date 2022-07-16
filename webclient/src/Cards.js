@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
+import React, { useState } from 'react';
 import './light.css';
 import moment from 'moment-timezone';
-import { Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { BasicTable, requester, staticUrl } from './utils.js';
-import { NotFound, PleaseLogin } from './Misc.js';
+import { Button, Container, Header, Table } from 'semantic-ui-react';
+import { BasicTable, staticUrl } from './utils.js';
 
 export function Cards(props) {
 	const { user, token } = props;

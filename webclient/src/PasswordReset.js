@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useReducer, useContext } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
-import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { apiUrl, statusColor, BasicTable, staticUrl, requester } from './utils.js';
-import { NotFound } from './Misc.js';
+import React, { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { Container, Form, Grid, Header, Message } from 'semantic-ui-react';
+import { requester } from './utils.js';
 
 function ResetForm() {
 	const [input, setInput] = useState({});
@@ -29,13 +28,6 @@ function ResetForm() {
 		});
 	};
 
-	const makeProps = (name) => ({
-		name: name,
-		onChange: handleChange,
-		value: input[name] || '',
-		error: error[name],
-	});
-
 	return (
 		<Form onSubmit={handleSubmit} error={!!error.email}>
 			<Form.Input
@@ -45,7 +37,7 @@ function ResetForm() {
 				error={error.email}
 			/>
 
-			{error.email == 'Not found.' &&
+			{error.email === 'Not found.' &&
 				<Message
 					error
 					header='Email not found in Spaceport'
@@ -69,7 +61,6 @@ function ConfirmForm() {
 	const [progress, setProgress] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
-	const history = useHistory();
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);

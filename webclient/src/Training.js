@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import './light.css';
-import { Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Popup, Segment, Table } from 'semantic-ui-react';
+import { Container, Header, Popup, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
-import { requester, getInstructor } from './utils.js';
-import { NotFound, PleaseLogin } from './Misc.js';
+import { getInstructor } from './utils.js';
 
 export function CertList(props) {
 	const { member } = props;

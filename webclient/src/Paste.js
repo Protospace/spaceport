@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useReducer, useContext } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
-import { Button, Container, Checkbox, Dimmer, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { apiUrl, statusColor, BasicTable, staticUrl, requester } from './utils.js';
-import { NotFound } from './Misc.js';
+import React, { useState, useEffect, useReducer } from 'react';
+import { Button, Container, Form, Header, Message } from 'semantic-ui-react';
+import { requester } from './utils.js';
 
 function PasteForm(props) {
 	const { token, input, setInput } = props;
@@ -58,7 +56,6 @@ function LabelForm(props) {
 	const [input, setInput] = useState({ id: '107', size: '2' });
 	const [label, setLabel] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [success, setSuccess] = useState(false);
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
@@ -76,7 +73,6 @@ function LabelForm(props) {
 		})
 		.then(res => {
 			setLoading(false);
-			setSuccess(true);
 			setError(false);
 			const imageObjectURL = URL.createObjectURL(res);
 			setLabel(imageObjectURL);

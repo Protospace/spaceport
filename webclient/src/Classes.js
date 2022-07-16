@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import './light.css';
-import { Label, Button, Container, Divider, Dropdown, Form, Grid, Header, Icon, Image, Menu, Message, Segment, Table } from 'semantic-ui-react';
+import { Label, Button, Container, Dropdown, Form, Header, Icon, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
-import { apiUrl, isAdmin, isInstructor, getInstructor, BasicTable, requester, useIsMobile } from './utils.js';
-import { NotFound, PleaseLogin } from './Misc.js';
+import { apiUrl, isAdmin, getInstructor, BasicTable, requester, useIsMobile } from './utils.js';
+import { NotFound } from './Misc.js';
 import { InstructorClassDetail, InstructorClassAttendance } from './InstructorClasses.js';
 import { PayPalPayNow } from './PayPal.js';
 import { tags } from './Courses.js';
@@ -450,19 +450,62 @@ export function ICalButtons(props) {
 		});
 	};
 
+	const addToGoogleCalendar = (e) => {
+		e.preventDefault();
+
+		// construct and set the dates format that google calendar links require
+		let starttime = moment(clazz.datetime);
+		let endtime = starttime.clone().add(1, 'hour');
+		const datestringfmt = 'YYYYMMDDTkkmmss';
+		let dates = `${starttime.format(datestringfmt)}/${endtime.format(datestringfmt)}`
+
+		// send user to google calendar
+		window.location = `https://www.google.com/calendar/render?action=TEMPLATE&text=${clazz.course_data.name}&dates=${dates}`;
+	};
+
+	const options = [
+		{ key: 'email', icon: 'mail outline', text: 'Email ICS Event', value: 'Email', action: handleEmail },
+		{ key: 'download', icon: 'download', text: 'Download ICS Event', value: 'Download', action: handleDownload },
+		{ key: 'google', icon: 'google', text: 'Add to Google Calendar', value: 'Google', action: addToGoogleCalendar },
+	];
+
+	// get default option from local storage or default to first item in options list
+	const calendarValue = localStorage.getItem('calendarPreference') || 'Email';
+	const defaultOption = options.find(x => x.value === calendarValue);
+
+	const [selectedOption, setOption] = useState(defaultOption);
+
+	const onChange = (e, data) => {
+		const newOption = options.find(x => x.value === data.value);
+		setOption(newOption);
+
+		// set the option as users preference
+		localStorage.setItem('calendarPreference', newOption.value);
+	};
+
 	return (
 		<>
-			<Button compact onClick={handleDownload}>
-				Download
-			</Button>
-			{success ?
-				<span>&nbsp;&nbsp;Sent!</span>
-			:
-				<Button compact loading={loading} onClick={handleEmail}>
-					Email
+		{success ?
+			<span>Sent!</span>
+		:
+			<Button.Group>
+				<Button
+					loading={loading}
+					onClick={selectedOption.action}
+				>
+					<Icon name={selectedOption.icon} />{selectedOption.value}
 				</Button>
-			}
-			{error && <span>Error.</span>}
+				<Dropdown
+					className='button icon'
+					floating
+					onChange={onChange}
+					options={options}
+					trigger={<></>}
+					selectOnBlur={false}
+				/>
+			</Button.Group>
+		}
+		{error && <p>Error.</p>}
 		</>
 	);
 };
@@ -475,7 +518,7 @@ export function ClassDetail(props) {
 	const [override, setOverride] = useState(false);
 	const { token, user, refreshUser } = props;
 	const { id } = useParams();
-	const userTraining = clazz && clazz.students.find(x => x.user == user.id);
+	const userTraining = clazz && clazz.students.find(x => x.user === user.id);
 
 	useEffect(() => {
 		requester('/sessions/'+id+'/', 'GET', token)
@@ -572,7 +615,7 @@ export function ClassDetail(props) {
 									<Table.Cell>{clazz.student_count} {!!clazz.max_students && '/ '+clazz.max_students}</Table.Cell>
 								</Table.Row>
 								<Table.Row>
-									<Table.Cell>Invite:</Table.Cell>
+									<Table.Cell>Event:</Table.Cell>
 									<Table.Cell><ICalButtons token={token} clazz={clazz} /></Table.Cell>
 								</Table.Row>
 							</Table.Body>
@@ -595,7 +638,7 @@ export function ClassDetail(props) {
 							</Segment>
 						}
 
-						{clazz.instructor != user.id &&
+						{clazz.instructor !== user.id &&
 							(userTraining ?
 								<div>
 									<p>Status: {userTraining.attendance_status}</p>
@@ -611,7 +654,7 @@ export function ClassDetail(props) {
 										}
 									</p>
 
-									{clazz.cost != '0.00' && !userTraining.paid_date && userTraining.attendance_status !== 'Withdrawn' &&
+									{clazz.cost !== '0.00' && !userTraining.paid_date && userTraining.attendance_status !== 'Withdrawn' &&
 										<div>
 											{userTraining.attendance_status === 'Waiting for payment' ?
 												<p>Please pay the course fee of ${clazz.cost} to confirm your attendance:</p>

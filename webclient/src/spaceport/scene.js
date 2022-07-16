@@ -55,7 +55,6 @@ export const scene = ({ ref }) => {
 		//star_circle.rotation.y = Math.PI / 2;
 		const u = Math.random() - 0.5;
 		const v = Math.random() - 0.5;
-		const w = Math.random() - 0.5;
 		star_circle.position.set(-100000*Math.sin(v*Math.PI+Math.PI/2), 300000*u, 100000*Math.cos(v*Math.PI+Math.PI/2));
 		star_circle.lookAt(camera.position);
 		stars.push(star_circle);

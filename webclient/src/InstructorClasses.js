@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import ReactToPrint from 'react-to-print';
 import * as Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
 import moment from 'moment-timezone';
 import './light.css';
-import { Button, Container, Checkbox, Divider, Dropdown, Form, Grid, Header, Icon, Image, Label, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { BasicTable, staticUrl, requester } from './utils.js';
+import { Button, Checkbox, Form, Grid, Header, Icon, Label, Message, Table } from 'semantic-ui-react';
+import { requester } from './utils.js';
 import { MembersDropdown } from './Members.js';
 
 class AttendanceSheet extends React.Component {
@@ -72,7 +72,7 @@ function AttendanceRow(props) {
 
 	const handleMark = (newStatus) => {
 		if (loading) return;
-		if (student.attendance_status == newStatus) return;
+		if (student.attendance_status === newStatus) return;
 		setLoading(newStatus);
 		const data = { ...student, attendance_status: newStatus };
 		requester('/training/'+student.id+'/', 'PATCH', token, data)
@@ -232,7 +232,6 @@ function InstructorClassEditor(props) {
 	const [editInstructor, setEditInstructor] = useState(false);
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
-	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
 	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 	const handleDatetime = (v) => setInput({ ...input, datetime: v.utc().format() });
@@ -421,6 +420,11 @@ export function InstructorClassList(props) {
 		).sort((a, b) => a.datetime > b.datetime ? 1 : -1));
 	}, [input.datetime]);
 
+	const fillSuggestion = (e) => {
+		e.preventDefault();
+		setInput({ ...input, ...course.suggestion });
+	};
+
 	return (
 		<div>
 			<Header size='medium'>Instructor Panel</Header>
@@ -434,6 +438,10 @@ export function InstructorClassList(props) {
 							<Header size='small'>Add a Class</Header>
 
 							<p>Documentation: <a href='https://wiki.protospace.ca/Be_a_Course_Instructor' target='_blank' rel='noopener noreferrer'>https://wiki.protospace.ca/Be_a_Course_Instructor</a></p>
+
+							{course.suggestion &&
+								<p><Button onClick={fillSuggestion}>Suggest</Button> based off previous classes.</p>
+							}
 
 							<InstructorClassEditor input={input} setInput={setInput} error={error} token={token} />
 

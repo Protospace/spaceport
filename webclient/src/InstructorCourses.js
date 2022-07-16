@@ -1,18 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './light.css';
-import { Button, Container, Checkbox, Divider, Dropdown, Form, Grid, Header, Icon, Image, Label, Menu, Message, Segment, Table } from 'semantic-ui-react';
-import { BasicTable, staticUrl, requester } from './utils.js';
+import { Button, Form, Header, Label } from 'semantic-ui-react';
+import { requester } from './utils.js';
 
 function InstructorCourseEditor(props) {
 	const { input, setInput, error } = props;
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
-	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
-	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 	const handleQuill = (v, d, s, e) => s === 'user' && setInput({
 		...input,
 		description: v === '<p><br></p>' ? '' : v,
@@ -133,13 +131,8 @@ export function InstructorCourseList(props) {
 	const [success, setSuccess] = useState(false);
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
-	const handleUpload = (e, v) => setInput({ ...input, [v.name]: e.target.files[0] });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
 	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
-	const handleQuill = (v, d, s, e) => s === 'user' && setInput({
-		...input,
-		description: v === '<p><br></p>' ? '' : v,
-	});
 
 	const makeProps = (name) => ({
 		name: name,
