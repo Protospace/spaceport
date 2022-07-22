@@ -572,7 +572,8 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             cost = 0
             max_students = None
         elif obj.id == 317: # members' meeting 7:00 PM 3rd Thursday of odd months, Wednesday of even months
-            if utils.today_alberta_tz().month % 2 == 0:
+            next_month = next_date(calendar.WEDNESDAY, week_num=3).month
+            if next_month % 2 == 0:
                 date = next_date(calendar.WEDNESDAY, week_num=3)
             else:
                 date = next_date(calendar.THURSDAY, week_num=3)
