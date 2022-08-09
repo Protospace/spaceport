@@ -29,6 +29,7 @@ import { NotFound, PleaseLogin } from './Misc.js';
 import { Debug } from './Debug.js';
 import { Garden } from './Garden.js';
 import { Footer } from './Footer.js';
+import { LCARS1Display } from './Display.js';
 
 const APP_VERSION = 3;  // TODO: automate this
 
@@ -122,6 +123,10 @@ function App() {
 
 				<Route exact path='/usage/:name'>
 					<Usage token={token} />
+				</Route>
+
+				<Route exact path='/display/lcars1'>
+					<LCARS1Display token={token} />
 				</Route>
 
 				<Route path='/'>
