@@ -307,13 +307,10 @@ export function Home(props) {
 								</p>}
 
 								<p>
-									Trotec availability: {getTrackStat('TROTECS300')} <Popup content={
+									Trotec availability: Broken <Popup content={
 										<React.Fragment>
 											<p>
-												Last use:<br />
-												{getTrackLast('TROTECS300')}<br />
-												{getTrackAgo('TROTECS300')}<br />
-												by {getTrackName('TROTECS300')}
+												Broken motor / motor driver.
 											</p>
 										</React.Fragment>
 									} trigger={<a>[more]</a>} />
