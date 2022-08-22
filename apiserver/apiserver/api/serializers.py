@@ -38,6 +38,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         'Member',
         'Clearing',
         'Cash',
+        'Protocoin',
     ])
     category = serializers.ChoiceField([
         'Membership',
@@ -49,6 +50,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         'Garage Sale',
         'Reimburse',
         'Other',
+        'Exchange',
     ])
     member_id = serializers.SerializerMethodField()
     member_name = serializers.SerializerMethodField()
@@ -58,8 +60,10 @@ class TransactionSerializer(serializers.ModelSerializer):
         'Unmatched Purchase',
         'User Flagged',
     ], allow_null=True, required=False)
-    number_of_membership_months = serializers.IntegerField(max_value=36, min_value=-36)
+    number_of_membership_months = serializers.IntegerField(max_value=36, min_value=-36, default=0)
     recorder = serializers.SerializerMethodField()
+    amount = serializers.DecimalField(max_digits=None, decimal_places=2, default=0)
+    protocoin = serializers.DecimalField(max_digits=None, decimal_places=2, default=0)
 
     class Meta:
         model = models.Transaction
@@ -80,16 +84,24 @@ class TransactionSerializer(serializers.ModelSerializer):
         member = get_object_or_404(models.Member, id=self.initial_data['member_id'])
         validated_data['user'] = member.user
 
-        if validated_data['account_type'] != 'Clearing':
+        if validated_data['account_type'] == 'Protocoin' and validated_data['category'] == 'Exchange':
+            raise ValidationError(dict(category='Can\'t purchase Protocoin with Protocoin.'))
+
+        if validated_data['category'] == 'Exchange':
+            if validated_data['amount'] == 0:
+                raise ValidationError(dict(category='Can\'t purchase 0 Protocoin.'))
+            validated_data['protocoin'] = validated_data['amount']
+
+        if validated_data['account_type'] not in ['Clearing', 'Protocoin']:
             if validated_data['amount'] == 0:
                 raise ValidationError(dict(account_type='Can\'t have a $0.00 {} transaction. Do you want "Membership Adjustment"?'.format(validated_data['account_type'])))
 
-        if validated_data['category'] != 'Reimburse':
-            if validated_data['amount'] < 0:
-                raise ValidationError(dict(category='Can\'t have a negative {} transaction. Do you want "Reimbursement"?'.format(validated_data['category'])))
-
         if validated_data['account_type'] == 'PayPal':
             msg = 'Manual PayPal transaction added:\n' + str(validated_data)
+            utils.alert_tanner(msg)
+
+        if validated_data['account_type'] == 'Protocoin':
+            msg = 'Manual Protocoin transaction added:\n' + str(validated_data)
             utils.alert_tanner(msg)
 
         if validated_data['account_type'] in ['Interac', 'Dream Pmt', 'Square Pmt', 'PayPal']:

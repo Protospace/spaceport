@@ -26,7 +26,7 @@ const memberSorts = {
 export function MembersDropdown(props) {
 	const { token, name, onChange, value, initial } = props;
 	const [response, setResponse] = useState({ results: [] });
-	const searchDefault = {seq: 0, q: initial || ''};
+	const searchDefault = {seq: 0, q: initial || '', sort: 'newest_active'};
 	const [search, setSearch] = useState(searchDefault);
 
 	useEffect(() => {
@@ -59,7 +59,7 @@ export function MembersDropdown(props) {
 			value={value}
 			placeholder='Search for Member'
 			onChange={onChange}
-			onSearchChange={(e, v) => setSearch({seq: parseInt(e.timeStamp), q: v.searchQuery})}
+			onSearchChange={(e, v) => setSearch({seq: parseInt(e.timeStamp), q: v.searchQuery, sort: 'newest_active'})}
 		/>
 
 	);

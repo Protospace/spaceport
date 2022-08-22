@@ -9,7 +9,7 @@ import { isAdmin, BasicTable, requester } from './utils.js';
 import { NotFound } from './Misc.js';
 
 export function TransactionEditor(props) {
-	const { token, input, setInput, error, noMemberSearch } = props;
+	const { token, input, setInput, error } = props;
 
 	const [prevInput] = useState(input);
 
@@ -32,6 +32,7 @@ export function TransactionEditor(props) {
 		//{ key: '5', text: 'Member Balance / Protocash', value: 'Member' },
 		{ key: '6', text: 'Membership Adjustment / Clearing', value: 'Clearing' },
 		{ key: '7', text: 'PayPal', value: 'PayPal' },
+		{ key: '8', text: 'Protocoin', value: 'Protocoin' },
 	];
 
 	const sourceOptions = [
@@ -53,76 +54,97 @@ export function TransactionEditor(props) {
 		{ key: '0', text: 'Membership Dues', value: 'Membership' },
 		{ key: '1', text: 'Course Fee', value: 'OnAcct' },
 		{ key: '2', text: 'Snacks / Pop / Coffee', value: 'Snacks' },
-		{ key: '3', text: 'Donation', value: 'Donation' },
-		{ key: '4', text: 'Consumables (Explain in memo)', value: 'Consumables' },
+		{ key: '3', text: 'Donation (Explain in Memo)', value: 'Donation' },
+		{ key: '4', text: 'Consumables (Explain in Memo)', value: 'Consumables' },
 		{ key: '5', text: 'Purchase of Locker / Materials / Stock', value: 'Purchases' },
-		//{ key: '6', text: 'Auction, Garage Sale, Nearly Free Shelf', value: 'Garage Sale' },
-		{ key: '7', text: 'Reimbursement (Enter a negative value)', value: 'Reimburse' },
-		{ key: '8', text: 'Other (Explain in memo)', value: 'Other' },
+		{ key: '6', text: 'Purchase of Protocoin', value: 'Exchange' },
+		{ key: '7', text: 'Reimbursement (Not for Refunds)', value: 'Reimburse' },
+		{ key: '8', text: 'Other (Explain in Memo)', value: 'Other' },
 	];
 
 	return (
 		<div className='transaction-editor'>
-			{!noMemberSearch && <Form.Field error={error.member_id}>
-				<label>Member (search)</label>
-				<MembersDropdown
-					token={token}
-					{...makeProps('member_id')}
-					onChange={handleValues}
-					initial={input.member_name}
-				/>
-			</Form.Field>}
-
 			<Form.Group widths='equal'>
+				<Form.Field error={error.member_id}>
+					<label>Member (search)</label>
+					<MembersDropdown
+						token={token}
+						{...makeProps('member_id')}
+						onChange={handleValues}
+						initial={input.member_name}
+					/>
+				</Form.Field>
+
 				<Form.Input
 					label='Date'
 					fluid
 					{...makeProps('date')}
 				/>
-				<Form.Input
-					label='Amount'
-					fluid
-					{...makeProps('amount')}
-				/>
 			</Form.Group>
 
-			<Form.Select
-				label='Category'
-				fluid
-				options={categoryOptions}
-				{...makeProps('category')}
-				onChange={handleValues}
-			/>
+			<Form.Group widths='equal'>
+				<Form.Select
+					label='Payment Method'
+					fluid
+					options={accountOptions}
+					{...makeProps('account_type')}
+					onChange={handleValues}
+				/>
 
-			<Form.Select
-				label='Payment Method / Account'
-				fluid
-				options={accountOptions}
-				{...makeProps('account_type')}
-				onChange={handleValues}
-			/>
+				{input.account_type && (input.account_type === 'Protocoin' ?
+					<Form.Input
+						label='Protocoin Delta (+/-)'
+						fluid
+						{...makeProps('protocoin')}
+					/>
+				:
+					<Form.Input
+						label='Amount ($)'
+						fluid
+						{...makeProps('amount')}
+					/>
+				)}
+			</Form.Group>
 
 			{input?.account_type !== prevInput?.account_type && input?.account_type === 'PayPal' &&
 				<Message visible warning>
 					<Message.Header>Are you sure?</Message.Header>
-					<p>PayPal transactions should be automatic. Double check there's no duplicate. They may take 24h to appear.</p>
+					<p>PayPal transactions are automatic. Double check there's no duplicate. They may take 24h to appear.</p>
 				</Message>
 			}
 
-			{/* <Form.Group widths='equal'>
-				<Form.Input
-					label='Payment Method'
-					fluid
-					{...makeProps('payment_method')}
-				/>
+			{input?.account_type !== prevInput?.account_type && input?.account_type === 'Protocoin' &&
+				<Message visible warning>
+					<Message.Header>Are you sure?</Message.Header>
+					<p>Protocoin spending transactions are automatic. Do you want "Purchase of Protocoin" category below?</p>
+				</Message>
+			}
+
+			<Form.Group widths='equal'>
 				<Form.Select
-					label='Info Source'
+					label='Category'
 					fluid
-					options={sourceOptions}
-					{...makeProps('info_source')}
+					options={categoryOptions}
+					{...makeProps('category')}
 					onChange={handleValues}
 				/>
-			</Form.Group> */}
+
+				{input.category === 'Membership' &&
+					<Form.Input
+						label='Membership Months (+/-)'
+						fluid
+						{...makeProps('number_of_membership_months')}
+					/>
+				}
+
+				{input.category === 'Exchange' &&
+					<Form.Input
+						label='Protocoin Purchased'
+						fluid
+						{...makeProps('amount')}  // trick the user
+					/>
+				}
+			</Form.Group>
 
 			<Form.Group widths='equal'>
 				<Form.Input
@@ -132,17 +154,11 @@ export function TransactionEditor(props) {
 				/>
 
 				<Form.Input
-					label='Number of Membership Months'
+					label='Memo / Notes'
 					fluid
-					{...makeProps('number_of_membership_months')}
+					{...makeProps('memo')}
 				/>
 			</Form.Group>
-
-			<Form.Input
-				label='Memo / Notes'
-				fluid
-				{...makeProps('memo')}
-			/>
 
 		</div>
 	);
@@ -435,7 +451,7 @@ export function TransactionDetail(props) {
 						<Header size='large'>Transaction Receipt</Header>
 
 						<Grid stackable columns={2}>
-							<Grid.Column>
+							<Grid.Column width={6}>
 								<TransactionTable user={user} transaction={transaction} />
 
 								<div style={{ display: 'none' }}>
@@ -447,7 +463,7 @@ export function TransactionDetail(props) {
 								/>
 							</Grid.Column>
 
-							<Grid.Column>
+							<Grid.Column width={10}>
 								{isAdmin(user) ?
 									<Segment padded>
 										<EditTransaction transaction={transaction} setTransaction={setTransaction} {...props} />
