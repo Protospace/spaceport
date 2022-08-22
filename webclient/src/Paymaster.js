@@ -9,6 +9,7 @@ export function Paymaster(props) {
 	const [pop, setPop] = useState('20.00');
 	const [locker, setLocker] = useState('5.00');
 	const [consumables, setConsumables] = useState('20.00');
+	const [buyProtocoin, setBuyProtocoin] = useState('10.00');
 	const [consumablesMemo, setConsumablesMemo] = useState('');
 	const [donate, setDonate] = useState('20.00');
 	const [memo, setMemo] = useState('');
@@ -19,6 +20,31 @@ export function Paymaster(props) {
 		<Container>
 			<Header size='large'>Paymaster</Header>
 			<p>Use these buttons to send money to Protospace.</p>
+
+			<Header size='medium'>Protocoin</Header>
+			<p>Protocoin is used to buy things at Protospace's vending machines. Current balance: ₱&thinsp;{user.member.protocoin}</p>
+
+			<Grid stackable padded columns={3}>
+				<Grid.Column>
+					Buy {buyProtocoin} Protocoin:
+
+					<div className='pay-custom'>
+						<Input
+							fluid
+							label={{ basic: true, content: '$' }}
+							labelPosition='left'
+							value={buyProtocoin}
+							onChange={(e, v) => setBuyProtocoin(v.value)}
+						/>
+					</div>
+
+					<PayPalPayNow
+						amount={buyProtocoin}
+						name='Protospace Protocoin'
+						custom={JSON.stringify({ category: 'Exchange', member: user.member.id })}
+					/>
+				</Grid.Column>
+			</Grid>
 
 			<Header size='medium'>Snacks, Pop, Coffee</Header>
 			<Grid stackable padded columns={3}>

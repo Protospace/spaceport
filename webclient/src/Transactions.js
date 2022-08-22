@@ -281,7 +281,7 @@ export function TransactionList(props) {
 					<Table.HeaderCell>Date</Table.HeaderCell>
 					{!noMember && <Table.HeaderCell>Member</Table.HeaderCell>}
 					<Table.HeaderCell>Amount</Table.HeaderCell>
-					<Table.HeaderCell>Account</Table.HeaderCell>
+					<Table.HeaderCell>Method</Table.HeaderCell>
 					{!noCategory && <Table.HeaderCell>Category</Table.HeaderCell>}
 					<Table.HeaderCell>Memo</Table.HeaderCell>
 				</Table.Row>
@@ -371,7 +371,7 @@ class TransactionTable extends React.Component {
 						<Table.Cell>{transaction.category}</Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Cell>Account:</Table.Cell>
+						<Table.Cell>Method:</Table.Cell>
 						<Table.Cell>{transaction.account_type}</Table.Cell>
 					</Table.Row>
 					{/* <Table.Row>

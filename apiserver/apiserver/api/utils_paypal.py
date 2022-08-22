@@ -243,23 +243,33 @@ def check_training(data, training_id, amount):
     logger.info('IPN - Amount valid for training cost, id: ' + str(training.id))
     return create_member_training_tx(data, member, training)
 
-def create_category_tx(data, member, custom_json):
+def create_category_tx(data, member, custom_json, amount):
     transactions = models.Transaction.objects
 
     user = getattr(member, 'user', None)
+    category = custom_json['category']
+
+    if category == 'Exchange':
+        protocoin = amount
+        note = '{} Protocoin Purchase'.format(amount)
+    else:
+        protocoin = 0
+        note = custom_json.get('memo', 'none')
+
     memo = '{} {} - {}, email: {}, note: {}'.format(
         data.get('first_name', 'unknown'),
         data.get('last_name', 'unknown'),
-        custom_json['category'],
+        category,
         data.get('payer_email', 'unknown'),
-        custom_json.get('memo', 'none'),
+        note,
     )
 
     return transactions.create(
         **build_tx(data),
-        category=custom_json['category'],
+        category=category,
         memo=memo,
         user=user,
+        protocoin=protocoin,
     )
 
 
@@ -354,10 +364,10 @@ def process_paypal_ipn(data):
         defaults=dict(user=user),
     )
 
-    if custom_json.get('category', False) in ['Snacks', 'OnAcct', 'Donation', 'Consumables', 'Purchases']:
+    if custom_json.get('category', False) in ['Snacks', 'OnAcct', 'Donation', 'Consumables', 'Purchases', 'Exchange']:
         logger.info('IPN - Category matched')
         update_ipn(ipn, 'Accepted, category')
-        return create_category_tx(data, member, custom_json)
+        return create_category_tx(data, member, custom_json, amount)
 
     monthly_fees = member.monthly_fees
 
