@@ -3,6 +3,7 @@ logger = logging.getLogger(__name__)
 
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
+from django.db.models import Max, F, Count, Q, Sum
 from django.utils.timezone import now
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -77,12 +78,20 @@ class TransactionSerializer(serializers.ModelSerializer):
             'paypal_payer_id',
         ]
 
-    def create(self, validated_data):
+    def validate_transaction(self, validated_data):
         if not self.initial_data.get('member_id', None):
             raise ValidationError(dict(member_id='This field is required.'))
 
         member = get_object_or_404(models.Member, id=self.initial_data['member_id'])
         validated_data['user'] = member.user
+
+        if validated_data['account_type'] == 'Protocoin':
+            validated_data['amount'] = 0
+        else:
+            validated_data['protocoin'] = 0
+
+        if validated_data['category'] != 'Membership':
+            validated_data['number_of_membership_months'] = 0
 
         if validated_data['account_type'] == 'Protocoin' and validated_data['category'] == 'Exchange':
             raise ValidationError(dict(category='Can\'t purchase Protocoin with Protocoin.'))
@@ -92,9 +101,28 @@ class TransactionSerializer(serializers.ModelSerializer):
                 raise ValidationError(dict(category='Can\'t purchase 0 Protocoin.'))
             validated_data['protocoin'] = validated_data['amount']
 
+        if validated_data['account_type'] == 'Protocoin':
+            if validated_data['protocoin'] == 0:
+                raise ValidationError(dict(account_type='Can\'t have a 0.00 protocoin transaction.'))
+
         if validated_data['account_type'] not in ['Clearing', 'Protocoin']:
             if validated_data['amount'] == 0:
                 raise ValidationError(dict(account_type='Can\'t have a $0.00 {} transaction. Do you want "Membership Adjustment"?'.format(validated_data['account_type'])))
+
+        if validated_data['protocoin'] < 0:
+            current_protocoin = member.user.transactions.aggregate(Sum('protocoin'))['protocoin__sum']
+            new_protocoin = current_protocoin + validated_data['protocoin']
+            if new_protocoin < 0:
+                raise ValidationError(dict(protocoin='Insufficient funds. Member only has {} protocoin.'.format(current_protocoin)))
+
+        if validated_data['account_type'] in ['Interac', 'Dream Pmt', 'Square Pmt', 'PayPal']:
+            if not validated_data.get('reference_number', None):
+                raise ValidationError(dict(reference_number='This field is required.'))
+
+        return validated_data
+
+    def create(self, validated_data):
+        validated_data = self.validate_transaction(validated_data)
 
         if validated_data['account_type'] == 'PayPal':
             msg = 'Manual PayPal transaction added:\n' + str(validated_data)
@@ -104,18 +132,10 @@ class TransactionSerializer(serializers.ModelSerializer):
             msg = 'Manual Protocoin transaction added:\n' + str(validated_data)
             utils.alert_tanner(msg)
 
-        if validated_data['account_type'] in ['Interac', 'Dream Pmt', 'Square Pmt', 'PayPal']:
-            if not validated_data.get('reference_number', None):
-                raise ValidationError(dict(reference_number='This field is required.'))
-
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        if not self.initial_data.get('member_id', None):
-            raise ValidationError(dict(member_id='This field is required.'))
-
-        member = get_object_or_404(models.Member, id=self.initial_data['member_id'])
-        validated_data['user'] = member.user
+        validated_data = self.validate_transaction(validated_data)
         return super().update(instance, validated_data)
 
     def get_member_id(self, obj):
@@ -183,6 +203,7 @@ class MemberSerializer(serializers.ModelSerializer):
     crop = serializers.CharField(write_only=True, required=False)
     email = fields.UserEmailField(serializers.EmailField)
     phone = serializers.CharField()
+    protocoin = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Member
@@ -220,6 +241,11 @@ class MemberSerializer(serializers.ModelSerializer):
             'is_allowed_entry',
             'mediawiki_username',
         ]
+
+    def get_protocoin(self, obj):
+        transactions = obj.user.transactions
+        total = transactions.aggregate(Sum('protocoin'))['protocoin__sum']
+        return total
 
     def update(self, instance, validated_data):
         instance.user.email = validated_data.get('email', instance.user.email)

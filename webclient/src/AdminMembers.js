@@ -540,6 +540,11 @@ export function AdminMemberInfo(props) {
 					</Table.Row>
 
 					<Table.Row>
+						<Table.Cell>Protocoin:</Table.Cell>
+						<Table.Cell>₱&thinsp;{member.protocoin.toFixed(2)}</Table.Cell>
+					</Table.Row>
+
+					<Table.Row>
 						<Table.Cell>Application Date:</Table.Cell>
 						<Table.Cell>{member.application_date}</Table.Cell>
 					</Table.Row>

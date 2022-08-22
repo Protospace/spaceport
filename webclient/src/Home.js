@@ -49,6 +49,10 @@ function MemberInfo(props) {
 								</Table.Cell>
 							</Table.Row>
 							<Table.Row>
+								<Table.Cell>Protocoin:</Table.Cell>
+								<Table.Cell>₱&thinsp;{member.protocoin.toFixed(2)}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
 								<Table.Cell>Expiry:</Table.Cell>
 								<Table.Cell>{member.expire_date ? moment(member.expire_date).format('ll') : 'Unknown'}</Table.Cell>
 							</Table.Row>
@@ -126,7 +130,7 @@ function MemberInfo(props) {
 									<Link to={'/transactions/'+x.id}>{moment(x.date).format('ll')}</Link>
 								</Table.Cell>
 								<Table.Cell>{x.account_type}</Table.Cell>
-								<Table.Cell>${x.amount}</Table.Cell>
+								<Table.Cell>{x.protocoin !== '0.00' ? '₱ ' + x.protocoin : '$ ' + x.amount}</Table.Cell>
 							</Table.Row>
 						)
 					:

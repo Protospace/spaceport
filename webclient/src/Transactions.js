@@ -159,7 +159,6 @@ export function TransactionEditor(props) {
 					{...makeProps('memo')}
 				/>
 			</Form.Group>
-
 		</div>
 	);
 };
@@ -304,7 +303,7 @@ export function TransactionList(props) {
 									x.member_name
 								}
 							</Table.Cell>}
-							<Table.Cell>${x.amount}</Table.Cell>
+							<Table.Cell style={{ minWidth: '8rem' }}>{x.protocoin !== '0.00' ? '₱ ' + x.protocoin : '$ ' + x.amount}</Table.Cell>
 							<Table.Cell>{x.account_type}</Table.Cell>
 							{!noCategory && <Table.Cell>{x.category}</Table.Cell>}
 							<Table.Cell>{x.memo || x.report_memo}</Table.Cell>
@@ -361,8 +360,12 @@ class TransactionTable extends React.Component {
 					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Amount:</Table.Cell>
-						<Table.Cell>${transaction.amount}</Table.Cell>
+						<Table.Cell>$ {transaction.amount}</Table.Cell>
 					</Table.Row>
+					{transaction.protocoin !== '0.00' && <Table.Row>
+						<Table.Cell>Protocoin:</Table.Cell>
+						<Table.Cell>₱ {transaction.protocoin}</Table.Cell>
+					</Table.Row>}
 					<Table.Row>
 						<Table.Cell>Category:</Table.Cell>
 						<Table.Cell>{transaction.category}</Table.Cell>
