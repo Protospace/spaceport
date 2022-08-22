@@ -109,12 +109,6 @@ class TransactionSerializer(serializers.ModelSerializer):
             if validated_data['amount'] == 0:
                 raise ValidationError(dict(account_type='Can\'t have a $0.00 {} transaction. Do you want "Membership Adjustment"?'.format(validated_data['account_type'])))
 
-        if validated_data['protocoin'] < 0:
-            current_protocoin = member.user.transactions.aggregate(Sum('protocoin'))['protocoin__sum']
-            new_protocoin = current_protocoin + validated_data['protocoin']
-            if new_protocoin < 0:
-                raise ValidationError(dict(protocoin='Insufficient funds. Member only has {} protocoin.'.format(current_protocoin)))
-
         if validated_data['account_type'] in ['Interac', 'Dream Pmt', 'Square Pmt', 'PayPal']:
             if not validated_data.get('reference_number', None):
                 raise ValidationError(dict(reference_number='This field is required.'))
@@ -123,6 +117,13 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data = self.validate_transaction(validated_data)
+
+        if validated_data['protocoin'] < 0:
+            user = validated_data['user']
+            current_protocoin = user.transactions.aggregate(Sum('protocoin'))['protocoin__sum']
+            new_protocoin = current_protocoin + validated_data['protocoin']
+            if new_protocoin < 0:
+                raise ValidationError(dict(category='Insufficient funds. Member only has {} protocoin.'.format(current_protocoin)))
 
         if validated_data['account_type'] == 'PayPal':
             msg = 'Manual PayPal transaction added:\n' + str(validated_data)
@@ -136,6 +137,15 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         validated_data = self.validate_transaction(validated_data)
+
+        if validated_data['protocoin'] < 0:
+            user = validated_data['user']
+            # when updating, we need to subtract out the transaction being edited
+            current_protocoin = user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] - instance.protocoin
+            new_protocoin = current_protocoin + validated_data['protocoin']
+            if new_protocoin < 0:
+                raise ValidationError(dict(category='Insufficient funds. Member only had {} protocoin.'.format(current_protocoin)))
+
         return super().update(instance, validated_data)
 
     def get_member_id(self, obj):

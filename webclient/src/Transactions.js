@@ -116,7 +116,8 @@ export function TransactionEditor(props) {
 			{input?.account_type !== prevInput?.account_type && input?.account_type === 'Protocoin' &&
 				<Message visible warning>
 					<Message.Header>Are you sure?</Message.Header>
-					<p>Protocoin spending transactions are automatic. Do you want "Purchase of Protocoin" category below?</p>
+					<p>Protocoin spending transactions are automatic. Do you want the "Purchase of Protocoin" category below?</p>
+					{input.protocoin > 0 && <p>Also, the value should be a <b>negative</b> number if they are spending Protocoin.</p>}
 				</Message>
 			}
 
