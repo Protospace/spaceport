@@ -1082,8 +1082,6 @@ class ProtocoinViewSet(Base):
         source_user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum']
         source_user_balance = float(source_user_balance)
 
-        print(source_user_balance)
-
         if source_user_balance != balance:
             raise exceptions.ValidationError(dict(balance='Incorrect current balance.'))
 
@@ -1124,6 +1122,24 @@ class ProtocoinViewSet(Base):
         )
 
         return Response(200)
+
+    @action(detail=True, methods=['get'])
+    def card_vend_balance(self, request, pk=None):
+        auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.VEND_API_TOKEN:
+            raise exceptions.PermissionDenied()
+
+        card = get_object_or_404(models.Card, card_number=pk)
+        user = card.user
+
+        user_balance = user.transactions.aggregate(Sum('protocoin'))['protocoin__sum']
+        user_balance = float(user_balance)
+
+        res = dict(
+            balance=user_balance,
+            first_name=user.member.first_name,
+        )
+        return Response(res)
 
 
 

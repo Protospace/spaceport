@@ -92,7 +92,7 @@ export function Paymaster(props) {
 			<Header size='medium'>Protocoin</Header>
 			<p>Protocoin is used to buy things from Protospace's vending machines.</p>
 
-			<p>Current balance: ₱&thinsp;{user.member.protocoin}</p>
+			<p>Current balance: ₱&thinsp;{user.member.protocoin.toFixed(2)}</p>
 
 			<Grid stackable padded columns={2}>
 				<Grid.Column width={5}>
