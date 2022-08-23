@@ -50,7 +50,7 @@ function MemberInfo(props) {
 							</Table.Row>
 							<Table.Row>
 								<Table.Cell>Protocoin:</Table.Cell>
-								<Table.Cell>₱&thinsp;{member.protocoin.toFixed(2)}</Table.Cell>
+								<Table.Cell>₱&thinsp;{member.protocoin.toFixed(2)} <Link to='/paymaster'>[buy]</Link></Table.Cell>
 							</Table.Row>
 							<Table.Row>
 								<Table.Cell>Expiry:</Table.Cell>
