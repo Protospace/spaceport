@@ -1129,18 +1129,78 @@ class ProtocoinViewSet(Base):
         if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.VEND_API_TOKEN:
             raise exceptions.PermissionDenied()
 
-        card = get_object_or_404(models.Card, card_number=pk)
-        user = card.user
+        source_card = get_object_or_404(models.Card, card_number=pk)
+        source_user = source_card.user
 
-        user_balance = user.transactions.aggregate(Sum('protocoin'))['protocoin__sum']
+        user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum']
         user_balance = float(user_balance)
 
         res = dict(
             balance=user_balance,
-            first_name=user.member.first_name,
+            first_name=source_user.member.first_name,
         )
         return Response(res)
 
+    @action(detail=True, methods=['post'])
+    def card_vend_request(self, request, pk=None):
+        auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.VEND_API_TOKEN:
+            raise exceptions.PermissionDenied()
+
+        source_card = get_object_or_404(models.Card, card_number=pk)
+        source_user = source_card.user
+
+        try:
+            number = request.data['number']
+        except KeyError:
+            raise exceptions.ValidationError(dict(number='This field is required.'))
+
+        try:
+            balance = float(request.data['balance'])
+        except KeyError:
+            raise exceptions.ValidationError(dict(balance='This field is required.'))
+        except ValueError:
+            raise exceptions.ValidationError(dict(balance='Invalid number.'))
+
+        try:
+            amount = float(request.data['amount'])
+        except KeyError:
+            raise exceptions.ValidationError(dict(amount='This field is required.'))
+        except ValueError:
+            raise exceptions.ValidationError(dict(amount='Invalid number.'))
+
+        if amount < 1.00:
+            raise exceptions.ValidationError(dict(amount='Amount too small.'))
+
+
+        source_user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum']
+        source_user_balance = float(source_user_balance)
+
+        if source_user_balance != balance:
+            raise exceptions.ValidationError(dict(balance='Incorrect current balance.'))
+
+        if source_user_balance < amount:
+            raise exceptions.ValidationError(dict(amount='Insufficient funds.'))
+
+        source_delta = -amount
+
+        memo = 'Protocoin - Purchase spent ₱ {} on vending machine item #{}'.format(
+            amount,
+            number,
+        )
+
+        models.Transaction.objects.create(
+            user=source_user,
+            protocoin=source_delta,
+            amount=0,
+            number_of_membership_months=0,
+            account_type='Protocoin',
+            category='Snacks',
+            info_source='System',
+            memo=memo,
+        )
+
+        return Response(200)
 
 
 class RegistrationView(RegisterView):
