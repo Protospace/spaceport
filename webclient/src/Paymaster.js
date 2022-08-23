@@ -121,47 +121,6 @@ export function Paymaster(props) {
 				</Grid.Column>
 			</Grid>
 
-			<Header size='medium'>Snacks, Pop, Coffee</Header>
-			<Grid stackable padded columns={3}>
-				<Grid.Column>
-					<p>Pay $5.00:</p>
-					<PayPalPayNow
-						amount={5}
-						name='Protospace Snacks / Pop'
-						custom={JSON.stringify({ category: 'Snacks', member: user.member.id })}
-					/>
-				</Grid.Column>
-
-				<Grid.Column>
-					<p>Pay $10.00:</p>
-					<PayPalPayNow
-						amount={10}
-						name='Protospace Snacks / Pop'
-						custom={JSON.stringify({ category: 'Snacks', member: user.member.id })}
-					/>
-				</Grid.Column>
-
-				<Grid.Column>
-					Custom amount:
-
-					<div className='pay-custom'>
-						<Input
-							fluid
-							label={{ basic: true, content: '$' }}
-							labelPosition='left'
-							value={pop}
-							onChange={(e, v) => setPop(v.value)}
-						/>
-					</div>
-
-					<PayPalPayNow
-						amount={pop}
-						name='Protospace Snacks / Pop'
-						custom={JSON.stringify({ category: 'Snacks', member: user.member.id })}
-					/>
-				</Grid.Column>
-			</Grid>
-
 			<Header size='medium'>Member Dues</Header>
 			<Grid stackable padded columns={3}>
 				<Grid.Column>
