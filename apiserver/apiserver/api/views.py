@@ -476,11 +476,13 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
             )
 
     def perform_create(self, serializer):
-        serializer.save(recorder=self.request.user)
+        tx = serializer.save(recorder=self.request.user)
+        utils.log_transaction(tx)
         self.retally_membership()
 
     def perform_update(self, serializer):
         tx = serializer.save()
+        utils.log_transaction(tx)
         self.retally_membership()
         self.train_paypal_hint(tx)
 
@@ -1099,7 +1101,7 @@ class ProtocoinViewSet(Base):
             destination_member.id,
         )
 
-        models.Transaction.objects.create(
+        tx = models.Transaction.objects.create(
             user=source_user,
             protocoin=source_delta,
             amount=0,
@@ -1109,8 +1111,9 @@ class ProtocoinViewSet(Base):
             info_source='System',
             memo=memo,
         )
+        utils.log_transaction(tx)
 
-        models.Transaction.objects.create(
+        tx = models.Transaction.objects.create(
             user=destination_user,
             protocoin=destination_delta,
             amount=0,
@@ -1120,6 +1123,7 @@ class ProtocoinViewSet(Base):
             info_source='System',
             memo=memo,
         )
+        utils.log_transaction(tx)
 
         return Response(200)
 
@@ -1189,7 +1193,7 @@ class ProtocoinViewSet(Base):
             number,
         )
 
-        models.Transaction.objects.create(
+        tx = models.Transaction.objects.create(
             user=source_user,
             protocoin=source_delta,
             amount=0,
@@ -1199,6 +1203,7 @@ class ProtocoinViewSet(Base):
             info_source='System',
             memo=memo,
         )
+        utils.log_transaction(tx)
 
         return Response(200)
 

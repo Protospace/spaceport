@@ -137,11 +137,14 @@ def create_unmatched_member_tx(data):
         data.get('memo', 'none'),
     )
 
-    return transactions.create(
+    tx = transactions.create(
         **build_tx(data),
         report_memo=report_memo,
         report_type='Unmatched Member',
     )
+
+    utils.log_transaction(tx)
+    return tx
 
 def create_member_dues_tx(data, member, num_months, deal):
     transactions = models.Transaction.objects
@@ -172,6 +175,7 @@ def create_member_dues_tx(data, member, num_months, deal):
         user=user,
     )
     utils.tally_membership_months(member)
+    utils.log_transaction(tx)
     return tx
 
 def create_unmatched_purchase_tx(data, member):
@@ -186,12 +190,15 @@ def create_unmatched_purchase_tx(data, member):
         data.get('memo', 'none'),
     )
 
-    return transactions.create(
+    tx = transactions.create(
         **build_tx(data),
         report_memo=report_memo,
         report_type='Unmatched Purchase',
         user=user,
     )
+
+    utils.log_transaction(tx)
+    return tx
 
 def create_member_training_tx(data, member, training):
     transactions = models.Transaction.objects
@@ -206,12 +213,15 @@ def create_member_training_tx(data, member, training):
         str(training.id),
     )
 
-    return transactions.create(
+    tx = transactions.create(
         **build_tx(data),
         category='OnAcct',
         memo=memo,
         user=user,
     )
+
+    utils.log_transaction(tx)
+    return tx
 
 def check_training(data, training_id, amount):
     trainings = models.Training.objects
@@ -264,13 +274,16 @@ def create_category_tx(data, member, custom_json, amount):
         note,
     )
 
-    return transactions.create(
+    tx = transactions.create(
         **build_tx(data),
         category=category,
         memo=memo,
         user=user,
         protocoin=protocoin,
     )
+
+    utils.log_transaction(tx)
+    return tx
 
 
 def process_paypal_ipn(data):

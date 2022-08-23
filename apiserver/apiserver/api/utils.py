@@ -467,3 +467,18 @@ def custom_exception_handler(exc, context):
     if response is not None:
         logging.warning('Response: %s', json.dumps(exc.detail))
     return response
+
+def log_transaction(tx):
+    msg = 'Transaction log | {} | {} | {} | {} | {} | {} | {} | {} | {}'.format(
+        tx.id,
+        tx.user.username,
+        tx.user.member.id,
+        tx.account_type,
+        tx.amount,
+        tx.protocoin,
+        tx.category,
+        tx.reference_number,
+        tx.memo,
+    )
+
+    logging.info(msg)
