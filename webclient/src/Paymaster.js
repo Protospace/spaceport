@@ -1,11 +1,79 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './light.css';
-import { Container, Grid, Header, Input } from 'semantic-ui-react';
+import { Container, Form, Grid, Header, Input } from 'semantic-ui-react';
 import { PayPalPayNow, PayPalSubscribe } from './PayPal.js';
+import { MembersDropdown } from './Members.js';
+import { requester } from './utils.js';
+
+export function SendProtocoin(props) {
+	const { token, user, refreshUser } = props;
+	const member = user.member;
+	const [input, setInput] = useState({});
+	const [error, setError] = useState({});
+	const [loading, setLoading] = useState(false);
+	const [success, setSuccess] = useState(false);
+
+	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
+	const handleChange = (e) => handleValues(e, e.currentTarget);
+
+	const handleSubmit = (e) => {
+		if (loading) return;
+		setSuccess(false);
+		setLoading(true);
+
+		const data = { ...input, balance: member.protocoin };
+		requester('/protocoin/send_to_member/', 'POST', token, data)
+		.then(res => {
+			setLoading(false);
+			setSuccess(true);
+			setInput({});
+			setError({});
+			refreshUser();
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+			setError(err.data);
+		});
+	};
+
+	const makeProps = (name) => ({
+		name: name,
+		onChange: handleChange,
+		value: input[name] || '',
+		error: error[name],
+	});
+
+	return (
+		<Form onSubmit={handleSubmit}>
+			<Form.Group widths='equal'>
+				<Form.Field error={error.member_id}>
+					<label>Member (search)</label>
+					<MembersDropdown
+						token={token}
+						{...makeProps('member_id')}
+						onChange={handleValues}
+					/>
+				</Form.Field>
+
+				<Form.Input
+					label='Amount (₱)'
+					fluid
+					{...makeProps('amount')}
+				/>
+			</Form.Group>
+
+			<Form.Button loading={loading} error={error.non_field_errors}>
+				Send
+			</Form.Button>
+			{success && <div>Success!</div>}
+		</Form>
+	);
+};
 
 export function Paymaster(props) {
-	const { user } = props;
+	const { token, user, refreshUser } = props;
 	const [pop, setPop] = useState('20.00');
 	const [locker, setLocker] = useState('5.00');
 	const [consumables, setConsumables] = useState('20.00');
@@ -22,10 +90,12 @@ export function Paymaster(props) {
 			<p>Use these buttons to send money to Protospace.</p>
 
 			<Header size='medium'>Protocoin</Header>
-			<p>Protocoin is used to buy things at Protospace's vending machines. Current balance: ₱&thinsp;{user.member.protocoin}</p>
+			<p>Protocoin is used to buy things from Protospace's vending machines.</p>
 
-			<Grid stackable padded columns={3}>
-				<Grid.Column>
+			<p>Current balance: ₱&thinsp;{user.member.protocoin}</p>
+
+			<Grid stackable padded columns={2}>
+				<Grid.Column width={5}>
 					Buy {buyProtocoin} Protocoin:
 
 					<div className='pay-custom'>
@@ -43,6 +113,11 @@ export function Paymaster(props) {
 						name='Protospace Protocoin'
 						custom={JSON.stringify({ category: 'Exchange', member: user.member.id })}
 					/>
+				</Grid.Column>
+
+				<Grid.Column width={8}>
+					<p>Send Protocoin:</p>
+					<SendProtocoin token={token} user={user} refreshUser={refreshUser} />
 				</Grid.Column>
 			</Grid>
 

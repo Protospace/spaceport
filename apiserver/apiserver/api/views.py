@@ -1042,6 +1042,91 @@ class InterestViewSet(Base, Retrieve, Create):
         )
 
 
+class ProtocoinViewSet(Base):
+    @action(detail=False, methods=['post'], permission_classes=[AllowMetadata | IsAuthenticated])
+    def send_to_member(self, request):
+        source_user = self.request.user
+        source_member = source_user.member
+
+        try:
+            member_id = int(request.data['member_id'])
+        except KeyError:
+            raise exceptions.ValidationError(dict(member_id='This field is required.'))
+        except ValueError:
+            raise exceptions.ValidationError(dict(member_id='Invalid number.'))
+
+        try:
+            balance = float(request.data['balance'])
+        except KeyError:
+            raise exceptions.ValidationError(dict(balance='This field is required.'))
+        except ValueError:
+            raise exceptions.ValidationError(dict(balance='Invalid number.'))
+
+        try:
+            amount = float(request.data['amount'])
+        except KeyError:
+            raise exceptions.ValidationError(dict(amount='This field is required.'))
+        except ValueError:
+            raise exceptions.ValidationError(dict(amount='Invalid number.'))
+
+        if amount < 1.00:
+            raise exceptions.ValidationError(dict(amount='Amount too small.'))
+
+
+        if member_id == source_member.id:
+            raise exceptions.ValidationError(dict(member_id='Unable to send to self.'))
+
+        destination_member = get_object_or_404(models.Member, id=member_id)
+        destination_user = destination_member.user
+
+        source_user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum']
+        source_user_balance = float(source_user_balance)
+
+        print(source_user_balance)
+
+        if source_user_balance != balance:
+            raise exceptions.ValidationError(dict(balance='Incorrect current balance.'))
+
+        if source_user_balance < amount:
+            raise exceptions.ValidationError(dict(amount='Insufficient funds.'))
+
+        source_delta = -amount
+        destination_delta = amount
+
+        memo = 'Protocoin - Transaction {} ({}) sent ₱ {} to {} ({})'.format(
+            source_member.first_name + ' ' + source_member.last_name,
+            source_member.id,
+            amount,
+            destination_member.first_name + ' ' + destination_member.last_name,
+            destination_member.id,
+        )
+
+        models.Transaction.objects.create(
+            user=source_user,
+            protocoin=source_delta,
+            amount=0,
+            number_of_membership_months=0,
+            account_type='Protocoin',
+            category='Other',
+            info_source='System',
+            memo=memo,
+        )
+
+        models.Transaction.objects.create(
+            user=destination_user,
+            protocoin=destination_delta,
+            amount=0,
+            number_of_membership_months=0,
+            account_type='Protocoin',
+            category='Other',
+            info_source='System',
+            memo=memo,
+        )
+
+        return Response(200)
+
+
+
 class RegistrationView(RegisterView):
     serializer_class = serializers.MyRegisterSerializer
 

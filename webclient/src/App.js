@@ -287,7 +287,7 @@ function App() {
 									</Route>
 
 									<Route path='/paymaster'>
-										<Paymaster user={user} />
+										<Paymaster token={token} user={user} refreshUser={refreshUser} />
 									</Route>
 
 									<Route path='/cards'>
