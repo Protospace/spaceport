@@ -90,13 +90,13 @@ export function Paymaster(props) {
 			<p>Use these buttons to send money to Protospace.</p>
 
 			<Header size='medium'>Protocoin</Header>
-			<p>Protocoin is used to buy things from Protospace's vending machines.</p>
+			<p>Protocoin is used to buy things from Protospace's vending machines. No cash value.</p>
 
 			<p>Current balance: ₱&thinsp;{user.member.protocoin.toFixed(2)}</p>
 
 			<Grid stackable padded columns={2}>
 				<Grid.Column width={5}>
-					Buy {buyProtocoin} Protocoin:
+					Buy any amount of Protocoin:
 
 					<div className='pay-custom'>
 						<Input
@@ -113,6 +113,8 @@ export function Paymaster(props) {
 						name='Protospace Protocoin'
 						custom={JSON.stringify({ category: 'Exchange', member: user.member.id })}
 					/>
+
+					<p>See a director to purchase Protocoin with a different payment method.</p>
 				</Grid.Column>
 
 				<Grid.Column width={8}>
