@@ -8,6 +8,7 @@ body {
 body {
 	background: black;
 	overflow-y: scroll;
+	font-family: 'protofont',Lato,'Helvetica Neue',Arial,Helvetica,sans-serif !important;
 }
 
 #root {
