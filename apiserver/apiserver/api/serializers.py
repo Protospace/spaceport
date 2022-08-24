@@ -214,6 +214,7 @@ class MemberSerializer(serializers.ModelSerializer):
     email = fields.UserEmailField(serializers.EmailField)
     phone = serializers.CharField()
     protocoin = serializers.SerializerMethodField()
+    total_protocoin = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Member
@@ -254,6 +255,11 @@ class MemberSerializer(serializers.ModelSerializer):
 
     def get_protocoin(self, obj):
         transactions = obj.user.transactions
+        total = transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
+        return total
+
+    def get_total_protocoin(self, obj):
+        transactions = models.Transaction.objects
         total = transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
         return total
 

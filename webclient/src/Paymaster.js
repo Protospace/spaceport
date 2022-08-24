@@ -94,6 +94,8 @@ export function Paymaster(props) {
 
 			<p>Current balance: ₱&thinsp;{user.member.protocoin.toFixed(2)}</p>
 
+			<p>Total circulation: ₱&thinsp;{user.member.total_protocoin.toFixed(2)}</p>
+
 			<Grid stackable padded columns={2}>
 				<Grid.Column width={5}>
 					Buy any amount of Protocoin:
