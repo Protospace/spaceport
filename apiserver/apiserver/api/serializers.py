@@ -254,7 +254,7 @@ class MemberSerializer(serializers.ModelSerializer):
 
     def get_protocoin(self, obj):
         transactions = obj.user.transactions
-        total = transactions.aggregate(Sum('protocoin'))['protocoin__sum']
+        total = transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
         return total
 
     def update(self, instance, validated_data):
