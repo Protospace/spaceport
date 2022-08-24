@@ -97,33 +97,33 @@ class SearchViewSet(Base, Retrieve):
         elif self.action == 'create':
             if sort == 'recently_vetted':
                 queryset = queryset.filter(vetted_date__isnull=False)
-                queryset = queryset.order_by('-vetted_date')
+                queryset = queryset.order_by('-vetted_date', '-id')
             elif sort == 'newest_active':
                 queryset = queryset.filter(paused_date__isnull=True)
-                queryset = queryset.order_by('-application_date')
+                queryset = queryset.order_by('-application_date', '-id')
             elif sort == 'newest_overall':
-                queryset = queryset.order_by('-application_date')
+                queryset = queryset.order_by('-application_date', '-id')
             elif sort == 'oldest_active':
                 queryset = queryset.filter(paused_date__isnull=True)
-                queryset = queryset.order_by('application_date')
+                queryset = queryset.order_by('application_date', 'id')
             elif sort == 'oldest_overall':
                 queryset = queryset.filter(application_date__isnull=False)
-                queryset = queryset.order_by('application_date')
+                queryset = queryset.order_by('application_date', 'id')
             elif sort == 'recently_inactive':
                 queryset = queryset.filter(paused_date__isnull=False)
                 queryset = queryset.order_by('-paused_date')
             elif sort == 'is_director':
                 queryset = queryset.filter(is_director=True)
-                queryset = queryset.order_by('application_date')
+                queryset = queryset.order_by('application_date', 'id')
             elif sort == 'is_instructor':
                 queryset = queryset.filter(paused_date__isnull=True, is_instructor=True)
-                queryset = queryset.order_by('application_date')
+                queryset = queryset.order_by('application_date', 'id')
             elif sort == 'due':
                 queryset = queryset.filter(status='Due')
-                queryset = queryset.order_by('expire_date')
+                queryset = queryset.order_by('expire_date', 'id')
             elif sort == 'overdue':
                 queryset = queryset.filter(status='Overdue')
-                queryset = queryset.order_by('expire_date')
+                queryset = queryset.order_by('expire_date', 'id')
             elif sort == 'last_scanned':
                 if self.request.user.member.allow_last_scanned:
                     queryset = queryset.filter(allow_last_scanned=True)
@@ -133,7 +133,7 @@ class SearchViewSet(Base, Retrieve):
                 else:
                     queryset = []
             elif sort == 'everyone':
-                queryset = queryset.annotate(Count('user__transactions')).order_by('-user__transactions__count')
+                queryset = queryset.annotate(Count('user__transactions')).order_by('-user__transactions__count', 'id')
             elif sort == 'best_looking':
                 queryset = []
 
@@ -984,7 +984,7 @@ class VettingViewSet(Base, List):
         queryset = queryset.filter(vetted_date__isnull=True)
         queryset = queryset.filter(current_start_date__lte=four_weeks_ago)
 
-        return queryset.order_by('-current_start_date')
+        return queryset.order_by('-current_start_date', '-id')
 
 
 class UsageViewSet(Base):

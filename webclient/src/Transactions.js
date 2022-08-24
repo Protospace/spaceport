@@ -290,7 +290,7 @@ export function TransactionList(props) {
 
 			<Table.Body>
 				{transactions.length ?
-					transactions.slice().sort((a, b) => a.date < b.date ? 1 : -1).map(x =>
+					transactions.map(x =>
 						<Table.Row key={x.id}>
 							<Table.Cell style={{ minWidth: '8rem' }}>
 								<Link to={'/transactions/'+x.id}>{moment(x.date).format('ll')}</Link>
