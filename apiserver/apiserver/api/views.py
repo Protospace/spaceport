@@ -1083,7 +1083,7 @@ class ProtocoinViewSet(Base):
                 destination_member = get_object_or_404(models.Member, id=member_id)
                 destination_user = destination_member.user
 
-                source_user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum']
+                source_user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
                 source_user_balance = float(source_user_balance)
 
                 if source_user_balance != balance:
@@ -1140,7 +1140,7 @@ class ProtocoinViewSet(Base):
         source_card = get_object_or_404(models.Card, card_number=pk)
         source_user = source_card.user
 
-        user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum']
+        user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
         user_balance = float(user_balance)
 
         res = dict(
@@ -1183,7 +1183,7 @@ class ProtocoinViewSet(Base):
                     raise exceptions.ValidationError(dict(amount='Amount too small.'))
 
 
-                source_user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum']
+                source_user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
                 source_user_balance = float(source_user_balance)
 
                 if source_user_balance != balance:

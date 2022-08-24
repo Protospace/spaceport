@@ -120,7 +120,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
         if validated_data['protocoin'] < 0:
             user = validated_data['user']
-            current_protocoin = user.transactions.aggregate(Sum('protocoin'))['protocoin__sum']
+            current_protocoin = user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
             new_protocoin = current_protocoin + validated_data['protocoin']
             if new_protocoin < 0:
                 raise ValidationError(dict(category='Insufficient funds. Member only has {} protocoin.'.format(current_protocoin)))
@@ -141,7 +141,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         if validated_data['protocoin'] < 0:
             user = validated_data['user']
             # when updating, we need to subtract out the transaction being edited
-            current_protocoin = user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] - instance.protocoin
+            current_protocoin = (user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0) - instance.protocoin
             new_protocoin = current_protocoin + validated_data['protocoin']
             if new_protocoin < 0:
                 raise ValidationError(dict(category='Insufficient funds. Member only had {} protocoin.'.format(current_protocoin)))
