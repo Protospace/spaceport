@@ -533,7 +533,7 @@ class DoorViewSet(viewsets.ViewSet, List):
             if not member.is_allowed_entry: continue
 
             active_member_cards[card.card_number] = '{} ({})'.format(
-                member.first_name + ' ' + member.last_name[0],
+                member.preferred_name + ' ' + member.last_name[0],
                 member.id,
             )
 
@@ -547,7 +547,7 @@ class DoorViewSet(viewsets.ViewSet, List):
 
         member = card.user.member
         t = utils.now_alberta_tz().strftime('%Y-%m-%d %H:%M:%S, %a %I:%M %p')
-        logger.info('Scan - Time: {} | Name: {} {} ({})'.format(t, member.first_name, member.last_name, member.id))
+        logger.info('Scan - Time: {} | Name: {} {} ({})'.format(t, member.preferred_name, member.last_name, member.id))
 
         utils_stats.calc_card_scans()
 
@@ -1096,10 +1096,10 @@ class ProtocoinViewSet(Base):
                 destination_delta = amount
 
                 memo = 'Protocoin - Transaction {} ({}) sent ₱ {} to {} ({})'.format(
-                    source_member.first_name + ' ' + source_member.last_name,
+                    source_member.preferred_name + ' ' + source_member.last_name,
                     source_member.id,
                     amount,
-                    destination_member.first_name + ' ' + destination_member.last_name,
+                    destination_member.preferred_name + ' ' + destination_member.last_name,
                     destination_member.id,
                 )
 
@@ -1145,7 +1145,7 @@ class ProtocoinViewSet(Base):
 
         res = dict(
             balance=user_balance,
-            first_name=source_user.member.first_name,
+            first_name=source_user.member.preferred_name,
         )
         return Response(res)
 

@@ -75,14 +75,14 @@ export function SignupForm(props) {
 	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 
 	const genUsername = () => {
-		if (input.first_name && input.last_name) {
-			let first_name = input.first_name.trim().toLowerCase();
+		if (input.preferred_name && input.last_name) {
+			let preferred_name = input.preferred_name.trim().toLowerCase();
 			let last_name = input.last_name.trim().toLowerCase();
-			first_name = first_name.replace(/[^a-z- ]+/g, '');
+			preferred_name = preferred_name.replace(/[^a-z- ]+/g, '');
 			last_name = last_name.replace(/[^a-z- ]+/g, '');
-			first_name = first_name.replace(/[ -]/g, '.');
+			preferred_name = preferred_name.replace(/[ -]/g, '.');
 			last_name = last_name.replace(/[ -]/g, '.');
-			return first_name + '.' + last_name;
+			return preferred_name + '.' + last_name;
 		} else {
 			return '';
 		}
@@ -147,6 +147,18 @@ export function SignupForm(props) {
 						/>
 					</Form.Group>
 
+					<Form.Group widths='equal'>
+						<Form.Input
+							label='Preferred First Name'
+							name='preferred_name'
+							autoComplete='off'
+							fluid
+							onChange={handleChange}
+							error={error.preferred_name}
+						/>
+						<Form.Field/>
+					</Form.Group>
+
 					<Form.Input
 						label='Email'
 						autoComplete='off'
@@ -181,7 +193,7 @@ export function SignupForm(props) {
 
 					{!!genUsername() &&
 						<Form.Input
-							label='Username'
+							label='Spaceport Username'
 							name='username'
 							value={genUsername()}
 							error={error.username}

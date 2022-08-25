@@ -26,7 +26,7 @@ def find_user(username):
 
 def create_user(data):
     ldap_data = dict(
-        first=data['first_name'],
+        first=data['preferred_name'],
         last=data['last_name'],
         username=data['username'],
         email=data['email'],
@@ -50,7 +50,7 @@ def add_to_group(member, group):
         if ldap_api('add-to-group', ldap_data) != 200: raise
     except BaseException as e:
         logger.error('LDAP Group - {} - {}'.format(e.__class__.__name__, str(e)))
-        m = '{} {} ({})'.format(member.first_name, member.last_name, member.id)
+        m = '{} {} ({})'.format(member.preferred_name, member.last_name, member.id)
         msg = 'Problem adding {} to group {}!'.format(m, group)
         utils.alert_tanner(msg)
         logger.info(msg)
@@ -64,7 +64,7 @@ def remove_from_group(member, group):
         if ldap_api('remove-from-group', ldap_data) != 200: raise
     except BaseException as e:
         logger.error('LDAP Group - {} - {}'.format(e.__class__.__name__, str(e)))
-        m = '{} {} ({})'.format(member.first_name, member.last_name, member.id)
+        m = '{} {} ({})'.format(member.preferred_name, member.last_name, member.id)
         msg = 'Problem removing {} from group {}!'.format(m, group)
         utils.alert_tanner(msg)
         logger.info(msg)

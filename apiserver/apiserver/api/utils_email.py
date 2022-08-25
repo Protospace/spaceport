@@ -17,7 +17,7 @@ def send_welcome_email(member):
 
     def replace_fields(text):
         return text.replace(
-            '[name]', member.first_name,
+            '[name]', member.preferred_name,
         ).replace(
             '[username]', member.user.username,
         ).replace(
@@ -45,7 +45,7 @@ def send_ical_email(member, session, ical_file):
         date = session.datetime.astimezone(utils.TIMEZONE_CALGARY).strftime('%A, %B %d')
 
         return text.replace(
-            '[name]', member.first_name,
+            '[name]', member.preferred_name,
         ).replace(
             '[class]', session.course.name,
         ).replace(
@@ -71,7 +71,7 @@ def send_ical_email(member, session, ical_file):
 def send_interest_email(interest):
     def replace_fields(text):
         return text.replace(
-            '[name]', interest.user.member.first_name,
+            '[name]', interest.user.member.preferred_name,
         ).replace(
             '[course]', interest.course.name,
         ).replace(
