@@ -84,7 +84,7 @@ def discourse_api_delete(url, data={}):
 
 def discourse_rails_script(script):
     result = subprocess.run(['docker', 'exec', '-i', secrets.DISCOURSE_CONTAINER, 'rails', 'runner', script],
-            shell=False, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
+            shell=False, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
     output = result.stdout or result.stderr
     output = output.strip() or 'No complaints'
     return result, output
@@ -99,24 +99,15 @@ def get_discourse_group_id(group_name):
 
 def get_discourse_usernames():
     usernames = []
-    page = 1
 
-    for _ in range(10):
-        params = {
-            'page': page,
-        }
-        response = discourse_api_get('https://forum.protospace.ca/admin/users/list/active.json', params)
-        response = response.json()
+    response = discourse_api_get('https://forum.protospace.ca/groups/trust_level_0/members.json?limit=1000')
+    response = response.json()
 
-        if not len(response):
-            break
+    for user in response['members']:
+        usernames.append(user['username'])
 
-        for u in response:
-            usernames.append(u['username'])
-
-        page += 1
-    else:  # for
-        logger.error('Too many user pages, aborting')
+    if len(usernames) == 1000:
+        logger.error('Hit username limit, aborting!')
         abort(400)
 
     return usernames
