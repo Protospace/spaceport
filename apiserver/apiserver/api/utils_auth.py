@@ -2,6 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import requests
+from requests.exceptions import Timeout
 
 from apiserver import secrets
 from apiserver.api import utils
@@ -16,8 +17,12 @@ def discourse_is_configured():
 def auth_api(url, data=None, json=None):
     try:
         headers = {'Authorization': 'Token ' + secrets.AUTH_API_KEY}
-        r = requests.post(url, data=data, json=json, headers=headers, timeout=20)
+        r = requests.post(url, data=data, json=json, headers=headers, timeout=6)
         return r.status_code
+    except Timeout as e:
+        logger.info('Auth {} - {} - {}'.format(url, e.__class__.__name__, str(e)))
+        logger.info('Auth timeout occured, assuming it worked and returning 200.')
+        return 200
     except BaseException as e:
         logger.error('Auth {} - {} - {}'.format(url, e.__class__.__name__, str(e)))
         return None
