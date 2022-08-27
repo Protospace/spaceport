@@ -11,7 +11,7 @@ from . import models
 from .permissions import is_admin_director
 
 def get_object_owner(obj):
-    full_name = lambda member: member.first_name + ' ' + member.last_name
+    full_name = lambda member: member.preferred_name + ' ' + member.last_name
 
     if obj.__class__.__name__ == 'Member':
         return full_name(obj), obj.id
