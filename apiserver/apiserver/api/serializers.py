@@ -426,7 +426,7 @@ class AdminSearchSerializer(serializers.Serializer):
 
     def get_transactions(self, obj):
         queryset = obj.user.transactions
-        queryset = queryset.order_by('-id', '-date')
+        queryset = queryset.order_by('-date', '-id')
         serializer = TransactionSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
