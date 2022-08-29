@@ -93,6 +93,9 @@ class TransactionSerializer(serializers.ModelSerializer):
         if validated_data['category'] != 'Membership':
             validated_data['number_of_membership_months'] = 0
 
+        if validated_data['category'] == 'Membership' and not validated_data['number_of_membership_months']:
+            raise ValidationError(dict(number_of_membership_months='This field is required.'))
+
         if validated_data['account_type'] == 'Protocoin' and validated_data['category'] == 'Exchange':
             raise ValidationError(dict(category='Can\'t purchase Protocoin with Protocoin.'))
 
