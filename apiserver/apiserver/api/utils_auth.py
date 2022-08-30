@@ -23,6 +23,8 @@ def auth_api(url, data=None, json=None):
         logger.info('Auth {} - {} - {}'.format(url, e.__class__.__name__, str(e)))
         logger.info('Auth timeout occured, assuming it worked and returning 200.')
         return 200
+    except KeyboardInterrupt:
+        raise
     except BaseException as e:
         logger.error('Auth {} - {} - {}'.format(url, e.__class__.__name__, str(e)))
         return None
