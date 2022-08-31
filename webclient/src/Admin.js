@@ -42,7 +42,7 @@ export function AdminVet(props) {
 			onClick={handleVet}
 			loading={loading}
 		>
-			{yousure ? 'You Sure?' : 'Vet ' + member.first_name}
+			{yousure ? 'You Sure?' : 'Vet ' + member.preferred_name}
 		</Button>
 	);
 }
@@ -87,7 +87,7 @@ export function AdminVetting(props) {
 							<Table.Body>
 								{(displayAll ? vetting : vetting.slice(0,5)).map(x =>
 									<Table.Row key={x.id}>
-										<Table.Cell><Link to={'/members/'+x.id}>{x.first_name} {x.last_name}</Link></Table.Cell>
+										<Table.Cell><Link to={'/members/'+x.id}>{x.preferred_name} {x.last_name}</Link></Table.Cell>
 										<Table.Cell><a href={'mailto:'+x.email}>Email</a></Table.Cell>
 										<Table.Cell>
 											<Icon name='circle' color={statusColor[x.status]} />

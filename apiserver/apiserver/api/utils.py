@@ -258,7 +258,7 @@ def gen_card_photo(member):
     font = ImageFont.truetype('DejaVuSans.ttf', font_sizes[0])
     x = CARD_PHOTO_MARGIN_SIDE
     y = my + CARD_PHOTO_MARGIN_TOP + CARD_PHOTO_MARGIN_SIDE
-    draw.text((x, y), str(member.first_name), (0,0,0), font=font)
+    draw.text((x, y), str(member.preferred_name), (0,0,0), font=font)
 
     font = ImageFont.truetype('DejaVuSans-Bold.ttf', font_sizes[1])
     y = my + CARD_PHOTO_MARGIN_TOP + CARD_PHOTO_MARGIN_SIDE + font_sizes[1]
@@ -339,13 +339,14 @@ def create_new_member(data, user):
         user=user,
         first_name=data['first_name'],
         last_name=data['last_name'],
-        preferred_name=data['first_name'],
+        preferred_name=data['preferred_name'],
     )
 
 def register_user(data, user):
     data = data.copy()
     data['first_name'] = data['first_name'].title().strip()
     data['last_name'] = data['last_name'].title().strip()
+    data['preferred_name'] = data['preferred_name'].title().strip()
 
     # Sometimes during demos, a user makes a fake account then then has to be cleaned out
     # Notify me that this has happened so I can go clean out the database
@@ -370,7 +371,7 @@ def register_user(data, user):
         username=data['username'],
         password=data['password1'],
         email=data['email'],
-        first_name=data['first_name'],
+        first_name=data['preferred_name'],
     )
 
     if utils_auth.wiki_is_configured():
@@ -410,7 +411,7 @@ def register_user(data, user):
 
     gen_search_strings()
 
-    cache.set('sign', 'Welcome to Protospace, {}!'.format(data['first_name']))
+    cache.set('sign', 'Welcome to Protospace, {}!'.format(data['preferred_name']))
 
 
 BLANK_FORM = 'misc/blank_member_form.pdf'
@@ -434,7 +435,7 @@ def gen_member_forms(member):
     packet = io.BytesIO()
     can = canvas.Canvas(packet, pagesize=letter)
     can.drawRightString(600, 770, '{} {} ({})'.format(
-        data['first_name'],
+        data['preferred_name'],
         data['last_name'],
         data['id'],
     ))

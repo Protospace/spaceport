@@ -212,7 +212,7 @@ export function AccountForm(props) {
 			<Header size='medium'>Member Details</Header>
 
 			<div className='field'>
-				<label>Username</label>
+				<label>Spaceport Username</label>
 				<p>{user.username}</p>
 			</div>
 

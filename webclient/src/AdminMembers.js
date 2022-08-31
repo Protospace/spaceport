@@ -528,10 +528,6 @@ export function AdminMemberInfo(props) {
 			<BasicTable>
 				<Table.Body>
 					<Table.Row>
-						<Table.Cell>Name:</Table.Cell>
-						<Table.Cell>{member.first_name} {member.last_name}</Table.Cell>
-					</Table.Row>
-					<Table.Row>
 						<Table.Cell>Status:</Table.Cell>
 						<Table.Cell>
 							<Icon name='circle' color={statusColor[member.status]} />

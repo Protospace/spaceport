@@ -299,7 +299,7 @@ class MemberSerializer(serializers.ModelSerializer):
                 index__owner_id=instance.id,
                 index__history_date__gte=ONE_WEEK,
             ).count() >= 6:
-                msg = 'Member allow_last_scanned rate limit exceeded by: ' + instance.first_name + ' ' + instance.last_name
+                msg = 'Member allow_last_scanned rate limit exceeded by: ' + instance.preferred_name + ' ' + instance.last_name
                 utils.alert_tanner(msg)
                 logger.info(msg)
                 raise ValidationError(dict(allow_last_scanned='You\'re doing that too often.'))
@@ -729,6 +729,7 @@ class UserSerializer(serializers.ModelSerializer):
 class MyRegisterSerializer(RegisterSerializer):
     first_name = serializers.CharField(max_length=32)
     last_name = serializers.CharField(max_length=32)
+    preferred_name = serializers.CharField(max_length=32)
     request_id = serializers.CharField(required=False)
 
     def validate_username(self, username):
@@ -773,7 +774,7 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
             username=self.user.username,
             password=self.data['new_password1'],
             email=self.user.email,
-            first_name=self.user.member.first_name,
+            first_name=self.user.member.preferred_name,
         )
 
         data['username'] = self.user.member.mediawiki_username or self.user.username
@@ -814,7 +815,7 @@ class MyPasswordResetSerializer(PasswordResetSerializer):
     def save(self):
         email = self.data['email']
         member = User.objects.get(email__iexact=email).member
-        logging.info('Password reset requested for: {} - {} {} ({})'.format(email, member.first_name, member.last_name, member.id))
+        logging.info('Password reset requested for: {} - {} {} ({})'.format(email, member.preferred_name, member.last_name, member.id))
         super().save()
 
 class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
@@ -838,7 +839,7 @@ class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
             username=self.user.username,
             password=self.data['new_password1'],
             email=self.user.email,
-            first_name=self.user.member.first_name,
+            first_name=self.user.member.preferred_name,
         )
 
         data['username'] = self.user.member.mediawiki_username or self.user.username
@@ -865,7 +866,7 @@ class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
                 self.user.member.save()
 
         member = self.user.member
-        logging.info('Password reset completed for: {} {} ({})'.format(member.first_name, member.last_name, member.id))
+        logging.info('Password reset completed for: {} {} ({})'.format(member.preferred_name, member.last_name, member.id))
 
         if request_id: utils_stats.set_progress(request_id, 'Success! You can now log in as: ' + self.user.username)
 
@@ -915,7 +916,7 @@ class SpaceportAuthSerializer(LoginSerializer):
         if user:
             data = self.context['request'].data.copy()
             data['email'] = user.email
-            data['first_name'] = user.member.first_name
+            data['first_name'] = user.member.preferred_name
 
             data['username'] = user.member.mediawiki_username or user.username
             utils_auth.set_wiki_password(data)
