@@ -12,7 +12,7 @@
 		"downloadjs": "^1.4.7",
 		"lodash": "^4.17.19",
 		"moment": "~2.24.0",
-		"moment-timezone": "~0.5.28",
+		"moment-timezone": "~0.5.35",
 		"query-string": "^7.0.1",
 		"react": "^16.13.1",
 		"react-datetime": "~2.16.3",
