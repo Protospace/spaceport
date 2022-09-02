@@ -28,6 +28,17 @@ class UsageSerializer(serializers.ModelSerializer):
     def get_first_name(self, obj):
         return obj.user.member.preferred_name
 
+class ProtocoinTransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Transaction
+        fields = [
+            'id',
+            'date',
+            'protocoin',
+            'account_type',
+            'category',
+        ]
+
 class TransactionSerializer(serializers.ModelSerializer):
     # fields directly from old portal. replace with slugs we want
     account_type = serializers.ChoiceField([

@@ -1215,6 +1215,19 @@ class ProtocoinViewSet(Base):
         except OperationalError:
             self.card_vend_request(request, pk)
 
+    @action(detail=False, methods=['get'])
+    def transactions(self, request):
+        transactions = models.Transaction.objects.exclude(protocoin=0).order_by('-date', '-id')
+        total_protocoin = transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
+
+        serializer = serializers.ProtocoinTransactionSerializer(transactions, many=True)
+
+        res = dict(
+            total_protocoin=total_protocoin,
+            transactions=serializer.data,
+        )
+        return Response(res)
+
 
 class RegistrationView(RegisterView):
     serializer_class = serializers.MyRegisterSerializer
