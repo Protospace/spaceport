@@ -195,8 +195,13 @@ def calc_card_scans():
 def get_progress(request_id):
     return cache.get('request-progress-' + request_id, [])
 
-def set_progress(request_id, data):
+def set_progress(request_id, data, replace=False):
     logger.info('Progress - ID: %s | Status: %s', request_id, data)
     progress = get_progress(request_id)
-    progress.append(data)
+
+    if replace and len(progress):
+        progress[-1] = data
+    else:
+        progress.append(data)
+
     cache.set('request-progress-' + request_id, progress)

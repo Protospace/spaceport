@@ -279,6 +279,7 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
             return serializers.SessionSerializer
 
     def perform_create(self, serializer):
+        data = self.request.data
         session = serializer.save(instructor=self.request.user)
 
         # ensure session datetime is at least 1 day in the future
@@ -287,15 +288,22 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
             logging.info('Session is in the past or too soon, not sending interest emails.')
             return
 
-        interests = models.Interest.objects.filter(course=session.course, satisfied_by__isnull=True)
+        interests = models.Interest.objects.filter(
+            course=session.course,
+            satisfied_by__isnull=True,
+            user__member__paused_date__isnull=True
+        )
 
-        for interest in interests:
+        for num, interest in enumerate(interests):
+            msg = 'Sending email {} / {}...'.format(num+1, len(interests))
+            if data['request_id']: utils_stats.set_progress(data['request_id'], msg, replace=True)
+
             try:
                 utils_email.send_interest_email(interest)
             except BaseException as e:
                 msg = 'Problem sending interest email: ' + str(e)
                 logger.exception(msg)
-                alert_tanner(msg)
+                utils.alert_tanner(msg)
 
         num_satisfied = interests.update(satisfied_by=session)
         logging.info('Satisfied %s interests.', num_satisfied)

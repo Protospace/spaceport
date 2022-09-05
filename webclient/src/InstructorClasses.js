@@ -6,7 +6,7 @@ import 'react-datetime/css/react-datetime.css';
 import moment from 'moment-timezone';
 import './light.css';
 import { Button, Checkbox, Form, Grid, Header, Icon, Label, Message, Table } from 'semantic-ui-react';
-import { requester } from './utils.js';
+import { requester, randomString } from './utils.js';
 import { MembersDropdown } from './Members.js';
 
 class AttendanceSheet extends React.Component {
@@ -378,6 +378,7 @@ export function InstructorClassList(props) {
 	const [open, setOpen] = useState(false);
 	const [input, setInput] = useState({ max_students: null });
 	const [error, setError] = useState(false);
+	const [progress, setProgress] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
 	const [classes, setClasses] = useState([]);
@@ -387,9 +388,23 @@ export function InstructorClassList(props) {
 		if (loading) return;
 		setLoading(true);
 		setSuccess(false);
-		const data = { ...input, course: course.id };
+
+		const request_id = randomString();
+		const getStatus = () => {
+			requester('/stats/progress/?request_id='+request_id, 'GET')
+			.then(res => {
+				setProgress(res);
+			})
+			.catch(err => {
+				console.log(err);
+			});
+		};
+		const interval = setInterval(getStatus, 500);
+
+		const data = { ...input, course: course.id, request_id: request_id };
 		requester('/sessions/', 'POST', token, data)
 		.then(res => {
+			clearInterval(interval);
 			setSuccess(res.id);
 			setInput({ max_students: null });
 			setLoading(false);
@@ -398,6 +413,7 @@ export function InstructorClassList(props) {
 			setCourse({ ...course, sessions: [ res, ...course.sessions ] });
 		})
 		.catch(err => {
+			clearInterval(interval);
 			setLoading(false);
 			console.log(err);
 			setError(err.data);
@@ -444,6 +460,10 @@ export function InstructorClassList(props) {
 							}
 
 							<InstructorClassEditor input={input} setInput={setInput} error={error} token={token} />
+
+							<p>
+								{progress.map(x => <>{x}<br /></>)}
+							</p>
 
 							<Form.Button loading={loading} error={error.non_field_errors}>
 								Submit

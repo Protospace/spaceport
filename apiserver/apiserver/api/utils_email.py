@@ -3,6 +3,7 @@ logger = logging.getLogger(__name__)
 
 import os
 import smtplib
+import time
 from datetime import datetime, timedelta
 
 from django.core.mail import send_mail, EmailMultiAlternatives
@@ -91,5 +92,8 @@ def send_interest_email(interest):
         recipient_list=[interest.user.email],
         html_message=email_html,
     )
+
+    if not settings.EMAIL_HOST:
+        time.sleep(0.5)  # simulate slowly sending emails when logging to console
 
     logger.info('Sent interest email:\n' + email_text)
