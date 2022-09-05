@@ -157,6 +157,11 @@ body {
 	margin-left: auto;
 }
 
+.interest .ui.button {
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+}
+
 .ui.tag.label {
 	padding-left: 1rem;
 	padding-right: 0.5rem;

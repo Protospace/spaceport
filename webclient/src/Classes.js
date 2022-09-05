@@ -101,6 +101,7 @@ function NewClassTableCourse(props) {
 	const {course, classes, token, user, refreshUser} = props;
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [interested, setInterested] = useState(course.num_interested || 0);
 
 	const handleInterest = () => {
 		if (loading) return;
@@ -110,6 +111,7 @@ function NewClassTableCourse(props) {
 		.then(res => {
 			setError(false);
 			refreshUser();
+			setInterested(interested+1);
 		})
 		.catch(err => {
 			console.log(err);
@@ -139,14 +141,19 @@ function NewClassTableCourse(props) {
 				{user &&
 					<div className='interest'>
 						{user.interests.filter(x => !x.satisfied_by).map(x => x.course).includes(course.id) ?
-							'Interested ✅'
+							<Button
+								size='tiny'
+								color='green'
+							>
+								{interested} interested
+							</Button>
 						:
 							<Button
 								size='tiny'
 								loading={loading}
 								onClick={handleInterest}
 							>
-								Interest&nbsp;+
+								{interested} interested
 							</Button>
 						}
 					</div>
@@ -206,7 +213,7 @@ function NewClassTable(props) {
 
 	let sortedClasses = [];
 	let seenCourseIds = [];
-	if (classes.length) {
+	if (classes.length && courses.length) {
 		for (const clazz of classes) {
 			const course_data = clazz.course_data;
 			const course = sortedClasses.find(x => x?.course?.id === course_data?.id);
@@ -215,7 +222,7 @@ function NewClassTable(props) {
 				course.classes.push(clazz);
 			} else {
 				sortedClasses.push({
-					course: course_data,
+					course: courses.find(x => x.id === course_data.id),
 					classes: [clazz],
 				});
 				seenCourseIds.push(
