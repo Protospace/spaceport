@@ -31,7 +31,7 @@ import { Garden } from './Garden.js';
 import { Footer } from './Footer.js';
 import { LCARS1Display } from './Display.js';
 
-const APP_VERSION = 4;  // TODO: automate this
+const APP_VERSION = 5;  // TODO: automate this
 
 function App() {
 	const [token, setToken] = useState(localStorage.getItem('token', ''));
