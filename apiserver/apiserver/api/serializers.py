@@ -630,7 +630,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             else:
                 return False
 
-        prev_session = obj.sessions.last()
+        prev_session = obj.sessions.order_by('datetime').last()
 
         if obj.id == 273: # monthly clean 10:00 AM 3rd Saturday of each month
             date = next_date(calendar.SATURDAY, week_num=3)
@@ -651,7 +651,6 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             cost = 0
             max_students = None
         elif prev_session:
-            prev_session = obj.sessions.last()
             dt = prev_session.datetime
 
             if course_is_usually_monthly(obj):
