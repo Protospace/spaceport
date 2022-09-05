@@ -182,7 +182,7 @@ function NewClassTableCourse(props) {
 									{' - '}{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}
 								</Table.Cell>
 
-								<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost.slice(0,2)}</Table.Cell>
+								<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost.slice(0,-3)}</Table.Cell>
 
 								<Table.Cell>
 									{!!x.max_students ?
