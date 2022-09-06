@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import './light.css';
-import { Label, Button, Container, Dropdown, Form, Header, Icon, Segment, Table } from 'semantic-ui-react';
+import { Label, Button, Container, Dropdown, Form, Header, Icon, Input, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
 import { apiUrl, isAdmin, getInstructor, BasicTable, requester, useIsMobile } from './utils.js';
 import { NotFound } from './Misc.js';
@@ -305,6 +305,7 @@ export function ClassFeed(props) {
 export function Classes(props) {
 	const [classes, setClasses] = useState(classesCache);
 	const [courses, setCourses] = useState(false);
+	const [search, setSearch] = useState('');
 	const [sortByCourse, setSortByCourse] = useState(sortCache);
 	const [tagFilter, setTagFilter] = useState(tagFilterCache);
 	const { token, user, refreshUser } = props;
@@ -334,6 +335,8 @@ export function Classes(props) {
 	const byDate = (a, b) => a.datetime > b.datetime ? 1 : -1;
 	const classesByTag = (x) => tagFilter ? x.course_data.tags.includes(tagFilter) : true;
 	const coursesByTag = (x) => tagFilter ? x.tags.includes(tagFilter) : true;
+	const classesBySearch = (x) => search ? x.course_data.name.toLowerCase().includes(search.toLowerCase()) : true;
+	const coursesBySearch = (x) => search ? x.name.toLowerCase().includes(search.toLowerCase()) : true;
 
 	return (
 		<Container>
@@ -368,6 +371,21 @@ export function Classes(props) {
 				>
 					Sort by date
 				</Button>
+
+				<Input focus icon='search'
+					placeholder='Search...'
+					value={search}
+					onChange={(event) => setSearch(event.target.value)}
+					aria-label='search products'
+					style={{ margin: '0.5rem 0.5rem 0.5rem 0' }}
+				/>
+
+				{!!search.length &&
+					<Button
+						content='Clear'
+						onClick={() => setSearch('')}
+					/>
+				}
 			</p>
 
 			<p>Filter by tag:</p>
@@ -413,14 +431,14 @@ export function Classes(props) {
 			{classes.length && courses.length ?
 				sortByCourse ?
 					<NewClassTable
-						classes={classes.filter(classesByTag)}
-						courses={courses.filter(coursesByTag)}
+						classes={classes.filter(classesByTag).filter(classesBySearch)}
+						courses={courses.filter(coursesByTag).filter(coursesBySearch)}
 						token={token}
 						user={user}
 						refreshUser={refreshUser}
 					/>
 				:
-					<ClassTable classes={classes.slice().filter(classesByTag).sort(byDate)} />
+					<ClassTable classes={classes.slice().filter(classesByTag).filter(classesBySearch).sort(byDate)} />
 			:
 				<p>Loading...</p>
 			}
