@@ -116,11 +116,19 @@ export const scene = ({ ref }) => {
 		ships = ships.filter((s) => !s.kill);
 		bolts = bolts.filter((s) => !s.kill);
 
-		requestAnimationFrame(animate);
-		renderer.render(scene, camera);
+		try {
+			requestAnimationFrame(animate);
+			renderer.render(scene, camera);
+		} catch(err) {
+			return;
+		}
 	};
 
-	animate();
-
-	renderer.render(scene, camera);
+	try {
+		animate();
+		renderer.render(scene, camera);
+	} catch(err) {
+		renderer.dispose();
+		return;
+	}
 };
