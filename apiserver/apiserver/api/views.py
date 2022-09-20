@@ -361,40 +361,53 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             return serializers.StudentTrainingSerializer
 
     def update_cert(self, session, member, status):
+        def check_attendance(requires_vetted=False):
+            if requires_vetted:
+                if status == 'Attended' and member.vetted_date:
+                    logging.info('Granting certification: %s', session.course.name)
+                    return utils.today_alberta_tz()
+            else:
+                if status == 'Attended':
+                    logging.info('Granting certification: %s', session.course.name)
+                    return utils.today_alberta_tz()
+
+            logging.info('Not granting certification: %s', session.course.name)
+            return None
+
         # always update cert date incase member is returning and gets recertified
         if session.course.id == 249:
-            member.orientation_date = utils.today_alberta_tz() if status == 'Attended' else None
+            member.orientation_date = check_attendance()
         elif session.course.id == 261:
-            member.wood_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+            member.wood_cert_date = check_attendance()
         elif session.course.id == 401:
-            member.wood2_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+            member.wood2_cert_date = check_attendance()
         elif session.course.id == 281:
-            member.lathe_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+            member.lathe_cert_date = check_attendance()
         elif session.course.id == 283:
-            member.mill_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+            member.mill_cert_date = check_attendance()
         elif session.course.id == 259:
-            member.tormach_cnc_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+            member.tormach_cnc_cert_date = check_attendance()
         elif session.course.id == 428:
-            member.precix_cnc_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+            member.precix_cnc_cert_date = check_attendance(requires_vetted=True)
 
             if utils_ldap.is_configured():
-                if status == 'Attended':
+                if member.precix_cnc_cert_date:
                     utils_ldap.add_to_group(member, 'CNC-Precix-Users')
                 else:
                     utils_ldap.remove_from_group(member, 'CNC-Precix-Users')
         elif session.course.id == 247:
-            member.rabbit_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+            member.rabbit_cert_date = check_attendance(requires_vetted=True)
 
             if utils_ldap.is_configured():
-                if status == 'Attended':
+                if member.rabbit_cert_date:
                     utils_ldap.add_to_group(member, 'Laser Users')
                 else:
                     utils_ldap.remove_from_group(member, 'Laser Users')
         elif session.course.id == 321:
-            member.trotec_cert_date = utils.today_alberta_tz() if status == 'Attended' else None
+            member.trotec_cert_date = check_attendance(requires_vetted=True)
 
             if utils_ldap.is_configured():
-                if status == 'Attended':
+                if member.trotec_cert_date:
                     utils_ldap.add_to_group(member, 'Trotec Users')
                 else:
                     utils_ldap.remove_from_group(member, 'Trotec Users')
