@@ -196,7 +196,7 @@ export function SignupForm(props) {
 							label='Spaceport Username'
 							name='username'
 							value={genUsername()}
-							error={error.username}
+							error={error?.username?.[0] === 'This field may not be blank.' ? false : error.username}
 							readOnly
 						>
 							<input style={{ border: 'none' }}></input>
