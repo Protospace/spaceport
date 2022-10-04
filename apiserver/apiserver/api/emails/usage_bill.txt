@@ -1,0 +1,21 @@
+Hi [name],
+
+Please find attached a summary of your [device] usage in [month]. You used
+[overage] minutes over your free allotment, which at $0.50/min comes to $[bill].
+You can pay this on the portal's Paymaster page under the consumables section,
+or send an e-Transfer to info@protospace.ca, or hand a director cash.
+
+INVOICE
+Device:  [device]
+Month:   [month]
+Usage:   [minutes] min
+Overage: [overage] min
+----------------------
+Bill:    $[bill]
+
+If you want to reply to this email, please click "reply-all" since the Spaceport
+inbox does not exist.
+
+If you've already paid, ignore this email.
+
+Spaceport
