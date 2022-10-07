@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import './light.css';
-import { Button, Checkbox, Dimmer, Form, Header, Icon, Image, Segment, Table } from 'semantic-ui-react';
+import { Button, Checkbox, Dimmer, Form, Message, Header, Icon, Image, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
 import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { TrainingList } from './Training.js';
@@ -220,12 +220,17 @@ export function AdminMemberCards(props) {
 		<div>
 			<Header size='medium'>Edit Member Cards</Header>
 
+			<Header size='small'>Add a Card</Header>
+
 			{result.member.photo_large ?
 				<p>
-					<Button onClick={(e) => getCardPhoto(e)}>Add a Card</Button>
+					<Button onClick={(e) => getCardPhoto(e)}>New Card</Button>
 				</p>
 			:
-				<p>No card image, member photo missing!</p>
+				<Message warning>
+					<Message.Header>Member photo missing!</Message.Header>
+					<p>Have the member upload a photo, then refresh this page.</p>
+				</Message>
 			}
 
 			{cardPhoto &&
@@ -234,7 +239,7 @@ export function AdminMemberCards(props) {
 						<Image rounded size='medium' src={cardPhoto} />
 					</p>
 
-					<Header size='small'>How to Print a Card</Header>
+					<Header size='small'>How to Add a Card</Header>
 					<ol>
 						<li>Right click on image > Save image as...</li>
 						<li>Right click on file > Print</li>
