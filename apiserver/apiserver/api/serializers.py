@@ -74,8 +74,8 @@ class TransactionSerializer(serializers.ModelSerializer):
     ], allow_null=True, required=False)
     number_of_membership_months = serializers.IntegerField(max_value=36, min_value=-36, default=0)
     recorder = serializers.SerializerMethodField()
-    amount = serializers.DecimalField(max_digits=None, decimal_places=2, default=0)
-    protocoin = serializers.DecimalField(max_digits=None, decimal_places=2, default=0)
+    amount = serializers.DecimalField(max_digits=7, decimal_places=2, default=0)
+    protocoin = serializers.DecimalField(max_digits=7, decimal_places=2, default=0)
 
     class Meta:
         model = models.Transaction
