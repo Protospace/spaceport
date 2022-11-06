@@ -1200,7 +1200,7 @@ class ProtocoinViewSet(Base):
                 except ValueError:
                     raise exceptions.ValidationError(dict(amount='Invalid number.'))
 
-                if amount < 1.00:
+                if amount < 0.25:
                     raise exceptions.ValidationError(dict(amount='Amount too small.'))
 
 
