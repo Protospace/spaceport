@@ -1250,6 +1250,54 @@ class ProtocoinViewSet(Base):
         return Response(res)
 
 
+class PinballViewSet(Base):
+    @action(detail=False, methods=['post'])
+    def score(self, request):
+        auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if secrets.PINBALL_API_TOKEN and auth_token != 'Bearer ' + secrets.PINBALL_API_TOKEN:
+            raise exceptions.PermissionDenied()
+
+        card_number = request.data.get('card_number', None)
+
+        if card_number:
+            card = get_object_or_404(models.Card, card_number=card_number)
+            user = card.user
+        else:
+            user = None
+
+        try:
+            game_id = int(request.data['game_id'])
+        except KeyError:
+            raise exceptions.ValidationError(dict(game_id='This field is required.'))
+        except ValueError:
+            raise exceptions.ValidationError(dict(game_id='Invalid number.'))
+
+        try:
+            player = int(request.data['player'])
+        except KeyError:
+            raise exceptions.ValidationError(dict(player='This field is required.'))
+        except ValueError:
+            raise exceptions.ValidationError(dict(player='Invalid number.'))
+
+        try:
+            score = int(request.data['score'])
+        except KeyError:
+            raise exceptions.ValidationError(dict(score='This field is required.'))
+        except ValueError:
+            raise exceptions.ValidationError(dict(score='Invalid number.'))
+
+        _ = models.PinballScore.objects.update_or_create(
+            game_id=game_id,
+            player=player,
+            defaults=dict(
+                user=user,
+                score=score,
+                finished_at=now(),
+            ),
+        )
+
+        return Response(200)
+
 class RegistrationView(RegisterView):
     serializer_class = serializers.MyRegisterSerializer
 

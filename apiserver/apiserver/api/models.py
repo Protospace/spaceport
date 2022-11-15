@@ -188,6 +188,18 @@ class Usage(models.Model):
 
     history = HistoricalRecords(excluded_fields=['num_reports'])
 
+class PinballScore(models.Model):
+    user = models.ForeignKey(User, related_name='scores', blank=True, null=True, on_delete=models.SET_NULL)
+
+    started_at = models.DateTimeField(auto_now_add=True)
+    finished_at = models.DateTimeField(null=True)
+
+    game_id = models.IntegerField()
+    player = models.IntegerField()
+    score = models.IntegerField()
+
+    # no history
+
 class HistoryIndex(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField()
