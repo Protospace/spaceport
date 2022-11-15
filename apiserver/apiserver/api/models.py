@@ -61,6 +61,10 @@ class Member(models.Model):
 
     history = HistoricalRecords(excluded_fields=['member_forms'])
 
+    MY_FIELDS = ['user', 'preferred_name', 'last_name', 'status']
+    def __str__(self):
+        return self.user.username
+
 class Transaction(models.Model):
     user = models.ForeignKey(User, related_name='transactions', blank=True, null=True, on_delete=models.SET_NULL)
     recorder = models.ForeignKey(User, related_name=IGNORE, blank=True, null=True, on_delete=models.SET_NULL)
@@ -85,6 +89,10 @@ class Transaction(models.Model):
 
     history = HistoricalRecords()
 
+    MY_FIELDS = ['date', 'user', 'amount', 'protocoin', 'account_type', 'category']
+    def __str__(self):
+        return '%s tx %s' % (user.username, date)
+
 class PayPalHint(models.Model):
     user = models.ForeignKey(User, related_name='paypal_hints', blank=True, null=True, on_delete=models.SET_NULL)
 
@@ -93,12 +101,20 @@ class PayPalHint(models.Model):
 
     history = HistoricalRecords()
 
+    MY_FIELDS = ['account', 'user']
+    def __str__(self):
+        return self.account
+
 class IPN(models.Model):
     datetime = models.DateTimeField(auto_now_add=True)
     data = models.TextField()
     status = models.CharField(max_length=32)
 
     history = HistoricalRecords()
+
+    MY_FIELDS = ['datetime', 'status']
+    def __str__(self):
+        return self.datetime
 
 class Card(models.Model):
     user = models.ForeignKey(User, related_name='cards', blank=True, null=True, on_delete=models.SET_NULL)
@@ -112,6 +128,10 @@ class Card(models.Model):
 
     history = HistoricalRecords(excluded_fields=['last_seen_at', 'last_seen'])
 
+    MY_FIELDS = ['card_number', 'user', 'last_seen']
+    def __str__(self):
+        return self.card_number
+
 class Course(models.Model):
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
@@ -119,6 +139,10 @@ class Course(models.Model):
     tags = models.CharField(max_length=128, blank=True)
 
     history = HistoricalRecords()
+
+    MY_FIELDS = ['name', 'id']
+    def __str__(self):
+        return self.name
 
 class Session(models.Model):
     instructor = models.ForeignKey(User, related_name='teaching', blank=True, null=True, on_delete=models.SET_NULL)
@@ -132,6 +156,10 @@ class Session(models.Model):
 
     history = HistoricalRecords()
 
+    MY_FIELDS = ['datetime', 'course', 'instructor']
+    def __str__(self):
+        return '%s @ %s' % (self.course.name, self.datetime)
+
 class Training(models.Model):
     user = models.ForeignKey(User, related_name='training', blank=True, null=True, on_delete=models.SET_NULL)
     session = models.ForeignKey(Session, related_name='students', blank=True, null=True, on_delete=models.SET_NULL)
@@ -143,11 +171,19 @@ class Training(models.Model):
 
     history = HistoricalRecords()
 
+    MY_FIELDS = ['session', 'user']
+    def __str__(self):
+        return '%s taking %s @ %s' % (self.user, self.session.course.name, self.session.datetime)
+
 class Interest(models.Model):
     user = models.ForeignKey(User, related_name='interests', null=True, on_delete=models.SET_NULL)
     course = models.ForeignKey(Course, related_name='interests', null=True, on_delete=models.SET_NULL)
 
     satisfied_by = models.ForeignKey(Session, related_name='satisfies', null=True, on_delete=models.SET_NULL)
+
+    MY_FIELDS = ['user', 'course', 'satisfied_by']
+    def __str__(self):
+        return '%s interested in %s' % (self.user, self.course)
 
 
 class MetaInfo(models.Model):
@@ -188,6 +224,10 @@ class Usage(models.Model):
 
     history = HistoricalRecords(excluded_fields=['num_reports'])
 
+    MY_FIELDS = ['started_at', 'finished_at', 'user', 'num_seconds', 'should_bill']
+    def __str__(self):
+        return self.started_at
+
 class PinballScore(models.Model):
     user = models.ForeignKey(User, related_name='scores', blank=True, null=True, on_delete=models.SET_NULL)
 
@@ -199,6 +239,10 @@ class PinballScore(models.Model):
     score = models.IntegerField()
 
     # no history
+
+    MY_FIELDS = ['started_at', 'game_id', 'player', 'score']
+    def __str__(self):
+        return self.started_at
 
 class HistoryIndex(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
@@ -216,9 +260,17 @@ class HistoryIndex(models.Model):
     is_system = models.BooleanField()
     is_admin = models.BooleanField()
 
+    MY_FIELDS = ['history_date', 'history_user', 'history_type', 'owner_name', 'object_name']
+    def __str__(self):
+        return '%s changed %s\'s %s' % (self.history_user, self.owner_name, self.object_name)
+
 class HistoryChange(models.Model):
     index = models.ForeignKey(HistoryIndex, related_name='changes', null=True, on_delete=models.SET_NULL)
 
     field = models.TextField()
     old = models.TextField()
     new = models.TextField()
+
+    MY_FIELDS = ['field', 'old', 'new', 'index']
+    def __str__(self):
+        return self.field

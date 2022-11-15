@@ -8,7 +8,14 @@ for model in app_models:
     if model._meta.model_name.startswith('historical'):
         continue
 
+    class MyAdmin(SimpleHistoryAdmin):
+        pass
+
     try:
-        admin.site.register(model, SimpleHistoryAdmin)
+        if hasattr(model, 'MY_FIELDS'):
+            MyAdmin.list_display = model.MY_FIELDS
+            MyAdmin.search_fields = model.MY_FIELDS
+
+        admin.site.register(model, MyAdmin)
     except AlreadyRegistered:
         pass
