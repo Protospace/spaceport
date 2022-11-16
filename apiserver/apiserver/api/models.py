@@ -248,7 +248,7 @@ class PinballScore(models.Model):
 
     MY_FIELDS = ['started_at', 'game_id', 'player', 'score']
     def __str__(self):
-        return self.started_at
+        return str(self.started_at)
 
 class HistoryIndex(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
