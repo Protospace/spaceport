@@ -183,6 +183,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 # hide info for non-vetted members so someone sitting
 # in our parking lot can't scrape all our info
 class OtherMemberSerializer(serializers.ModelSerializer):
+    pinball_score = serializers.IntegerField(required=False)
     last_name = serializers.SerializerMethodField()
 
     class Meta:
@@ -196,6 +197,7 @@ class OtherMemberSerializer(serializers.ModelSerializer):
             'application_date',
             'photo_small',
             'public_bio',
+            'pinball_score',
         ]
 
     def get_last_name(self, obj):
@@ -206,6 +208,8 @@ class OtherMemberSerializer(serializers.ModelSerializer):
 
 # vetted member viewing other members
 class VettedOtherMemberSerializer(serializers.ModelSerializer):
+    pinball_score = serializers.IntegerField(required=False)
+
     class Meta:
         model = models.Member
         fields = [
@@ -218,6 +222,7 @@ class VettedOtherMemberSerializer(serializers.ModelSerializer):
             'photo_small',
             'photo_large',
             'public_bio',
+            'pinball_score',
         ]
 
 

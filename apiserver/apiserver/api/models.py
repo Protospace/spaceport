@@ -246,7 +246,7 @@ class PinballScore(models.Model):
 
     # no history
 
-    MY_FIELDS = ['started_at', 'game_id', 'player', 'score']
+    MY_FIELDS = ['started_at', 'game_id', 'player', 'score', 'user']
     def __str__(self):
         return str(self.started_at)
 
