@@ -197,15 +197,21 @@ class StatsMemberCount(models.Model):
     vetted_count = models.IntegerField()
     subscriber_count = models.IntegerField()
 
+    MY_FIELDS = ['date', 'member_count', 'green_count', 'six_month_plus_count', 'vetted_count', 'subscriber_count']
+
 class StatsSignupCount(models.Model):
     month = models.DateField()
     signup_count = models.IntegerField()
     retain_count = models.IntegerField(default=0)
     vetted_count = models.IntegerField(default=0)
 
+    MY_FIELDS = ['month', 'signup_count', 'retain_count', 'vetted_count']
+
 class StatsSpaceActivity(models.Model):
     date = models.DateField(default=today_alberta_tz)
     card_scans = models.IntegerField()
+
+    MY_FIELDS = ['date', 'card_scans']
 
 class Usage(models.Model):
     user = models.ForeignKey(User, related_name='usages', blank=True, null=True, on_delete=models.SET_NULL)
