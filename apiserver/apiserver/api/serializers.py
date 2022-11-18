@@ -185,6 +185,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 class OtherMemberSerializer(serializers.ModelSerializer):
     pinball_score = serializers.IntegerField(required=False)
     last_name = serializers.SerializerMethodField()
+    storage = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Member
@@ -198,6 +199,7 @@ class OtherMemberSerializer(serializers.ModelSerializer):
             'photo_small',
             'public_bio',
             'pinball_score',
+            'storage',
         ]
 
     def get_last_name(self, obj):
@@ -206,9 +208,15 @@ class OtherMemberSerializer(serializers.ModelSerializer):
         else:
             return ''
 
+    def get_storage(self, obj):
+        serializer = SimpleStorageSpaceSerializer(data=obj.user.storage, many=True)
+        serializer.is_valid()
+        return serializer.data
+
 # vetted member viewing other members
 class VettedOtherMemberSerializer(serializers.ModelSerializer):
     pinball_score = serializers.IntegerField(required=False)
+    storage = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Member
@@ -223,7 +231,13 @@ class VettedOtherMemberSerializer(serializers.ModelSerializer):
             'photo_large',
             'public_bio',
             'pinball_score',
+            'storage',
         ]
+
+    def get_storage(self, obj):
+        serializer = StorageSpaceSerializer(data=obj.user.storage, many=True)
+        serializer.is_valid()
+        return serializer.data
 
 
 # member viewing his own details
@@ -499,6 +513,43 @@ class CardSerializer(serializers.ModelSerializer):
     def get_member_id(self, obj):
         if not obj.user: return None
         return obj.user.member.id
+
+
+class SimpleStorageSpaceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.StorageSpace
+        fields = '__all__'
+
+
+class StorageSpaceSerializer(serializers.ModelSerializer):
+    member = serializers.SerializerMethodField()
+    member_id = serializers.IntegerField(write_only=True, required=False)
+
+    class Meta:
+        model = models.StorageSpace
+        fields = '__all__'
+        read_only_fields = [
+            'id',
+            'shelf_id',
+            'location',
+        ]
+
+    def update(self, instance, validated_data):
+        member_id = self.initial_data.get('member_id', None)
+        if member_id:
+            member = get_object_or_404(models.Member, id=self.initial_data['member_id'])
+            validated_data['user'] = member.user
+        else:
+            validated_data['user'] = None
+
+        return super().update(instance, validated_data)
+
+    def get_member(self, obj):
+        if obj.user:
+            serializer = OtherMemberSerializer(obj.user.member)
+            return serializer.data
+        else:
+            return None
 
 
 class TrainingSerializer(serializers.ModelSerializer):

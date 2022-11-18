@@ -1050,6 +1050,7 @@ class UsageViewSet(Base):
 
         return response
 
+
 class InterestViewSet(Base, Retrieve, Create):
     permission_classes = [AllowMetadata | IsAuthenticated]
     queryset = models.Interest.objects.all()
@@ -1301,6 +1302,13 @@ class PinballViewSet(Base):
         )
 
         return Response(200)
+
+
+class StorageSpaceViewSet(Base, List, Retrieve, Update):
+    permission_classes = [AllowMetadata | IsAdmin]
+    queryset = models.StorageSpace.objects.all()
+    serializer_class = serializers.StorageSpaceSerializer
+
 
 class RegistrationView(RegisterView):
     serializer_class = serializers.MyRegisterSerializer

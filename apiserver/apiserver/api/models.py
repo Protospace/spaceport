@@ -250,6 +250,24 @@ class PinballScore(models.Model):
     def __str__(self):
         return str(self.started_at)
 
+class StorageSpace(models.Model):
+    user = models.ForeignKey(User, related_name='storage', blank=True, null=True, on_delete=models.SET_NULL)
+
+    shelf_id = models.TextField(unique=True)
+    location = models.TextField(choices=[
+        ('member_shelves', 'Member Shelves'),
+        ('lockers', 'Lockers'),
+        ('large_project_storage', 'Large Project Storage'),
+    ])
+    memo = models.TextField(blank=True)
+
+    history = HistoricalRecords()
+
+    MY_FIELDS = ['shelf_id', 'location', 'user', 'id']
+    def __str__(self):
+        return self.shelf_id
+
+
 class HistoryIndex(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField()
