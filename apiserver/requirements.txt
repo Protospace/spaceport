@@ -39,7 +39,7 @@ packaging==20.0
 parso==0.8.3
 pexpect==4.8.0
 pickleshare==0.7.5
-Pillow==8.3.2
+Pillow==9.3.0
 prompt-toolkit==3.0.29
 ptyprocess==0.7.0
 pycparser==2.19
