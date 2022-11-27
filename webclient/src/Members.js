@@ -235,7 +235,21 @@ export function Members(props) {
 											</>
 										:
 											<>
-												<Item.Description>Status: {x.member.status || 'Unknown'}</Item.Description>
+												<Item.Description>
+													Shelf: {x.member.storage.length ?
+														x.member.storage.map((x, i) =>
+															<Button
+																className='storage-button'
+																onClick={(e) => e.preventDefault()}
+																size='tiny'
+															>
+																{x.shelf_id}
+															</Button>
+														)
+													:
+														'None'
+													}
+												</Item.Description>
 												<Item.Description>Joined: {x.member.application_date || 'Unknown'}</Item.Description>
 											</>
 										}

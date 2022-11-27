@@ -765,6 +765,7 @@ class UserSerializer(serializers.ModelSerializer):
             'app_version',
             #'usages',
             'interests',
+            'storage',
         ]
         depth = 1
 
