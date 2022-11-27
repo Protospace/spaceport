@@ -616,9 +616,10 @@ class CourseDetailSerializer(serializers.ModelSerializer):
                         continue
                     yield date
 
-        def next_date(weekday, week_num=False):
+        def next_date(weekday, week_num=False, fake_start=False):
+            start = fake_start or utils.today_alberta_tz()
             for date in iter_matching_dates(weekday, week_num):
-                if date > utils.today_alberta_tz():
+                if date > start:
                     return date
             raise
 
@@ -639,9 +640,14 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             dt = utils.TIMEZONE_CALGARY.localize(dt)
             cost = 0
             max_students = None
-        elif obj.id == 317: # members' meeting 7:00 PM 3rd Thursday of odd months, Wednesday of even months
+        elif obj.id == 317:
+            # members' meeting 7:00 PM 3rd Thursday of odd months, Wednesday of even months
+            # but December's gets skipped
             next_month = next_date(calendar.WEDNESDAY, week_num=3).month
-            if next_month % 2 == 0:
+            if next_month == 12:
+                one_month_ahead = utils.today_alberta_tz() + datetime.timedelta(days=31)
+                date = next_date(calendar.THURSDAY, week_num=3, fake_start=one_month_ahead)
+            elif next_month % 2 == 0:
                 date = next_date(calendar.WEDNESDAY, week_num=3)
             else:
                 date = next_date(calendar.THURSDAY, week_num=3)
