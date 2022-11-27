@@ -430,6 +430,11 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             member = get_object_or_404(models.Member, id=data['member_id'])
             user = member.user
 
+            if user == session.instructor:
+                msg = 'Self-register trickery detected:\n' + str(data.dict())
+                utils.alert_tanner(msg)
+                raise exceptions.ValidationError(dict(non_field_errors='Can\'t register the instructor. Don\'t try to trick the portal.'))
+
             training1 = models.Training.objects.filter(user=user, session=session)
             if training1.exists():
                 raise exceptions.ValidationError(dict(non_field_errors='Already registered.'))
