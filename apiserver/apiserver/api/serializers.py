@@ -577,9 +577,22 @@ class SessionSerializer(serializers.ModelSerializer):
         else:
             return None
 
+    def create(self, validated_data):
+        if validated_data['datetime'] < now() - datetime.timedelta(days=2):
+            msg = 'Past class creation detected:\n' + str(validated_data)
+            utils.alert_tanner(msg)
+            raise ValidationError(dict(non_field_errors='Class can\'t be in the past.'))
+
+        return super().create(validated_data)
+
     def update(self, instance, validated_data):
         if not self.initial_data.get('instructor_id', None):
             raise ValidationError(dict(instructor_id='This field is required.'))
+
+        if validated_data['datetime'] < now() - datetime.timedelta(days=2):
+            msg = 'Past class modification detected:\n' + str(validated_data)
+            utils.alert_tanner(msg)
+            raise ValidationError(dict(non_field_errors='Can\'t modify past class.'))
 
         member = get_object_or_404(models.Member, id=self.initial_data['instructor_id'])
         if not (is_admin_director(member.user) or member.is_instructor):
