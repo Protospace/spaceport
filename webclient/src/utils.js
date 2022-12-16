@@ -30,6 +30,8 @@ export const statusColor = {
 	'Due': 'yellow',
 	'Overdue': 'red',
 	'Former Member': 'black',
+	'Paused Member': 'black',
+	'Expired Member': 'black',
 };
 
 export const BasicTable = (props) => (

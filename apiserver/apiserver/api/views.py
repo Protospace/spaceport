@@ -183,9 +183,13 @@ class MemberViewSet(Base, Retrieve, Update):
         if not is_admin_director(self.request.user):
             raise exceptions.PermissionDenied()
         member = self.get_object()
-        member.status = 'Former Member'
+        member.status = 'Paused Member'
         member.paused_date = utils.today_alberta_tz()
         member.save()
+
+        msg = 'Member has been paused: {} {}'.format(member.preferred_name, member.last_name)
+        utils.alert_tanner(msg)
+        logger.info(msg)
         return Response(200)
 
     @action(detail=True, methods=['post'])
