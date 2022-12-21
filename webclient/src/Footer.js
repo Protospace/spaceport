@@ -97,7 +97,7 @@ export const Footer = () => {
 					</a>
 				</p>
 
-				<p>© 2020 Calgary Protospace Ltd.</p>
+				<p>© 2020-{new Date().getFullYear()} Calgary Protospace Ltd.</p>
 			</Container>
 		</div>
 	);
