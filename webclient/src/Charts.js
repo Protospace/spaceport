@@ -310,7 +310,7 @@ export function Charts(props) {
 							<XAxis dataKey='date' minTickGap={10} />
 							<YAxis />
 							<CartesianGrid strokeDasharray='3 3'/>
-							<Tooltip />
+							<Tooltip labelFormatter={t => moment(t).format('YYYY-MM-DD ddd')} />
 							<Legend />
 
 							<Bar
