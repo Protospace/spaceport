@@ -65,8 +65,8 @@ function MemberInfo(props) {
 				<Message.Header>Welcome, new member!</Message.Header>
 				<p>
 					<a href={staticUrl + '/' + member.member_forms} target='_blank'>
-						Click here
-					</a> to view your application forms.
+						View your application forms.
+					</a>
 				</p>
 			</Message>}
 

@@ -49,9 +49,9 @@ export const Footer = () => {
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						Click here
+						View the source code and license on GitHub.
 					</a>{' '}
-					to view the source code and license.
+					
 				</p>
 
 				<p>

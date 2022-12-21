@@ -20,8 +20,8 @@ export function Cards(props) {
 			{user.member.card_photo ?
 				<p>
 					<a href={staticUrl + '/' + user.member.card_photo} target='_blank'>
-						Click here
-					</a> to view your card image.
+						View your card image.
+					</a>
 				</p>
 			:
 				<p>Upload a photo to generate a card image.</p>
