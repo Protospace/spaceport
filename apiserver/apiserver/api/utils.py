@@ -104,12 +104,19 @@ def tally_membership_months(member, fake_date=None):
     status = calc_member_status(expire_date, fake_date)
 
     if member.expire_date != expire_date or member.status != status:
+        previous_status = member.status
+
         member.expire_date = expire_date
         member.status = status
 
         if status == 'Expired Member':
             member.paused_date = today_alberta_tz()
             msg = 'Member has expired: {} {}'.format(member.preferred_name, member.last_name)
+            alert_tanner(msg)
+            logger.info(msg)
+
+        if status == 'Overdue' and previous_status == 'Due':
+            msg = 'Member has become Overdue: {} {}'.format(member.preferred_name, member.last_name)
             alert_tanner(msg)
             logger.info(msg)
 
