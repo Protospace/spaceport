@@ -23,8 +23,7 @@ import icalendar
 import datetime, time
 import io
 import csv
-
-import requests
+import xmltodict
 
 from . import models, serializers, utils, utils_paypal, utils_stats, utils_ldap, utils_email
 from .permissions import (
@@ -1257,6 +1256,128 @@ class ProtocoinViewSet(Base):
             transactions=serializer.data,
         )
         return Response(res)
+
+    @action(detail=False, methods=['post'])
+    def printer_report(self, request, pk=None):
+        try:
+            with transaction.atomic():
+                #auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+                #if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.VEND_API_TOKEN:
+                #    raise exceptions.PermissionDenied()
+
+                xml_start = len('XML_string=')
+                xml_string = request.body.decode()[xml_start:]
+                report_json = xmltodict.parse(xml_string)
+
+                jobs = report_json['xdm:Device']['xdm:Metrics']['xdm:JobHistory']['xdm:Job']
+                jobs.sort(key=lambda x: x['job:Job']['job:Processing']['pwg:DateTimeAtCreation'], reverse=True)
+
+                logging.info('Sorted %s jobs by creation date.', str(len(jobs)))
+
+                #import json
+                #print(json.dumps(jobs, indent=4))
+
+                # most recent job might be an automatic service job
+                # so iterate until we find a userIO job
+                for job in jobs:
+                    previous_job = job['job:Job']
+                    source = previous_job['job:Source'].get('dd:JobSource', None)
+                    if source == 'userIO': break
+
+                job_uuid = previous_job.get('dd:UUID', None)
+                username = previous_job['job:Source']['job:Client'].get('dd:UserName', None)
+
+                logging.info('New printer job UUID: %s, username: %s', str(job_uuid), str(username))
+
+                if not job_uuid:
+                    msg = 'Missing job UUID, aborting.'
+                    utils.alert_tanner(msg)
+                    logger.error(msg)
+                    return Response(200)
+
+                tx = models.Transaction.objects.filter(reference_number=job_uuid)
+                if tx.exists():
+                    msg = 'Job {}: already billed for in transaction {}, aborting.'.format(job_uuid, tx[0].id)
+                    utils.alert_tanner(msg)
+                    logger.error(msg)
+                    return Response(200)
+
+                if not username:
+                    msg = 'Job {}: missing username, aborting.'.format(job_uuid)
+                    utils.alert_tanner(msg)
+                    logger.error(msg)
+                    return Response(200)
+
+                is_completed = previous_job.get('dd:EndState', None) == 'Completed'
+                is_print = previous_job.get('dd:JobType', None) == 'print'
+
+                if not is_completed:
+                    msg = 'Job {} user {}: not complete, aborting.'.format(job_uuid, username)
+                    utils.alert_tanner(msg)
+                    logger.error(msg)
+                    return Response(200)
+
+                if not is_print:
+                    msg = 'Job {} user {}: not a print, aborting.'.format(job_uuid, username)
+                    utils.alert_tanner(msg)
+                    logger.error(msg)
+                    return Response(200)
+
+                try:
+                    user = User.objects.get(username__iexact=username)
+                except User.DoesNotExist:
+                    msg = 'Job {}: unable to find username {}, aborting.'.format(job_uuid, username)
+                    utils.alert_tanner(msg)
+                    logger.error(msg)
+                    return Response(200)
+
+                INK_PROTOCOIN_PER_ML = 0.20
+                PAPER_PROTOCOIN_PER_M = 0.25
+                PROTOCOIN_PER_PRINT = 2.0
+
+                total_cost = PROTOCOIN_PER_PRINT
+                logging.info('    Fixed cost: %s', str(PROTOCOIN_PER_PRINT))
+
+                counters = previous_job['job:Processing']['job:JobTotals']['count:Counter']
+
+                for counter in counters:
+                    if counter['dd:CounterTarget'] == 'inkUsed':
+                        microliters = float(counter['dd:ValueFloat'])
+                        millilitres = microliters / 1000.0
+                        cost = millilitres * INK_PROTOCOIN_PER_ML
+                        total_cost += cost
+                        logging.info('    %s ink cost: %s', counter['dd:MarkerColor'], str(cost))
+                    elif counter['dd:CounterTarget'] == 'mediaFed':
+                        squareinches = float(counter['dd:ValueFloat'])
+                        squaremetres = squareinches / 1550.0
+                        cost = squaremetres * PAPER_PROTOCOIN_PER_M
+                        total_cost += cost
+                        logging.info('    Paper cost: %s', str(cost))
+
+                total_cost = round(total_cost, 2)
+
+                logging.info('Total cost: %s protocoin', str(total_cost))
+
+                memo = 'Protocoin - Purchase spent ₱ {} on printing'.format(
+                    total_cost,
+                )
+
+                tx = models.Transaction.objects.create(
+                    user=user,
+                    protocoin=-total_cost,
+                    amount=0,
+                    number_of_membership_months=0,
+                    account_type='Protocoin',
+                    category='Consumables',
+                    info_source='System',
+                    reference_number=job_uuid,
+                    memo=memo,
+                )
+                utils.log_transaction(tx)
+
+                return Response(200)
+        except OperationalError:
+            self.printer_report(request, pk)
 
 
 class PinballViewSet(Base):
