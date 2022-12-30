@@ -196,11 +196,29 @@ class MemberViewSet(Base, Retrieve, Update):
     def unpause(self, request, pk=None):
         if not is_admin_director(self.request.user):
             raise exceptions.PermissionDenied()
+
+        today = utils.today_alberta_tz()
         member = self.get_object()
-        member.current_start_date = utils.today_alberta_tz()
+
+        difference = utils.today_alberta_tz() - member.paused_date
+        if difference.days > 370:  # give some leeway
+            logging.info('Member has been away for %s days (since %s), unvetting...', difference.days, member.paused_date)
+            member.vetted_date = None
+            member.orientation_date = None
+            member.lathe_cert_date = None
+            member.mill_cert_date = None
+            member.wood_cert_date = None
+            member.wood2_cert_date = None
+            member.tormach_cnc_cert_date = None
+            member.precix_cnc_cert_date = None
+            member.rabbit_cert_date = None
+            member.trotec_cert_date = None
+
+        member.current_start_date = today
         member.paused_date = None
         if not member.monthly_fees:
             member.monthly_fees = 55
+
         member.save()
         utils.tally_membership_months(member)
         utils.gen_member_forms(member)
@@ -560,6 +578,7 @@ class DoorViewSet(viewsets.ViewSet, List):
         for card in cards:
             member = card.user.member
             if member.paused_date: continue
+            if not member.vetted_date: continue
             if not member.is_allowed_entry: continue
 
             active_member_cards[card.card_number] = '{} ({})'.format(
