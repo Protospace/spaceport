@@ -1326,6 +1326,21 @@ class PinballViewSet(Base):
 
         return Response(200)
 
+    @action(detail=True, methods=['get'])
+    def get_name(self, request, pk=None):
+        auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if secrets.PINBALL_API_TOKEN and auth_token != 'Bearer ' + secrets.PINBALL_API_TOKEN:
+            raise exceptions.PermissionDenied()
+
+        card = get_object_or_404(models.Card, card_number=pk)
+        member = card.user.member
+
+        res = dict(
+            name=member.preferred_name + ' ' + member.last_name[0]
+        )
+        return Response(res)
+
+
 class RegistrationView(RegisterView):
     serializer_class = serializers.MyRegisterSerializer
 
