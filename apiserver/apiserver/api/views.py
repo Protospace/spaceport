@@ -780,7 +780,8 @@ class StatsViewSet(viewsets.ViewSet, List):
         if should_count:
             start_new_use = not last_use or last_use.finished_at or last_use.username != username
             if start_new_use:
-                if username_isfrom_track and time.time() - track[device]['time'] > 20*60:
+                username_isexpired = time.time() - track[device]['time'] > 2*60*60  # two hours
+                if username_isfrom_track and username_isexpired:
                     msg = 'Usage tracker problem expired username {} for device: {}'.format(username, device)
                     utils.alert_tanner(msg)
                     logger.error(msg)
