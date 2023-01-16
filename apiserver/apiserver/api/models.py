@@ -221,7 +221,7 @@ class Usage(models.Model):
     device = models.CharField(max_length=64)
     started_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True)
-    deleted_at = models.DateTimeField(null=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     num_seconds = models.IntegerField()
     num_reports = models.IntegerField()
@@ -232,7 +232,7 @@ class Usage(models.Model):
 
     MY_FIELDS = ['started_at', 'finished_at', 'user', 'num_seconds', 'should_bill']
     def __str__(self):
-        return self.started_at
+        return str(self.started_at)
 
 class PinballScore(models.Model):
     user = models.ForeignKey(User, related_name='scores', blank=True, null=True, on_delete=models.SET_NULL)

@@ -476,7 +476,10 @@ def gen_member_forms(member):
 def custom_exception_handler(exc, context):
     response = exception_handler(exc, context)
     if response is not None:
-        logging.warning('Response: %s', json.dumps(exc.detail))
+        if hasattr(exc, 'detail'):
+            logging.warning('Response: %s', json.dumps(exc.detail))
+        else:
+            logging.warning('Response: %s', exc)
     return response
 
 def log_transaction(tx):
