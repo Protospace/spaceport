@@ -11,6 +11,7 @@ import AbortController from 'abort-controller';
 const memberSorts = {
 	recently_vetted: 'Recently Vetted',
 	last_scanned: 'Last Scanned',
+	pinball_score: 'Pinball Score',
 	newest_active: 'Newest',
 	//newest_overall: 'Newest Overall',
 	oldest_active: 'Oldest',
@@ -227,8 +228,17 @@ export function Members(props) {
 											<Icon name='circle' color={statusColor[x.member.status]} />
 											{x.member.preferred_name} {x.member.last_name}
 										</Item.Header>
-										<Item.Description>Status: {x.member.status || 'Unknown'}</Item.Description>
-										<Item.Description>Joined: {x.member.application_date || 'Unknown'}</Item.Description>
+										{sort === 'pinball_score' ?
+											<>
+												<Item.Description>Score: {x.member.pinball_score || 'Unknown'}</Item.Description>
+												<Item.Description>Rank: {i === 0 ? 'Pinball Wizard' : 'Not the Pinball Wizard'}</Item.Description>
+											</>
+										:
+											<>
+												<Item.Description>Status: {x.member.status || 'Unknown'}</Item.Description>
+												<Item.Description>Joined: {x.member.application_date || 'Unknown'}</Item.Description>
+											</>
+										}
 										<Item.Description>ID: {x.member.id}</Item.Description>
 									</Item.Content>
 								</Item>

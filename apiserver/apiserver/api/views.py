@@ -132,6 +132,10 @@ class SearchViewSet(Base, Retrieve):
                     ).exclude(last_scanned__isnull=True).order_by('-last_scanned')
                 else:
                     queryset = []
+            elif sort == 'pinball_score':
+                queryset = queryset.annotate(
+                    pinball_score=Max('user__scores__score'),
+                ).exclude(pinball_score__isnull=True).order_by('-pinball_score')
             elif sort == 'everyone':
                 queryset = queryset.annotate(Count('user__transactions')).order_by('-user__transactions__count', 'id')
             elif sort == 'best_looking':
