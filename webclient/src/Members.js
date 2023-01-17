@@ -230,7 +230,7 @@ export function Members(props) {
 										</Item.Header>
 										{sort === 'pinball_score' ?
 											<>
-												<Item.Description>Score: {x.member.pinball_score || 'Unknown'}</Item.Description>
+												<Item.Description>Score: {x.member.pinball_score.toLocaleString() || 'Unknown'}</Item.Description>
 												<Item.Description>Rank: {i === 0 ? 'Pinball Wizard' : 'Not the Pinball Wizard'}</Item.Description>
 											</>
 										:
