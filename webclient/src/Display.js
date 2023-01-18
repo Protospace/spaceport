@@ -34,7 +34,9 @@ export function LCARS1Display(props) {
 					</p>
 				}
 
-				<div></div>
+				<div className='display-scores'>
+					<DisplayScores />
+				</div>
 
 				<div className='display-usage'>
 					<DisplayUsage token={token} name={'trotec'} />
@@ -71,17 +73,51 @@ export function DisplayUsage(props) {
 
 	return (
 		<>
+			<Header size='large'>Trotec Usage</Header>
+
 			{showUsage ?
 				<TrotecUsage usage={usage} />
 			:
-				<>
-					<Header size='medium'>Trotec Usage</Header>
-
-					<p className='stat'>
-						Waiting for job
-					</p>
-				</>
+				<p className='stat'>
+					Waiting for job
+				</p>
 			}
+		</>
+	);
+};
+
+export function DisplayScores(props) {
+	const { token, name } = props;
+	const [scores, setScores] = useState(false);
+
+	const getScores = () => {
+		requester('/pinball/high_scores/', 'GET')
+		.then(res => {
+			setScores(res);
+		})
+		.catch(err => {
+			console.log(err);
+			setScores(false);
+		});
+	};
+
+	useEffect(() => {
+		getScores();
+		const interval = setInterval(getScores, 60000);
+		return () => clearInterval(interval);
+	}, []);
+
+	return (
+		<>
+			<Header size='large'>Pinball High Scores</Header>
+
+			{scores && scores.map((x, i) =>
+				<div key={i}>
+					<Header size='medium'>#{i+1} — {x.name}.</Header>
+					<p>{x.score.toLocaleString()}</p>
+				</div>
+			)}
+
 		</>
 	);
 };

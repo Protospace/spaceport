@@ -179,15 +179,28 @@ body {
 	height: 100vh;
 	background-color: black;
 	color: white;
-	font-size: 1em;
+	font-size: 1.5em;
 }
 
 .display-usage {
 	border: 1px solid white;
 	padding: 0.5em;
 	align-self: flex-end;
-	width: 240px;
-	height: 383px;
+	width: 25vw;
+	height: 75vh;
+}
+
+.display-scores {
+	border: 1px solid white;
+	padding: 0.5em;
+	align-self: flex-end;
+	width: 25vw;
+	height: 75vh;
+}
+
+.display-scores p {
+	font-size: 1.5em;
+	text-align: right;
 }
 
 .usage {

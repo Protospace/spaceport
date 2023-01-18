@@ -1345,6 +1345,23 @@ class PinballViewSet(Base):
         )
         return Response(res)
 
+    @action(detail=False, methods=['get'])
+    def high_scores(self, request):
+        members = models.Member.objects.all()
+        members = members.annotate(
+            pinball_score=Max('user__scores__score'),
+        ).exclude(pinball_score__isnull=True).order_by('-pinball_score')[:5]
+
+        scores = []
+
+        for member in members:
+            scores.append(dict(
+                name=member.preferred_name + ' ' + member.last_name[0],
+                score=member.pinball_score,
+            ))
+
+        return Response(scores)
+
 
 class RegistrationView(RegisterView):
     serializer_class = serializers.MyRegisterSerializer
