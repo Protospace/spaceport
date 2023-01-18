@@ -69,7 +69,8 @@ export function DisplayUsage(props) {
 		return () => clearInterval(interval);
 	}, []);
 
-	const showUsage = usage && usage.track.username === usage.username;
+	const inUse = usage && moment().unix() - usage.track.time <= 60;
+	const showUsage = usage && inUse && usage.track.username === usage.username;
 
 	return (
 		<>
