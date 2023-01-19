@@ -63,7 +63,7 @@ class Member(models.Model):
 
     MY_FIELDS = ['user', 'preferred_name', 'last_name', 'status']
     def __str__(self):
-        return self.user.username
+        return getattr(self.user, 'username', 'None')
 
 class Transaction(models.Model):
     user = models.ForeignKey(User, related_name='transactions', blank=True, null=True, on_delete=models.SET_NULL)
