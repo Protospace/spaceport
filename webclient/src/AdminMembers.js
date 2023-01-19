@@ -373,7 +373,7 @@ export function AdminMemberPause(props) {
 							</p>
 							<p>
 								<Form.Checkbox
-									name='told_subscriptions'
+									name='told1'
 									value={told1}
 									label='Told member to get re-vetted'
 									required
@@ -382,7 +382,7 @@ export function AdminMemberPause(props) {
 							</p>
 							<p>
 								<Form.Checkbox
-									name='told_shelves'
+									name='told2'
 									value={told2}
 									label='Collected payment for member dues'
 									required
@@ -395,16 +395,45 @@ export function AdminMemberPause(props) {
 							</Button>
 						</>
 					:
-						<Button onClick={handleUnpause} loading={loading}>
-							Unpause
-						</Button>
+						result.member.status == 'Expired Member' ?
+							<>
+								<p>
+									{result.member.preferred_name} has expired due to lapse of payment.
+								</p>
+								<p>
+									<Form.Checkbox
+										name='told1'
+										value={told1}
+										label='Member has paid any back-dues owed'
+										required
+										onChange={(e, v) => setTold1(v.checked)}
+									/>
+								</p>
+								<p>
+									<Form.Checkbox
+										name='told2'
+										value={told2}
+										label='Recorded payment transaction on portal'
+										required
+										onChange={(e, v) => setTold2(v.checked)}
+									/>
+								</p>
+
+								<Button onClick={handleUnpause} loading={loading} disabled={!told1 || !told2}>
+									Unpause
+								</Button>
+							</>
+						:
+							<Button onClick={handleUnpause} loading={loading}>
+								Unpause
+							</Button>
 				:
 					<>
 						<p>Pause members who are inactive, former, or on vacation.</p>
 
 						<p>
 							<Form.Checkbox
-								name='told_subscriptions'
+								name='told1'
 								value={told1}
 								label='Told member to stop any PayPal subscriptions'
 								required
@@ -413,7 +442,7 @@ export function AdminMemberPause(props) {
 						</p>
 						<p>
 							<Form.Checkbox
-								name='told_shelves'
+								name='told2'
 								value={told2}
 								label='Told member to clear any shelves'
 								required
