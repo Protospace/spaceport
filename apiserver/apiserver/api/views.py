@@ -314,25 +314,28 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
             logging.info('Session is in the past or too soon, not sending interest emails.')
             return
 
-        interests = models.Interest.objects.filter(
-            course=session.course,
-            satisfied_by__isnull=True,
-            user__member__paused_date__isnull=True
-        )
+        with transaction.atomic():
+            interests = models.Interest.objects.filter(
+                course=session.course,
+                satisfied_by__isnull=True,
+                user__member__paused_date__isnull=True
+            )[:20]
 
-        for num, interest in enumerate(interests):
-            msg = 'Sending email {} / {}...'.format(num+1, len(interests))
-            if data['request_id']: utils_stats.set_progress(data['request_id'], msg, replace=True)
+            for num, interest in enumerate(interests):
+                msg = 'Sending email {} / {}...'.format(num+1, len(interests))
+                if data['request_id']: utils_stats.set_progress(data['request_id'], msg, replace=True)
 
-            try:
-                utils_email.send_interest_email(interest)
-            except BaseException as e:
-                msg = 'Problem sending interest email: ' + str(e)
-                logger.exception(msg)
-                utils.alert_tanner(msg)
+                try:
+                    utils_email.send_interest_email(interest)
+                except BaseException as e:
+                    msg = 'Problem sending interest email: ' + str(e)
+                    logger.exception(msg)
+                    utils.alert_tanner(msg)
 
-        num_satisfied = interests.update(satisfied_by=session)
-        logging.info('Satisfied %s interests.', num_satisfied)
+            interest_ids = interests.values('id')
+            num_satisfied = models.Interest.objects.filter(id__in=interest_ids).update(satisfied_by=session)
+
+            logging.info('Satisfied %s interests.', num_satisfied)
 
     def generate_ical(self, session):
         cal = icalendar.Calendar()
