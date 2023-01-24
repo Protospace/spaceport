@@ -114,7 +114,7 @@ export function DisplayScores(props) {
 
 			{scores && scores.map((x, i) =>
 				<div key={i}>
-					<Header size='medium'>#{i+1} — {x.name}.</Header>
+					<Header size='medium'>#{i+1} — {x.name}. {i === 0 ? '👑' : ''}</Header>
 					<p>{x.score.toLocaleString()}</p>
 				</div>
 			)}
