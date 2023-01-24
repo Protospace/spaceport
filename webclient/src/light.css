@@ -176,10 +176,19 @@ body {
 .display {
 	display: flex;
 	justify-content: space-between;
+	flex-direction: column;
 	height: 100vh;
 	background-color: black;
 	color: white;
 	font-size: 1.8em;
+}
+
+.display-row1 {
+}
+
+.display-row2 {
+	display: flex;
+	justify-content: space-between;
 }
 
 .display-usage {
@@ -202,6 +211,69 @@ body {
 	font-size: 1.5em;
 	text-align: right;
 }
+
+.display-sign {
+	border: 1px solid white;
+	align-self: flex-start;
+	width: 100vw;
+	height: 25vh;
+	font-size: 5rem;
+
+	padding-top: 1rem;
+}
+
+.marquee {
+	height: 100%;
+	overflow: hidden;
+	position: relative;
+}
+
+.marquee p {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	line-height: initial;
+	text-align: center;
+	-moz-transform: translateX(100%);
+	-webkit-transform: translateX(100%);
+	transform: translateX(100%);
+	-moz-animation: scroll-left 2s linear infinite;
+	-webkit-animation: scroll-left 2s linear infinite;
+	animation: scroll-left 20s linear infinite;
+}
+
+@-moz-keyframes scroll-left {
+	0% {
+		-moz-transform: translateX(100%);
+	}
+	100% {
+		-moz-transform: translateX(-100%);
+	}
+}
+
+@-webkit-keyframes scroll-left {
+	0% {
+		-webkit-transform: translateX(100%);
+	}
+	100% {
+		-webkit-transform: translateX(-100%);
+	}
+}
+
+@keyframes scroll-left {
+	0% {
+		-moz-transform: translateX(100%);
+		-webkit-transform: translateX(100%);
+		transform: translateX(100%);
+	}
+	100% {
+		-moz-transform: translateX(-100%);
+		-webkit-transform: translateX(-100%);
+		transform: translateX(-100%);
+	}
+}
+
 
 .usage {
 	height: 100vh;

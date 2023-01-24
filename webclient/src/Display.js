@@ -34,12 +34,20 @@ export function LCARS1Display(props) {
 					</p>
 				}
 
-				<div className='display-scores'>
-					<DisplayScores />
+				<div className='display-row1'>
+					<div className='display-sign'>
+						<DisplaySign />
+					</div>
 				</div>
 
-				<div className='display-usage'>
-					<DisplayUsage token={token} name={'trotec'} />
+				<div className='display-row2'>
+					<div className='display-scores'>
+						<DisplayScores />
+					</div>
+
+					<div className='display-usage'>
+						<DisplayUsage token={token} name={'trotec'} />
+					</div>
 				</div>
 			</div>
 		</Container>
@@ -83,6 +91,34 @@ export function DisplayUsage(props) {
 					Waiting for job
 				</p>
 			}
+		</>
+	);
+};
+
+export function DisplaySign(props) {
+	const { token, name } = props;
+	const [sign, setSign] = useState(false);
+
+	const getSign = () => {
+		requester('/stats/', 'GET')
+		.then(res => {
+			setSign(res.sign);
+		})
+		.catch(err => {
+			console.log(err);
+			setSign(false);
+		});
+	};
+
+	useEffect(() => {
+		getSign();
+		const interval = setInterval(getSign, 5000);
+		return () => clearInterval(interval);
+	}, []);
+
+	return (
+		<>
+			<div className='marquee'><p>{sign}</p></div>
 		</>
 	);
 };
