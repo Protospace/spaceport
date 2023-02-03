@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './light.css';
-import { Container, Checkbox, Form, Header, Segment } from 'semantic-ui-react';
+import { Container, Checkbox, Form, Header, Segment, Table } from 'semantic-ui-react';
 import * as Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
 import moment from 'moment';
@@ -42,12 +42,14 @@ export function AdminReportedTransactions(props) {
 };
 
 let transactionsCache = false;
+let summaryCache = false;
 let excludePayPalCache = false;
 
 export function AdminHistoricalTransactions(props) {
 	const { token } = props;
 	const [input, setInput] = useState({ month: moment() });
 	const [transactions, setTransactions] = useState(transactionsCache);
+	const [summary, setSummary] = useState(summaryCache);
 	const [excludePayPal, setExcludePayPal] = useState(excludePayPalCache);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(false);
@@ -75,6 +77,19 @@ export function AdminHistoricalTransactions(props) {
 			console.log(err);
 			setError(true);
 		});
+
+		requester('/transactions/summary/?month=' + month, 'GET', token)
+		.then(res => {
+			setLoading(false);
+			setError(false);
+			setSummary(res);
+			summaryCache = res;
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+			setError(true);
+		});
 	};
 
 	return (
@@ -96,10 +111,40 @@ export function AdminHistoricalTransactions(props) {
 					</Form.Button>
 				</Form.Group>
 			</Form>
+			{transactions && <p>Found {transactions.length} transactions.</p>}
+
+			{!error ?
+				summary && <div>
+					<Header size='small'>Summary</Header>
+
+					<Table basic='very'>
+						<Table.Header>
+							<Table.Row>
+								<Table.HeaderCell>Category</Table.HeaderCell>
+								<Table.HeaderCell>Dollar</Table.HeaderCell>
+								<Table.HeaderCell>Protocoin</Table.HeaderCell>
+							</Table.Row>
+						</Table.Header>
+
+						<Table.Body>
+							{summary.map(x =>
+								<Table.Row key={x.category}>
+									<Table.Cell>{x.category}</Table.Cell>
+									<Table.Cell>{'$ ' + x.dollar.toFixed(2)}</Table.Cell>
+									<Table.Cell>{'₱ ' + x.protocoin.toFixed(2)}</Table.Cell>
+								</Table.Row>
+							)}
+						</Table.Body>
+					</Table>
+				</div>
+			:
+				<p>Error loading summary.</p>
+			}
+
+			<p/>
 
 			{!error ?
 				transactions && <div>
-					<p>Found {transactions.length} transactions.</p>
 					{!!transactions.length &&
 						<Header size='small'>{moment(transactions[0].date, 'YYYY-MM-DD').format('MMMM YYYY')} Transactions</Header>
 					}

@@ -557,6 +557,31 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
         transaction.save()
         return Response(200)
 
+    @action(detail=False, methods=['get'])
+    def summary(self, request):
+        txs = models.Transaction.objects
+        month = self.request.query_params.get('month', '')
+
+        try:
+            dt = datetime.datetime.strptime(month, '%Y-%m')
+        except ValueError:
+            raise exceptions.ValidationError(dict(month='Should be YYYY-MM.'))
+
+        txs = txs.filter(date__year=dt.year)
+        txs = txs.filter(date__month=dt.month)
+        txs = txs.exclude(category='Memberships:Fake Months')
+
+        result = []
+
+        for category in ['Membership', 'Snacks', 'OnAcct', 'Donation', 'Consumables', 'Purchases']:
+            result.append(dict(
+                category = category,
+                dollar = txs.filter(category=category).aggregate(Sum('amount'))['amount__sum'] or 0,
+                protocoin = -1 * (txs.filter(category=category).aggregate(Sum('protocoin'))['protocoin__sum'] or 0),
+            ))
+
+        return Response(result)
+
 
 class UserView(views.APIView):
     permission_classes = [AllowMetadata | IsAuthenticated]
