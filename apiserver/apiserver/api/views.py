@@ -1242,6 +1242,8 @@ class ProtocoinViewSet(Base):
                 source_card = get_object_or_404(models.Card, card_number=pk)
                 source_user = source_card.user
 
+                machine = request.data.get('machine', 'unknown')
+
                 try:
                     number = request.data['number']
                 except KeyError:
@@ -1276,8 +1278,9 @@ class ProtocoinViewSet(Base):
 
                 source_delta = -amount
 
-                memo = 'Protocoin - Purchase spent ₱ {} on vending machine item #{}'.format(
+                memo = 'Protocoin - Purchase spent ₱ {} on {} vending machine item #{}'.format(
                     amount,
+                    machine,
                     number,
                 )
 
