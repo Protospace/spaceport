@@ -24,9 +24,6 @@ class LoggingThrottle(throttling.BaseThrottle):
             return True
         elif path == '/sessions/' and user == None:
             return True
-        elif path == '/protocoin/printer_report/':
-            logging.info('%s %s | User: %s | Data: [XML]', method, path, user)
-            return True
 
         if request.data:
             if type(request.data) is not dict:

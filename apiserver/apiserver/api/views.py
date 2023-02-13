@@ -1285,27 +1285,11 @@ class ProtocoinViewSet(Base):
                 #if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.VEND_API_TOKEN:
                 #    raise exceptions.PermissionDenied()
 
-                xml_start = len('XML_string=')
-                xml_string = request.body.decode()[xml_start:]
-                report_json = xmltodict.parse(xml_string)
+                # {'job_name': 'download.png', 'uuid': '6abbad4d-dda3-4954-b4f1-ac77933a0562', 'timestamp': '20230211173624',
+                # 'job_status': '0', 'user_name': 'Tanner.Collin', 'source': '1', 'paper_name': 'Plain Paper', 'paper_sqi': '356', 'ink_ul': '54'}
 
-                jobs = report_json['xdm:Device']['xdm:Metrics']['xdm:JobHistory']['xdm:Job']
-                jobs.sort(key=lambda x: x['job:Job']['job:Processing']['pwg:DateTimeAtCreation'], reverse=True)
-
-                logging.info('Sorted %s jobs by creation date.', str(len(jobs)))
-
-                #import json
-                #print(json.dumps(jobs, indent=4))
-
-                # most recent job might be an automatic service job
-                # so iterate until we find a userIO job
-                for job in jobs:
-                    previous_job = job['job:Job']
-                    source = previous_job['job:Source'].get('dd:JobSource', None)
-                    if source == 'userIO': break
-
-                job_uuid = previous_job.get('dd:UUID', None)
-                username = previous_job['job:Source']['job:Client'].get('dd:UserName', None)
+                job_uuid = request.data['uuid']
+                username = request.data['user_name']
 
                 logging.info('New printer job UUID: %s, username: %s', str(job_uuid), str(username))
 
@@ -1328,8 +1312,8 @@ class ProtocoinViewSet(Base):
                     logger.error(msg)
                     return Response(200)
 
-                is_completed = previous_job.get('dd:EndState', None) == 'Completed'
-                is_print = previous_job.get('dd:JobType', None) == 'print'
+                is_completed = request.data['job_status'] == '0'
+                is_print = request.data['source'] == '1'
 
                 if not is_completed:
                     msg = 'Job {} user {}: not complete, aborting.'.format(job_uuid, username)
@@ -1352,34 +1336,35 @@ class ProtocoinViewSet(Base):
                     return Response(200)
 
                 INK_PROTOCOIN_PER_ML = 0.20
-                PAPER_PROTOCOIN_PER_M = 0.25
+                DEFAULT_PAPER_PROTOCOIN_PER_M = 0.25
                 PROTOCOIN_PER_PRINT = 2.0
 
                 total_cost = PROTOCOIN_PER_PRINT
                 logging.info('    Fixed cost: %s', str(PROTOCOIN_PER_PRINT))
 
-                counters = previous_job['job:Processing']['job:JobTotals']['count:Counter']
+                microliters = float(request.data['ink_ul'])
+                millilitres = microliters / 1000.0
+                cost = millilitres * INK_PROTOCOIN_PER_ML
+                total_cost += cost
+                logging.info('    %s ul ink cost: %s', str(microliters), str(cost))
 
-                for counter in counters:
-                    if counter['dd:CounterTarget'] == 'inkUsed':
-                        microliters = float(counter['dd:ValueFloat'])
-                        millilitres = microliters / 1000.0
-                        cost = millilitres * INK_PROTOCOIN_PER_ML
-                        total_cost += cost
-                        logging.info('    %s ink cost: %s', counter['dd:MarkerColor'], str(cost))
-                    elif counter['dd:CounterTarget'] == 'mediaFed':
-                        squareinches = float(counter['dd:ValueFloat'])
-                        squaremetres = squareinches / 1550.0
-                        cost = squaremetres * PAPER_PROTOCOIN_PER_M
-                        total_cost += cost
-                        logging.info('    Paper cost: %s', str(cost))
+                PAPER_COSTS = {
+                    'Plain Paper': 0.25,
+                }
+
+                squareinches = float(request.data['paper_sqi'])
+                squaremetres = squareinches / 1550.0
+                cost = squaremetres * PAPER_COSTS.get(request.data['paper_name'], DEFAULT_PAPER_PROTOCOIN_PER_M)
+                total_cost += cost
+                logging.info('    %s sqi paper cost: %s', str(squareinches), str(cost))
 
                 total_cost = round(total_cost, 2)
 
                 logging.info('Total cost: %s protocoin', str(total_cost))
 
-                memo = 'Protocoin - Purchase spent ₱ {} on printing'.format(
+                memo = 'Protocoin - Purchase spent ₱ {} printing {}'.format(
                     total_cost,
+                    request.data['job_name'],
                 )
 
                 tx = models.Transaction.objects.create(
