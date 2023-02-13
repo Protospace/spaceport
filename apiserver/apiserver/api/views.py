@@ -1312,6 +1312,9 @@ class ProtocoinViewSet(Base):
                     logger.error(msg)
                     return Response(200)
 
+                # status 0 = complete
+                # status 3 = cancelled
+
                 is_completed = request.data['job_status'] == '0'
                 is_print = request.data['source'] == '1'
 
@@ -1335,8 +1338,8 @@ class ProtocoinViewSet(Base):
                     logger.error(msg)
                     return Response(200)
 
-                INK_PROTOCOIN_PER_ML = 0.20
-                DEFAULT_PAPER_PROTOCOIN_PER_M = 0.25
+                INK_PROTOCOIN_PER_ML = 0.75
+                DEFAULT_PAPER_PROTOCOIN_PER_M = 0.50
                 PROTOCOIN_PER_PRINT = 2.0
 
                 total_cost = PROTOCOIN_PER_PRINT
