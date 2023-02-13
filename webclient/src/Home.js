@@ -22,6 +22,11 @@ function MemberInfo(props) {
 
 	return (
 		<div>
+			{member.protocoin < 0 && <Message error>
+				<Message.Header>Your Protocoin balance is negative!</Message.Header>
+				<p>Visit the <Link to='/paymaster'>Paymaster</Link> page or pay a Director to buy Protocoin.</p>
+			</Message>}
+
 			<Grid stackable>
 				<Grid.Column width={5}>
 					<Image
@@ -231,9 +236,11 @@ export function Home(props) {
 	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').fromNow() : '';
 	const getTrackName = (x) => stats && stats.track && stats.track[x] && stats.track[x]['first_name'] ? stats.track[x]['first_name'] : 'Unknown';
 
-	const alarmStat = () => stats && stats.alarm && moment().unix() - stats.alarm['time'] < 300 ? stats.alarm['data'] < 270 ? 'Armed' : 'Disarmed' : 'Unknown';
+	//const alarmStat = () => stats && stats.alarm && moment().unix() - stats.alarm['time'] < 300 ? stats.alarm['data'] < 270 ? 'Armed' : 'Disarmed' : 'Unknown';
+	const alarmStat = () => 'Unknown';
 
-	const doorOpenStat = () => alarmStat() === 'Disarmed' && stats.alarm['data'] > 360 ? ', door open' : '';
+	//const doorOpenStat = () => alarmStat() === 'Disarmed' && stats.alarm['data'] > 360 ? ', door open' : '';
+	const doorOpenStat = () => '';
 
 	const show_signup = stats?.at_protospace;
 
