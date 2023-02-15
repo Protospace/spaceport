@@ -1490,7 +1490,7 @@ class PinballViewSet(Base):
         members = models.Member.objects.all()
         members = members.annotate(
             pinball_score=Max('user__scores__score'),
-        ).exclude(pinball_score__isnull=True).order_by('-pinball_score')[:5]
+        ).exclude(pinball_score__isnull=True).order_by('-pinball_score')
 
         scores = []
 
@@ -1498,6 +1498,7 @@ class PinballViewSet(Base):
             scores.append(dict(
                 name=member.preferred_name + ' ' + member.last_name[0],
                 score=member.pinball_score,
+                member_id=member.id,
             ))
 
         return Response(scores)

@@ -112,7 +112,7 @@ export function DisplayScores(props) {
 		<>
 			<Header size='large'>Pinball High Scores</Header>
 
-			{scores && scores.map((x, i) =>
+			{scores && scores.slice(0, 5).map((x, i) =>
 				<div key={i}>
 					<Header size='medium'>#{i+1} — {x.name}. {i === 0 ? '👑' : ''}</Header>
 					<p>{x.score.toLocaleString()}</p>
