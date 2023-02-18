@@ -676,6 +676,18 @@ class IpnView(views.APIView):
         return Response(200)
 
 
+class SquareView(views.APIView):
+    def post(self, request):
+        try:
+            import json
+            logging.info('Square Webhook message:\n%s', json.dumps(request.data, indent=4))
+        except BaseException as e:
+            logger.error('Square route - {} - {}'.format(e.__class__.__name__, str(e)))
+            return HttpResponseServerError()
+
+        return Response(200)
+
+
 class StatsViewSet(viewsets.ViewSet, List):
     def list(self, request):
         stats_keys = utils_stats.DEFAULTS.keys()
@@ -1496,9 +1508,9 @@ class PinballViewSet(Base):
 
         for member in members:
             scores.append(dict(
+                member_id=member.id,
                 name=member.preferred_name + ' ' + member.last_name[0],
                 score=member.pinball_score,
-                member_id=member.id,
             ))
 
         return Response(scores)

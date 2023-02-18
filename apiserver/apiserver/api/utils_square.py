@@ -14,104 +14,6 @@ from django.utils.timezone import now
 from . import models, serializers, utils
 from .. import settings
 
-SANDBOX = False
-if SANDBOX:
-    VERIFY_URL = 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr'
-    OUR_EMAIL = 'seller@paypalsandbox.com'
-    OUR_CURRENCY = 'USD'
-else:
-    VERIFY_URL = 'https://ipnpb.paypal.com/cgi-bin/webscr'
-    OUR_EMAIL = 'paypal@protospace.ca'
-    OUR_CURRENCY = 'CAD'
-
-def parse_paypal_date(string):
-    '''
-    Convert paypal date string into python datetime. PayPal's a bunch of idiots.
-    Their API returns dates in some custom format, so we have to parse it.
-
-    Stolen from:
-    https://github.com/spookylukey/django-paypal/blob/master/paypal/standard/forms.py
-
-    Return the UTC python datetime.
-    '''
-    MONTHS = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
-        'Sep', 'Oct', 'Nov', 'Dec',
-    ]
-
-    if not string: return now()
-
-    value = string.strip()
-    try:
-        time_part, month_part, day_part, year_part, zone_part = value.split()
-        month_part = month_part.strip('.')
-        day_part = day_part.strip(',')
-        month = MONTHS.index(month_part) + 1
-        day = int(day_part)
-        year = int(year_part)
-        hour, minute, second = map(int, time_part.split(':'))
-        dt = datetime.datetime(year, month, day, hour, minute, second)
-    except ValueError as e:
-        raise ValidationError('Invalid date format {} {}'.format(
-            value, str(e)
-        ))
-
-    if zone_part in ['PDT', 'PST']:
-        # PST/PDT is 'US/Pacific' and ignored, localize only cares about date
-        dt = timezone.pytz.timezone('US/Pacific').localize(dt)
-        dt = dt.astimezone(timezone.pytz.UTC)
-    else:
-        raise ValidationError('Bad timezone: ' + zone_part)
-    return dt
-
-def record_ipn(data):
-    '''
-    Record each individual IPN (even dupes) for logging and debugging
-    '''
-    return models.IPN.objects.create(
-        data=data.urlencode(),
-        status='New',
-    )
-
-def update_ipn(ipn, status):
-    ipn.status = status
-    ipn.save()
-
-def verify_paypal_ipn(data):
-    if settings.DEBUG:
-        return True
-
-    params = data.copy()
-    params['cmd'] = '_notify-validate'
-    headers = {
-        'content-type': 'application/x-www-form-urlencoded',
-        'user-agent': 'spaceport',
-    }
-
-    try:
-        r = requests.post(VERIFY_URL, params=params, headers=headers, timeout=4)
-        r.raise_for_status()
-        logger.info('Result: ' + r.text)
-        if r.text == 'VERIFIED':
-            return True
-    except BaseException as e:
-        logger.error('IPN verify - {} - {}'.format(e.__class__.__name__, str(e)))
-
-    logger.info('IPN - verification failed, retrying...')
-
-    try:
-        r = requests.post(VERIFY_URL, params=params, headers=headers, timeout=4)
-        r.raise_for_status()
-        logger.info('Result: ' + r.text)
-        if r.text == 'VERIFIED':
-            return True
-    except BaseException as e:
-        logger.error('IPN verify - {} - {}'.format(e.__class__.__name__, str(e)))
-
-    utils.alert_tanner('IPN failed to verify:\n\n' + str(data.dict()))
-
-    return False
-
 def build_tx(data):
     amount = float(data.get('mc_gross', 0))
     return dict(
@@ -286,53 +188,73 @@ def create_category_tx(data, member, custom_json, amount):
     return tx
 
 
-def process_paypal_ipn(data):
+def process_square_webhook(data):
     '''
-    Receive IPN from PayPal, then verify it. If it's good, try to associate it
-    with a member. If the value is a multiple of member dues, credit that many
-    months of membership. Ignore if payment incomplete or duplicate IPN.
+    Receive webhook data from Square.
 
-    Blocks the IPN POST response, so keep it quick.
+    Blocks the POST response, so keep it quick.
     '''
-    ipn = record_ipn(data)
 
-    if verify_paypal_ipn(data):
-        logger.info('IPN - verified')
-    else:
-        logger.error('IPN - verification failed')
-        update_ipn(ipn, 'Verification Failed')
+    amount = data['total_money']['amount'] / 100.0
+
+    if data['total_money']['currency'] != 'CAD':
+        logger.info('Square - Payment currency invalid, ignoring')
         return False
 
-    amount = float(data.get('mc_gross', '0'))
-
-    if data.get('payment_status', 'unknown') != 'Completed':
-        logger.info('IPN - Payment not yet completed, ignoring')
-        update_ipn(ipn, 'Payment Incomplete')
+    if data['state'] != 'COMPLETED':
+        logger.info('Square - Payment not yet completed, ignoring')
         return False
 
-    if data.get('receiver_email', 'unknown') != OUR_EMAIL:
-        logger.info('IPN - Payment not for us, ignoring')
-        update_ipn(ipn, 'Invalid Receiver')
-        return False
-
-    if data.get('mc_currency', 'unknown') != OUR_CURRENCY:
-        logger.info('IPN - Payment currency invalid, ignoring')
-        update_ipn(ipn, 'Invalid Currency')
+    if data['location_id'] != 'XR9TVNPEJ44GR':
+        logger.info('Square - Payment not for us, ignoring')
         return False
 
     transactions = models.Transaction.objects
     members = models.Member.objects
     hints = models.PayPalHint.objects
+    user = False
 
-    if 'txn_id' not in data:
-        logger.info('IPN - Missing transaction ID, ignoring')
-        update_ipn(ipn, 'Missing ID')
+    dt = datetime.datetime.strptime(data['created_at'], '%Y-%m-%dT%H:%M:%SZ')
+    dt = dt.replace(tzinfo=timezone.utc)
+
+    if transactions.filter(square_txn_id=data['id']).exists():
+        logger.info('Square - Duplicate transaction, ignoring')
         return False
 
-    if transactions.filter(paypal_txn_id=data['txn_id']).exists():
-        logger.info('IPN - Duplicate transaction, ignoring')
-        update_ipn(ipn, 'Duplicate')
-        return False
+    try:
+        customer_id = data['tenders'][0].get('customer_id', None)
+        user = hints.get(account=customer_id).user
+    except models.PayPalHint.DoesNotExist:
+        logger.info('Square - No payment hint found for %s', customer_id)
+
+    tx = dict(
+        account_type='Square Pmt',
+        amount=amount,
+        date=dt,
+        info_source='Square Webhook',
+        payment_method='N/A'
+        square_payer_id=customer_id,
+        square_txn_id=data['id'],
+        reference_number=data['id'],
+    )
+
+
+
+
+
+
+
+
+    if not user:
+        logger.info('IPN - Unable to associate with member, reporting')
+        update_ipn(ipn, 'Accepted, Unmatched Member')
+        return create_unmatched_member_tx(data)
+
+
+
+
+
+
 
     try:
         custom_json = json.loads(data.get('custom', '').replace('`', '"'))
@@ -349,25 +271,6 @@ def process_paypal_ipn(data):
                 defaults=dict(user=tx.user),
             )
             return tx
-
-    user = False
-
-    try:
-        user = hints.get(account=data['payer_id']).user
-    except models.PayPalHint.DoesNotExist:
-        logger.info('IPN - No PayPalHint found for %s', data['payer_id'])
-
-    if not user and 'member' in custom_json:
-        member_id = custom_json['member']
-        try:
-            user = members.get(id=member_id).user
-        except models.Member.DoesNotExist:
-            pass
-
-    if not user:
-        logger.info('IPN - Unable to associate with member, reporting')
-        update_ipn(ipn, 'Accepted, Unmatched Member')
-        return create_unmatched_member_tx(data)
 
     member = user.member
 

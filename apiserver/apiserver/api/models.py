@@ -82,6 +82,8 @@ class Transaction(models.Model):
     paypal_txn_id = models.CharField(max_length=17, blank=True, null=True, unique=True)
     paypal_txn_type = models.CharField(max_length=64, blank=True, null=True)
     paypal_payer_id = models.CharField(max_length=13, blank=True, null=True)
+    square_txn_id = models.CharField(max_length=30, blank=True, null=True, unique=True)
+    square_payer_id = models.CharField(max_length=30, blank=True, null=True)
     protocoin = models.DecimalField(max_digits=7, decimal_places=2, default=0)
 
     report_type = models.TextField(blank=True, null=True)
@@ -96,7 +98,7 @@ class Transaction(models.Model):
 class PayPalHint(models.Model):
     user = models.ForeignKey(User, related_name='paypal_hints', blank=True, null=True, on_delete=models.SET_NULL)
 
-    account = models.CharField(unique=True, max_length=13)
+    account = models.CharField(unique=True, max_length=30)
     member_id = models.IntegerField(null=True)
 
     history = HistoricalRecords()

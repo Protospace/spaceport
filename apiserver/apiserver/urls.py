@@ -51,6 +51,10 @@ if secrets.IPN_RANDOM:
     IPN_ROUTE = r'^ipn/{}/'.format(secrets.IPN_RANDOM)
     urlpatterns.append(url(IPN_ROUTE, views.IpnView.as_view(), name='ipn'))
 
+if secrets.SQUARE_RANDOM:
+    SQUARE_ROUTE = r'^square/{}/'.format(secrets.SQUARE_RANDOM)
+    urlpatterns.append(url(SQUARE_ROUTE, views.SquareView.as_view(), name='square'))
+
 if secrets.ADMIN_RANDOM:
     ADMIN_ROUTE = '{}/admin/'.format(secrets.ADMIN_RANDOM)
 else:
