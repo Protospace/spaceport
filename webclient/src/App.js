@@ -99,6 +99,7 @@ function App() {
 			buttonColorDark: '#666',
 			buttonColorLight: '#aaa',
 			label: '🌙',
+			autoMatchOsTheme: false,
 		}
 		const darkmode = new Darkmode(options);
 		darkmode.showWidget();
