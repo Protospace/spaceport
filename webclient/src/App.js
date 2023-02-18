@@ -98,7 +98,7 @@ function App() {
 			right: '16px',
 			buttonColorDark: '#666',
 			buttonColorLight: '#aaa',
-			label: '🌙',
+			label: '🌓',
 			autoMatchOsTheme: false,
 		}
 		const darkmode = new Darkmode(options);
