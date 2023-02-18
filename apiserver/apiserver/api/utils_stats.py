@@ -28,6 +28,7 @@ DEFAULTS = {
     'sign': '',
     'link': '',
     'autoscan': '',
+    'last_scan': {},
 }
 
 if secrets.MUMBLE:

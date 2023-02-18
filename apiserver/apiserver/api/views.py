@@ -629,6 +629,12 @@ class DoorViewSet(viewsets.ViewSet, List):
         t = utils.now_alberta_tz().strftime('%Y-%m-%d %H:%M:%S, %a %I:%M %p')
         logger.info('Scan - Time: {} | Name: {} {} ({})'.format(t, member.preferred_name, member.last_name, member.id))
 
+        last_scan = dict(
+            time=time.time(),
+            member_id=member.id,
+        )
+        cache.set('last_scan', last_scan)
+
         utils_stats.calc_card_scans()
 
         return Response(200)
