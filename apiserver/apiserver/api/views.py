@@ -1236,6 +1236,38 @@ class ProtocoinViewSet(Base):
         )
         return Response(res)
 
+    @action(detail=False, methods=['get'])
+    def printer_balance(self, request, pk=None):
+        #auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        #if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.VEND_API_TOKEN:
+        #    raise exceptions.PermissionDenied()
+
+        track = cache.get('track', {})
+        track_graphics_computer = track.get('PROTOGRAPH1', None)
+
+        if not track_graphics_computer:
+            return Response(200)
+
+        track_username = track_graphics_computer['username']
+        track_time = track_graphics_computer['time']
+
+        try:
+            source_user = User.objects.get(username__iexact=track_username)
+        except User.DoesNotExist:
+            return Response(200)
+
+        if time.time() - track_time > 10:
+            return Response(200)
+
+        user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
+        user_balance = float(user_balance)
+
+        res = dict(
+            balance=user_balance,
+            first_name=source_user.member.preferred_name,
+        )
+        return Response(res)
+
     @action(detail=True, methods=['post'])
     def card_vend_request(self, request, pk=None):
         try:
