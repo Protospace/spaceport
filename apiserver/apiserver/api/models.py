@@ -250,6 +250,19 @@ class PinballScore(models.Model):
     def __str__(self):
         return str(self.started_at)
 
+class Hosting(models.Model):
+    user = models.ForeignKey(User, related_name='hosting', blank=True, null=True, on_delete=models.SET_NULL)
+
+    started_at = models.DateTimeField(auto_now_add=True)
+    finished_at = models.DateTimeField()
+    hours = models.DecimalField(max_digits=5, decimal_places=2)
+
+    # no history
+
+    MY_FIELDS = ['started_at', 'hours', 'finished_at', 'user']
+    def __str__(self):
+        return str(self.started_at)
+
 class HistoryIndex(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField()
