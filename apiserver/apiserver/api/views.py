@@ -632,6 +632,7 @@ class DoorViewSet(viewsets.ViewSet, List):
         last_scan = dict(
             time=time.time(),
             member_id=member.id,
+            first_name=member.preferred_name,
         )
         cache.set('last_scan', last_scan)
 
