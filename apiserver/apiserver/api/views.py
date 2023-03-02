@@ -631,6 +631,7 @@ class DoorViewSet(viewsets.ViewSet, List):
         last_scan = dict(
             time=time.time(),
             member_id=member.id,
+            first_name=member.preferred_name,
         )
         cache.set('last_scan', last_scan)
 
@@ -1539,6 +1540,72 @@ class PinballViewSet(Base):
             ))
 
         return Response(scores)
+
+
+class HostingViewSet(Base):
+    @action(detail=False, methods=['post'])
+    def offer(self, request):
+        #auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        #if secrets.PINBALL_API_TOKEN and auth_token != 'Bearer ' + secrets.PINBALL_API_TOKEN:
+        #    raise exceptions.PermissionDenied()
+
+        try:
+            member_id = int(request.data['member_id'])
+        except KeyError:
+            raise exceptions.ValidationError(dict(game_id='This field is required.'))
+        except ValueError:
+            raise exceptions.ValidationError(dict(game_id='Invalid number.'))
+
+        try:
+            hours = int(request.data['hours'])
+        except KeyError:
+            raise exceptions.ValidationError(dict(player='This field is required.'))
+        except ValueError:
+            raise exceptions.ValidationError(dict(player='Invalid number.'))
+
+        hosting_member = get_object_or_404(models.Member, id=member_id)
+        hosting_user = hosting_member.user
+
+        logging.info('Hosting offer from %s %s for %s hours', hosting_member.preferred_name, hosting_member.last_name, hours)
+
+        try:
+            current_hosting = models.Hosting.objects.get(user=hosting_user, finished_at__gte=now())
+            logging.info('Current hosting by member: %s', current_hosting)
+            new_end = now() + datetime.timedelta(hours=hours)
+            new_delta = new_end - current_hosting.started_at
+            new_hours = new_delta.seconds / 3600
+
+            logging.info(
+                'Hosting %s from %s is still going, updating hours from %s to %s.',
+                current_hosting.id,
+                current_hosting.started_at,
+                current_hosting.hours,
+                new_hours
+            )
+
+            current_hosting.finished_at = new_end
+            current_hosting.hours = new_hours
+            current_hosting.save()
+
+        except models.Hosting.DoesNotExist:
+            h = models.Hosting.objects.create(
+                user=hosting_user,
+                hours=hours,
+                finished_at=now() + datetime.timedelta(hours=hours),
+            )
+
+            logging.info('No current hosting for that user, new hosting #%s created.', h.id)
+
+        # update "open until" time
+        hosting = models.Hosting.objects.order_by('-finished_at').first()
+        closing = dict(
+            time=hosting.finished_at.timestamp(),
+            time_str=hosting.finished_at.astimezone(utils.TIMEZONE_CALGARY).strftime('%-I:%M %p'),
+            first_name=hosting.user.member.preferred_name,
+        )
+        cache.set('closing', closing)
+
+        return Response(200)
 
 
 class RegistrationView(RegisterView):
