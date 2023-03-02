@@ -242,6 +242,8 @@ export function Home(props) {
 	//const doorOpenStat = () => alarmStat() === 'Disarmed' && stats.alarm['data'] > 360 ? ', door open' : '';
 	const doorOpenStat = () => '';
 
+	const closedStat = (x) => stats && stats.closing ? moment().unix() > stats.closing['time'] ? 'Closed' : 'Open until ' + stats.closing['time_str'] : 'Unknown';
+
 	const show_signup = stats?.at_protospace;
 
 	return (
@@ -356,6 +358,8 @@ export function Home(props) {
 								</p>
 
 								{user && <p>Alarm status: {alarmStat()}{doorOpenStat()}</p>}
+
+								{user && <p>Hosting status: {closedStat()}</p>}
 							</div>
 
 							<SignForm token={token} />
