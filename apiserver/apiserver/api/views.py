@@ -1607,6 +1607,24 @@ class HostingViewSet(Base):
 
         return Response(200)
 
+    @action(detail=False, methods=['get'])
+    def high_scores(self, request):
+        members = models.Member.objects.all()
+        members = members.annotate(
+            hosting_hours=Sum('user__hosting__hours'),
+        ).exclude(hosting_hours__isnull=True).order_by('-hosting_hours')
+
+        hours = []
+
+        for member in members:
+            hours.append(dict(
+                name=member.preferred_name + ' ' + member.last_name[0],
+                hours=member.hosting_hours,
+                member_id=member.id,
+            ))
+
+        return Response(hours)
+
 
 class RegistrationView(RegisterView):
     serializer_class = serializers.MyRegisterSerializer

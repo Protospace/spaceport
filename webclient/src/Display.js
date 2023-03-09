@@ -38,6 +38,10 @@ export function LCARS1Display(props) {
 					<DisplayScores />
 				</div>
 
+				<div className='display-scores'>
+					<DisplayHosting />
+				</div>
+
 				<div className='display-usage'>
 					<DisplayUsage token={token} name={'trotec'} />
 				</div>
@@ -116,6 +120,42 @@ export function DisplayScores(props) {
 				<div key={i}>
 					<Header size='medium'>#{i+1} — {x.name}. {i === 0 ? '👑' : ''}</Header>
 					<p>{x.score.toLocaleString()}</p>
+				</div>
+			)}
+
+		</>
+	);
+};
+
+export function DisplayHosting(props) {
+	const { token, name } = props;
+	const [scores, setScores] = useState(false);
+
+	const getScores = () => {
+		requester('/hosting/high_scores/', 'GET')
+		.then(res => {
+			setScores(res);
+		})
+		.catch(err => {
+			console.log(err);
+			setScores(false);
+		});
+	};
+
+	useEffect(() => {
+		getScores();
+		const interval = setInterval(getScores, 60000);
+		return () => clearInterval(interval);
+	}, []);
+
+	return (
+		<>
+			<Header size='large'>Most Host</Header>
+
+			{scores && scores.slice(0, 5).map((x, i) =>
+				<div key={i}>
+					<Header size='medium'>#{i+1} — {x.name}. {i === 0 ? <img className='toast' src='/toast.png' /> : ''}</Header>
+					<p>{x.hours.toFixed(2)} hours</p>
 				</div>
 			)}
 
