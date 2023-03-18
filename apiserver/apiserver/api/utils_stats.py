@@ -30,6 +30,7 @@ DEFAULTS = {
     'autoscan': '',
     'last_scan': {},
     'closing': {},
+    'printer3d': {},
 }
 
 if secrets.MUMBLE:

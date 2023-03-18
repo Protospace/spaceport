@@ -244,6 +244,8 @@ export function Home(props) {
 
 	const closedStat = (x) => stats && stats.closing ? moment().unix() > stats.closing['time'] ? 'Closed' : 'Open until ' + stats.closing['time_str'] : 'Unknown';
 
+	const printer3dStat = (x) => stats && stats.printer3d[x] ? stats.printer3d[x].state === 'Printing' ? 'Printing (' + stats.printer3d[x].progress + '%)' : stats.printer3d[x].state : 'Unknown';
+
 	const show_signup = stats?.at_protospace;
 
 	return (
@@ -356,6 +358,10 @@ export function Home(props) {
 										</React.Fragment>
 									} trigger={<a>[more]</a>} />
 								</p>
+
+								<p>ORD2 printer: {printer3dStat('ord2')}</p>
+
+								<p>ORD3 printer: {printer3dStat('ord3')}</p>
 
 								{user && <p>Alarm status: {alarmStat()}{doorOpenStat()}</p>}
 

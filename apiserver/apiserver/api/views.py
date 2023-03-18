@@ -953,6 +953,23 @@ class StatsViewSet(viewsets.ViewSet, List):
 
         return Response(200)
 
+    @action(detail=True, methods=['post'])
+    def printer3d(self, request, pk=None):
+        printer3d = cache.get('printer3d', {})
+
+        devicename = pk
+        status = request.data['result']['status']
+
+        printer3d[devicename] = dict(
+            progress=int(status['display_status']['progress'] * 100),
+            #filename=status['print_stats']['filename'],
+            state=status['idle_timeout']['state'],
+        )
+        cache.set('printer3d', printer3d)
+
+        return Response(200)
+
+
 
 class MemberCountViewSet(Base, List):
     pagination_class = None
