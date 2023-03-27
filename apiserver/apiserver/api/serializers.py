@@ -713,6 +713,7 @@ class UserSerializer(serializers.ModelSerializer):
     training = UserTrainingSerializer(many=True)
     member = MemberSerializer()
     transactions = serializers.SerializerMethodField()
+    training = serializers.SerializerMethodField()
     interests = InterestSerializer(many=True)
     door_code = serializers.SerializerMethodField()
     wifi_pass = serializers.SerializerMethodField()
@@ -738,9 +739,24 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_transactions(self, obj):
         queryset = models.Transaction.objects.filter(user=obj)
+        queryset = queryset.select_related('user', 'user__member')
         queryset = queryset.exclude(category='Memberships:Fake Months')
         queryset = queryset.order_by('-id', '-date')
         serializer = TransactionSerializer(data=queryset, many=True)
+        serializer.is_valid()
+        return serializer.data
+
+    def get_training(self, obj):
+        queryset = obj.training
+        queryset = queryset.select_related(
+            'session',
+            'session__course',
+            'session__instructor',
+            'session__instructor__member'
+        )
+        queryset = queryset.prefetch_related('session__students')
+        queryset = queryset.order_by('-id')
+        serializer = UserTrainingSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
 
