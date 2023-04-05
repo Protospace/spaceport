@@ -50,6 +50,47 @@ export function LCARS1Display(props) {
 	);
 };
 
+export function LCARS2Display(props) {
+	const { token } = props;
+	const [fullElement, setFullElement] = useState(false);
+	const ref = useRef(null);
+
+	const goFullScreen = () => {
+		if ('wakeLock' in navigator) {
+			navigator.wakeLock.request('screen');
+		}
+
+		ref.current.requestFullscreen({ navigationUI: 'hide' }).then(() => {
+			setFullElement(true);
+		});
+	};
+
+	return (
+		<Container>
+			<div className='display' ref={ref}>
+
+				{!fullElement &&
+					<p>
+						<Button onClick={goFullScreen}>Fullscreen</Button>
+					</p>
+				}
+
+				<div className='display-scores'>
+					<DisplayScores />
+				</div>
+
+				<div className='display-scores'>
+					<DisplayHosting />
+				</div>
+
+				<div className='display-usage'>
+					<DisplayUsage token={token} name={'trotec'} />
+				</div>
+			</div>
+		</Container>
+	);
+};
+
 export function DisplayUsage(props) {
 	const { token, name } = props;
 	const title = deviceNames[name].title;

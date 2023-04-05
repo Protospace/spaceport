@@ -29,7 +29,7 @@ import { NotFound, PleaseLogin } from './Misc.js';
 import { Debug } from './Debug.js';
 import { Garden } from './Garden.js';
 import { Footer } from './Footer.js';
-import { LCARS1Display } from './Display.js';
+import { LCARS1Display, LCARS2Display } from './Display.js';
 
 const APP_VERSION = 5;  // TODO: automate this
 
@@ -128,6 +128,10 @@ function App() {
 
 				<Route exact path='/display/lcars1'>
 					<LCARS1Display token={token} />
+				</Route>
+
+				<Route exact path='/display/lcars2'>
+					<LCARS2Display token={token} />
 				</Route>
 
 				<Route path='/'>
