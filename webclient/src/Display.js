@@ -82,10 +82,6 @@ export function LCARS2Display(props) {
 				<div className='display-scores'>
 					<DisplayHosting />
 				</div>
-
-				<div className='display-usage'>
-					<DisplayUsage token={token} name={'trotec'} />
-				</div>
 			</div>
 		</Container>
 	);
