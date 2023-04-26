@@ -1473,6 +1473,18 @@ class ProtocoinViewSet(Base):
                 )
                 utils.log_transaction(tx)
 
+                track = cache.get('track', {})
+
+                devicename = 'LASTLARGEPRINT'
+                first_name = username.split('.')[0].title()
+
+                track[devicename] = dict(
+                    time=time.time(),
+                    username=username,
+                    first_name=first_name,
+                )
+                cache.set('track', track)
+
                 return Response(200)
         except OperationalError:
             self.printer_report(request, pk)

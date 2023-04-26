@@ -359,6 +359,26 @@ export function Home(props) {
 									} trigger={<a>[more]</a>} />
 								</p>
 
+								<p>
+									Media computer: {getTrackStat('PROTOGRAPH1')} <Popup content={
+										<React.Fragment>
+											<p>
+												Last use:<br />
+												{getTrackLast('PROTOGRAPH1')}<br />
+												{getTrackAgo('PROTOGRAPH1')}<br />
+												by {getTrackName('PROTOGRAPH1')}
+											</p>
+
+											<p>
+												Last print:<br />
+												{getTrackLast('LASTLARGEPRINT')}<br />
+												{getTrackAgo('LASTLARGEPRINT')}<br />
+												by {getTrackName('LASTLARGEPRINT')}
+											</p>
+										</React.Fragment>
+									} trigger={<a>[more]</a>} />
+								</p>
+
 								<p>ORD2 printer: {printer3dStat('ord2')}</p>
 
 								<p>ORD3 printer: {printer3dStat('ord3')}</p>
