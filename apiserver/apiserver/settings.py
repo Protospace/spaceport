@@ -79,9 +79,11 @@ INSTALLED_APPS = [
     'allauth.socialaccount', # to support user deletion
     'rest_auth.registration',
     'simple_history',
+    'silk',
 ]
 
 MIDDLEWARE = [
+    'silk.middleware.SilkyMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -91,6 +93,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
 ]
+
+SILKY_PYTHON_PROFILER = True
 
 if BINDALL_ENV:
     INSTALLED_APPS += [

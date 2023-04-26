@@ -580,10 +580,13 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
 
         return Response(result)
 
+from silk.profiling.profiler import silk_profile
 
 class UserView(views.APIView):
     permission_classes = [AllowMetadata | IsAuthenticated]
 
+
+    @silk_profile(name='user view')
     def get(self, request):
         serializer = serializers.UserSerializer(request.user)
         return Response(serializer.data)

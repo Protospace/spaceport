@@ -58,6 +58,8 @@ else:
     ADMIN_ROUTE = 'admin/'
 urlpatterns.append(path(ADMIN_ROUTE, admin.site.urls))
 
+urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
+
 if settings.DEBUG:
     urlpatterns += [
         path('api-auth/', include('rest_framework.urls')),
