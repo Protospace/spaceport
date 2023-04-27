@@ -1190,7 +1190,7 @@ class ProtocoinViewSet(Base):
                 source_user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
                 source_user_balance = float(source_user_balance)
 
-                if source_user_balance != balance:
+                if abs(source_user_balance - balance) > 0.01:  # stupid https://docs.djangoproject.com/en/4.2/ref/databases/#decimal-handling
                     raise exceptions.ValidationError(dict(balance='Incorrect current balance.'))
 
                 if source_user_balance < amount:
@@ -1324,7 +1324,7 @@ class ProtocoinViewSet(Base):
                 source_user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
                 source_user_balance = float(source_user_balance)
 
-                if source_user_balance != balance:
+                if abs(source_user_balance - balance) > 0.01:  # stupid https://docs.djangoproject.com/en/4.2/ref/databases/#decimal-handling
                     raise exceptions.ValidationError(dict(balance='Incorrect current balance.'))
 
                 if source_user_balance < amount:
