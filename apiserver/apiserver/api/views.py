@@ -544,17 +544,6 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
             raise exceptions.PermissionDenied()
         return super().list(request)
 
-    @action(detail=True, methods=['post'])
-    def report(self, request, pk=None):
-        report_memo = request.data.get('report_memo', '').strip()
-        if not report_memo:
-            raise exceptions.ValidationError(dict(report_memo='This field may not be blank.'))
-        transaction = self.get_object()
-        transaction.report_type = 'User Flagged'
-        transaction.report_memo = report_memo
-        transaction.save()
-        return Response(200)
-
     @action(detail=False, methods=['get'])
     def summary(self, request):
         txs = models.Transaction.objects
