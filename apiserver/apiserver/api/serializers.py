@@ -158,7 +158,8 @@ class TransactionSerializer(serializers.ModelSerializer):
             current_protocoin = (user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0) - instance.protocoin
             new_protocoin = current_protocoin + validated_data['protocoin']
             if new_protocoin < 0:
-                raise ValidationError(dict(category='Insufficient funds. Member only had {} protocoin.'.format(current_protocoin)))
+                msg = 'Negative Protocoin transaction updated:\n' + str(validated_data)
+                utils.alert_tanner(msg)
 
         return super().update(instance, validated_data)
 

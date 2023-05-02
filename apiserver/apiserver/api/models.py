@@ -72,7 +72,7 @@ class Transaction(models.Model):
     member_id = models.IntegerField(blank=True, null=True)
     date = models.DateField(default=today_alberta_tz)
     amount = models.DecimalField(max_digits=7, decimal_places=2)
-    reference_number = models.CharField(max_length=32, blank=True, null=True)
+    reference_number = models.CharField(max_length=64, blank=True, null=True)
     memo = models.TextField(blank=True, null=True)
     number_of_membership_months = models.IntegerField(blank=True, null=True)
     payment_method = models.TextField(blank=True, null=True)
