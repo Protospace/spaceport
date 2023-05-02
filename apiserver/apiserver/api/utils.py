@@ -115,10 +115,15 @@ def tally_membership_months(member, fake_date=None):
             alert_tanner(msg)
             logger.info(msg)
 
-        if status == 'Overdue' and previous_status == 'Due':
-            msg = 'Member has become Overdue: {} {}'.format(member.preferred_name, member.last_name)
-            alert_tanner(msg)
-            logger.info(msg)
+        if status == 'Overdue':
+            if previous_status == 'Due':
+                msg = 'Member has become Overdue: {} {}'.format(member.preferred_name, member.last_name)
+                alert_tanner(msg)
+                logger.info(msg)
+
+                utils_email.send_overdue_email(member)
+            else:
+                logger.info('Skipping email because member wasn\'t due before.')
 
         member.save()
         logging.debug('Tallied %s membership months: updated.', member)
