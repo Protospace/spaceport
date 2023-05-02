@@ -39,6 +39,10 @@ export function LCARS1Display(props) {
 				</div>
 
 				<div className='display-scores'>
+					<DisplayMonthlyScores />
+				</div>
+
+				<div className='display-scores'>
 					<DisplayHosting />
 				</div>
 
@@ -156,6 +160,42 @@ export function DisplayScores(props) {
 			{scores && scores.slice(0, 5).map((x, i) =>
 				<div key={i}>
 					<Header size='medium'>#{i+1} — {x.name}. {i === 0 ? '👑' : ''}</Header>
+					<p>{x.score.toLocaleString()}</p>
+				</div>
+			)}
+
+		</>
+	);
+};
+
+export function DisplayMonthlyScores(props) {
+	const { token, name } = props;
+	const [scores, setScores] = useState(false);
+
+	const getScores = () => {
+		requester('/pinball/monthly_high_scores/', 'GET')
+		.then(res => {
+			setScores(res);
+		})
+		.catch(err => {
+			console.log(err);
+			setScores(false);
+		});
+	};
+
+	useEffect(() => {
+		getScores();
+		const interval = setInterval(getScores, 60000);
+		return () => clearInterval(interval);
+	}, []);
+
+	return (
+		<>
+			<Header size='large'>Monthly High Scores</Header>
+
+			{scores && scores.slice(0, 5).map((x, i) =>
+				<div key={i}>
+					<Header size='medium'>#{i+1} — {x.name}. {i === 0 ? '🧙' : ''}</Header>
 					<p>{x.score.toLocaleString()}</p>
 				</div>
 			)}

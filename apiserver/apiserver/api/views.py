@@ -1570,6 +1570,27 @@ class PinballViewSet(Base):
 
         return Response(scores)
 
+    @action(detail=False, methods=['get'])
+    def monthly_high_scores(self, request):
+        now = utils.now_alberta_tz()
+        current_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+        members = models.Member.objects.all()
+        members = members.annotate(
+            pinball_score=Max('user__scores__score', filter=Q(user__scores__finished_at__gte=current_month_start)),
+        ).exclude(pinball_score__isnull=True).order_by('-pinball_score')
+
+        scores = []
+
+        for member in members:
+            scores.append(dict(
+                name=member.preferred_name + ' ' + member.last_name[0],
+                score=member.pinball_score,
+                member_id=member.id,
+            ))
+
+        return Response(scores)
+
 
 class HostingViewSet(Base):
     @action(detail=False, methods=['post'])
