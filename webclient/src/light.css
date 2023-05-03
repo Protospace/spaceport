@@ -236,6 +236,10 @@ body {
 	text-overflow: ellipsis;
 }
 
+.filter-option {
+	margin-right: 1rem;
+}
+
 
 .footer {
 	margin-top: -20rem;

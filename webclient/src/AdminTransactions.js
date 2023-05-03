@@ -43,29 +43,24 @@ export function AdminReportedTransactions(props) {
 
 let transactionsCache = false;
 let summaryCache = false;
-let excludePayPalCache = false;
 
 export function AdminHistoricalTransactions(props) {
 	const { token } = props;
 	const [input, setInput] = useState({ month: moment() });
 	const [transactions, setTransactions] = useState(transactionsCache);
 	const [summary, setSummary] = useState(summaryCache);
-	const [excludePayPal, setExcludePayPal] = useState(excludePayPalCache);
+	const [excludePayPal, setExcludePayPal] = useState(false);
+	const [excludeSnacks, setExcludeSnacks] = useState(true);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(false);
 
 	const handleDatetime = (v) => setInput({ ...input, month: v });
 
-	const handleExcludePayPal = (e, v) => {
-		setExcludePayPal(v.checked);
-		excludePayPalCache = v.checked;
-	};
-
-	const handleSubmit = (e) => {
+	const makeRequest = () => {
 		if (loading) return;
 		setLoading(true);
 		const month = input.month.format('YYYY-MM');
-		requester('/transactions/?month=' + month, 'GET', token)
+		requester('/transactions/?month=' + month + '&exclude_paypal=' + excludePayPal + '&exclude_snacks=' + excludeSnacks, 'GET', token)
 		.then(res => {
 			setLoading(false);
 			setError(false);
@@ -91,6 +86,22 @@ export function AdminHistoricalTransactions(props) {
 			setError(true);
 		});
 	};
+
+	const handleSubmit = (e) => {
+		makeRequest();
+	};
+
+	const handleExcludePayPal = (e, v) => {
+		setExcludePayPal(v.checked);
+	};
+
+	const handleExcludeSnacks = (e, v) => {
+		setExcludeSnacks(v.checked);
+	};
+
+	useEffect(() => {
+		makeRequest();
+	}, [excludePayPal, excludeSnacks]);
 
 	return (
 		<div>
@@ -150,12 +161,20 @@ export function AdminHistoricalTransactions(props) {
 					}
 
 					<Checkbox
+						className='filter-option'
 						label='Exclude PayPal'
 						onChange={handleExcludePayPal}
 						checked={excludePayPal}
 					/>
 
-					<TransactionList transactions={transactions.filter(x => !excludePayPal || x.account_type !== 'PayPal')} />
+					<Checkbox
+						className='filter-option'
+						label='Exclude Snacks'
+						onChange={handleExcludeSnacks}
+						checked={excludeSnacks}
+					/>
+
+					<TransactionList transactions={transactions} />
 				</div>
 			:
 				<p>Error loading transactions.</p>

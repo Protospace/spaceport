@@ -499,19 +499,27 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
     def get_queryset(self):
         queryset = models.Transaction.objects
         month = self.request.query_params.get('month', '')
+        exclude_paypal = self.request.query_params.get('exclude_paypal', '') == 'true'
+        exclude_snacks = self.request.query_params.get('exclude_snacks', '') == 'true'
 
-        if self.action == 'list' and month:
-            try:
-                dt = datetime.datetime.strptime(month, '%Y-%m')
-            except ValueError:
-                raise exceptions.ValidationError(dict(month='Should be YYYY-MM.'))
-            queryset = queryset.filter(date__year=dt.year)
-            queryset = queryset.filter(date__month=dt.month)
-            queryset = queryset.exclude(category='Memberships:Fake Months')
-            return queryset.order_by('-date', '-id')
-        elif self.action == 'list':
-            queryset = queryset.exclude(report_type__isnull=True)
-            queryset = queryset.exclude(report_type='')
+        if self.action == 'list':
+            if month:
+                try:
+                    dt = datetime.datetime.strptime(month, '%Y-%m')
+                except ValueError:
+                    raise exceptions.ValidationError(dict(month='Should be YYYY-MM.'))
+                queryset = queryset.filter(date__year=dt.year)
+                queryset = queryset.filter(date__month=dt.month)
+                queryset = queryset.exclude(category='Memberships:Fake Months')
+            else:
+                queryset = queryset.exclude(report_type__isnull=True)
+                queryset = queryset.exclude(report_type='')
+
+            if exclude_paypal:
+                queryset = queryset.exclude(account_type='PayPal')
+
+            if exclude_snacks:
+                queryset = queryset.exclude(category='Snacks')
             return queryset.order_by('-date', '-id')
         else:
             return queryset.all()
