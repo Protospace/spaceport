@@ -7,12 +7,14 @@ from django.utils.timezone import now, pytz
 from simple_history.models import HistoricalRecords
 from simple_history import register
 
+TIMEZONE_CALGARY = pytz.timezone('America/Edmonton')
+
 register(User)
 
 IGNORE = '+'
 
 def today_alberta_tz():
-    return datetime.now(pytz.timezone('America/Edmonton')).date()
+    return datetime.now(TIMEZONE_CALGARY).date()
 
 class Member(models.Model):
     user = models.OneToOneField(User, related_name='member', blank=True, null=True, on_delete=models.SET_NULL)
@@ -61,7 +63,8 @@ class Member(models.Model):
 
     history = HistoricalRecords(excluded_fields=['member_forms'])
 
-    MY_FIELDS = ['user', 'preferred_name', 'last_name', 'status']
+    list_display = ['user', 'preferred_name', 'last_name', 'status']
+    search_fields = ['user__username', 'preferred_name', 'last_name', 'status']
     def __str__(self):
         return getattr(self.user, 'username', 'None')
 
@@ -89,7 +92,8 @@ class Transaction(models.Model):
 
     history = HistoricalRecords()
 
-    MY_FIELDS = ['date', 'user', 'amount', 'protocoin', 'account_type', 'category']
+    list_display = ['date', 'user', 'amount', 'protocoin', 'account_type', 'category']
+    search_fields = ['date', 'user__username', 'account_type', 'category']
     def __str__(self):
         return '%s tx %s' % (user.username, date)
 
@@ -101,7 +105,8 @@ class PayPalHint(models.Model):
 
     history = HistoricalRecords()
 
-    MY_FIELDS = ['account', 'user']
+    list_display = ['account', 'user']
+    search_fields = ['account', 'user__username']
     def __str__(self):
         return self.account
 
@@ -112,7 +117,8 @@ class IPN(models.Model):
 
     history = HistoricalRecords()
 
-    MY_FIELDS = ['datetime', 'status']
+    list_display = ['datetime', 'status']
+    search_fields = ['datetime', 'status']
     def __str__(self):
         return self.datetime
 
@@ -128,7 +134,8 @@ class Card(models.Model):
 
     history = HistoricalRecords(excluded_fields=['last_seen_at', 'last_seen'])
 
-    MY_FIELDS = ['card_number', 'user', 'last_seen']
+    list_display = ['card_number', 'user', 'last_seen']
+    search_fields = ['card_number', 'user__username', 'last_seen']
     def __str__(self):
         return self.card_number
 
@@ -140,7 +147,8 @@ class Course(models.Model):
 
     history = HistoricalRecords()
 
-    MY_FIELDS = ['name', 'id']
+    list_display = ['name', 'id']
+    search_fields = ['name', 'id']
     def __str__(self):
         return self.name
 
@@ -156,9 +164,10 @@ class Session(models.Model):
 
     history = HistoricalRecords()
 
-    MY_FIELDS = ['datetime', 'course', 'instructor']
+    list_display = ['datetime', 'course', 'instructor']
+    search_fields = ['datetime', 'course__name', 'instructor__username']
     def __str__(self):
-        return '%s @ %s' % (self.course.name, self.datetime)
+        return '%s @ %s' % (self.course.name, self.datetime.astimezone(TIMEZONE_CALGARY).strftime('%Y-%m-%d %-I:%M %p'))
 
 class Training(models.Model):
     user = models.ForeignKey(User, related_name='training', blank=True, null=True, on_delete=models.SET_NULL)
@@ -171,7 +180,8 @@ class Training(models.Model):
 
     history = HistoricalRecords()
 
-    MY_FIELDS = ['session', 'user']
+    list_display = ['session', 'user']
+    search_fields = ['session__course__name', 'user__username']
     def __str__(self):
         return '%s taking %s @ %s' % (self.user, self.session.course.name, self.session.datetime)
 
@@ -181,7 +191,8 @@ class Interest(models.Model):
 
     satisfied_by = models.ForeignKey(Session, related_name='satisfies', null=True, on_delete=models.SET_NULL)
 
-    MY_FIELDS = ['user', 'course', 'satisfied_by']
+    list_display = ['user', 'course', 'satisfied_by']
+    search_fields = ['user__username', 'course__name']
     def __str__(self):
         return '%s interested in %s' % (self.user, self.course)
 
@@ -197,7 +208,8 @@ class StatsMemberCount(models.Model):
     vetted_count = models.IntegerField()
     subscriber_count = models.IntegerField()
 
-    MY_FIELDS = ['date', 'member_count', 'green_count', 'six_month_plus_count', 'vetted_count', 'subscriber_count']
+    list_display = ['date', 'member_count', 'green_count', 'six_month_plus_count', 'vetted_count', 'subscriber_count']
+    search_fields = ['date', 'member_count', 'green_count', 'six_month_plus_count', 'vetted_count', 'subscriber_count']
 
 class StatsSignupCount(models.Model):
     month = models.DateField()
@@ -205,13 +217,15 @@ class StatsSignupCount(models.Model):
     retain_count = models.IntegerField(default=0)
     vetted_count = models.IntegerField(default=0)
 
-    MY_FIELDS = ['month', 'signup_count', 'retain_count', 'vetted_count']
+    list_display = ['month', 'signup_count', 'retain_count', 'vetted_count']
+    search_fields = ['month', 'signup_count', 'retain_count', 'vetted_count']
 
 class StatsSpaceActivity(models.Model):
     date = models.DateField(default=today_alberta_tz)
     card_scans = models.IntegerField()
 
-    MY_FIELDS = ['date', 'card_scans']
+    list_display = ['date', 'card_scans']
+    search_fields = ['date', 'card_scans']
 
 class Usage(models.Model):
     user = models.ForeignKey(User, related_name='usages', blank=True, null=True, on_delete=models.SET_NULL)
@@ -230,7 +244,8 @@ class Usage(models.Model):
 
     history = HistoricalRecords(excluded_fields=['num_reports'])
 
-    MY_FIELDS = ['started_at', 'finished_at', 'user', 'num_seconds', 'should_bill']
+    list_display = ['started_at', 'finished_at', 'user', 'num_seconds', 'should_bill']
+    search_fields = ['started_at', 'finished_at', 'user__username']
     def __str__(self):
         return str(self.started_at)
 
@@ -246,7 +261,8 @@ class PinballScore(models.Model):
 
     # no history
 
-    MY_FIELDS = ['started_at', 'game_id', 'player', 'score', 'user']
+    list_display = ['started_at', 'game_id', 'player', 'score', 'user']
+    search_fields = ['started_at', 'game_id', 'player', 'score', 'user__username']
     def __str__(self):
         return str(self.started_at)
 
@@ -259,7 +275,8 @@ class Hosting(models.Model):
 
     # no history
 
-    MY_FIELDS = ['started_at', 'hours', 'finished_at', 'user']
+    list_display = ['started_at', 'hours', 'finished_at', 'user']
+    search_fields = ['started_at', 'hours', 'finished_at', 'user__username']
     def __str__(self):
         return str(self.started_at)
 
@@ -279,7 +296,8 @@ class HistoryIndex(models.Model):
     is_system = models.BooleanField()
     is_admin = models.BooleanField()
 
-    MY_FIELDS = ['history_date', 'history_user', 'history_type', 'owner_name', 'object_name']
+    list_display = ['history_date', 'history_user', 'history_type', 'owner_name', 'object_name']
+    search_fields = ['history_date', 'history_user__username', 'history_type', 'owner_name', 'object_name']
     def __str__(self):
         return '%s changed %s\'s %s' % (self.history_user, self.owner_name, self.object_name)
 
@@ -290,6 +308,7 @@ class HistoryChange(models.Model):
     old = models.TextField()
     new = models.TextField()
 
-    MY_FIELDS = ['field', 'old', 'new', 'index']
+    list_display = ['field', 'old', 'new', 'index']
+    search_fields = ['field', 'old', 'new', 'index__history_user__username']
     def __str__(self):
         return self.field
