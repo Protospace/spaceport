@@ -94,14 +94,18 @@ function MemberInfo(props) {
 				<QRCode value={siteUrl + 'subscribe?monthly_fees=' + user.member.monthly_fees + '&id=' + user.member.id} />
 			</React.Fragment>}
 
-			<Header size='medium'>Latest Training</Header>
-
 			{unpaidTraining.map(x =>
 				<Message warning>
 					<Message.Header>Please pay your course fee!</Message.Header>
 					<p>Pay ${x.session.cost} for <Link to={'/classes/'+x.session.id}>{x.session.course_data.name}</Link> to avoid losing your spot.</p>
 				</Message>
 			)}
+
+			<Header size='medium'>Latest Training</Header>
+
+			{!member.orientation_date && <p>
+				⚠️ You need to attend a <Link to={'/courses/249/'}>New Member Orientation</Link> to use any tool larger than a screwdriver.
+			</p>}
 
 			<BasicTable>
 				<Table.Body>
@@ -115,7 +119,7 @@ function MemberInfo(props) {
 							</Table.Row>
 						)
 					:
-						<Table.Row><Table.Cell>None, please sign up for an <Link to={'/courses/249/'}>Orientation</Link></Table.Cell></Table.Row>
+						<Table.Row><Table.Cell>None</Table.Cell></Table.Row>
 					}
 					{user.training.length > 3 &&
 						<Table.Row><Table.Cell>
