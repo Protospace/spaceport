@@ -77,8 +77,8 @@ export function AdminVetting(props) {
 							<Table.Header>
 								<Table.Row>
 									<Table.HeaderCell>Name</Table.HeaderCell>
-									<Table.HeaderCell></Table.HeaderCell>
 									<Table.HeaderCell>Status</Table.HeaderCell>
+									<Table.HeaderCell>NMO</Table.HeaderCell>
 									<Table.HeaderCell>Start Date</Table.HeaderCell>
 									<Table.HeaderCell></Table.HeaderCell>
 								</Table.Row>
@@ -88,11 +88,11 @@ export function AdminVetting(props) {
 								{(displayAll ? vetting : vetting.slice(0,5)).map(x =>
 									<Table.Row key={x.id}>
 										<Table.Cell><Link to={'/members/'+x.id}>{x.preferred_name} {x.last_name}</Link></Table.Cell>
-										<Table.Cell><a href={'mailto:'+x.email}>Email</a></Table.Cell>
 										<Table.Cell>
 											<Icon name='circle' color={statusColor[x.status]} />
 											{x.status || 'Unknown'}
 										</Table.Cell>
+										<Table.Cell>{x.orientation_date ? '✅' : '❌'}</Table.Cell>
 										<Table.Cell>{x.current_start_date}</Table.Cell>
 										<Table.Cell><AdminVet {...props} member={x} refreshVetting={refreshVetting} /></Table.Cell>
 									</Table.Row>
