@@ -69,31 +69,27 @@ export function AdminVetting(props) {
 	const displayAll = (vetting && vetting.length <= 5) || showAll;
 
 	return (
-		<div>
+		<div className='adminvetting'>
 			{!error ?
 				vetting ?
 					<>
-						<Table collapsing basic='very'>
+						<Table compact collapsing unstackable basic='very'>
 							<Table.Header>
 								<Table.Row>
 									<Table.HeaderCell>Name</Table.HeaderCell>
-									<Table.HeaderCell>Status</Table.HeaderCell>
-									<Table.HeaderCell>NMO</Table.HeaderCell>
-									<Table.HeaderCell>Start Date</Table.HeaderCell>
+									<Table.HeaderCell>Status / NMO</Table.HeaderCell>
 									<Table.HeaderCell></Table.HeaderCell>
 								</Table.Row>
 							</Table.Header>
 
 							<Table.Body>
-								{(displayAll ? vetting : vetting.slice(0,5)).map(x =>
+								{(displayAll ? vetting : vetting.slice(0,5)).sort((a, b) => a.last_name > b.last_name ? 1 : -1).map(x =>
 									<Table.Row key={x.id}>
 										<Table.Cell><Link to={'/members/'+x.id}>{x.preferred_name} {x.last_name}</Link></Table.Cell>
 										<Table.Cell>
 											<Icon name='circle' color={statusColor[x.status]} />
-											{x.status || 'Unknown'}
+											{x.orientation_date ? '✅' : '❌'}
 										</Table.Cell>
-										<Table.Cell>{x.orientation_date ? '✅' : '❌'}</Table.Cell>
-										<Table.Cell>{x.current_start_date}</Table.Cell>
 										<Table.Cell><AdminVet {...props} member={x} refreshVetting={refreshVetting} /></Table.Cell>
 									</Table.Row>
 								)}
@@ -344,6 +340,7 @@ export function Admin(props) {
 
 			<Header size='medium'>Ready to Vet</Header>
 			<p>Members who are Current or Due, and past their probationary period.</p>
+			<p>Sorted by last name.</p>
 			<AdminVetting {...props} />
 
 
