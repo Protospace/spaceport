@@ -643,7 +643,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             raise
 
         def course_is_usually_monthly(course):
-            two_months_ago = utils.today_alberta_tz() - datetime.timedelta(days=61)
+            two_months_ago = utils.now_alberta_tz() - datetime.timedelta(days=61)
             recent_sessions = obj.sessions.filter(datetime__gte=two_months_ago)
             if recent_sessions.count() < 3:
                 return True
