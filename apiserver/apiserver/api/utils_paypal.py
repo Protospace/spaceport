@@ -156,6 +156,9 @@ def create_member_dues_tx(data, member, num_months, deal):
     elif deal == 3 and num_months == 2:
         num_months = 3
         deal_str = '3 for 2, '
+    elif num_months == 11:  # handle pre-Spaceport yearly subs
+        num_months = 12
+        deal_str = '12 for 11 (legacy), '
     else:
         deal_str = ''
 
