@@ -456,8 +456,9 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
 
             member = get_object_or_404(models.Member, id=data['member_id'])
             user = member.user
+            course_id = session.course.id
 
-            if user == session.instructor:
+            if course_id not in [317, 273, 413] and user == session.instructor:
                 msg = 'Self-register trickery detected:\n' + str(data.dict())
                 utils.alert_tanner(msg)
                 raise exceptions.ValidationError(dict(non_field_errors='Can\'t register the instructor. Don\'t try to trick the portal.'))
