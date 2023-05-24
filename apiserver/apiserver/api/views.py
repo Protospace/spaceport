@@ -136,7 +136,10 @@ class SearchViewSet(Base, Retrieve):
                     pinball_score=Max('user__scores__score'),
                 ).exclude(pinball_score__isnull=True).order_by('-pinball_score')
             elif sort == 'everyone':
-                queryset = queryset.annotate(Count('user__transactions')).order_by('-user__transactions__count', 'id')
+                queryset = queryset.annotate(
+                    protocoin_sum=Sum('user__transactions__protocoin'),
+                    tx_sum=Sum('user__transactions__amount'),
+                ).order_by('-protocoin_sum', '-tx_sum', 'id')
             elif sort == 'best_looking':
                 queryset = []
 
