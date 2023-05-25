@@ -298,6 +298,8 @@ export function ClassFeed(props) {
 			:
 				<p>Loading...</p>
 			}
+
+			<p style={{ marginBottom: '30rem' }}/>
 		</Container>
 	);
 };
