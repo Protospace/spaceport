@@ -1151,6 +1151,71 @@ class InterestViewSet(Base, Retrieve, Create):
 
 class ProtocoinViewSet(Base):
     @action(detail=False, methods=['post'], permission_classes=[AllowMetadata | IsAuthenticated])
+    def spend_request(self, request):
+        try:
+            with transaction.atomic():
+                source_user = self.request.user
+                source_member = source_user.member
+
+                try:
+                    balance = float(request.data['balance'])
+                except KeyError:
+                    raise exceptions.ValidationError(dict(balance='This field is required.'))
+                except ValueError:
+                    raise exceptions.ValidationError(dict(balance='Invalid number.'))
+
+                try:
+                    amount = float(request.data['amount'])
+                except KeyError:
+                    raise exceptions.ValidationError(dict(amount='This field is required.'))
+                except ValueError:
+                    raise exceptions.ValidationError(dict(amount='Invalid number.'))
+
+                try:
+                    category = str(request.data['category'])
+                except KeyError:
+                    raise exceptions.ValidationError(dict(category='This field is required.'))
+                if category not in ['Consumables', 'Donation']:
+                    raise exceptions.ValidationError(dict(category='Invalid category.'))
+
+                memo = str(request.data.get('memo', ''))
+
+                # also prevents negative spending
+                if amount < 0.25:
+                    raise exceptions.ValidationError(dict(amount='Amount too small.'))
+
+                source_user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
+                source_user_balance = float(source_user_balance)
+
+                if abs(source_user_balance - balance) > 0.01:  # stupid https://docs.djangoproject.com/en/4.2/ref/databases/#decimal-handling
+                    raise exceptions.ValidationError(dict(balance='Incorrect current balance.'))
+
+                if source_user_balance < amount:
+                    raise exceptions.ValidationError(dict(amount='Insufficient funds.'))
+
+                tx_memo = 'Protocoin - Transaction spent ₱ {} on {}{}'.format(
+                    amount,
+                    category,
+                    ', memo: ' + memo if memo else ''
+                )
+
+                tx = models.Transaction.objects.create(
+                    user=source_user,
+                    protocoin=-amount,
+                    amount=0,
+                    number_of_membership_months=0,
+                    account_type='Protocoin',
+                    category=category,
+                    info_source='System',
+                    memo=tx_memo,
+                )
+                utils.log_transaction(tx)
+
+                return Response(200)
+        except OperationalError:
+            self.spend_request(request)
+
+    @action(detail=False, methods=['post'], permission_classes=[AllowMetadata | IsAuthenticated])
     def send_to_member(self, request):
         try:
             with transaction.atomic():
@@ -1178,6 +1243,7 @@ class ProtocoinViewSet(Base):
                 except ValueError:
                     raise exceptions.ValidationError(dict(amount='Invalid number.'))
 
+                # also prevents negative spending
                 if amount < 1.00:
                     raise exceptions.ValidationError(dict(amount='Amount too small.'))
 
@@ -1318,6 +1384,7 @@ class ProtocoinViewSet(Base):
                 except ValueError:
                     raise exceptions.ValidationError(dict(amount='Invalid number.'))
 
+                # also prevents negative spending
                 if amount < 0.25:
                     raise exceptions.ValidationError(dict(amount='Amount too small.'))
 

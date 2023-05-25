@@ -6,6 +6,44 @@ import { PayPalPayNow, PayPalSubscribe } from './PayPal.js';
 import { MembersDropdown } from './Members.js';
 import { requester } from './utils.js';
 
+export function PayWithProtocoin(props) {
+	const { token, user, refreshUser, amount, setAmount, custom } = props;
+	const member = user.member;
+	const [error, setError] = useState({});
+	const [loading, setLoading] = useState(false);
+	const [success, setSuccess] = useState(false);
+
+	const handleSubmit = (e) => {
+		if (loading) return;
+		setSuccess(false);
+		setLoading(true);
+
+		const data = { amount: amount, ...custom, balance: member.protocoin };
+		requester('/protocoin/spend_request/', 'POST', token, data)
+		.then(res => {
+			setLoading(false);
+			setSuccess(true);
+			setAmount('');
+			setError({});
+			refreshUser();
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+			setError(err.data);
+		});
+	};
+
+	return (
+		<Form onSubmit={handleSubmit}>
+			<Form.Button disabled={!amount} color='green' loading={loading} error={error.amount}>
+				Pay with Protocoin
+			</Form.Button>
+			{success && <div>Success!</div>}
+		</Form>
+	);
+};
+
 export function SendProtocoin(props) {
 	const { token, user, refreshUser } = props;
 	const member = user.member;
@@ -76,10 +114,10 @@ export function Paymaster(props) {
 	const { token, user, refreshUser } = props;
 	const [pop, setPop] = useState('20.00');
 	const [locker, setLocker] = useState('5.00');
-	const [consumables, setConsumables] = useState('20.00');
+	const [consumables, setConsumables] = useState('');
 	const [buyProtocoin, setBuyProtocoin] = useState('10.00');
 	const [consumablesMemo, setConsumablesMemo] = useState('');
-	const [donate, setDonate] = useState('20.00');
+	const [donate, setDonate] = useState('');
 	const [memo, setMemo] = useState('');
 
 	const monthly_fees = user.member.monthly_fees || 55;
@@ -188,6 +226,15 @@ export function Paymaster(props) {
 						name='Protospace Consumables'
 						custom={JSON.stringify({ category: 'Consumables', member: user.member.id, memo: consumablesMemo })}
 					/>
+
+					<p/>
+
+					<PayWithProtocoin
+						token={token} user={user} refreshUser={refreshUser}
+						amount={consumables}
+						setAmount={setConsumables}
+						custom={{ category: 'Consumables', memo: consumablesMemo }}
+					/>
 				</Grid.Column>
 			</Grid>
 
@@ -220,6 +267,15 @@ export function Paymaster(props) {
 						amount={donate}
 						name='Protospace Donation'
 						custom={JSON.stringify({ category: 'Donation', member: user.member.id, memo: memo })}
+					/>
+
+					<p/>
+
+					<PayWithProtocoin
+						token={token} user={user} refreshUser={refreshUser}
+						amount={donate}
+						setAmount={setDonate}
+						custom={{ category: 'Donation', memo: memo }}
 					/>
 				</Grid.Column>
 			</Grid>
