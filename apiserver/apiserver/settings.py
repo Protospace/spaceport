@@ -250,6 +250,11 @@ LOGGING = {
         },
     },
     'loggers': {
+        #'django.db.backends': {
+        #    'handlers': ['console'],
+        #    'level': 'DEBUG',
+        #    'propagate': False,
+        #    },
         'gunicorn': {
             'handlers': ['console'],
             'level': 'DEBUG' if DEBUG else 'INFO',
