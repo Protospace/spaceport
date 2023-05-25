@@ -54,9 +54,10 @@ export class Ship {
 
 		if (!this.flyIn) {
 			const xs = Math.sin(this.life * 0.5 + this.x);
-			this.mesh.position.y = this.y + Math.sin(this.life + this.y) * 0.08;
-			this.mesh.position.x = this.x + xs * 0.08;
-			this.mesh.rotation.y = xs * 0.25;
+			const yrot = Math.sin(this.life + this.x + (3.14/2 * this.direction));
+			this.mesh.position.y = this.y + Math.sin(this.life + this.y) * 0.2;
+			this.mesh.position.x = this.x + xs * 0.15;
+			this.mesh.rotation.x = yrot * 0.15;
 			this.mesh.position.z += 0.01 * this.direction;
 			this.nextShot -= deltaTime;
 			if (this.nextShot <= 0) {
@@ -70,6 +71,9 @@ export class Ship {
 			this.mesh.position.z += a * 2 * this.direction;
 			this.mesh.scale.z = a * 4;
 			this.firing = false;
+
+			this.mesh.rotation.y = 0;
+			this.mesh.rotation.x = 0;
 		}
 
 		if (Math.abs(this.mesh.position.z > 475 / 2)) {

@@ -16,6 +16,7 @@ export class Laser {
 	constructor(ship) {
 		const position = new THREE.Vector3();
 		this.direction = ship.direction;
+		this.kill = false;
 
 		ship.mesh.getWorldPosition(position);
 
@@ -31,5 +32,9 @@ export class Laser {
 
 	update({ deltaTime }) {
 		this.mesh.position.z += 0.5 * this.direction;
+
+		if (Math.abs(this.mesh.position.z > 475/2)) {
+			this.kill = true;
+		}
 	}
 }
