@@ -7,7 +7,7 @@ import { MembersDropdown } from './Members.js';
 import { requester } from './utils.js';
 
 export function PayWithProtocoin(props) {
-	const { token, user, refreshUser, amount, setAmount, custom } = props;
+	const { token, user, refreshUser, amount, onSuccess, custom } = props;
 	const member = user.member;
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
@@ -23,7 +23,9 @@ export function PayWithProtocoin(props) {
 		.then(res => {
 			setLoading(false);
 			setSuccess(true);
-			setAmount('');
+			if (onSuccess) {
+				onSuccess();
+			}
 			setError({});
 			refreshUser();
 		})
@@ -232,7 +234,7 @@ export function Paymaster(props) {
 					<PayWithProtocoin
 						token={token} user={user} refreshUser={refreshUser}
 						amount={consumables}
-						setAmount={setConsumables}
+						onSuccess={() => setConsumables('')}
 						custom={{ category: 'Consumables', memo: consumablesMemo }}
 					/>
 				</Grid.Column>
@@ -274,7 +276,7 @@ export function Paymaster(props) {
 					<PayWithProtocoin
 						token={token} user={user} refreshUser={refreshUser}
 						amount={donate}
-						setAmount={setDonate}
+						onSuccess={() => setDonate('')}
 						custom={{ category: 'Donation', memo: memo }}
 					/>
 				</Grid.Column>

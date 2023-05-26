@@ -1157,6 +1157,8 @@ class ProtocoinViewSet(Base):
                 source_user = self.request.user
                 source_member = source_user.member
 
+                training = None
+
                 try:
                     balance = float(request.data['balance'])
                 except KeyError:
@@ -1175,8 +1177,32 @@ class ProtocoinViewSet(Base):
                     category = str(request.data['category'])
                 except KeyError:
                     raise exceptions.ValidationError(dict(category='This field is required.'))
-                if category not in ['Consumables', 'Donation']:
+                if category not in ['Consumables', 'Donation', 'OnAcct']:
                     raise exceptions.ValidationError(dict(category='Invalid category.'))
+
+                if category == 'OnAcct':
+                    try:
+                        training_id = int(request.data['training'])
+                    except KeyError:
+                        raise exceptions.ValidationError(dict(training='This field is required.'))
+                    except ValueError:
+                        raise exceptions.ValidationError(dict(training='Invalid number.'))
+
+                    training = get_object_or_404(models.Training, id=training_id)
+
+                    if not training.session:
+                        raise exceptions.ValidationError(dict(training='Invalid session.'))
+
+                    if training.session.is_cancelled:
+                        raise exceptions.ValidationError(dict(training='Class is cancelled.'))
+
+                    if training.paid_date:
+                        raise exceptions.ValidationError(dict(training='Already paid.'))
+
+                    if training.session.cost != amount:
+                        msg = 'Protocoin training payment amount mismatch:\n' + str(request.data.dict())
+                        utils.alert_tanner(msg)
+                        raise exceptions.ValidationError(dict(training='Class cost doesn\'t match amount.'))
 
                 memo = str(request.data.get('memo', ''))
 
@@ -1193,11 +1219,19 @@ class ProtocoinViewSet(Base):
                 if source_user_balance < amount:
                     raise exceptions.ValidationError(dict(amount='Insufficient funds.'))
 
-                tx_memo = 'Protocoin - Transaction spent ₱ {} on {}{}'.format(
-                    amount,
-                    category,
-                    ', memo: ' + memo if memo else ''
-                )
+                if training:
+                    tx_memo = 'Protocoin - Transaction spent ₱ {} on {}, session: {}, training: {}'.format(
+                        amount,
+                        training.session.course.name,
+                        str(training.session.id),
+                        str(training.id),
+                    )
+                else:
+                    tx_memo = 'Protocoin - Transaction spent ₱ {} on {}{}'.format(
+                        amount,
+                        category,
+                        ', memo: ' + memo if memo else ''
+                    )
 
                 tx = models.Transaction.objects.create(
                     user=source_user,
@@ -1210,6 +1244,12 @@ class ProtocoinViewSet(Base):
                     memo=tx_memo,
                 )
                 utils.log_transaction(tx)
+
+                if training:
+                    if training.attendance_status == 'Waiting for payment':
+                        training.attendance_status = 'Confirmed'
+                    training.paid_date = utils.today_alberta_tz()
+                    training.save()
 
                 return Response(200)
         except OperationalError:

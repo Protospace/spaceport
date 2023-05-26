@@ -250,7 +250,7 @@ def check_training(data, training_id, amount):
 
     if training.attendance_status == 'Waiting for payment':
         training.attendance_status = 'Confirmed'
-    training.paid_date = datetime.date.today()
+    training.paid_date = utils.today_alberta_tz()
     training.save()
 
     logger.info('IPN - Amount valid for training cost, id: ' + str(training.id))
