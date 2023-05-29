@@ -196,12 +196,12 @@ export function Paymaster(props) {
 				</Grid.Column>
 			</Grid>
 
-			<Header size='medium'>Consumables</Header>
-
-			<p>Pay for materials you use (ie. welding gas, 3D printing, blades, etc).</p>
-
-			<Grid stackable padded columns={1}>
+			<Grid stackable columns={2}>
 				<Grid.Column>
+					<Header size='medium'>Consumables</Header>
+
+					<p>Pay for materials you use (ie. welding gas, 3D printing, etc).</p>
+
 					Custom amount:
 
 					<div className='pay-custom'>
@@ -238,12 +238,11 @@ export function Paymaster(props) {
 						custom={{ category: 'Consumables', memo: consumablesMemo }}
 					/>
 				</Grid.Column>
-			</Grid>
-
-			<Header size='medium'>Donate</Header>
-
-			<Grid stackable padded columns={1}>
 				<Grid.Column>
+					<Header size='medium'>Donate</Header>
+
+					<p>Donation of any amount to Protospace.</p>
+
 					Custom amount:
 
 					<div className='pay-custom'>
