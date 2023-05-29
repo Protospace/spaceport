@@ -293,7 +293,8 @@ class StorageSpace(models.Model):
 
     history = HistoricalRecords()
 
-    MY_FIELDS = ['shelf_id', 'location', 'user', 'id']
+    list_display = ['shelf_id', 'location', 'user', 'id']
+    search_fields = ['shelf_id', 'location', 'user__username', 'id']
     def __str__(self):
         return self.shelf_id
 
