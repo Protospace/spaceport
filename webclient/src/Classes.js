@@ -697,6 +697,8 @@ export function ClassDetail(props) {
 
 											<p/>
 
+											<p>Current balance: ₱&thinsp;{user.member.protocoin.toFixed(2)}</p>
+
 											<PayWithProtocoin
 												token={token} user={user} refreshUser={refreshUser}
 												amount={clazz.cost}
