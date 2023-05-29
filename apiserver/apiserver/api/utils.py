@@ -70,7 +70,7 @@ def calc_member_status(expire_date, fake_date=None):
     if today + timedelta(days=29) < expire_date:
         return 'Prepaid'
     elif difference <= -3:
-        return 'Former Member'
+        return 'Expired Member'
     elif today - timedelta(days=29) >= expire_date:
         return 'Overdue'
     elif today < expire_date:
@@ -104,11 +104,26 @@ def tally_membership_months(member, fake_date=None):
     status = calc_member_status(expire_date, fake_date)
 
     if member.expire_date != expire_date or member.status != status:
+        previous_status = member.status
+
         member.expire_date = expire_date
         member.status = status
 
-        if status == 'Former Member':
-            member.paused_date = expire_date
+        if status == 'Expired Member':
+            member.paused_date = today_alberta_tz()
+            msg = 'Member has expired: {} {}'.format(member.preferred_name, member.last_name)
+            alert_tanner(msg)
+            logger.info(msg)
+
+        if status == 'Overdue':
+            if previous_status == 'Due':
+                msg = 'Member has become Overdue: {} {}'.format(member.preferred_name, member.last_name)
+                alert_tanner(msg)
+                logger.info(msg)
+
+                utils_email.send_overdue_email(member)
+            else:
+                logger.info('Skipping email because member wasn\'t due before.')
 
         member.save()
         logging.debug('Tallied %s membership months: updated.', member)
@@ -466,7 +481,10 @@ def gen_member_forms(member):
 def custom_exception_handler(exc, context):
     response = exception_handler(exc, context)
     if response is not None:
-        logging.warning('Response: %s', json.dumps(exc.detail))
+        if hasattr(exc, 'detail'):
+            logging.warning('Response: %s', json.dumps(exc.detail))
+        else:
+            logging.warning('Response: %s', exc)
     return response
 
 def log_transaction(tx):

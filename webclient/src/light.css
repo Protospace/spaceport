@@ -157,6 +157,11 @@ body {
 	margin-left: auto;
 }
 
+.adminvetting .ui.button {
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+}
+
 .interest .ui.button {
 	padding-left: 0.5rem;
 	padding-right: 0.5rem;
@@ -184,15 +189,34 @@ body {
 	height: 100vh;
 	background-color: black;
 	color: white;
-	font-size: 1em;
+	font-size: 1.75em;
 }
 
 .display-usage {
 	border: 1px solid white;
 	padding: 0.5em;
 	align-self: flex-end;
-	width: 240px;
-	height: 383px;
+	width: 25vw;
+	height: 75vh;
+}
+
+.display-scores {
+	border: 1px solid white;
+	padding: 0.5em;
+	align-self: flex-end;
+	width: 25vw;
+	height: 75vh;
+}
+
+.display-scores p {
+	font-size: 1.5em;
+	text-align: right;
+}
+
+.display .display-scores .toast {
+	width: 40px;
+	height: 40px;
+	margin-bottom: 15px;
 }
 
 .usage {
@@ -220,6 +244,10 @@ body {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+.filter-option {
+	margin-right: 1rem;
 }
 
 

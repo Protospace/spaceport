@@ -19,10 +19,19 @@ class LoggingThrottle(throttling.BaseThrottle):
         if path.startswith('/lockout/'):
             return True
         elif path == '/stats/sign/':
-            pass
+            pass  # log this one
         elif path.startswith('/stats/'):
             return True
         elif path == '/sessions/' and user == None:
+            return True
+        elif path in [
+            '/pinball/high_scores/',
+            '/pinball/monthly_high_scores/',
+            '/protocoin/printer_balance/',
+            '/hosting/high_scores/',
+            '/stats/ord2/printer3d/',
+            '/stats/ord3/printer3d/'
+        ]:
             return True
 
         if request.data:

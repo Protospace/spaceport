@@ -22,6 +22,11 @@ function MemberInfo(props) {
 
 	return (
 		<div>
+			{member.protocoin < 0 && <Message error>
+				<Message.Header>Your Protocoin balance is negative!</Message.Header>
+				<p>Visit the <Link to='/paymaster'>Paymaster</Link> page or pay a Director to buy Protocoin.</p>
+			</Message>}
+
 			<Grid stackable>
 				<Grid.Column width={5}>
 					<Image
@@ -65,8 +70,8 @@ function MemberInfo(props) {
 				<Message.Header>Welcome, new member!</Message.Header>
 				<p>
 					<a href={staticUrl + '/' + member.member_forms} target='_blank'>
-						Click here
-					</a> to view your application forms.
+						View your application forms.
+					</a>
 				</p>
 			</Message>}
 
@@ -89,14 +94,18 @@ function MemberInfo(props) {
 				<QRCode value={siteUrl + 'subscribe?monthly_fees=' + user.member.monthly_fees + '&id=' + user.member.id} />
 			</React.Fragment>}
 
-			<Header size='medium'>Latest Training</Header>
-
 			{unpaidTraining.map(x =>
 				<Message warning>
 					<Message.Header>Please pay your course fee!</Message.Header>
 					<p>Pay ${x.session.cost} for <Link to={'/classes/'+x.session.id}>{x.session.course_data.name}</Link> to avoid losing your spot.</p>
 				</Message>
 			)}
+
+			<Header size='medium'>Latest Training</Header>
+
+			{!member.orientation_date && <p>
+				⚠️ You need to attend a <Link to={'/courses/249/'}>New Member Orientation</Link> to use any tool larger than a screwdriver.
+			</p>}
 
 			<BasicTable>
 				<Table.Body>
@@ -110,7 +119,7 @@ function MemberInfo(props) {
 							</Table.Row>
 						)
 					:
-						<Table.Row><Table.Cell>None, please sign up for an <Link to={'/courses/249/'}>Orientation</Link></Table.Cell></Table.Row>
+						<Table.Row><Table.Cell>None</Table.Cell></Table.Row>
 					}
 					{user.training.length > 3 &&
 						<Table.Row><Table.Cell>
@@ -231,9 +240,15 @@ export function Home(props) {
 	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').fromNow() : '';
 	const getTrackName = (x) => stats && stats.track && stats.track[x] && stats.track[x]['first_name'] ? stats.track[x]['first_name'] : 'Unknown';
 
-	const alarmStat = () => stats && stats.alarm && moment().unix() - stats.alarm['time'] < 300 ? stats.alarm['data'] < 270 ? 'Armed' : 'Disarmed' : 'Unknown';
+	//const alarmStat = () => stats && stats.alarm && moment().unix() - stats.alarm['time'] < 300 ? stats.alarm['data'] < 270 ? 'Armed' : 'Disarmed' : 'Unknown';
+	const alarmStat = () => 'Unknown';
 
-	const doorOpenStat = () => alarmStat() === 'Disarmed' && stats.alarm['data'] > 360 ? ', door open' : '';
+	//const doorOpenStat = () => alarmStat() === 'Disarmed' && stats.alarm['data'] > 360 ? ', door open' : '';
+	const doorOpenStat = () => '';
+
+	const closedStat = (x) => stats && stats.closing ? moment().unix() > stats.closing['time'] ? 'Closed' : 'Open until ' + stats.closing['time_str'] : 'Unknown';
+
+	const printer3dStat = (x) => stats && stats.printer3d && stats.printer3d[x] ? stats.printer3d[x].state === 'Printing' ? 'Printing (' + stats.printer3d[x].progress + '%)' : stats.printer3d[x].state : 'Unknown';
 
 	const show_signup = stats?.at_protospace;
 
@@ -261,8 +276,8 @@ export function Home(props) {
 					{user?.member?.set_details !== false &&
 						<Segment>
 							<Header size='medium'>Quick Links</Header>
-							<p><a href='http://protospace.ca/' target='_blank' rel='noopener noreferrer'>Main Website</a></p>
-							<p><a href='http://wiki.protospace.ca/Welcome_to_Protospace' target='_blank' rel='noopener noreferrer'>Protospace Wiki</a> — <Link to='/auth/wiki'>[register]</Link></p>
+							<p><a href='https://protospace.ca/' target='_blank' rel='noopener noreferrer'>Main Website</a></p>
+							<p><a href='https://wiki.protospace.ca/Welcome_to_Protospace' target='_blank' rel='noopener noreferrer'>Protospace Wiki</a> — <Link to='/auth/wiki'>[register]</Link></p>
 							<p><a href='https://forum.protospace.ca' target='_blank' rel='noopener noreferrer'>Forum (Spacebar)</a> — <Link to='/auth/discourse'>[register]</Link></p>
 							{!!user && <p><a href='https://drive.google.com/drive/folders/0By-vvp6fxFekfmU1cmdxaVRlaldiYXVyTE9rRnNVNjhkc3FjdkFIbjBwQkZ3MVVQX2Ezc3M?resourcekey=0-qVLjcYr8ZCmLypdINk2svg' target='_blank' rel='noopener noreferrer'>Google Drive</a></p>}
 							{!!user && isAdmin(user) && <p><a href='https://estancia.hippocmms.ca/' target='_blank' rel='noopener noreferrer'>Property Management Portal</a></p>}
@@ -348,7 +363,33 @@ export function Home(props) {
 									} trigger={<a>[more]</a>} />
 								</p>
 
+								<p>
+									Media computer: {getTrackStat('PROTOGRAPH1')} <Popup content={
+										<React.Fragment>
+											<p>
+												Last use:<br />
+												{getTrackLast('PROTOGRAPH1')}<br />
+												{getTrackAgo('PROTOGRAPH1')}<br />
+												by {getTrackName('PROTOGRAPH1')}
+											</p>
+
+											<p>
+												Last print:<br />
+												{getTrackLast('LASTLARGEPRINT')}<br />
+												{getTrackAgo('LASTLARGEPRINT')}<br />
+												by {getTrackName('LASTLARGEPRINT')}
+											</p>
+										</React.Fragment>
+									} trigger={<a>[more]</a>} />
+								</p>
+
+								<p>ORD2 printer: {printer3dStat('ord2')}</p>
+
+								<p>ORD3 printer: {printer3dStat('ord3')}</p>
+
 								{user && <p>Alarm status: {alarmStat()}{doorOpenStat()}</p>}
+
+								{user && <p>Hosting status: {closedStat()}</p>}
 							</div>
 
 							<SignForm token={token} />

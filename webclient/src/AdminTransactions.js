@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './light.css';
-import { Container, Checkbox, Form, Header, Segment } from 'semantic-ui-react';
+import { Container, Checkbox, Form, Header, Segment, Table } from 'semantic-ui-react';
 import * as Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
 import moment from 'moment';
@@ -42,28 +42,25 @@ export function AdminReportedTransactions(props) {
 };
 
 let transactionsCache = false;
-let excludePayPalCache = false;
+let summaryCache = false;
 
 export function AdminHistoricalTransactions(props) {
 	const { token } = props;
 	const [input, setInput] = useState({ month: moment() });
 	const [transactions, setTransactions] = useState(transactionsCache);
-	const [excludePayPal, setExcludePayPal] = useState(excludePayPalCache);
+	const [summary, setSummary] = useState(summaryCache);
+	const [excludePayPal, setExcludePayPal] = useState(false);
+	const [excludeSnacks, setExcludeSnacks] = useState(true);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(false);
 
 	const handleDatetime = (v) => setInput({ ...input, month: v });
 
-	const handleExcludePayPal = (e, v) => {
-		setExcludePayPal(v.checked);
-		excludePayPalCache = v.checked;
-	};
-
-	const handleSubmit = (e) => {
+	const makeRequest = () => {
 		if (loading) return;
 		setLoading(true);
 		const month = input.month.format('YYYY-MM');
-		requester('/transactions/?month=' + month, 'GET', token)
+		requester('/transactions/?month=' + month + '&exclude_paypal=' + excludePayPal + '&exclude_snacks=' + excludeSnacks, 'GET', token)
 		.then(res => {
 			setLoading(false);
 			setError(false);
@@ -75,7 +72,36 @@ export function AdminHistoricalTransactions(props) {
 			console.log(err);
 			setError(true);
 		});
+
+		requester('/transactions/summary/?month=' + month, 'GET', token)
+		.then(res => {
+			setLoading(false);
+			setError(false);
+			setSummary(res);
+			summaryCache = res;
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+			setError(true);
+		});
 	};
+
+	const handleSubmit = (e) => {
+		makeRequest();
+	};
+
+	const handleExcludePayPal = (e, v) => {
+		setExcludePayPal(v.checked);
+	};
+
+	const handleExcludeSnacks = (e, v) => {
+		setExcludeSnacks(v.checked);
+	};
+
+	useEffect(() => {
+		makeRequest();
+	}, [excludePayPal, excludeSnacks]);
 
 	return (
 		<div>
@@ -96,21 +122,59 @@ export function AdminHistoricalTransactions(props) {
 					</Form.Button>
 				</Form.Group>
 			</Form>
+			{transactions && <p>Found {transactions.length} transactions.</p>}
+
+			{!error ?
+				summary && <div>
+					<Header size='small'>Summary</Header>
+
+					<Table basic='very'>
+						<Table.Header>
+							<Table.Row>
+								<Table.HeaderCell>Category</Table.HeaderCell>
+								<Table.HeaderCell>Dollar</Table.HeaderCell>
+								<Table.HeaderCell>Protocoin</Table.HeaderCell>
+							</Table.Row>
+						</Table.Header>
+
+						<Table.Body>
+							{summary.map(x =>
+								<Table.Row key={x.category}>
+									<Table.Cell>{x.category}</Table.Cell>
+									<Table.Cell>{'$ ' + x.dollar.toFixed(2)}</Table.Cell>
+									<Table.Cell>{'₱ ' + x.protocoin.toFixed(2)}</Table.Cell>
+								</Table.Row>
+							)}
+						</Table.Body>
+					</Table>
+				</div>
+			:
+				<p>Error loading summary.</p>
+			}
+
+			<p/>
 
 			{!error ?
 				transactions && <div>
-					<p>Found {transactions.length} transactions.</p>
 					{!!transactions.length &&
 						<Header size='small'>{moment(transactions[0].date, 'YYYY-MM-DD').format('MMMM YYYY')} Transactions</Header>
 					}
 
 					<Checkbox
+						className='filter-option'
 						label='Exclude PayPal'
 						onChange={handleExcludePayPal}
 						checked={excludePayPal}
 					/>
 
-					<TransactionList transactions={transactions.filter(x => !excludePayPal || x.account_type !== 'PayPal')} />
+					<Checkbox
+						className='filter-option'
+						label='Exclude Snacks'
+						onChange={handleExcludeSnacks}
+						checked={excludeSnacks}
+					/>
+
+					<TransactionList transactions={transactions} />
 				</div>
 			:
 				<p>Error loading transactions.</p>

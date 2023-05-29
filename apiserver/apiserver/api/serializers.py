@@ -158,7 +158,8 @@ class TransactionSerializer(serializers.ModelSerializer):
             current_protocoin = (user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0) - instance.protocoin
             new_protocoin = current_protocoin + validated_data['protocoin']
             if new_protocoin < 0:
-                raise ValidationError(dict(category='Insufficient funds. Member only had {} protocoin.'.format(current_protocoin)))
+                msg = 'Negative Protocoin transaction updated:\n' + str(validated_data)
+                utils.alert_tanner(msg)
 
         return super().update(instance, validated_data)
 
@@ -633,9 +634,22 @@ class SessionSerializer(serializers.ModelSerializer):
         else:
             return None
 
+    def create(self, validated_data):
+        if validated_data['datetime'] < now() - datetime.timedelta(days=2):
+            msg = 'Past class creation detected:\n' + str(validated_data)
+            utils.alert_tanner(msg)
+            raise ValidationError(dict(non_field_errors='Class can\'t be in the past.'))
+
+        return super().create(validated_data)
+
     def update(self, instance, validated_data):
         if not self.initial_data.get('instructor_id', None):
             raise ValidationError(dict(instructor_id='This field is required.'))
+
+        if validated_data['datetime'] < now() - datetime.timedelta(days=2):
+            msg = 'Past class modification detected:\n' + str(validated_data)
+            utils.alert_tanner(msg)
+            raise ValidationError(dict(non_field_errors='Can\'t modify past class.'))
 
         member = get_object_or_404(models.Member, id=self.initial_data['instructor_id'])
         if not (is_admin_director(member.user) or member.is_instructor):
@@ -672,14 +686,15 @@ class CourseDetailSerializer(serializers.ModelSerializer):
                         continue
                     yield date
 
-        def next_date(weekday, week_num=False):
+        def next_date(weekday, week_num=False, fake_start=False):
+            start = fake_start or utils.today_alberta_tz()
             for date in iter_matching_dates(weekday, week_num):
-                if date > utils.today_alberta_tz():
+                if date > start:
                     return date
             raise
 
         def course_is_usually_monthly(course):
-            two_months_ago = utils.today_alberta_tz() - datetime.timedelta(days=61)
+            two_months_ago = utils.now_alberta_tz() - datetime.timedelta(days=61)
             recent_sessions = obj.sessions.filter(datetime__gte=two_months_ago)
             if recent_sessions.count() < 3:
                 return True
@@ -695,9 +710,14 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             dt = utils.TIMEZONE_CALGARY.localize(dt)
             cost = 0
             max_students = None
-        elif obj.id == 317: # members' meeting 7:00 PM 3rd Thursday of odd months, Wednesday of even months
+        elif obj.id == 317:
+            # members' meeting 7:00 PM 3rd Thursday of odd months, Wednesday of even months
+            # but December's gets skipped
             next_month = next_date(calendar.WEDNESDAY, week_num=3).month
-            if next_month % 2 == 0:
+            if next_month == 12:
+                one_month_ahead = utils.today_alberta_tz() + datetime.timedelta(days=31)
+                date = next_date(calendar.THURSDAY, week_num=3, fake_start=one_month_ahead)
+            elif next_month % 2 == 0:
                 date = next_date(calendar.WEDNESDAY, week_num=3)
             else:
                 date = next_date(calendar.THURSDAY, week_num=3)
@@ -745,6 +765,7 @@ class UserSerializer(serializers.ModelSerializer):
     training = UserTrainingSerializer(many=True)
     member = MemberSerializer()
     transactions = serializers.SerializerMethodField()
+    training = serializers.SerializerMethodField()
     interests = InterestSerializer(many=True)
     door_code = serializers.SerializerMethodField()
     wifi_pass = serializers.SerializerMethodField()
@@ -771,9 +792,24 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_transactions(self, obj):
         queryset = models.Transaction.objects.filter(user=obj)
+        queryset = queryset.select_related('user', 'user__member')
         queryset = queryset.exclude(category='Memberships:Fake Months')
         queryset = queryset.order_by('-id', '-date')
         serializer = TransactionSerializer(data=queryset, many=True)
+        serializer.is_valid()
+        return serializer.data
+
+    def get_training(self, obj):
+        queryset = obj.training
+        queryset = queryset.select_related(
+            'session',
+            'session__course',
+            'session__instructor',
+            'session__instructor__member'
+        )
+        queryset = queryset.prefetch_related('session__students')
+        queryset = queryset.order_by('-id')
+        serializer = UserTrainingSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
 

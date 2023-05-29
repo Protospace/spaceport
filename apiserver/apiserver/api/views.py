@@ -23,8 +23,7 @@ import icalendar
 import datetime, time
 import io
 import csv
-
-import requests
+import xmltodict
 
 from . import models, serializers, utils, utils_paypal, utils_stats, utils_ldap, utils_email
 from .permissions import (
@@ -137,7 +136,10 @@ class SearchViewSet(Base, Retrieve):
                     pinball_score=Max('user__scores__score'),
                 ).exclude(pinball_score__isnull=True).order_by('-pinball_score')
             elif sort == 'everyone':
-                queryset = queryset.annotate(Count('user__transactions')).order_by('-user__transactions__count', 'id')
+                queryset = queryset.annotate(
+                    protocoin_sum=Sum('user__transactions__protocoin'),
+                    tx_sum=Sum('user__transactions__amount'),
+                ).order_by('-protocoin_sum', '-tx_sum', 'id')
             elif sort == 'best_looking':
                 queryset = []
 
@@ -187,20 +189,42 @@ class MemberViewSet(Base, Retrieve, Update):
         if not is_admin_director(self.request.user):
             raise exceptions.PermissionDenied()
         member = self.get_object()
-        member.status = 'Former Member'
+        member.status = 'Paused Member'
         member.paused_date = utils.today_alberta_tz()
         member.save()
+
+        msg = 'Member has been paused: {} {}'.format(member.preferred_name, member.last_name)
+        utils.alert_tanner(msg)
+        logger.info(msg)
         return Response(200)
 
     @action(detail=True, methods=['post'])
     def unpause(self, request, pk=None):
         if not is_admin_director(self.request.user):
             raise exceptions.PermissionDenied()
+
+        today = utils.today_alberta_tz()
         member = self.get_object()
-        member.current_start_date = utils.today_alberta_tz()
+
+        difference = utils.today_alberta_tz() - member.paused_date
+        if difference.days > 370:  # give some leeway
+            logging.info('Member has been away for %s days (since %s), unvetting...', difference.days, member.paused_date)
+            member.vetted_date = None
+            member.orientation_date = None
+            member.lathe_cert_date = None
+            member.mill_cert_date = None
+            member.wood_cert_date = None
+            member.wood2_cert_date = None
+            member.tormach_cnc_cert_date = None
+            member.precix_cnc_cert_date = None
+            member.rabbit_cert_date = None
+            member.trotec_cert_date = None
+
+        member.current_start_date = today
         member.paused_date = None
         if not member.monthly_fees:
             member.monthly_fees = 55
+
         member.save()
         utils.tally_membership_months(member)
         utils.gen_member_forms(member)
@@ -296,7 +320,7 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
             course=session.course,
             satisfied_by__isnull=True,
             user__member__paused_date__isnull=True
-        )
+        )[:20]
 
         for num, interest in enumerate(interests):
             msg = 'Sending email {} / {}...'.format(num+1, len(interests))
@@ -309,7 +333,9 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
                 logger.exception(msg)
                 utils.alert_tanner(msg)
 
-        num_satisfied = interests.update(satisfied_by=session)
+        interest_ids = interests.values('id')
+        num_satisfied = models.Interest.objects.filter(id__in=interest_ids).update(satisfied_by=session)
+
         logging.info('Satisfied %s interests.', num_satisfied)
 
     def generate_ical(self, session):
@@ -433,6 +459,12 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
 
             member = get_object_or_404(models.Member, id=data['member_id'])
             user = member.user
+            course_id = session.course.id
+
+            if course_id not in [317, 273, 413] and user == session.instructor:
+                msg = 'Self-register trickery detected:\n' + str(data.dict())
+                utils.alert_tanner(msg)
+                raise exceptions.ValidationError(dict(non_field_errors='Can\'t register the instructor. Don\'t try to trick the portal.'))
 
             training1 = models.Training.objects.filter(user=user, session=session)
             if training1.exists():
@@ -471,19 +503,27 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
     def get_queryset(self):
         queryset = models.Transaction.objects
         month = self.request.query_params.get('month', '')
+        exclude_paypal = self.request.query_params.get('exclude_paypal', '') == 'true'
+        exclude_snacks = self.request.query_params.get('exclude_snacks', '') == 'true'
 
-        if self.action == 'list' and month:
-            try:
-                dt = datetime.datetime.strptime(month, '%Y-%m')
-            except ValueError:
-                raise exceptions.ValidationError(dict(month='Should be YYYY-MM.'))
-            queryset = queryset.filter(date__year=dt.year)
-            queryset = queryset.filter(date__month=dt.month)
-            queryset = queryset.exclude(category='Memberships:Fake Months')
-            return queryset.order_by('-date', '-id')
-        elif self.action == 'list':
-            queryset = queryset.exclude(report_type__isnull=True)
-            queryset = queryset.exclude(report_type='')
+        if self.action == 'list':
+            if month:
+                try:
+                    dt = datetime.datetime.strptime(month, '%Y-%m')
+                except ValueError:
+                    raise exceptions.ValidationError(dict(month='Should be YYYY-MM.'))
+                queryset = queryset.filter(date__year=dt.year)
+                queryset = queryset.filter(date__month=dt.month)
+                queryset = queryset.exclude(category='Memberships:Fake Months')
+            else:
+                queryset = queryset.exclude(report_type__isnull=True)
+                queryset = queryset.exclude(report_type='')
+
+            if exclude_paypal:
+                queryset = queryset.exclude(account_type='PayPal')
+
+            if exclude_snacks:
+                queryset = queryset.exclude(category='Snacks')
             return queryset.order_by('-date', '-id')
         else:
             return queryset.all()
@@ -516,16 +556,30 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
             raise exceptions.PermissionDenied()
         return super().list(request)
 
-    @action(detail=True, methods=['post'])
-    def report(self, request, pk=None):
-        report_memo = request.data.get('report_memo', '').strip()
-        if not report_memo:
-            raise exceptions.ValidationError(dict(report_memo='This field may not be blank.'))
-        transaction = self.get_object()
-        transaction.report_type = 'User Flagged'
-        transaction.report_memo = report_memo
-        transaction.save()
-        return Response(200)
+    @action(detail=False, methods=['get'])
+    def summary(self, request):
+        txs = models.Transaction.objects
+        month = self.request.query_params.get('month', '')
+
+        try:
+            dt = datetime.datetime.strptime(month, '%Y-%m')
+        except ValueError:
+            raise exceptions.ValidationError(dict(month='Should be YYYY-MM.'))
+
+        txs = txs.filter(date__year=dt.year)
+        txs = txs.filter(date__month=dt.month)
+        txs = txs.exclude(category='Memberships:Fake Months')
+
+        result = []
+
+        for category in ['Membership', 'Snacks', 'OnAcct', 'Donation', 'Consumables', 'Purchases']:
+            result.append(dict(
+                category = category,
+                dollar = txs.filter(category=category).aggregate(Sum('amount'))['amount__sum'] or 0,
+                protocoin = -1 * (txs.filter(category=category).aggregate(Sum('protocoin'))['protocoin__sum'] or 0),
+            ))
+
+        return Response(result)
 
 
 class UserView(views.APIView):
@@ -555,6 +609,7 @@ class DoorViewSet(viewsets.ViewSet, List):
         for card in cards:
             member = card.user.member
             if member.paused_date: continue
+            if not member.vetted_date: continue
             if not member.is_allowed_entry: continue
 
             active_member_cards[card.card_number] = '{} ({})'.format(
@@ -573,6 +628,13 @@ class DoorViewSet(viewsets.ViewSet, List):
         member = card.user.member
         t = utils.now_alberta_tz().strftime('%Y-%m-%d %H:%M:%S, %a %I:%M %p')
         logger.info('Scan - Time: {} | Name: {} {} ({})'.format(t, member.preferred_name, member.last_name, member.id))
+
+        last_scan = dict(
+            time=time.time(),
+            member_id=member.id,
+            first_name=member.preferred_name,
+        )
+        cache.set('last_scan', last_scan)
 
         utils_stats.calc_card_scans()
 
@@ -756,7 +818,8 @@ class StatsViewSet(viewsets.ViewSet, List):
         if should_count:
             start_new_use = not last_use or last_use.finished_at or last_use.username != username
             if start_new_use:
-                if username_isfrom_track and time.time() - track[device]['time'] > 20*60:
+                username_isexpired = time.time() - track[device]['time'] > 2*60*60  # two hours
+                if username_isfrom_track and username_isexpired:
                     msg = 'Usage tracker problem expired username {} for device: {}'.format(username, device)
                     utils.alert_tanner(msg)
                     logger.error(msg)
@@ -890,6 +953,23 @@ class StatsViewSet(viewsets.ViewSet, List):
         logging.debug('Wrote garden images to %s and %s', medium, large)
 
         return Response(200)
+
+    @action(detail=True, methods=['post'])
+    def printer3d(self, request, pk=None):
+        printer3d = cache.get('printer3d', {})
+
+        devicename = pk
+        status = request.data['result']['status']
+
+        printer3d[devicename] = dict(
+            progress=int(status['display_status']['progress'] * 100),
+            #filename=status['print_stats']['filename'],
+            state=status['idle_timeout']['state'],
+        )
+        cache.set('printer3d', printer3d)
+
+        return Response(200)
+
 
 
 class MemberCountViewSet(Base, List):
@@ -1072,6 +1152,111 @@ class InterestViewSet(Base, Retrieve, Create):
 
 class ProtocoinViewSet(Base):
     @action(detail=False, methods=['post'], permission_classes=[AllowMetadata | IsAuthenticated])
+    def spend_request(self, request):
+        try:
+            with transaction.atomic():
+                source_user = self.request.user
+                source_member = source_user.member
+
+                training = None
+
+                try:
+                    balance = float(request.data['balance'])
+                except KeyError:
+                    raise exceptions.ValidationError(dict(balance='This field is required.'))
+                except ValueError:
+                    raise exceptions.ValidationError(dict(balance='Invalid number.'))
+
+                try:
+                    amount = float(request.data['amount'])
+                except KeyError:
+                    raise exceptions.ValidationError(dict(amount='This field is required.'))
+                except ValueError:
+                    raise exceptions.ValidationError(dict(amount='Invalid number.'))
+
+                try:
+                    category = str(request.data['category'])
+                except KeyError:
+                    raise exceptions.ValidationError(dict(category='This field is required.'))
+                if category not in ['Consumables', 'Donation', 'OnAcct']:
+                    raise exceptions.ValidationError(dict(category='Invalid category.'))
+
+                if category == 'OnAcct':
+                    try:
+                        training_id = int(request.data['training'])
+                    except KeyError:
+                        raise exceptions.ValidationError(dict(training='This field is required.'))
+                    except ValueError:
+                        raise exceptions.ValidationError(dict(training='Invalid number.'))
+
+                    training = get_object_or_404(models.Training, id=training_id)
+
+                    if not training.session:
+                        raise exceptions.ValidationError(dict(training='Invalid session.'))
+
+                    if training.session.is_cancelled:
+                        raise exceptions.ValidationError(dict(training='Class is cancelled.'))
+
+                    if training.paid_date:
+                        raise exceptions.ValidationError(dict(training='Already paid.'))
+
+                    if training.session.cost != amount:
+                        msg = 'Protocoin training payment amount mismatch:\n' + str(request.data.dict())
+                        utils.alert_tanner(msg)
+                        raise exceptions.ValidationError(dict(training='Class cost doesn\'t match amount.'))
+
+                memo = str(request.data.get('memo', ''))
+
+                # also prevents negative spending
+                if amount < 0.25:
+                    raise exceptions.ValidationError(dict(amount='Amount too small.'))
+
+                source_user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
+                source_user_balance = float(source_user_balance)
+
+                if abs(source_user_balance - balance) > 0.01:  # stupid https://docs.djangoproject.com/en/4.2/ref/databases/#decimal-handling
+                    raise exceptions.ValidationError(dict(balance='Incorrect current balance.'))
+
+                if source_user_balance < amount:
+                    raise exceptions.ValidationError(dict(amount='Insufficient funds.'))
+
+                if training:
+                    tx_memo = 'Protocoin - Transaction spent ₱ {} on {}, session: {}, training: {}'.format(
+                        amount,
+                        training.session.course.name,
+                        str(training.session.id),
+                        str(training.id),
+                    )
+                else:
+                    tx_memo = 'Protocoin - Transaction spent ₱ {} on {}{}'.format(
+                        amount,
+                        category,
+                        ', memo: ' + memo if memo else ''
+                    )
+
+                tx = models.Transaction.objects.create(
+                    user=source_user,
+                    protocoin=-amount,
+                    amount=0,
+                    number_of_membership_months=0,
+                    account_type='Protocoin',
+                    category=category,
+                    info_source='System',
+                    memo=tx_memo,
+                )
+                utils.log_transaction(tx)
+
+                if training:
+                    if training.attendance_status == 'Waiting for payment':
+                        training.attendance_status = 'Confirmed'
+                    training.paid_date = utils.today_alberta_tz()
+                    training.save()
+
+                return Response(200)
+        except OperationalError:
+            self.spend_request(request)
+
+    @action(detail=False, methods=['post'], permission_classes=[AllowMetadata | IsAuthenticated])
     def send_to_member(self, request):
         try:
             with transaction.atomic():
@@ -1099,6 +1284,7 @@ class ProtocoinViewSet(Base):
                 except ValueError:
                     raise exceptions.ValidationError(dict(amount='Invalid number.'))
 
+                # also prevents negative spending
                 if amount < 1.00:
                     raise exceptions.ValidationError(dict(amount='Amount too small.'))
 
@@ -1112,7 +1298,7 @@ class ProtocoinViewSet(Base):
                 source_user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
                 source_user_balance = float(source_user_balance)
 
-                if source_user_balance != balance:
+                if abs(source_user_balance - balance) > 0.01:  # stupid https://docs.djangoproject.com/en/4.2/ref/databases/#decimal-handling
                     raise exceptions.ValidationError(dict(balance='Incorrect current balance.'))
 
                 if source_user_balance < amount:
@@ -1175,6 +1361,38 @@ class ProtocoinViewSet(Base):
         )
         return Response(res)
 
+    @action(detail=False, methods=['get'])
+    def printer_balance(self, request, pk=None):
+        #auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        #if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.VEND_API_TOKEN:
+        #    raise exceptions.PermissionDenied()
+
+        track = cache.get('track', {})
+        track_graphics_computer = track.get('PROTOGRAPH1', None)
+
+        if not track_graphics_computer:
+            return Response(200)
+
+        track_username = track_graphics_computer['username']
+        track_time = track_graphics_computer['time']
+
+        try:
+            source_user = User.objects.get(username__iexact=track_username)
+        except User.DoesNotExist:
+            return Response(200)
+
+        if time.time() - track_time > 10:
+            return Response(200)
+
+        user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
+        user_balance = float(user_balance)
+
+        res = dict(
+            balance=user_balance,
+            first_name=source_user.member.preferred_name,
+        )
+        return Response(res)
+
     @action(detail=True, methods=['post'])
     def card_vend_request(self, request, pk=None):
         try:
@@ -1185,6 +1403,8 @@ class ProtocoinViewSet(Base):
 
                 source_card = get_object_or_404(models.Card, card_number=pk)
                 source_user = source_card.user
+
+                machine = request.data.get('machine', 'unknown')
 
                 try:
                     number = request.data['number']
@@ -1205,6 +1425,7 @@ class ProtocoinViewSet(Base):
                 except ValueError:
                     raise exceptions.ValidationError(dict(amount='Invalid number.'))
 
+                # also prevents negative spending
                 if amount < 0.25:
                     raise exceptions.ValidationError(dict(amount='Amount too small.'))
 
@@ -1212,7 +1433,7 @@ class ProtocoinViewSet(Base):
                 source_user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
                 source_user_balance = float(source_user_balance)
 
-                if source_user_balance != balance:
+                if abs(source_user_balance - balance) > 0.01:  # stupid https://docs.djangoproject.com/en/4.2/ref/databases/#decimal-handling
                     raise exceptions.ValidationError(dict(balance='Incorrect current balance.'))
 
                 if source_user_balance < amount:
@@ -1220,8 +1441,9 @@ class ProtocoinViewSet(Base):
 
                 source_delta = -amount
 
-                memo = 'Protocoin - Purchase spent ₱ {} on vending machine item #{}'.format(
+                memo = 'Protocoin - Purchase spent ₱ {} on {} vending machine item #{}'.format(
                     amount,
+                    machine,
                     number,
                 )
 
@@ -1253,6 +1475,128 @@ class ProtocoinViewSet(Base):
             transactions=serializer.data,
         )
         return Response(res)
+
+    @action(detail=False, methods=['post'])
+    def printer_report(self, request, pk=None):
+        try:
+            with transaction.atomic():
+                #auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+                #if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.VEND_API_TOKEN:
+                #    raise exceptions.PermissionDenied()
+
+                # {'job_name': 'download.png', 'uuid': '6abbad4d-dda3-4954-b4f1-ac77933a0562', 'timestamp': '20230211173624',
+                # 'job_status': '0', 'user_name': 'Tanner.Collin', 'source': '1', 'paper_name': 'Plain Paper', 'paper_sqi': '356', 'ink_ul': '54'}
+
+                job_uuid = request.data['uuid']
+                username = request.data['user_name']
+
+                logging.info('New printer job UUID: %s, username: %s', str(job_uuid), str(username))
+
+                if not job_uuid:
+                    msg = 'Missing job UUID, aborting.'
+                    utils.alert_tanner(msg)
+                    logger.error(msg)
+                    return Response(200)
+
+                tx = models.Transaction.objects.filter(reference_number=job_uuid)
+                if tx.exists():
+                    msg = 'Job {}: already billed for in transaction {}, aborting.'.format(job_uuid, tx[0].id)
+                    utils.alert_tanner(msg)
+                    logger.error(msg)
+                    return Response(200)
+
+                if not username:
+                    msg = 'Job {}: missing username, aborting.'.format(job_uuid)
+                    utils.alert_tanner(msg)
+                    logger.error(msg)
+                    return Response(200)
+
+                # status 0 = complete
+                # status 3 = cancelled
+
+                is_completed = request.data['job_status'] == '0'
+                is_print = request.data['source'] == '1'
+
+                if not is_completed:
+                    msg = 'Job {} user {}: not complete, aborting.'.format(job_uuid, username)
+                    utils.alert_tanner(msg)
+                    logger.error(msg)
+                    return Response(200)
+
+                if not is_print:
+                    msg = 'Job {} user {}: not a print, aborting.'.format(job_uuid, username)
+                    utils.alert_tanner(msg)
+                    logger.error(msg)
+                    return Response(200)
+
+                try:
+                    user = User.objects.get(username__iexact=username)
+                except User.DoesNotExist:
+                    msg = 'Job {}: unable to find username {}, aborting.'.format(job_uuid, username)
+                    utils.alert_tanner(msg)
+                    logger.error(msg)
+                    return Response(200)
+
+                INK_PROTOCOIN_PER_ML = 0.75
+                DEFAULT_PAPER_PROTOCOIN_PER_M = 0.50
+                PROTOCOIN_PER_PRINT = 2.0
+
+                total_cost = PROTOCOIN_PER_PRINT
+                logging.info('    Fixed cost: %s', str(PROTOCOIN_PER_PRINT))
+
+                microliters = float(request.data['ink_ul'])
+                millilitres = microliters / 1000.0
+                cost = millilitres * INK_PROTOCOIN_PER_ML
+                total_cost += cost
+                logging.info('    %s ul ink cost: %s', str(microliters), str(cost))
+
+                PAPER_COSTS = {
+                    'Plain Paper': 0.25,
+                }
+
+                squareinches = float(request.data['paper_sqi'])
+                squaremetres = squareinches / 1550.0
+                cost = squaremetres * PAPER_COSTS.get(request.data['paper_name'], DEFAULT_PAPER_PROTOCOIN_PER_M)
+                total_cost += cost
+                logging.info('    %s sqi paper cost: %s', str(squareinches), str(cost))
+
+                total_cost = round(total_cost, 2)
+
+                logging.info('Total cost: %s protocoin', str(total_cost))
+
+                memo = 'Protocoin - Purchase spent ₱ {} printing {}'.format(
+                    total_cost,
+                    request.data['job_name'],
+                )
+
+                tx = models.Transaction.objects.create(
+                    user=user,
+                    protocoin=-total_cost,
+                    amount=0,
+                    number_of_membership_months=0,
+                    account_type='Protocoin',
+                    category='Consumables',
+                    info_source='System',
+                    reference_number=job_uuid,
+                    memo=memo,
+                )
+                utils.log_transaction(tx)
+
+                track = cache.get('track', {})
+
+                devicename = 'LASTLARGEPRINT'
+                first_name = username.split('.')[0].title()
+
+                track[devicename] = dict(
+                    time=time.time(),
+                    username=username,
+                    first_name=first_name,
+                )
+                cache.set('track', track)
+
+                return Response(200)
+        except OperationalError:
+            self.printer_report(request, pk)
 
 
 class PinballViewSet(Base):
@@ -1302,6 +1646,143 @@ class PinballViewSet(Base):
         )
 
         return Response(200)
+
+    @action(detail=True, methods=['get'])
+    def get_name(self, request, pk=None):
+        auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if secrets.PINBALL_API_TOKEN and auth_token != 'Bearer ' + secrets.PINBALL_API_TOKEN:
+            raise exceptions.PermissionDenied()
+
+        card = get_object_or_404(models.Card, card_number=pk)
+        member = card.user.member
+
+        res = dict(
+            name=member.preferred_name + ' ' + member.last_name[0]
+        )
+        return Response(res)
+
+    @action(detail=False, methods=['get'])
+    def high_scores(self, request):
+        members = models.Member.objects.all()
+        members = members.annotate(
+            pinball_score=Max('user__scores__score'),
+        ).exclude(pinball_score__isnull=True).order_by('-pinball_score')
+
+        scores = []
+
+        for member in members:
+            scores.append(dict(
+                name=member.preferred_name + ' ' + member.last_name[0],
+                score=member.pinball_score,
+                member_id=member.id,
+            ))
+
+        return Response(scores)
+
+    @action(detail=False, methods=['get'])
+    def monthly_high_scores(self, request):
+        now = utils.now_alberta_tz()
+        current_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+        members = models.Member.objects.all()
+        members = members.annotate(
+            pinball_score=Max('user__scores__score', filter=Q(user__scores__finished_at__gte=current_month_start)),
+        ).exclude(pinball_score__isnull=True).order_by('-pinball_score')
+
+        scores = []
+
+        for member in members:
+            scores.append(dict(
+                name=member.preferred_name + ' ' + member.last_name[0],
+                score=member.pinball_score,
+                member_id=member.id,
+            ))
+
+        return Response(scores)
+
+
+class HostingViewSet(Base):
+    @action(detail=False, methods=['post'])
+    def offer(self, request):
+        #auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        #if secrets.PINBALL_API_TOKEN and auth_token != 'Bearer ' + secrets.PINBALL_API_TOKEN:
+        #    raise exceptions.PermissionDenied()
+
+        try:
+            member_id = int(request.data['member_id'])
+        except KeyError:
+            raise exceptions.ValidationError(dict(game_id='This field is required.'))
+        except ValueError:
+            raise exceptions.ValidationError(dict(game_id='Invalid number.'))
+
+        try:
+            hours = int(request.data['hours'])
+        except KeyError:
+            raise exceptions.ValidationError(dict(player='This field is required.'))
+        except ValueError:
+            raise exceptions.ValidationError(dict(player='Invalid number.'))
+
+        hosting_member = get_object_or_404(models.Member, id=member_id)
+        hosting_user = hosting_member.user
+
+        logging.info('Hosting offer from %s %s for %s hours', hosting_member.preferred_name, hosting_member.last_name, hours)
+
+        try:
+            current_hosting = models.Hosting.objects.get(user=hosting_user, finished_at__gte=now())
+            logging.info('Current hosting by member: %s', current_hosting)
+            new_end = now() + datetime.timedelta(hours=hours)
+            new_delta = new_end - current_hosting.started_at
+            new_hours = new_delta.seconds / 3600
+
+            logging.info(
+                'Hosting %s from %s is still going, updating hours from %s to %s.',
+                current_hosting.id,
+                current_hosting.started_at,
+                current_hosting.hours,
+                new_hours
+            )
+
+            current_hosting.finished_at = new_end
+            current_hosting.hours = new_hours
+            current_hosting.save()
+
+        except models.Hosting.DoesNotExist:
+            h = models.Hosting.objects.create(
+                user=hosting_user,
+                hours=hours,
+                finished_at=now() + datetime.timedelta(hours=hours),
+            )
+
+            logging.info('No current hosting for that user, new hosting #%s created.', h.id)
+
+        # update "open until" time
+        hosting = models.Hosting.objects.order_by('-finished_at').first()
+        closing = dict(
+            time=hosting.finished_at.timestamp(),
+            time_str=hosting.finished_at.astimezone(utils.TIMEZONE_CALGARY).strftime('%-I:%M %p'),
+            first_name=hosting.user.member.preferred_name,
+        )
+        cache.set('closing', closing)
+
+        return Response(200)
+
+    @action(detail=False, methods=['get'])
+    def high_scores(self, request):
+        members = models.Member.objects.all()
+        members = members.annotate(
+            hosting_hours=Sum('user__hosting__hours'),
+        ).exclude(hosting_hours__isnull=True).order_by('-hosting_hours')
+
+        hours = []
+
+        for member in members:
+            hours.append(dict(
+                name=member.preferred_name + ' ' + member.last_name[0],
+                hours=member.hosting_hours,
+                member_id=member.id,
+            ))
+
+        return Response(hours)
 
 
 class StorageSpaceViewSet(Base, List, Retrieve, Update):

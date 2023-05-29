@@ -121,10 +121,34 @@ def send_usage_bill_email(user, device, month, minutes, overage, bill):
         subject='{} {} Usage Bill'.format(month, device),
         message=email_text,
         from_email=None,  # defaults to DEFAULT_FROM_EMAIL
-        recipient_list=[user.email, 'directors@protospace.ca', 'protospace@tannercollin.com'],
+        recipient_list=[user.email, 'directors@protospace.ca', 'spaceport@tannercollin.com'],
     )
 
     if not settings.EMAIL_HOST:
         time.sleep(0.5)  # simulate slowly sending emails when logging to console
 
     logger.info('Sent usage bill email:\n' + email_text)
+
+def send_overdue_email(member):
+    def replace_fields(text):
+        return text.replace(
+            '[name]', member.preferred_name,
+        ).replace(
+            '[date]', member.expire_date.strftime('%B %d, %Y'),
+        )
+
+    with open(EMAIL_DIR + 'overdue.txt', 'r') as f:
+        email_text = replace_fields(f.read())
+
+    with open(EMAIL_DIR + 'overdue.html', 'r') as f:
+        email_html = replace_fields(f.read())
+
+    send_mail(
+        subject='Protospace member dues overdue',
+        message=email_text,
+        from_email=None,  # defaults to DEFAULT_FROM_EMAIL
+        recipient_list=[member.user.email, 'directors@protospace.ca', 'spaceport@tannercollin.com'],
+        html_message=email_html,
+    )
+
+    logger.info('Sent overdue email:\n' + email_text)

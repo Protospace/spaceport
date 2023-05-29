@@ -28,6 +28,9 @@ DEFAULTS = {
     'sign': '',
     'link': '',
     'autoscan': '',
+    'last_scan': {},
+    'closing': {},
+    'printer3d': {},
 }
 
 if secrets.MUMBLE:

@@ -235,7 +235,7 @@ export function CourseDetail(props) {
 
 							<Table.Body>
 								{course.sessions.length ?
-									course.sessions.sort((a, b) => a.datetime < b.datetime ? 1 : -1).slice(0,10).map(x =>
+									course.sessions.sort((a, b) => a.datetime < b.datetime ? 1 : -1).map(x =>
 										<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
 											<Table.Cell>
 												<Link to={'/classes/'+x.id}>

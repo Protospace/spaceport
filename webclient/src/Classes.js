@@ -7,6 +7,7 @@ import { apiUrl, isAdmin, getInstructor, BasicTable, requester, useIsMobile } fr
 import { NotFound } from './Misc.js';
 import { InstructorClassDetail, InstructorClassAttendance } from './InstructorClasses.js';
 import { PayPalPayNow } from './PayPal.js';
+import { PayWithProtocoin } from './Paymaster.js';
 import { tags } from './Courses.js';
 
 function ClassTable(props) {
@@ -298,6 +299,8 @@ export function ClassFeed(props) {
 			:
 				<p>Loading...</p>
 			}
+
+			<p style={{ marginBottom: '30rem' }}/>
 		</Container>
 	);
 };
@@ -690,6 +693,20 @@ export function ClassDetail(props) {
 												amount={clazz.cost}
 												name={clazz.course_data.name}
 												custom={JSON.stringify({ training: userTraining.id })}
+											/>
+
+											<p/>
+
+											<p>Current balance: ₱&thinsp;{user.member.protocoin.toFixed(2)}</p>
+
+											<PayWithProtocoin
+												token={token} user={user} refreshUser={refreshUser}
+												amount={clazz.cost}
+												onSuccess={() => {
+													refreshUser();
+													refreshClass();
+												}}
+												custom={{ category: 'OnAcct', training: userTraining.id }}
 											/>
 										</div>
 									}

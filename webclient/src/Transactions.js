@@ -211,66 +211,6 @@ function EditTransaction(props) {
 	);
 };
 
-function ReportTransaction(props) {
-	const { transaction, token, refreshUser } = props;
-	const [input, setInput] = useState(transaction);
-	const [error, setError] = useState(false);
-	const [loading, setLoading] = useState(false);
-	const [success, setSuccess] = useState(false);
-	const { id } = useParams();
-
-	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
-	const handleChange = (e) => handleValues(e, e.currentTarget);
-
-	const handleSubmit = (e) => {
-		if (loading) return;
-		setLoading(true);
-		setSuccess(false);
-		requester('/transactions/'+id+'/report/', 'POST', token, input)
-		.then(res => {
-			setLoading(false);
-			setSuccess(true);
-			setError(false);
-			if (refreshUser) {
-				refreshUser();
-			}
-		})
-		.catch(err => {
-			setLoading(false);
-			console.log(err);
-			setError(err.data);
-		});
-	};
-
-	const makeProps = (name) => ({
-		name: name,
-		onChange: handleChange,
-		value: input[name] || '',
-		error: error[name],
-	});
-
-	return (
-		<div>
-			<Header size='medium'>Report Transaction</Header>
-
-			<p>If this transaction was made in error or there is anything incorrect about it, please report it using this form.</p>
-			<p>A staff member will review the report as soon as possible.</p>
-			<p>Follow up with <a href='mailto:directors@protospace.ca' target='_blank' rel='noopener noreferrer'>directors@protospace.ca</a>.</p>
-
-			<Form onSubmit={handleSubmit}>
-				<Form.TextArea
-					label='Reason'
-					{...makeProps('report_memo')}
-				/>
-
-				<Form.Button loading={loading} error={error.non_field_errors}>
-					Submit Report
-				</Form.Button>
-				{success && <div>Success!</div>}
-			</Form>
-		</div>
-	);
-};
 
 export function TransactionList(props) {
 	const { transactions, noMember, noCategory } = props;
@@ -474,7 +414,11 @@ export function TransactionDetail(props) {
 									</Segment>
 								:
 									<Segment padded>
-										<ReportTransaction transaction={transaction} setTransaction={setTransaction} {...props} />
+										<Header size='medium'>Report Transaction</Header>
+
+										<p>If there's anything wrong with this transaction or it was made in error please email the Protospace Directors:</p>
+										<p><a href='mailto:directors@protospace.ca' target='_blank' rel='noopener noreferrer'>directors@protospace.ca</a></p>
+										<p>Please include a link to this transaction and any relevant details.</p>
 									</Segment>
 								}
 							</Grid.Column>

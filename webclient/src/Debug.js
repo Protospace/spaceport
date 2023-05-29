@@ -26,6 +26,10 @@ export function Debug(props) {
 
 			<p><Link to='/usage/trotec'>Trotec Usage</Link></p>
 
+			<p><Link to='/display/lcars1'>LCARS1 Display</Link></p>
+
+			<p><Link to='/display/lcars2'>LCARS2 Display</Link></p>
+
 
 		</Container>
 	);

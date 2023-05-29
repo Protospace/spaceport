@@ -49,9 +49,9 @@ export const Footer = () => {
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						Click here
+						View the source code and license on GitHub.
 					</a>{' '}
-					to view the source code and license.
+					
 				</p>
 
 				<p>
@@ -97,7 +97,7 @@ export const Footer = () => {
 					</a>
 				</p>
 
-				<p>© 2020 Calgary Protospace Ltd.</p>
+				<p>© 2020-{new Date().getFullYear()} Calgary Protospace Ltd.</p>
 			</Container>
 		</div>
 	);

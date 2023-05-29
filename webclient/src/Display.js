@@ -34,10 +34,57 @@ export function LCARS1Display(props) {
 					</p>
 				}
 
-				<div></div>
+				<div className='display-scores'>
+					<DisplayScores />
+				</div>
+
+				<div className='display-scores'>
+					<DisplayMonthlyScores />
+				</div>
+
+				<div className='display-scores'>
+					<DisplayHosting />
+				</div>
 
 				<div className='display-usage'>
 					<DisplayUsage token={token} name={'trotec'} />
+				</div>
+			</div>
+		</Container>
+	);
+};
+
+export function LCARS2Display(props) {
+	const { token } = props;
+	const [fullElement, setFullElement] = useState(false);
+	const ref = useRef(null);
+
+	const goFullScreen = () => {
+		if ('wakeLock' in navigator) {
+			navigator.wakeLock.request('screen');
+		}
+
+		ref.current.requestFullscreen({ navigationUI: 'hide' }).then(() => {
+			setFullElement(true);
+		});
+	};
+
+	return (
+		<Container>
+			<div className='display' ref={ref}>
+
+				{!fullElement &&
+					<p>
+						<Button onClick={goFullScreen}>Fullscreen</Button>
+					</p>
+				}
+
+				<div className='display-scores'>
+					<DisplayScores />
+				</div>
+
+				<div className='display-scores'>
+					<DisplayHosting />
 				</div>
 			</div>
 		</Container>
@@ -67,21 +114,128 @@ export function DisplayUsage(props) {
 		return () => clearInterval(interval);
 	}, []);
 
-	const showUsage = usage && usage.track.username === usage.username;
+	const inUse = usage && moment().unix() - usage.track.time <= 60;
+	const showUsage = usage && inUse && usage.track.username === usage.username;
 
 	return (
 		<>
+			<Header size='large'>Trotec Usage</Header>
+
 			{showUsage ?
 				<TrotecUsage usage={usage} />
 			:
-				<>
-					<Header size='medium'>Trotec Usage</Header>
-
-					<p className='stat'>
-						Waiting for job
-					</p>
-				</>
+				<p className='stat'>
+					Waiting for job
+				</p>
 			}
+		</>
+	);
+};
+
+export function DisplayScores(props) {
+	const { token, name } = props;
+	const [scores, setScores] = useState(false);
+
+	const getScores = () => {
+		requester('/pinball/high_scores/', 'GET')
+		.then(res => {
+			setScores(res);
+		})
+		.catch(err => {
+			console.log(err);
+			setScores(false);
+		});
+	};
+
+	useEffect(() => {
+		getScores();
+		const interval = setInterval(getScores, 60000);
+		return () => clearInterval(interval);
+	}, []);
+
+	return (
+		<>
+			<Header size='large'>Pinball High Scores</Header>
+
+			{scores && scores.slice(0, 5).map((x, i) =>
+				<div key={i}>
+					<Header size='medium'>#{i+1} — {x.name}. {i === 0 ? '👑' : ''}</Header>
+					<p>{x.score.toLocaleString()}</p>
+				</div>
+			)}
+
+		</>
+	);
+};
+
+export function DisplayMonthlyScores(props) {
+	const { token, name } = props;
+	const [scores, setScores] = useState(false);
+
+	const getScores = () => {
+		requester('/pinball/monthly_high_scores/', 'GET')
+		.then(res => {
+			setScores(res);
+		})
+		.catch(err => {
+			console.log(err);
+			setScores(false);
+		});
+	};
+
+	useEffect(() => {
+		getScores();
+		const interval = setInterval(getScores, 60000);
+		return () => clearInterval(interval);
+	}, []);
+
+	return (
+		<>
+			<Header size='large'>Monthly High Scores</Header>
+
+			{scores && scores.slice(0, 5).map((x, i) =>
+				<div key={i}>
+					<Header size='medium'>#{i+1} — {x.name}. {i === 0 ? '🧙' : ''}</Header>
+					<p>{x.score.toLocaleString()}</p>
+				</div>
+			)}
+
+		</>
+	);
+};
+
+export function DisplayHosting(props) {
+	const { token, name } = props;
+	const [scores, setScores] = useState(false);
+
+	const getScores = () => {
+		requester('/hosting/high_scores/', 'GET')
+		.then(res => {
+			setScores(res);
+		})
+		.catch(err => {
+			console.log(err);
+			setScores(false);
+		});
+	};
+
+	useEffect(() => {
+		getScores();
+		const interval = setInterval(getScores, 60000);
+		return () => clearInterval(interval);
+	}, []);
+
+	return (
+		<>
+			<Header size='large'>Most Host</Header>
+
+			{scores && scores.slice(0, 5).map((x, i) =>
+				<div key={i}>
+					<Header size='medium'>#{i+1} — {x.name}. {i === 0 ? <img className='toast' src='/toast.png' /> : ''}</Header>
+					<p>{x.hours.toFixed(2)} hours</p>
+				</div>
+			)}
+
 		</>
 	);
 };

@@ -12,9 +12,10 @@ for model in app_models:
         pass
 
     try:
-        if hasattr(model, 'MY_FIELDS'):
-            MyAdmin.list_display = model.MY_FIELDS
-            MyAdmin.search_fields = model.MY_FIELDS
+        if hasattr(model, 'list_display'):
+            MyAdmin.list_display = model.list_display
+        if hasattr(model, 'search_fields'):
+            MyAdmin.search_fields = model.search_fields
 
         admin.site.register(model, MyAdmin)
     except AlreadyRegistered:

@@ -124,7 +124,7 @@ let prevAutoscan = '';
 export function AdminMemberCards(props) {
 	const { token, result, refreshResult } = props;
 	const cards = result.cards;
-	const startDimmed = Boolean((result.member.paused_date || !result.member.is_allowed_entry) && cards.length);
+	const startDimmed = Boolean((result.member.paused_date || !result.member.is_allowed_entry || !result.member.vetted_date) && cards.length);
 	const [dimmed, setDimmed] = useState(startDimmed);
 	const [input, setInput] = useState({ active_status: 'card_active' });
 	const [error, setError] = useState(false);
@@ -134,7 +134,7 @@ export function AdminMemberCards(props) {
 	const { id } = useParams();
 
 	useEffect(() => {
-		const startDimmed = Boolean((result.member.paused_date || !result.member.is_allowed_entry) && cards.length);
+		const startDimmed = Boolean((result.member.paused_date || !result.member.is_allowed_entry || !result.member.vetted_date) && cards.length);
 		setDimmed(startDimmed);
 	}, [result.member]);
 
@@ -298,7 +298,7 @@ export function AdminMemberCards(props) {
 
 				<Dimmer active={dimmed}>
 					<p>
-						Member paused or not allowed entry, {cards.length} card{cards.length === 1 ? '' : 's'} ignored anyway.
+						Member paused, unvetted or not allowed entry. {cards.length} card{cards.length === 1 ? '' : 's'} ignored anyway.
 					</p>
 					<p>
 						<Button size='tiny' onClick={() => setDimmed(false)}>Close</Button>
@@ -363,18 +363,77 @@ export function AdminMemberPause(props) {
 		<div>
 			<Header size='medium'>Pause / Unpause Membership</Header>
 
-			<p>Pause members who are inactive, former, or on vacation.</p>
-
 			<p>
 				{result.member.paused_date ?
-					<Button onClick={handleUnpause} loading={loading}>
-						Unpause
-					</Button>
+					result.member.vetted_date && moment().diff(moment(result.member.paused_date), 'days') > 370 ?
+						<>
+							<p>
+								{result.member.preferred_name} has been away for more than a year and will need to be re-vetted according to our
+								<a href='https://wiki.protospace.ca/Approved_policies/Membership' target='_blank' rel='noopener noreferrer'> policy</a>.
+							</p>
+							<p>
+								<Form.Checkbox
+									name='told1'
+									value={told1}
+									label='Told member to get re-vetted'
+									required
+									onChange={(e, v) => setTold1(v.checked)}
+								/>
+							</p>
+							<p>
+								<Form.Checkbox
+									name='told2'
+									value={told2}
+									label='Collected payment for member dues'
+									required
+									onChange={(e, v) => setTold2(v.checked)}
+								/>
+							</p>
+
+							<Button onClick={handleUnpause} loading={loading} disabled={!told1 || !told2}>
+								Unpause
+							</Button>
+						</>
+					:
+						result.member.status == 'Expired Member' ?
+							<>
+								<p>
+									{result.member.preferred_name} has expired due to lapse of payment.
+								</p>
+								<p>
+									<Form.Checkbox
+										name='told1'
+										value={told1}
+										label='Member has paid any back-dues owed'
+										required
+										onChange={(e, v) => setTold1(v.checked)}
+									/>
+								</p>
+								<p>
+									<Form.Checkbox
+										name='told2'
+										value={told2}
+										label='Recorded payment transaction on portal'
+										required
+										onChange={(e, v) => setTold2(v.checked)}
+									/>
+								</p>
+
+								<Button onClick={handleUnpause} loading={loading} disabled={!told1 || !told2}>
+									Unpause
+								</Button>
+							</>
+						:
+							<Button onClick={handleUnpause} loading={loading}>
+								Unpause
+							</Button>
 				:
 					<>
+						<p>Pause members who are inactive, former, or on vacation.</p>
+
 						<p>
 							<Form.Checkbox
-								name='told_subscriptions'
+								name='told1'
 								value={told1}
 								label='Told member to stop any PayPal subscriptions'
 								required
@@ -383,7 +442,7 @@ export function AdminMemberPause(props) {
 						</p>
 						<p>
 							<Form.Checkbox
-								name='told_shelves'
+								name='told2'
 								value={told2}
 								label='Told member to clear any shelves'
 								required
