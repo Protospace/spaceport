@@ -27,6 +27,7 @@ import { Subscribe } from './PayPal.js';
 import { PasswordReset, ConfirmReset } from './PasswordReset.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { Debug } from './Debug.js';
+import { StorageDetail } from './Storage.js';
 import { Garden } from './Garden.js';
 import { Footer } from './Footer.js';
 import { LCARS1Display, LCARS2Display } from './Display.js';
@@ -239,6 +240,10 @@ function App() {
 
 					<div className='topPadding'>
 						<Switch>
+							<Route path='/storage/:id'>
+								<StorageDetail token={token} user={user} />
+							</Route>
+
 							<Route path='/debug'>
 								<Debug token={token} user={user} />
 							</Route>

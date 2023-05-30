@@ -1787,7 +1787,7 @@ class HostingViewSet(Base):
 
 class StorageSpaceViewSet(Base, List, Retrieve, Update):
     permission_classes = [AllowMetadata | IsAdmin]
-    queryset = models.StorageSpace.objects.all()
+    queryset = models.StorageSpace.objects.all().order_by('id')
     serializer_class = serializers.StorageSpaceSerializer
 
 

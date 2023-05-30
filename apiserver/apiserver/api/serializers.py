@@ -523,8 +523,8 @@ class SimpleStorageSpaceSerializer(serializers.ModelSerializer):
 
 
 class StorageSpaceSerializer(serializers.ModelSerializer):
-    member = serializers.SerializerMethodField()
-    member_id = serializers.IntegerField(write_only=True, required=False)
+    member_id = serializers.SerializerMethodField()
+    member_name = serializers.SerializerMethodField()
 
     class Meta:
         model = models.StorageSpace
@@ -545,12 +545,15 @@ class StorageSpaceSerializer(serializers.ModelSerializer):
 
         return super().update(instance, validated_data)
 
-    def get_member(self, obj):
-        if obj.user:
-            serializer = OtherMemberSerializer(obj.user.member)
-            return serializer.data
-        else:
-            return None
+    def get_member_id(self, obj):
+        if not obj.user: return None
+        return obj.user.member.id
+
+    def get_member_name(self, obj):
+        if not obj.user: return None
+
+        member = obj.user.member
+        return member.preferred_name + ' ' + member.last_name
 
 
 class TrainingSerializer(serializers.ModelSerializer):
