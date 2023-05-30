@@ -241,3 +241,82 @@ export function StorageList(props) {
 		</div>
 	);
 };
+
+export function ClaimShelfForm(props) {
+	const { token, user, refreshUser } = props;
+	const member = user.member;
+	const [input, setInput] = useState({});
+	const [error, setError] = useState({});
+	const [loading, setLoading] = useState(false);
+	const history = useHistory();
+
+	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
+	const handleChange = (e) => handleValues(e, e.currentTarget);
+
+	const handleSubmit = (e) => {
+		if (loading) return;
+		setLoading(true);
+		requester('/storage/claim/', 'POST', token, input)
+		.then(res => {
+			setError({});
+			refreshUser();
+			history.push('/');
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+			setError(err.data);
+		});
+	};
+
+	const makeProps = (name) => ({
+		name: name,
+		onChange: handleChange,
+		value: input[name] || '',
+		error: error[name],
+	});
+
+	return (
+		<Form onSubmit={handleSubmit}>
+			<div className='field'>
+				<label>Spaceport Username</label>
+				<p>{user.username}</p>
+			</div>
+
+			<Form.Input
+				label='Shelf ID'
+				autoComplete='off'
+				required
+				{...makeProps('shelf_id')}
+				maxLength={3}
+			/>
+
+			<Form.Button loading={loading} error={error.non_field_errors || error.detail}>
+				Submit
+			</Form.Button>
+		</Form>
+	);
+};
+
+export function ClaimShelf(props) {
+	const { token, user } = props;
+	const [error, setError] = useState(false);
+
+	return (
+		<Container>
+			<Grid stackable columns={2}>
+				<Grid.Column>
+					<Header size='large'>Claim Member Shelf</Header>
+
+					<p>Use this form to claim a member shelf.</p>
+
+					<p>Please make sure your name and contact info are visible on the shelf.</p>
+
+					<p>Use the Shelf ID visible on the corner label (A1A, A2B, etc.)</p>
+
+					<ClaimShelfForm {...props} />
+				</Grid.Column>
+			</Grid>
+		</Container>
+	);
+};

@@ -27,7 +27,7 @@ import { Subscribe } from './PayPal.js';
 import { PasswordReset, ConfirmReset } from './PasswordReset.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { Debug } from './Debug.js';
-import { StorageDetail } from './Storage.js';
+import { StorageDetail, ClaimShelf } from './Storage.js';
 import { Garden } from './Garden.js';
 import { Footer } from './Footer.js';
 import { LCARS1Display, LCARS2Display } from './Display.js';
@@ -285,6 +285,10 @@ function App() {
 
 							{user && user.member.set_details ?
 								<Switch>
+									<Route path='/claimshelf'>
+										<ClaimShelf token={token} user={user} refreshUser={refreshUser} />
+									</Route>
+
 									<Route path='/account'>
 										<Account token={token} user={user} refreshUser={refreshUser} />
 									</Route>

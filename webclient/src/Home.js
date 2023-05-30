@@ -77,7 +77,7 @@ function MemberInfo(props) {
 											</Button>
 										)
 									:
-										'None'
+										<>None <Link to='/claimshelf'>[claim]</Link></>
 									}
 								</Table.Cell>
 							</Table.Row>

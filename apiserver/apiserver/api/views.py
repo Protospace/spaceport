@@ -1790,6 +1790,35 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
     queryset = models.StorageSpace.objects.all().order_by('id')
     serializer_class = serializers.StorageSpaceSerializer
 
+    @action(detail=False, methods=['post'], permission_classes=[AllowMetadata | IsAuthenticated])
+    def claim(self, request):
+        user = self.request.user
+
+        if user.storage.count():
+            raise exceptions.ValidationError(dict(shelf_id='You already have a shelf.'))
+
+        try:
+            shelf_id = str(request.data['shelf_id']).upper()
+        except KeyError:
+            raise exceptions.ValidationError(dict(shelf_id='This field is required.'))
+
+        try:
+            storage = models.StorageSpace.objects.get(shelf_id=shelf_id)
+        except models.StorageSpace.DoesNotExist:
+            raise exceptions.ValidationError(dict(shelf_id='Shelf ID not found.'))
+
+        if storage.location != 'member_shelves':
+            raise exceptions.ValidationError(dict(shelf_id='Not a member shelf. Please see a Director.'))
+
+        if storage.user:
+            owner = storage.user.member.preferred_name
+            raise exceptions.ValidationError(dict(shelf_id='Shelf already belongs to {}.'.format(owner)))
+
+        storage.user = user
+        storage.save()
+
+        return Response(200)
+
 
 class RegistrationView(RegisterView):
     serializer_class = serializers.MyRegisterSerializer
