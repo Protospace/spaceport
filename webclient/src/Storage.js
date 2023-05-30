@@ -118,6 +118,12 @@ function EditStorage(props) {
 function StorageTable(props) {
 	const { storage, user } = props;
 
+	const locations = {
+		member_shelves: 'Member Shelves',
+		lockers: 'Lockers',
+		large_project_storage: 'Large Project Storage',
+	};
+
 	return (
 		<BasicTable>
 			<Table.Body>
@@ -127,19 +133,26 @@ function StorageTable(props) {
 				</Table.Row>
 				<Table.Row>
 					<Table.Cell>Owner:</Table.Cell>
-					{isAdmin(user) && storage.member_id ?
+					{storage.member_id ?
 						<Table.Cell>
 							<Link to={'/members/'+storage.member_id}>
 								{storage.member_name}
 							</Link>
 						</Table.Cell>
 					:
-						<Table.Cell>{storage.member_name}</Table.Cell>
+						<Table.Cell>None</Table.Cell>
 					}
 				</Table.Row>
 				<Table.Row>
 					<Table.Cell>Location:</Table.Cell>
-					<Table.Cell>{storage.location}</Table.Cell>
+					<Table.Cell>
+						{locations[storage.location]}
+						<p>
+							Aisle {storage.shelf_id[0]} <br/>
+							Column {storage.shelf_id[1]} <br/>
+							Row {storage.shelf_id[2]}
+						</p>
+					</Table.Cell>
 				</Table.Row>
 				<Table.Row>
 					<Table.Cell>Memo:</Table.Cell>
