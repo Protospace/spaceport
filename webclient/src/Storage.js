@@ -33,6 +33,7 @@ export function StorageEditor(props) {
 					{...makeProps('member_id')}
 					onChange={handleValues}
 					initial={input.member_name}
+					autofocus={!input.member_name}
 				/>
 			</Form.Field>
 
