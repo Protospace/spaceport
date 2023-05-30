@@ -95,18 +95,18 @@ function EditStorage(props) {
 
 	return (
 		<div>
-			<Header size='medium'>Edit Storage</Header>
+			<Header size='medium'>Edit Storage {storage.shelf_id}</Header>
 
 			<Form onSubmit={handleSubmit}>
+				<Form.Button floated='right' onClick={saveAndNext} loading={loading} error={error.non_field_errors}>
+					Save and edit next
+				</Form.Button>
+
 				<StorageEditor token={token} input={input} setInput={setInput} error={error} />
 
 				<Form.Group widths='equal'>
 					<Form.Button loading={loading} error={error.non_field_errors}>
 						Save
-					</Form.Button>
-
-					<Form.Button floated='right' onClick={saveAndNext} loading={loading} error={error.non_field_errors}>
-						Save and edit next
 					</Form.Button>
 				</Form.Group>
 				{success && <div>Success!</div>}

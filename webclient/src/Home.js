@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams, useHistory } from 'react-router-dom';
 import moment from 'moment-timezone';
 import QRCode from 'react-qr-code';
 import './light.css';
-import { Container, Divider, Grid, Header, Icon, Image, Message, Popup, Segment, Table } from 'semantic-ui-react';
+import { Button, Container, Divider, Grid, Header, Icon, Image, Message, Popup, Segment, Table } from 'semantic-ui-react';
 import { statusColor, BasicTable, siteUrl, staticUrl, requester, isAdmin } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 import { AccountForm } from './Account.js';
@@ -13,12 +13,18 @@ import { PayPalSubscribeDeal } from './PayPal.js';
 function MemberInfo(props) {
 	const user = props.user;
 	const member = user.member;
+	const history = useHistory();
 
 	const lastTrans = user.transactions?.slice(0,3);
 	const lastTrain = user.training?.sort((a, b) => a.session.datetime < b.session.datetime ? 1 : -1).slice(0,3);
 	const lastCard = user.cards?.sort((a, b) => a.last_seen < b.last_seen)[0];
 
 	const unpaidTraining = user.training?.filter(x => x.attendance_status === 'Waiting for payment');
+
+	const handleStorageButton = (e, id) => {
+		e.preventDefault();
+		history.push('/storage/' + id);
+	};
 
 	return (
 		<div>
@@ -56,6 +62,24 @@ function MemberInfo(props) {
 							<Table.Row>
 								<Table.Cell>Protocoin:</Table.Cell>
 								<Table.Cell>₱&thinsp;{member.protocoin.toFixed(2)} <Link to='/paymaster'>[buy]</Link></Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>Shelf:</Table.Cell>
+								<Table.Cell>
+									{user.storage.length ?
+										user.storage.map((x, i) =>
+											<Button
+												className='storage-button'
+												onClick={(e) => handleStorageButton(e, x.id)}
+												size='tiny'
+											>
+												{x.shelf_id}
+											</Button>
+										)
+									:
+										'None'
+									}
+								</Table.Cell>
 							</Table.Row>
 							<Table.Row>
 								<Table.Cell>Expiry:</Table.Cell>

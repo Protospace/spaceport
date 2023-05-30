@@ -170,6 +170,7 @@ body {
 .ui.button.storage-button {
 	padding-left: 0.5rem;
 	padding-right: 0.5rem;
+	margin-top: 0.25rem;
 }
 
 .ui.tag.label {

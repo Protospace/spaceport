@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Dropdown, Grid, Header, Icon, Image, Input, Item, Segment, Table } from 'semantic-ui-react';
 import { statusColor, isAdmin, isInstructor, BasicTable, staticUrl, requester } from './utils.js';
@@ -99,6 +99,7 @@ export function Members(props) {
 	const [search, setSearch] = useState(searchCache);
 	const [controller, setController] = useState(false);
 	const { token, user } = props;
+	const history = useHistory();
 
 	const makeRequest = ({loadPage, q, sort_key}) => {
 		let pageNum = 0;
@@ -163,6 +164,11 @@ export function Members(props) {
 	const handleChange = (event) => {
 		const q = event.target.value;
 		doSearch(q);
+	};
+
+	const handleStorageButton = (e, id) => {
+		e.preventDefault();
+		history.push('/storage/' + id);
 	};
 
 	useEffect(() => {
@@ -243,7 +249,7 @@ export function Members(props) {
 														x.member.storage.map((x, i) =>
 															<Button
 																className='storage-button'
-																onClick={(e) => e.preventDefault()}
+																onClick={(e) => handleStorageButton(e, x.id)}
 																size='tiny'
 															>
 																{x.shelf_id}
