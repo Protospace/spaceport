@@ -18,12 +18,6 @@ export function StorageEditor(props) {
 		error: error[name],
 	});
 
-	const locationOptions = [
-		{ key: '0', text: 'Member Shelves', value: 'member_shelves' },
-		{ key: '1', text: 'Lockers', value: 'lockers' },
-		{ key: '2', text: 'Large Project Storage', value: 'large_project_storage' },
-	];
-
 	return (
 		<div className='transaction-editor'>
 			<Form.Field error={error.member_id}>
@@ -36,14 +30,6 @@ export function StorageEditor(props) {
 					autofocus={!input.member_name}
 				/>
 			</Form.Field>
-
-			<Form.Select
-				label='Location'
-				fluid
-				options={locationOptions}
-				{...makeProps('location')}
-				onChange={handleValues}
-			/>
 
 			<Form.Input
 				label='Memo'
@@ -156,7 +142,7 @@ function StorageTable(props) {
 				</Table.Row>
 				<Table.Row>
 					<Table.Cell>Memo:</Table.Cell>
-					<Table.Cell>{storage.memo}</Table.Cell>
+					<Table.Cell>{storage.memo || 'None'}</Table.Cell>
 				</Table.Row>
 			</Table.Body>
 		</BasicTable>
