@@ -33,6 +33,14 @@ export function LoginForm(props) {
 		}
 	};
 
+	const handleCaptcha = (e) => {
+		console.log(e);
+		var rect = e.target.getBoundingClientRect();
+		var x = e.clientX - rect.left; //x position within the element.
+		var y = e.clientY - rect.top;  //y position within the element.
+		console.log("Left? : " + x + " ; Top? : " + y + ".");
+	};
+
 	return (
 		<Form
 			onSubmit={handleSubmit}
@@ -55,6 +63,13 @@ export function LoginForm(props) {
 				onChange={handleChange}
 				error={error.password}
 			/>
+
+			<Form.Field>
+				<label>CAPTCHA</label>
+				<p>To prove you're human, select the Protospace <b>fire extinguisher</b>:</p>
+				<img onClick={handleCaptcha} src='https://pic.t0.vc/MYJA' width='100%' />
+			</Form.Field>
+
 			<Form.Button loading={loading} error={error.non_field_errors}>
 				Log In
 			</Form.Button>
