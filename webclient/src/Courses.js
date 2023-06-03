@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Button, Label, Container, Header, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
-import { isInstructor, getInstructor, requester } from './utils.js';
+import { isInstructor, getInstructor, requester, useIsMobile } from './utils.js';
 import { NotFound } from './Misc.js';
 import { InstructorCourseList, InstructorCourseDetail } from './InstructorCourses.js';
 import { InstructorClassList } from './InstructorClasses.js';
@@ -31,6 +31,7 @@ export function Courses(props) {
 	const [courses, setCourses] = useState(courseCache);
 	const [tagFilter, setTagFilter] = useState(tagFilterCache);
 	const { token, user } = props;
+	const isMobile = useIsMobile();
 
 	useEffect(() => {
 		requester('/courses/', 'GET', token)
@@ -95,13 +96,13 @@ export function Courses(props) {
 
 			{courses ?
 				<Table basic='very'>
-					<Table.Header>
+					{!isMobile && <Table.Header>
 						<Table.Row>
 							<Table.HeaderCell>Name</Table.HeaderCell>
 							<Table.HeaderCell>Interest</Table.HeaderCell>
 							<Table.HeaderCell></Table.HeaderCell>
 						</Table.Row>
-					</Table.Header>
+					</Table.Header>}
 
 					<Table.Body>
 						{courses.length ?
@@ -111,7 +112,7 @@ export function Courses(props) {
 										<Link to={'/courses/'+x.id}>{x.name}</Link>
 									</Table.Cell>
 									<Table.Cell>
-										{!!x.num_interested &&
+										{isMobile && 'Interest: '}{!!x.num_interested &&
 											<>{x.num_interested} member{x.num_interested !== 1 && 's'}</>
 										}
 									</Table.Cell>
@@ -143,6 +144,7 @@ export function CourseDetail(props) {
 	const [loading, setLoading] = useState(false);
 	const { token, user, refreshUser } = props;
 	const { id } = useParams();
+	const isMobile = useIsMobile();
 
 	const handleInterest = () => {
 		if (loading) return;
@@ -223,7 +225,7 @@ export function CourseDetail(props) {
 						</Segment>}
 
 						<Table basic='very'>
-							<Table.Header>
+							{!isMobile && <Table.Header>
 								<Table.Row>
 									<Table.HeaderCell>Date</Table.HeaderCell>
 									<Table.HeaderCell>Time</Table.HeaderCell>
@@ -231,7 +233,7 @@ export function CourseDetail(props) {
 									<Table.HeaderCell>Cost</Table.HeaderCell>
 									<Table.HeaderCell>Students</Table.HeaderCell>
 								</Table.Row>
-							</Table.Header>
+							</Table.Header>}
 
 							<Table.Body>
 								{course.sessions.length ?
@@ -239,14 +241,14 @@ export function CourseDetail(props) {
 										<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
 											<Table.Cell>
 												<Link to={'/classes/'+x.id}>
-													&nbsp;{moment.utc(x.datetime).tz('America/Edmonton').format('ll')}
+													{!isMobile && <span>&nbsp;</span>}{moment.utc(x.datetime).tz('America/Edmonton').format('ll')}
 												</Link>
 											</Table.Cell>
-											<Table.Cell>{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}</Table.Cell>
-											<Table.Cell>{getInstructor(x)}</Table.Cell>
-											<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
+											<Table.Cell>{isMobile && 'Time: '}{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}</Table.Cell>
+											<Table.Cell>{isMobile && 'Instructor: '}{getInstructor(x)}</Table.Cell>
+											<Table.Cell>{isMobile && 'Cost: '}{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
 											<Table.Cell>
-												{!!x.max_students ?
+												{isMobile && 'Students: '}{!!x.max_students ?
 													x.max_students <= x.student_count ?
 														'Full'
 													:

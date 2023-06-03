@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import './light.css';
 import moment from 'moment-timezone';
 import { Button, Container, Header, Table } from 'semantic-ui-react';
-import { BasicTable, staticUrl } from './utils.js';
+import { BasicTable, staticUrl, useIsMobile } from './utils.js';
 
 export function Cards(props) {
 	const { user, token } = props;
 	const [open, setOpen] = useState(false);
+	const isMobile = useIsMobile();
 
 	const cardStatus = (c) => c.active_status === 'card_active' ? 'Yes' : 'No';
 	const card = user.cards[0];
@@ -30,22 +31,22 @@ export function Cards(props) {
 			{user.cards.length ?
 				user.cards.length > 1 ?
 					<Table basic='very'>
-						<Table.Header>
+						{!isMobile && <Table.Header>
 							<Table.Row>
 								<Table.HeaderCell>Number</Table.HeaderCell>
 								<Table.HeaderCell>Notes</Table.HeaderCell>
 								<Table.HeaderCell>Last Scan</Table.HeaderCell>
 								<Table.HeaderCell>Active</Table.HeaderCell>
 							</Table.Row>
-						</Table.Header>
+						</Table.Header>}
 
 						<Table.Body>
 							{user.cards.map(x =>
 								<Table.Row key={x.id}>
 									<Table.Cell>{x.card_number}</Table.Cell>
-									<Table.Cell>{x.notes}</Table.Cell>
+									<Table.Cell>{isMobile && 'Notes: '}{x.notes}</Table.Cell>
 									<Table.Cell>
-										{x.last_seen ?
+										{isMobile && 'Last Scan: '}{x.last_seen ?
 											x.last_seen > '2021-11-14T02:01:35.415685Z' ?
 												moment.utc(x.last_seen).tz('America/Edmonton').format('lll')
 											:
@@ -54,7 +55,7 @@ export function Cards(props) {
 											'Unknown'
 										}
 									</Table.Cell>
-									<Table.Cell>{cardStatus(x)}</Table.Cell>
+									<Table.Cell>{isMobile && 'Active: '}{cardStatus(x)}</Table.Cell>
 								</Table.Row>
 							)}
 						</Table.Body>

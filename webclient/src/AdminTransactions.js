@@ -5,7 +5,7 @@ import { Container, Checkbox, Form, Header, Segment, Table } from 'semantic-ui-r
 import * as Datetime from 'react-datetime';
 import 'react-datetime/css/react-datetime.css';
 import moment from 'moment';
-import { requester } from './utils.js';
+import { requester, useIsMobile } from './utils.js';
 import { TransactionList, TransactionEditor } from './Transactions.js';
 
 export function AdminReportedTransactions(props) {
@@ -53,6 +53,7 @@ export function AdminHistoricalTransactions(props) {
 	const [excludeSnacks, setExcludeSnacks] = useState(true);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(false);
+	const isMobile = useIsMobile();
 
 	const handleDatetime = (v) => setInput({ ...input, month: v });
 
@@ -129,20 +130,20 @@ export function AdminHistoricalTransactions(props) {
 					<Header size='small'>Summary</Header>
 
 					<Table basic='very'>
-						<Table.Header>
+						{!isMobile && <Table.Header>
 							<Table.Row>
 								<Table.HeaderCell>Category</Table.HeaderCell>
 								<Table.HeaderCell>Dollar</Table.HeaderCell>
 								<Table.HeaderCell>Protocoin</Table.HeaderCell>
 							</Table.Row>
-						</Table.Header>
+						</Table.Header>}
 
 						<Table.Body>
 							{summary.map(x =>
 								<Table.Row key={x.category}>
-									<Table.Cell>{x.category}</Table.Cell>
-									<Table.Cell>{'$ ' + x.dollar.toFixed(2)}</Table.Cell>
-									<Table.Cell>{'₱ ' + x.protocoin.toFixed(2)}</Table.Cell>
+									<Table.Cell>{isMobile && 'Category: '}{x.category}</Table.Cell>
+									<Table.Cell>{isMobile && 'Dollar: '}{'$ ' + x.dollar.toFixed(2)}</Table.Cell>
+									<Table.Cell>{isMobile && 'Protocoin: '}{'₱ ' + x.protocoin.toFixed(2)}</Table.Cell>
 								</Table.Row>
 							)}
 						</Table.Body>

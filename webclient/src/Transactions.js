@@ -5,7 +5,7 @@ import ReactToPrint from 'react-to-print';
 import './light.css';
 import { Button, Container, Form, Grid, Header, Message, Segment, Table } from 'semantic-ui-react';
 import { MembersDropdown } from './Members.js';
-import { isAdmin, BasicTable, requester } from './utils.js';
+import { isAdmin, BasicTable, requester, useIsMobile } from './utils.js';
 import { NotFound } from './Misc.js';
 
 export function TransactionEditor(props) {
@@ -214,10 +214,11 @@ function EditTransaction(props) {
 
 export function TransactionList(props) {
 	const { transactions, noMember, noCategory } = props;
+	const isMobile = useIsMobile();
 
 	return (
 		<Table basic='very'>
-			<Table.Header>
+			{!isMobile && <Table.Header>
 				<Table.Row>
 					<Table.HeaderCell>Date</Table.HeaderCell>
 					{!noMember && <Table.HeaderCell>Member</Table.HeaderCell>}
@@ -226,7 +227,7 @@ export function TransactionList(props) {
 					{!noCategory && <Table.HeaderCell>Category</Table.HeaderCell>}
 					<Table.HeaderCell>Memo</Table.HeaderCell>
 				</Table.Row>
-			</Table.Header>
+			</Table.Header>}
 
 			<Table.Body>
 				{transactions.length ?
@@ -244,9 +245,9 @@ export function TransactionList(props) {
 									x.member_name
 								}
 							</Table.Cell>}
-							<Table.Cell style={{ minWidth: '8rem' }}>{x.protocoin !== '0.00' ? '₱ ' + x.protocoin : '$ ' + x.amount}</Table.Cell>
-							<Table.Cell>{x.account_type}</Table.Cell>
-							{!noCategory && <Table.Cell>{x.category}</Table.Cell>}
+							<Table.Cell style={{ minWidth: '8rem' }}>{isMobile && 'Amount: '}{x.protocoin !== '0.00' ? '₱ ' + x.protocoin : '$ ' + x.amount}</Table.Cell>
+							<Table.Cell>{isMobile && 'Method: '}{x.account_type}</Table.Cell>
+							{!noCategory && <Table.Cell>{isMobile && 'Category: '}{x.category}</Table.Cell>}
 							<Table.Cell>{x.memo || x.report_memo}</Table.Cell>
 						</Table.Row>
 					)

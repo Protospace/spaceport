@@ -5,7 +5,7 @@ import { Button, Container, Checkbox, Form, Header, Icon, Table } from 'semantic
 import * as Datetime from 'react-datetime';
 import moment from 'moment-timezone';
 import download from 'downloadjs';
-import { apiUrl, statusColor, requester } from './utils.js';
+import { apiUrl, statusColor, requester, useIsMobile } from './utils.js';
 
 let vettingCache = false;
 let historyCache = false;
@@ -123,6 +123,7 @@ export function AdminHistory(props) {
 	const [excludeSystem, setExcludeSystem] = useState(excludeSystemCache);
 	const [focus, setFocus] = useState(focusCache);
 	const [error, setError] = useState(false);
+	const isMobile = useIsMobile();
 
 	const handleExcludeSystem = (e, v) => {
 		setExcludeSystem(v.checked);
@@ -154,7 +155,7 @@ export function AdminHistory(props) {
 						/>
 
 						<Table basic='very'>
-							<Table.Header>
+							{!isMobile && <Table.Header>
 								<Table.Row>
 									<Table.HeaderCell>Date</Table.HeaderCell>
 									<Table.HeaderCell>Username</Table.HeaderCell>
@@ -163,7 +164,7 @@ export function AdminHistory(props) {
 									<Table.HeaderCell>Object</Table.HeaderCell>
 									<Table.HeaderCell>Changed Fields</Table.HeaderCell>
 								</Table.Row>
-							</Table.Header>
+							</Table.Header>}
 
 							<Table.Body>
 								{history.map(x =>
@@ -174,11 +175,11 @@ export function AdminHistory(props) {
 													{moment.utc(x.history_date).tz('America/Edmonton').format('YYYY-MM-DD')}
 												</a>
 											</Table.Cell>
-											<Table.Cell>{x.is_system ? 'System' : (x.history_user || 'Deleted User')}</Table.Cell>
-											<Table.Cell>{x.history_type}</Table.Cell>
-											<Table.Cell>{x.owner_name}</Table.Cell>
-											<Table.Cell>{x.object_name}</Table.Cell>
-											<Table.Cell>{x.changes.map(x => x.field).join(', ')}</Table.Cell>
+											<Table.Cell>{isMobile && 'User: '}{x.is_system ? 'System' : (x.history_user || 'Deleted User')}</Table.Cell>
+											<Table.Cell>{isMobile && 'Type: '}{x.history_type}</Table.Cell>
+											<Table.Cell>{isMobile && 'Owner: '}{x.owner_name}</Table.Cell>
+											<Table.Cell>{isMobile && 'Object: '}{x.object_name}</Table.Cell>
+											<Table.Cell>{isMobile && 'Changed: '}{x.changes.map(x => x.field).join(', ')}</Table.Cell>
 										</Table.Row>
 
 										{focus === x.id &&
@@ -186,19 +187,19 @@ export function AdminHistory(props) {
 												<p>Object ID: {x.object_id}, <a href={apiUrl+x.revert_url} target='_blank'>Database Revert</a></p>
 												{!!x.changes.length &&
 													<Table basic='very'>
-														<Table.Header>
+														{!isMobile && <Table.Header>
 															<Table.Row>
 																<Table.HeaderCell>Change</Table.HeaderCell>
 																<Table.HeaderCell>Before</Table.HeaderCell>
 																<Table.HeaderCell>After</Table.HeaderCell>
 															</Table.Row>
-														</Table.Header>
+														</Table.Header>}
 														<Table.Body>
 															{x.changes.map(y =>
 																<Table.Row key={y.field}>
-																	<Table.Cell>{y.field}</Table.Cell>
-																	<Table.Cell>{y.old}</Table.Cell>
-																	<Table.Cell>{y.new}</Table.Cell>
+																	<Table.Cell>{isMobile && 'Change: '}{y.field}</Table.Cell>
+																	<Table.Cell>{isMobile && 'Before: '}{y.old}</Table.Cell>
+																	<Table.Cell>{isMobile && 'After: '}{y.new}</Table.Cell>
 																</Table.Row>
 															)}
 														</Table.Body>
@@ -225,6 +226,7 @@ let backupsCache = false;
 export function AdminBackups(props) {
 	const [backups, setBackups] = useState(backupsCache);
 	const [error, setError] = useState(false);
+	const isMobile = useIsMobile();
 
 	useEffect(() => {
 		requester('/backup/', 'GET')
@@ -243,20 +245,20 @@ export function AdminBackups(props) {
 			{!error ?
 				backups ?
 					<Table collapsing basic='very'>
-						<Table.Header>
+						{!isMobile && <Table.Header>
 							<Table.Row>
 								<Table.HeaderCell>Username</Table.HeaderCell>
 								<Table.HeaderCell>Last Downloaded</Table.HeaderCell>
 								<Table.HeaderCell>Less than 24 hours ago?</Table.HeaderCell>
 							</Table.Row>
-						</Table.Header>
+						</Table.Header>}
 
 						<Table.Body>
 							{backups.filter(x => x.download_time).map(x =>
 								<Table.Row key={x.backup_user}>
-									<Table.Cell>{x.backup_user}</Table.Cell>
-									<Table.Cell>{moment.utc(x.download_time).tz('America/Edmonton').format('LLLL')}</Table.Cell>
-									<Table.Cell>{x.less_than_24h ? 'Yes' : 'No - please investigate'}</Table.Cell>
+									<Table.Cell>{isMobile && 'User: '}{x.backup_user}</Table.Cell>
+									<Table.Cell>{isMobile && 'Last: '}{moment.utc(x.download_time).tz('America/Edmonton').format('LLLL')}</Table.Cell>
+									<Table.Cell>{isMobile && '24h ago: '}{x.less_than_24h ? 'Yes' : 'No - please investigate'}</Table.Cell>
 								</Table.Row>
 							)}
 						</Table.Body>

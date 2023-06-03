@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import './light.css';
 import { Container, Header, Popup, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
-import { getInstructor } from './utils.js';
+import { getInstructor, useIsMobile } from './utils.js';
 
 export function CertList(props) {
 	const { member } = props;
+	const isMobile = useIsMobile();
 
 	const MoreCert = (tools) => (<Popup content={
 		<>
@@ -17,58 +18,58 @@ export function CertList(props) {
 
 	return (
 		<Table basic='very'>
-			<Table.Header>
+			{!isMobile && <Table.Header>
 				<Table.Row>
 					<Table.HeaderCell>Name</Table.HeaderCell>
 					<Table.HeaderCell>Certification</Table.HeaderCell>
 					<Table.HeaderCell>Course</Table.HeaderCell>
 				</Table.Row>
-			</Table.Header>
+			</Table.Header>}
 
 			<Table.Body>
 				<Table.Row>
 					<Table.Cell>Common {MoreCert('Anything larger than a screwdriver.')}</Table.Cell>
-					<Table.Cell>{member.vetted_date || member.orientation_date ? 'Yes' : 'No'}</Table.Cell>
+					<Table.Cell>{isMobile && 'Certified: '}{member.vetted_date || member.orientation_date ? 'Yes' : 'No'}</Table.Cell>
 					<Table.Cell><Link to='/courses/249'>New Members: Orientation and Basic Safety</Link></Table.Cell>
 				</Table.Row>
 				<Table.Row>
 					<Table.Cell>Wood 1 {MoreCert('Table saw, band saw, chop saw, router.')}</Table.Cell>
-					<Table.Cell>{member.wood_cert_date ? 'Yes, ' + member.wood_cert_date : 'No'}</Table.Cell>
+					<Table.Cell>{isMobile && 'Certified: '}{member.wood_cert_date ? 'Yes, ' + member.wood_cert_date : 'No'}</Table.Cell>
 					<Table.Cell><Link to='/courses/261'>Woodworking Tools 1: Intro to Saws</Link></Table.Cell>
 				</Table.Row>
 				<Table.Row>
 					<Table.Cell>Wood 2 {MoreCert('Jointer, thickness planer, drum sander.')}</Table.Cell>
-					<Table.Cell>{member.wood2_cert_date ? 'Yes, ' + member.wood2_cert_date : 'No'}</Table.Cell>
+					<Table.Cell>{isMobile && 'Certified: '}{member.wood2_cert_date ? 'Yes, ' + member.wood2_cert_date : 'No'}</Table.Cell>
 					<Table.Cell><Link to='/courses/401'>Woodworking Tools 2: Jointer, Thickness Planer, Drum Sander</Link></Table.Cell>
 				</Table.Row>
 				<Table.Row>
 					<Table.Cell>Lathe {MoreCert('Manual metal lathe.')}</Table.Cell>
-					<Table.Cell>{member.lathe_cert_date ? 'Yes, ' + member.lathe_cert_date : 'No'}</Table.Cell>
+					<Table.Cell>{isMobile && 'Certified: '}{member.lathe_cert_date ? 'Yes, ' + member.lathe_cert_date : 'No'}</Table.Cell>
 					<Table.Cell><Link to='/courses/281'>Metal: Metal Cutting & Manual Lathe</Link></Table.Cell>
 				</Table.Row>
 				<Table.Row>
 					<Table.Cell>Mill {MoreCert('Manual metal mill.')}</Table.Cell>
-					<Table.Cell>{member.mill_cert_date ? 'Yes, ' + member.mill_cert_date : 'No'}</Table.Cell>
+					<Table.Cell>{isMobile && 'Certified: '}{member.mill_cert_date ? 'Yes, ' + member.mill_cert_date : 'No'}</Table.Cell>
 					<Table.Cell><Link to='/courses/283'>Metal: Manual Mill & Advanced Lathe</Link></Table.Cell>
 				</Table.Row>
 				<Table.Row>
 					<Table.Cell>Tormach CNC</Table.Cell>
-					<Table.Cell>{member.tormach_cnc_cert_date ? 'Yes, ' + member.tormach_cnc_cert_date : 'No'}</Table.Cell>
+					<Table.Cell>{isMobile && 'Certified: '}{member.tormach_cnc_cert_date ? 'Yes, ' + member.tormach_cnc_cert_date : 'No'}</Table.Cell>
 					<Table.Cell><Link to='/courses/259'>Tormach: CAM and Tormach Intro</Link></Table.Cell>
 				</Table.Row>
 				<Table.Row>
 					<Table.Cell>Precix CNC</Table.Cell>
-					<Table.Cell>{member.precix_cnc_cert_date ? 'Yes, ' + member.precix_cnc_cert_date : 'No'}</Table.Cell>
+					<Table.Cell>{isMobile && 'Certified: '}{member.precix_cnc_cert_date ? 'Yes, ' + member.precix_cnc_cert_date : 'No'}</Table.Cell>
 					<Table.Cell><Link to='/courses/428'>Basic CNC Wood Router</Link></Table.Cell>
 				</Table.Row>
 				<Table.Row>
 					<Table.Cell>Rabbit Laser</Table.Cell>
-					<Table.Cell>{member.rabbit_cert_date ? 'Yes, ' + member.rabbit_cert_date : 'No'}</Table.Cell>
+					<Table.Cell>{isMobile && 'Certified: '}{member.rabbit_cert_date ? 'Yes, ' + member.rabbit_cert_date : 'No'}</Table.Cell>
 					<Table.Cell><Link to='/courses/247'>Laser: Cutting and Engraving</Link></Table.Cell>
 				</Table.Row>
 				<Table.Row>
 					<Table.Cell>Trotec Laser</Table.Cell>
-					<Table.Cell>{member.trotec_cert_date ? 'Yes, ' + member.trotec_cert_date : 'No'}</Table.Cell>
+					<Table.Cell>{isMobile && 'Certified: '}{member.trotec_cert_date ? 'Yes, ' + member.trotec_cert_date : 'No'}</Table.Cell>
 					<Table.Cell><Link to='/courses/321'>Laser: Trotec Course</Link></Table.Cell>
 				</Table.Row>
 			</Table.Body>
@@ -78,17 +79,18 @@ export function CertList(props) {
 
 export function TrainingList(props) {
 	const { training } = props;
+	const isMobile = useIsMobile();
 
 	return (
 		<Table basic='very'>
-			<Table.Header>
+			{!isMobile && <Table.Header>
 				<Table.Row>
 					<Table.HeaderCell>Course / Event Name</Table.HeaderCell>
 					<Table.HeaderCell>Class Date</Table.HeaderCell>
 					<Table.HeaderCell>Status</Table.HeaderCell>
 					<Table.HeaderCell>Instructor</Table.HeaderCell>
 				</Table.Row>
-			</Table.Header>
+			</Table.Header>}
 
 			<Table.Body>
 				{training.slice().sort((a, b) => a.session.datetime < b.session.datetime ? 1 : -1).map(x =>
@@ -97,8 +99,8 @@ export function TrainingList(props) {
 						<Table.Cell>
 							<Link to={'/classes/'+x.session.id}>{moment(x.session.datetime).tz('America/Edmonton').format('ll')}</Link>
 						</Table.Cell>
-						<Table.Cell>{x.attendance_status}</Table.Cell>
-						<Table.Cell>{getInstructor(x.session)}</Table.Cell>
+						<Table.Cell>{isMobile && 'Attendance: '}{x.attendance_status}</Table.Cell>
+						<Table.Cell>{isMobile && 'Instructor: '}{getInstructor(x.session)}</Table.Cell>
 					</Table.Row>
 				)}
 			</Table.Body>
