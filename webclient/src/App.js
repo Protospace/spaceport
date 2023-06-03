@@ -27,7 +27,7 @@ import { Subscribe } from './PayPal.js';
 import { PasswordReset, ConfirmReset } from './PasswordReset.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { Debug } from './Debug.js';
-import { StorageDetail, ClaimShelf } from './Storage.js';
+import { Storage, StorageDetail, ClaimShelf } from './Storage.js';
 import { Garden } from './Garden.js';
 import { Footer } from './Footer.js';
 import { LCARS1Display, LCARS2Display } from './Display.js';
@@ -242,6 +242,10 @@ function App() {
 						<Switch>
 							<Route path='/storage/:id'>
 								<StorageDetail token={token} user={user} />
+							</Route>
+
+							<Route path='/storage'>
+								<Storage token={token} user={user} />
 							</Route>
 
 							<Route path='/debug'>

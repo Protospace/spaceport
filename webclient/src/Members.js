@@ -6,6 +6,7 @@ import { statusColor, isAdmin, isInstructor, BasicTable, staticUrl, requester } 
 import { NotFound } from './Misc.js';
 import { AdminMemberInfo, AdminMemberPause, AdminMemberForm, AdminMemberCards, AdminMemberTraining, AdminMemberCertifications } from './AdminMembers.js';
 import { AdminMemberTransactions } from './AdminTransactions.js';
+import { StorageButton } from './Storage.js';
 import AbortController from 'abort-controller';
 
 const memberSorts = {
@@ -166,11 +167,6 @@ export function Members(props) {
 		doSearch(q);
 	};
 
-	const handleStorageButton = (e, id) => {
-		e.preventDefault();
-		history.push('/storage/' + id);
-	};
-
 	useEffect(() => {
 		if (!responseCache) {
 			doSort('recently_vetted');
@@ -246,14 +242,8 @@ export function Members(props) {
 											<>
 												<Item.Description>
 													Shelf: {x.member.storage.length ?
-														x.member.storage.map((x, i) =>
-															<Button
-																className='storage-button'
-																onClick={(e) => handleStorageButton(e, x.id)}
-																size='tiny'
-															>
-																{x.shelf_id}
-															</Button>
+														x.member.storage.sort((a, b) => a.location == 'member_shelves' ? -1 : 1).map((x, i) =>
+															<StorageButton storage={x} />
 														)
 													:
 														'None'

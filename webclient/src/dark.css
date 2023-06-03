@@ -25,6 +25,16 @@
 	color: #db282882 !important;
 }
 
+.darkmode--activated i.blue.circle.icon {
+	mix-blend-mode: difference;
+	color: #2185d0 !important;
+}
+
+.darkmode--activated i.brown.circle.icon {
+	mix-blend-mode: difference;
+	color: #a5673f !important;
+}
+
 .darkmode--activated .footer {
 	mix-blend-mode: difference;
 }
@@ -60,6 +70,21 @@
 .darkmode--activated .ui.button.toggle.active {
 	mix-blend-mode: difference;
 	background: #21ba4582 !important;
+}
+
+.darkmode--activated .ui.grey.button {
+	mix-blend-mode: difference;
+	background: #767676 !important;
+}
+
+.darkmode--activated .ui.blue.button {
+	mix-blend-mode: difference;
+	background: #2185d0 !important;
+}
+
+.darkmode--activated .ui.brown.button {
+	mix-blend-mode: difference;
+	background: #a5673f !important;
 }
 
 .darkmode--activated .ui.tag.label {

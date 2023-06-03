@@ -8,6 +8,7 @@ import { statusColor, BasicTable, siteUrl, staticUrl, requester, isAdmin } from 
 import { LoginForm, SignupForm } from './LoginSignup.js';
 import { AccountForm } from './Account.js';
 import { SignForm } from './Sign.js';
+import { StorageButton } from './Storage.js';
 import { PayPalSubscribeDeal } from './PayPal.js';
 
 function MemberInfo(props) {
@@ -20,11 +21,6 @@ function MemberInfo(props) {
 	const lastCard = user.cards?.sort((a, b) => a.last_seen < b.last_seen)[0];
 
 	const unpaidTraining = user.training?.filter(x => x.attendance_status === 'Waiting for payment');
-
-	const handleStorageButton = (e, id) => {
-		e.preventDefault();
-		history.push('/storage/' + id);
-	};
 
 	return (
 		<div>
@@ -67,14 +63,8 @@ function MemberInfo(props) {
 								<Table.Cell>Shelf:</Table.Cell>
 								<Table.Cell>
 									{user.storage.length ?
-										user.storage.map((x, i) =>
-											<Button
-												className='storage-button'
-												onClick={(e) => handleStorageButton(e, x.id)}
-												size='tiny'
-											>
-												{x.shelf_id}
-											</Button>
+										user.storage.sort((a, b) => a.location == 'member_shelves' ? -1 : 1).map((x, i) =>
+											<StorageButton storage={x} />
 										)
 									:
 										<>None <Link to='/claimshelf'>[claim]</Link></>

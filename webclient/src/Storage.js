@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
 import { MembersDropdown } from './Members.js';
-import { isAdmin, BasicTable, requester } from './utils.js';
-import { Button, Container, Form, Grid, Header, Message, Segment, Table } from 'semantic-ui-react';
+import { isAdmin, BasicTable, requester, useIsMobile } from './utils.js';
+import { Button, Container, Form, Grid, Header, Icon, Message, Segment, Table } from 'semantic-ui-react';
 
 export function StorageEditor(props) {
 	const { token, input, setInput, error } = props;
@@ -174,6 +174,8 @@ export function StorageDetail(props) {
 					<div>
 						<Header size='large'>Storage Location</Header>
 
+						<p><Link to={'/storage'}>View the list of all storage locations.</Link></p>
+
 						<Grid stackable columns={2}>
 							<Grid.Column width={6}>
 								<StorageTable user={user} storage={storage} />
@@ -206,10 +208,38 @@ export function StorageDetail(props) {
 	);
 };
 
+export function StorageButton(props) {
+	const { storage } = props;
+	const history = useHistory();
+
+	const buttonColors = {
+		member_shelves: 'grey',
+		lockers: 'blue',
+		large_project_storage: 'brown',
+	};
+
+	const handleStorageButton = (e, id) => {
+		e.preventDefault();
+		history.push('/storage/' + id);
+	};
+
+	return (
+		<Button
+			className='storage-button'
+			onClick={(e) => handleStorageButton(e, storage.id)}
+			size='tiny'
+			color={buttonColors[storage.location]}
+		>
+			{storage.shelf_id}
+		</Button>
+	);
+};
+
 export function StorageList(props) {
 	const { token } = props;
 	const [storageList, setStorageList] = useState(false);
 	const [error, setError] = useState(false);
+	const isMobile = useIsMobile();
 
 	useEffect(() => {
 		requester('/storage/', 'GET', token)
@@ -225,19 +255,52 @@ export function StorageList(props) {
 
 	return (
 		<div>
+			<p>
+				<Icon name='circle' color='grey' /> Member shelf <br/>
+				<Icon name='circle' color='blue' /> Locker <br/>
+				<Icon name='circle' color='brown' /> Large project storage
+			</p>
 			{!error ?
 				storageList ?
-					storageList.map(x =>
-						<p><Link to={'/storage/'+x.id}>{x.shelf_id}</Link> - {!!x.member_id &&
-							<Link to={'/members/'+x.member_id}>{x.member_name}</Link>
-						}</p>
-					)
+					<Table basic='very'>
+						<Table.Header>
+							<Table.Row>
+								<Table.HeaderCell>Shelf ID</Table.HeaderCell>
+								<Table.HeaderCell>Owner</Table.HeaderCell>
+								<Table.HeaderCell>Memo</Table.HeaderCell>
+							</Table.Row>
+						</Table.Header>
+
+						<Table.Body>
+							{storageList.map(x =>
+								<Table.Row key={x.id}>
+									<Table.Cell><StorageButton storage={x} /></Table.Cell>
+									<Table.Cell>
+										{isMobile && 'Owner: '}<Link to={'/members/'+x.member_id}>{x.member_name}</Link>
+									</Table.Cell>
+									<Table.Cell>{isMobile && 'Memo: '}{x.memo}</Table.Cell>
+								</Table.Row>
+							)}
+						</Table.Body>
+					</Table>
 				:
 					<p>Loading...</p>
 			:
 				<p>Error loading.</p>
 			}
 		</div>
+	);
+};
+
+export function Storage(props) {
+	const { token, user } = props;
+
+	return (
+		<Container>
+			<Header size='large'>Storage Locations</Header>
+
+			<StorageList {...props} />
+		</Container>
 	);
 };
 
@@ -299,7 +362,6 @@ export function ClaimShelfForm(props) {
 
 export function ClaimShelf(props) {
 	const { token, user } = props;
-	const [error, setError] = useState(false);
 
 	return (
 		<Container>
