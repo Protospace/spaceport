@@ -22,6 +22,7 @@ const memberSorts = {
 	is_instructor: 'Instructors',
 	due: 'Due',
 	overdue: 'Overdue',
+	storage: 'Storage',
 	everyone: 'Everyone',
 };
 
