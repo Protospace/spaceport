@@ -246,7 +246,7 @@ class MemberViewSet(Base, Retrieve, Update):
         return FileResponse(card_photo, filename='card.jpg')
 
 
-class CardViewSet(Base, Create, Retrieve, Update, Destroy):
+class CardViewSet(Base, Create, Retrieve, Update):
     permission_classes = [AllowMetadata | IsAdmin]
     queryset = models.Card.objects.all()
     serializer_class = serializers.CardSerializer

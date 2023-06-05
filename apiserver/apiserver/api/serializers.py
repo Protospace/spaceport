@@ -476,10 +476,8 @@ class CardSerializer(serializers.ModelSerializer):
     )])
     member_id = serializers.SerializerMethodField()
     active_status = serializers.ChoiceField([
-        'card_blocked',
+        'card_active',
         'card_inactive',
-        'card_member_blocked',
-        'card_active'
     ])
 
     class Meta:

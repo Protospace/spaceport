@@ -12,7 +12,6 @@ function AdminCardDetail(props) {
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
-	const [yousure, setYousure] = useState(false);
 	const id = card.id;
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
@@ -37,22 +36,6 @@ function AdminCardDetail(props) {
 		});
 	};
 
-	const handleDelete = (e) => {
-		e.preventDefault();
-
-		if (yousure) {
-			requester('/cards/'+id+'/', 'DELETE', token)
-			.then(res => {
-				setInput(false);
-			})
-			.catch(err => {
-				console.log(err);
-			});
-		} else {
-			setYousure(true);
-		}
-	};
-
 	const makeProps = (name) => ({
 		name: name,
 		onChange: handleChange,
@@ -62,60 +45,44 @@ function AdminCardDetail(props) {
 
 	const statusOptions = [
 		{ key: '0', text: 'Card Active', value: 'card_active' },
-		{ key: '1', text: 'Card Blocked', value: 'card_blocked' },
-		{ key: '2', text: 'Card Inactive', value: 'card_inactive' },
-		{ key: '3', text: 'Card Member Blocked', value: 'card_member_blocked' },
+		{ key: '1', text: 'Card Inactive', value: 'card_inactive' },
 	];
 
 	return (
-		input ?
-			<Segment raised color={input.active_status === 'card_active' ? 'green' : 'red'}>
-				<Form onSubmit={handleSubmit}>
-					<Form.Group widths='equal'>
-						<Form.Input
-							fluid
-							{...makeProps('card_number')}
-						/>
-						<Form.Select
-							fluid
-							options={statusOptions}
-							{...makeProps('active_status')}
-							onChange={handleValues}
-						/>
+		<Segment raised color={input.active_status === 'card_active' ? 'green' : 'red'}>
+			<Form onSubmit={handleSubmit}>
+				<Form.Group widths='equal'>
+					<Form.Input
+						fluid
+						{...makeProps('card_number')}
+					/>
+					<Form.Select
+						fluid
+						options={statusOptions}
+						{...makeProps('active_status')}
+						onChange={handleValues}
+					/>
 
-						<Form.Group widths='equal'>
-							<Form.Button
-								loading={loading}
-								error={error.non_field_errors}
-							>
-								{success ? 'Saved.' : 'Save'}
-							</Form.Button>
+					<Form.Button
+						loading={loading}
+						error={error.non_field_errors}
+					>
+						{success ? 'Saved.' : 'Save'}
+					</Form.Button>
+				</Form.Group>
 
-							<Form.Button
-								color='red'
-								onClick={handleDelete}
-							>
-								{yousure ? 'You Sure?' : 'Delete'}
-							</Form.Button>
-						</Form.Group>
-					</Form.Group>
-
-					Notes: {input.notes || 'None'}<br />
-					Last Seen:{' '}
-					{input.last_seen ?
-						input.last_seen > '2021-11-14T02:01:35.415685Z' ?
-							moment.utc(input.last_seen).tz('America/Edmonton').format('lll')
-						:
-							moment.utc(input.last_seen).tz('America/Edmonton').format('ll')
+				Notes: {input.notes || 'None'}<br />
+				Last Seen:{' '}
+				{input.last_seen ?
+					input.last_seen > '2021-11-14T02:01:35.415685Z' ?
+						moment.utc(input.last_seen).tz('America/Edmonton').format('lll')
 					:
-						'Unknown'
-					}
-				</Form>
-			</Segment>
-		:
-			<Segment raised color='black'>
-				Deleted card: {card.card_number}
-			</Segment>
+						moment.utc(input.last_seen).tz('America/Edmonton').format('ll')
+				:
+					'Unknown'
+				}
+			</Form>
+		</Segment>
 	);
 };
 
