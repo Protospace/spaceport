@@ -1484,9 +1484,9 @@ class ProtocoinViewSet(Base):
     def printer_report(self, request, pk=None):
         try:
             with transaction.atomic():
-                #auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-                #if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.VEND_API_TOKEN:
-                #    raise exceptions.PermissionDenied()
+                auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+                if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.PRINTER_API_TOKEN:
+                    raise exceptions.PermissionDenied()
 
                 # {'job_name': 'download.png', 'uuid': '6abbad4d-dda3-4954-b4f1-ac77933a0562', 'timestamp': '20230211173624',
                 # 'job_status': '0', 'user_name': 'Tanner.Collin', 'source': '1', 'paper_name': 'Plain Paper', 'paper_sqi': '356', 'ink_ul': '54'}
