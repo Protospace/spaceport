@@ -1791,7 +1791,7 @@ class HostingViewSet(Base):
 
 class StorageSpaceViewSet(Base, List, Retrieve, Update):
     permission_classes = [AllowMetadata | IsAuthenticated, IsAdminOrReadOnly]
-    queryset = models.StorageSpace.objects.all().order_by('id')
+    queryset = models.StorageSpace.objects.all().select_related('user__member').order_by('id')
     serializer_class = serializers.StorageSpaceSerializer
 
     @action(detail=False, methods=['post'], permission_classes=[AllowMetadata | IsAuthenticated])
