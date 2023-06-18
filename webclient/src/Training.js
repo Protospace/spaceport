@@ -124,6 +124,8 @@ export function Training(props) {
 
 			<Header size='large'>Your Certifications</Header>
 
+			<p>⚠️  Everyone's been decertified on Wood Working I since the installation of the SawStop Table Saw.</p>
+
 			<CertList member={user.member} />
 
 			<p>Certifications are based on the courses you've taken. If there's any errors, please email <a href='mailto:directors@protospace.ca'>directors@protospace.ca</a>.</p>
