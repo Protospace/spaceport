@@ -75,8 +75,8 @@ class Command(BaseCommand):
                 self.stdout.write('    Is members meeting or cleanup, skipping.')
                 continue
 
-            if session.course.tags in ['Event', 'Outing']:
-                self.stdout.write('    Is only outing or event, skipping.')
+            if 'Event' in session.course.tags or 'Outing' in session.course.tags:
+                self.stdout.write('    Is partially outing or event, skipping.')
                 continue
 
             self.stdout.write('    Emailing {} {}:'.format(session.instructor.username, session.instructor.email))
@@ -134,8 +134,8 @@ class Command(BaseCommand):
                 self.stdout.write('    Is members meeting or cleanup, skipping.')
                 continue
 
-            if session.course.tags in ['Event', 'Outing']:
-                self.stdout.write('    Is only outing or event, skipping.')
+            if 'Event' in session.course.tags or 'Outing' in session.course.tags:
+                self.stdout.write('    Is partially outing or event, skipping.')
                 continue
 
             if session.students.count() == 0:
