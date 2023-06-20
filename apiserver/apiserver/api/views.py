@@ -764,6 +764,10 @@ class StatsViewSet(viewsets.ViewSet, List):
         # {'data': 'Disarmed: Partition 1'}
         # {'data': 'Disarmed: Partition 2'}
 
+        auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.ALARM_API_TOKEN:
+            raise exceptions.PermissionDenied()
+
         try:
             data = str(request.data['data'])
         except KeyError:
