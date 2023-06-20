@@ -765,7 +765,7 @@ class StatsViewSet(viewsets.ViewSet, List):
         # {'data': 'Disarmed: Partition 2'}
 
         auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-        if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.ALARM_API_TOKEN:
+        if secrets.ALARM_API_TOKEN and auth_token != 'Bearer ' + secrets.ALARM_API_TOKEN:
             raise exceptions.PermissionDenied()
 
         try:
@@ -1516,7 +1516,7 @@ class ProtocoinViewSet(Base):
         try:
             with transaction.atomic():
                 auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-                if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.PRINTER_API_TOKEN:
+                if secrets.PRINTER_API_TOKEN and auth_token != 'Bearer ' + secrets.PRINTER_API_TOKEN:
                     raise exceptions.PermissionDenied()
 
                 # {'job_name': 'download.png', 'uuid': '6abbad4d-dda3-4954-b4f1-ac77933a0562', 'timestamp': '20230211173624',
