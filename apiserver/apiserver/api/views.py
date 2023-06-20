@@ -751,14 +751,41 @@ class StatsViewSet(viewsets.ViewSet, List):
 
     @action(detail=False, methods=['post'])
     def alarm(self, request):
+        # Sample messages:
+        # {'data': 'Connected'}
+        # {'data': 'Trouble status on'}
+        # {'data': 'Exit delay in progress: Partition 1'}
+        # {'data': 'Disarmed: Partition 1'}
+        # {'data': 'Armed away: Partition 1'}
+        # {'data': 'Alarm: Partition 1'}
+        # {'data': 'Alarm: Partition 2'}
+        # {'data': 'Zone alarm restored: 1'}
+        # {'data': 'Zone alarm restored: 3'}
+        # {'data': 'Disarmed: Partition 1'}
+        # {'data': 'Disarmed: Partition 2'}
+
         try:
-            alarm = dict(time=time.time(), data=int(request.data['data']))
-            cache.set('alarm', alarm)
-            return Response(200)
-        except ValueError:
-            raise exceptions.ValidationError(dict(data='Invalid integer.'))
+            data = str(request.data['data'])
         except KeyError:
             raise exceptions.ValidationError(dict(data='This field is required.'))
+
+        logging.info('Alarm data: %s', data)
+
+        alarm = None
+        if data.startswith('Armed'):
+            alarm = 'Armed'
+        elif data.startswith('Disarmed'):
+            alarm = 'Disarmed'
+        elif data.startswith('Exit delay in progress'):
+            alarm = 'Exit delay'
+        elif data.startswith('Alarm'):
+            alarm = 'TRIGGERED!'
+
+        if alarm:
+            logging.info('Settings alarm status to: %s', alarm)
+            cache.set('alarm', alarm)
+
+        return Response(200)
 
     @action(detail=False, methods=['post'])
     def track(self, request):

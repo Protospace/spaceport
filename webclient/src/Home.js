@@ -254,11 +254,7 @@ export function Home(props) {
 	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').fromNow() : '';
 	const getTrackName = (x) => stats && stats.track && stats.track[x] && stats.track[x]['first_name'] ? stats.track[x]['first_name'] : 'Unknown';
 
-	//const alarmStat = () => stats && stats.alarm && moment().unix() - stats.alarm['time'] < 300 ? stats.alarm['data'] < 270 ? 'Armed' : 'Disarmed' : 'Unknown';
-	const alarmStat = () => 'Unknown';
-
-	//const doorOpenStat = () => alarmStat() === 'Disarmed' && stats.alarm['data'] > 360 ? ', door open' : '';
-	const doorOpenStat = () => '';
+	const alarmStat = () => stats && stats.alarm ? stats.alarm.toString() : 'Unknown';  // toString prevents crash from cached alarm Object
 
 	const closedStat = (x) => stats && stats.closing ? moment().unix() > stats.closing['time'] ? 'Closed' : 'Open until ' + stats.closing['time_str'] : 'Unknown';
 
@@ -401,7 +397,7 @@ export function Home(props) {
 
 								<p>ORD3 printer: {printer3dStat('ord3')}</p>
 
-								{user && <p>Alarm status: {alarmStat()}{doorOpenStat()}</p>}
+								{user && <p>Alarm status: {alarmStat()}</p>}
 
 								{user && <p>Hosting status: {closedStat()}</p>}
 							</div>
