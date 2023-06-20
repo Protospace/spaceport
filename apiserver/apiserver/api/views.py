@@ -509,6 +509,7 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
         month = self.request.query_params.get('month', '')
         exclude_paypal = self.request.query_params.get('exclude_paypal', '') == 'true'
         exclude_snacks = self.request.query_params.get('exclude_snacks', '') == 'true'
+        exclude_dues = self.request.query_params.get('exclude_dues', '') == 'true'
 
         if self.action == 'list':
             if month:
@@ -528,6 +529,9 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
 
             if exclude_snacks:
                 queryset = queryset.exclude(category='Snacks')
+
+            if exclude_dues:
+                queryset = queryset.exclude(category='Membership')
             return queryset.order_by('-date', '-id')
         else:
             return queryset.all()

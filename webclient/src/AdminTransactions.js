@@ -51,6 +51,7 @@ export function AdminHistoricalTransactions(props) {
 	const [summary, setSummary] = useState(summaryCache);
 	const [excludePayPal, setExcludePayPal] = useState(false);
 	const [excludeSnacks, setExcludeSnacks] = useState(true);
+	const [excludeDues, setExcludeDues] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(false);
 	const isMobile = useIsMobile();
@@ -61,7 +62,7 @@ export function AdminHistoricalTransactions(props) {
 		if (loading) return;
 		setLoading(true);
 		const month = input.month.format('YYYY-MM');
-		requester('/transactions/?month=' + month + '&exclude_paypal=' + excludePayPal + '&exclude_snacks=' + excludeSnacks, 'GET', token)
+		requester('/transactions/?month=' + month + '&exclude_paypal=' + excludePayPal + '&exclude_snacks=' + excludeSnacks + '&exclude_dues=' + excludeDues, 'GET', token)
 		.then(res => {
 			setLoading(false);
 			setError(false);
@@ -100,9 +101,13 @@ export function AdminHistoricalTransactions(props) {
 		setExcludeSnacks(v.checked);
 	};
 
+	const handleExcludeDues = (e, v) => {
+		setExcludeDues(v.checked);
+	};
+
 	useEffect(() => {
 		makeRequest();
-	}, [excludePayPal, excludeSnacks]);
+	}, [excludePayPal, excludeSnacks, excludeDues]);
 
 	return (
 		<div>
@@ -173,6 +178,13 @@ export function AdminHistoricalTransactions(props) {
 						label='Exclude Snacks'
 						onChange={handleExcludeSnacks}
 						checked={excludeSnacks}
+					/>
+
+					<Checkbox
+						className='filter-option'
+						label='Exclude Dues'
+						onChange={handleExcludeDues}
+						checked={excludeDues}
 					/>
 
 					<TransactionList transactions={transactions} />
