@@ -523,6 +523,8 @@ class SimpleStorageSpaceSerializer(serializers.ModelSerializer):
 class StorageSpaceSerializer(serializers.ModelSerializer):
     member_id = serializers.SerializerMethodField()
     member_name = serializers.SerializerMethodField()
+    member_status = serializers.SerializerMethodField()
+    member_paused = serializers.SerializerMethodField()
 
     class Meta:
         model = models.StorageSpace
@@ -552,6 +554,14 @@ class StorageSpaceSerializer(serializers.ModelSerializer):
 
         member = obj.user.member
         return member.preferred_name + ' ' + member.last_name
+
+    def get_member_status(self, obj):
+        if not obj.user: return None
+        return obj.user.member.status
+
+    def get_member_paused(self, obj):
+        if not obj.user: return None
+        return obj.user.member.paused_date
 
 
 class TrainingSerializer(serializers.ModelSerializer):

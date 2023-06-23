@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
 import { MembersDropdown } from './Members.js';
-import { isAdmin, BasicTable, requester, useIsMobile } from './utils.js';
+import { statusColor, isAdmin, BasicTable, requester, useIsMobile } from './utils.js';
 import { Button, Checkbox, Container, Form, Grid, Header, Icon, Input, Message, Segment, Table } from 'semantic-ui-react';
 
 export function StorageEditor(props) {
@@ -277,6 +277,7 @@ let storageListCache = false;
 let showEmptyCache = false;
 let showMemodCache = false;
 let showServedCache = false;
+let showExpiredCache = false;
 
 export function StorageList(props) {
 	const { token } = props;
@@ -285,6 +286,7 @@ export function StorageList(props) {
 	const [showEmpty, setShowEmpty] = useState(showEmptyCache);
 	const [showMemod, setShowMemod] = useState(showMemodCache);
 	const [showServed, setShowServed] = useState(showServedCache);
+	const [showExpired, setShowExpired] = useState(showExpiredCache);
 	const [error, setError] = useState(false);
 	const isMobile = useIsMobile();
 
@@ -310,8 +312,18 @@ export function StorageList(props) {
 			return false;
 		} else if (showServed && !x.memo.toLowerCase().includes('served')) {
 			return false;
+		} else if (showExpired && !x.member_paused) {
+			return false;
 		} else {
 			return true;
+		}
+	};
+
+	const sortStorage = (a, b) => {
+		if (showExpired) {
+			return a.member_paused !== b.member_paused ? a.member_paused < b.member_paused ? -1 : 1 : 0;
+		} else {
+			return a.shelf_id !== b.shelf_id ? a.shelf_id < b.shelf_id ? -1 : 1 : 0;
 		}
 	};
 
@@ -329,6 +341,13 @@ export function StorageList(props) {
 		setShowServed(v.checked);
 		showServedCache = v.checked;
 	};
+
+	const handleShowExpired = (e, v) => {
+		setShowExpired(v.checked);
+		showExpiredCache = v.checked;
+	};
+
+	const numResults = storageList ? storageList.filter(filterStorage).length : 0;
 
 	return (
 		<div>
@@ -363,29 +382,40 @@ export function StorageList(props) {
 					onChange={handleShowServed}
 					checked={showServed}
 				/>
+
+				<Checkbox
+					className='filter-option'
+					label='Show Expired'
+					onChange={handleShowExpired}
+					checked={showExpired}
+				/>
 			</p>
 
 			{!error ?
 				storageList ?
 					<>
-						<p>{storageList.filter(filterStorage).length} results:</p>
+						<p>{numResults} result{numResults === 1 ? '' : 's'}{showExpired && ', ordered by expiry'}:</p>
 
 						<Table basic='very'>
 							{!isMobile && <Table.Header>
 								<Table.Row>
 									<Table.HeaderCell>Shelf ID</Table.HeaderCell>
 									<Table.HeaderCell>Owner</Table.HeaderCell>
+									<Table.HeaderCell>Expired</Table.HeaderCell>
 									<Table.HeaderCell>Memo</Table.HeaderCell>
 								</Table.Row>
 							</Table.Header>}
 
 							<Table.Body>
-								{storageList.filter(filterStorage).map(x =>
+								{storageList.filter(filterStorage).sort(sortStorage).map(x =>
 									<Table.Row key={x.id}>
 										<Table.Cell><StorageButton storage={x} /></Table.Cell>
 										<Table.Cell>
-											{isMobile && 'Owner: '}<Link to={'/members/'+x.member_id}>{x.member_name}</Link>
+											{isMobile && 'Owner: '}
+											{x.member_name && <Icon name='circle' color={statusColor[x.member_status]} />}
+											<Link to={'/members/'+x.member_id}>{x.member_name}</Link>
 										</Table.Cell>
+										<Table.Cell>{isMobile && 'Expired: '}{x.member_paused}</Table.Cell>
 										<Table.Cell>{isMobile && 'Memo: '}{x.memo}</Table.Cell>
 									</Table.Row>
 								)}
