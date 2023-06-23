@@ -221,7 +221,7 @@ export function Members(props) {
 
 			{response ?
 				<>
-					<p>{response.total} results:</p>
+					<p>{response.total} result{response.total === 1 ? '' : 's'}:</p>
 
 					<Item.Group unstackable divided>
 						{!!response.results.length &&
