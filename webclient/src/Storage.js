@@ -3,7 +3,7 @@ import { Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
 import { MembersDropdown } from './Members.js';
 import { isAdmin, BasicTable, requester, useIsMobile } from './utils.js';
-import { Button, Container, Form, Grid, Header, Icon, Input, Message, Segment, Table } from 'semantic-ui-react';
+import { Button, Checkbox, Container, Form, Grid, Header, Icon, Input, Message, Segment, Table } from 'semantic-ui-react';
 
 export function StorageEditor(props) {
 	const { token, input, setInput, error } = props;
@@ -274,11 +274,17 @@ export function StorageSearch(props) {
 };
 
 let storageListCache = false;
+let showEmptyCache = false;
+let showMemodCache = false;
+let showServedCache = false;
 
 export function StorageList(props) {
 	const { token } = props;
 	const [storageList, setStorageList] = useState(storageListCache);
 	const [search, setSearch] = useState(storageSearchCache);
+	const [showEmpty, setShowEmpty] = useState(showEmptyCache);
+	const [showMemod, setShowMemod] = useState(showMemodCache);
+	const [showServed, setShowServed] = useState(showServedCache);
 	const [error, setError] = useState(false);
 	const isMobile = useIsMobile();
 
@@ -298,9 +304,30 @@ export function StorageList(props) {
 	const filterStorage = (x) => {
 		if (search.length && !x.shelf_id.startsWith(search)) {
 			return false;
+		} else if (showEmpty && x.member_name) {
+			return false;
+		} else if (showMemod && !x.memo) {
+			return false;
+		} else if (showServed && !x.memo.toLowerCase().includes('served')) {
+			return false;
 		} else {
 			return true;
 		}
+	};
+
+	const handleShowEmpty = (e, v) => {
+		setShowEmpty(v.checked);
+		showEmptyCache = v.checked;
+	};
+
+	const handleShowMemod = (e, v) => {
+		setShowMemod(v.checked);
+		showMemodCache = v.checked;
+	};
+
+	const handleShowServed = (e, v) => {
+		setShowServed(v.checked);
+		showServedCache = v.checked;
 	};
 
 	return (
@@ -311,31 +338,60 @@ export function StorageList(props) {
 				<Icon name='circle' color='brown' /> Large project storage
 			</p>
 
-			<StorageSearch setSearch={setSearch} />
+			<p>
+				<StorageSearch setSearch={setSearch} />
+			</p>
+
+			<p>
+				<Checkbox
+					className='filter-option'
+					label='Show Empty'
+					onChange={handleShowEmpty}
+					checked={showEmpty}
+				/>
+
+				<Checkbox
+					className='filter-option'
+					label={'Show Memo\'d'}
+					onChange={handleShowMemod}
+					checked={showMemod}
+				/>
+
+				<Checkbox
+					className='filter-option'
+					label='Show Served'
+					onChange={handleShowServed}
+					checked={showServed}
+				/>
+			</p>
 
 			{!error ?
 				storageList ?
-					<Table basic='very'>
-						{!isMobile && <Table.Header>
-							<Table.Row>
-								<Table.HeaderCell>Shelf ID</Table.HeaderCell>
-								<Table.HeaderCell>Owner</Table.HeaderCell>
-								<Table.HeaderCell>Memo</Table.HeaderCell>
-							</Table.Row>
-						</Table.Header>}
+					<>
+						<p>{storageList.filter(filterStorage).length} results:</p>
 
-						<Table.Body>
-							{storageList.filter(filterStorage).map(x =>
-								<Table.Row key={x.id}>
-									<Table.Cell><StorageButton storage={x} /></Table.Cell>
-									<Table.Cell>
-										{isMobile && 'Owner: '}<Link to={'/members/'+x.member_id}>{x.member_name}</Link>
-									</Table.Cell>
-									<Table.Cell>{isMobile && 'Memo: '}{x.memo}</Table.Cell>
+						<Table basic='very'>
+							{!isMobile && <Table.Header>
+								<Table.Row>
+									<Table.HeaderCell>Shelf ID</Table.HeaderCell>
+									<Table.HeaderCell>Owner</Table.HeaderCell>
+									<Table.HeaderCell>Memo</Table.HeaderCell>
 								</Table.Row>
-							)}
-						</Table.Body>
-					</Table>
+							</Table.Header>}
+
+							<Table.Body>
+								{storageList.filter(filterStorage).map(x =>
+									<Table.Row key={x.id}>
+										<Table.Cell><StorageButton storage={x} /></Table.Cell>
+										<Table.Cell>
+											{isMobile && 'Owner: '}<Link to={'/members/'+x.member_id}>{x.member_name}</Link>
+										</Table.Cell>
+										<Table.Cell>{isMobile && 'Memo: '}{x.memo}</Table.Cell>
+									</Table.Row>
+								)}
+							</Table.Body>
+						</Table>
+					</>
 				:
 					<p>Loading...</p>
 			:
