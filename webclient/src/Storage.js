@@ -3,7 +3,7 @@ import { Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
 import { MembersDropdown } from './Members.js';
 import { isAdmin, BasicTable, requester, useIsMobile } from './utils.js';
-import { Button, Container, Form, Grid, Header, Icon, Message, Segment, Table } from 'semantic-ui-react';
+import { Button, Container, Form, Grid, Header, Icon, Input, Message, Segment, Table } from 'semantic-ui-react';
 
 export function StorageEditor(props) {
 	const { token, input, setInput, error } = props;
@@ -235,9 +235,50 @@ export function StorageButton(props) {
 	);
 };
 
+let storageSearchCache = '';
+
+export function StorageSearch(props) {
+	const { setSearch } = props;
+	const [input, setInput] = useState(storageSearchCache);
+
+	const handleChange = (event) => {
+		const q = event.target.value.toUpperCase();
+		setInput(q);
+		setSearch(q);
+		storageSearchCache = q;
+	};
+
+	return (
+		<div>
+			<Input icon='search'
+				placeholder='Search...'
+				value={input}
+				onChange={handleChange}
+				aria-label='search products'
+				style={{ marginRight: '0.5rem' }}
+				maxLength={3}
+			/>
+
+			{input.length ?
+				<Button
+					content='Clear'
+					onClick={() => {
+						setInput('');
+						setSearch('');
+						storageSearchCache = '';
+					}}
+				/> : ''
+			}
+		</div>
+	);
+};
+
+let storageListCache = false;
+
 export function StorageList(props) {
 	const { token } = props;
-	const [storageList, setStorageList] = useState(false);
+	const [storageList, setStorageList] = useState(storageListCache);
+	const [search, setSearch] = useState(storageSearchCache);
 	const [error, setError] = useState(false);
 	const isMobile = useIsMobile();
 
@@ -245,6 +286,7 @@ export function StorageList(props) {
 		requester('/storage/', 'GET', token)
 		.then(res => {
 			setStorageList(res.results);
+			storageListCache = res.results;
 			setError(false);
 		})
 		.catch(err => {
@@ -253,6 +295,14 @@ export function StorageList(props) {
 		});
 	}, []);
 
+	const filterStorage = (x) => {
+		if (search.length && !x.shelf_id.startsWith(search)) {
+			return false;
+		} else {
+			return true;
+		}
+	};
+
 	return (
 		<div>
 			<p>
@@ -260,19 +310,22 @@ export function StorageList(props) {
 				<Icon name='circle' color='blue' /> Locker <br/>
 				<Icon name='circle' color='brown' /> Large project storage
 			</p>
+
+			<StorageSearch setSearch={setSearch} />
+
 			{!error ?
 				storageList ?
 					<Table basic='very'>
-						<Table.Header>
+						{!isMobile && <Table.Header>
 							<Table.Row>
 								<Table.HeaderCell>Shelf ID</Table.HeaderCell>
 								<Table.HeaderCell>Owner</Table.HeaderCell>
 								<Table.HeaderCell>Memo</Table.HeaderCell>
 							</Table.Row>
-						</Table.Header>
+						</Table.Header>}
 
 						<Table.Body>
-							{storageList.map(x =>
+							{storageList.filter(filterStorage).map(x =>
 								<Table.Row key={x.id}>
 									<Table.Cell><StorageButton storage={x} /></Table.Cell>
 									<Table.Cell>
