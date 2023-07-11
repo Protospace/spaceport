@@ -169,7 +169,7 @@ export function ImageCrop(props) {
 }
 
 export function AccountForm(props) {
-	const { token, user, refreshUser } = props;
+	const { token, user, refreshUser, isSignup } = props;
 	const member = user.member;
 	const [input, setInput] = useState({ ...member, set_details: true });
 	const [error, setError] = useState({});
@@ -216,19 +216,19 @@ export function AccountForm(props) {
 				<p>{user.username}</p>
 			</div>
 
-			<Form.Input
+			{!isSignup && <Form.Input
 				label='Preferred First Name'
 				autoComplete='off'
 				required
 				{...makeProps('preferred_name')}
-			/>
+			/>}
 
-			<Form.Input
+			{!isSignup && <Form.Input
 				label='Email Address'
 				autoComplete='off'
 				required
 				{...makeProps('email')}
-			/>
+			/>}
 
 			<Form.Input
 				label='Phone Number (999) 555-1234'
@@ -266,7 +266,7 @@ export function AccountForm(props) {
 				</Message>
 			}
 
-			<Form.Field>
+			{!isSignup && <Form.Field>
 				<label>Participate in "Last Scanned" member list?</label>
 				<Form.Checkbox
 					label='Yes, show me'
@@ -279,15 +279,15 @@ export function AccountForm(props) {
 						false
 					}
 				/>
-			</Form.Field>
+			</Form.Field>}
 
-			<Form.Input
+			{!isSignup && <Form.Input
 				label='Member Photo'
 				name='photo'
 				type='file'
 				accept='image/*'
 				onChange={handleUpload}
-			/>
+			/>}
 
 			{input.photo &&
 				<>

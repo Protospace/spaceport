@@ -234,11 +234,11 @@ function App() {
 						</Container>
 					</Menu>
 
-					<Route exact path='/'>
-						<Home token={token} setTokenCache={setTokenCache} user={user} refreshUser={refreshUser} />
-					</Route>
-
 					<div className='topPadding'>
+						<Route exact path='/'>
+							<Home token={token} setTokenCache={setTokenCache} user={user} refreshUser={refreshUser} />
+						</Route>
+
 						<Switch>
 							<Route path='/storage/:id'>
 								<StorageDetail token={token} user={user} />

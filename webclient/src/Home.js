@@ -264,13 +264,13 @@ export function Home(props) {
 
 	return (
 		<Container>
-			<Grid stackable padded columns={2}>
+			<Grid stackable columns={2}>
 				<Grid.Column>
 					{user ?
 						user.member.set_details ?
 							<MemberInfo user={user} />
 						:
-							<AccountForm {...props} />
+							<AccountForm {...props} isSignup={true} />
 					:
 						<div>
 							<LoginForm {...props} />
