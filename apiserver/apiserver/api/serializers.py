@@ -1066,6 +1066,11 @@ class MyLoginSerializer(LoginSerializer):
         if not User.objects.filter(username=username).exists():
             raise ValidationError(dict(username='Username not found. Try "first.last" or "first.middle.last".'))
 
+        try:
+            _ = User.objects.get(username=username).member
+        except User.member.RelatedObjectDoesNotExist:
+            raise ValidationError(dict(username='Can\'t log in as superuser. Make an account below.'))
+
         user = super().authenticate(**kwargs)
 
         if not user:
