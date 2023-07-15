@@ -35,15 +35,15 @@ export function LCARS1Display(props) {
 				}
 
 				<div className='display-scores'>
-					<DisplayScores />
-				</div>
-
-				<div className='display-scores'>
 					<DisplayMonthlyScores />
 				</div>
 
 				<div className='display-scores'>
 					<DisplayHosting />
+				</div>
+
+				<div className='display-scores'>
+					<DisplayMonthlyHosting />
 				</div>
 
 				<div className='display-usage'>
@@ -232,6 +232,42 @@ export function DisplayHosting(props) {
 			{scores && scores.slice(0, 5).map((x, i) =>
 				<div key={i}>
 					<Header size='medium'>#{i+1} — {x.name}. {i === 0 ? <img className='toast' src='/toast.png' /> : ''}</Header>
+					<p>{x.hours.toFixed(2)} hours</p>
+				</div>
+			)}
+
+		</>
+	);
+};
+
+export function DisplayMonthlyHosting(props) {
+	const { token, name } = props;
+	const [scores, setScores] = useState(false);
+
+	const getScores = () => {
+		requester('/hosting/monthly_high_scores/', 'GET')
+		.then(res => {
+			setScores(res);
+		})
+		.catch(err => {
+			console.log(err);
+			setScores(false);
+		});
+	};
+
+	useEffect(() => {
+		getScores();
+		const interval = setInterval(getScores, 60000);
+		return () => clearInterval(interval);
+	}, []);
+
+	return (
+		<>
+			<Header size='large'>Monthly Most Host</Header>
+
+			{scores && scores.slice(0, 5).map((x, i) =>
+				<div key={i}>
+					<Header size='medium'>#{i+1} — {x.name}. {i === 0 ? '🚀' : ''}</Header>
 					<p>{x.hours.toFixed(2)} hours</p>
 				</div>
 			)}

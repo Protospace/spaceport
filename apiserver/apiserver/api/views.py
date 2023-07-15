@@ -1823,6 +1823,27 @@ class HostingViewSet(Base):
 
         return Response(hours)
 
+    @action(detail=False, methods=['get'])
+    def monthly_high_scores(self, request):
+        now = utils.now_alberta_tz()
+        current_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+        members = models.Member.objects.all()
+        members = members.annotate(
+            hosting_hours=Max('user__hosting__hours', filter=Q(user__hosting__finished_at__gte=current_month_start)),
+        ).exclude(hosting_hours__isnull=True).order_by('-hosting_hours')
+
+        scores = []
+
+        for member in members:
+            scores.append(dict(
+                name=member.preferred_name + ' ' + member.last_name[0],
+                hours=member.hosting_hours,
+                member_id=member.id,
+            ))
+
+        return Response(scores)
+
 
 class StorageSpaceViewSet(Base, List, Retrieve, Update):
     permission_classes = [AllowMetadata | IsAuthenticated, IsAdminOrReadOnly]
