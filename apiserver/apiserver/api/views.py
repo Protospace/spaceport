@@ -1830,7 +1830,7 @@ class HostingViewSet(Base):
 
         members = models.Member.objects.all()
         members = members.annotate(
-            hosting_hours=Max('user__hosting__hours', filter=Q(user__hosting__finished_at__gte=current_month_start)),
+            hosting_hours=Sum('user__hosting__hours', filter=Q(user__hosting__finished_at__gte=current_month_start)),
         ).exclude(hosting_hours__isnull=True).order_by('-hosting_hours')
 
         scores = []
