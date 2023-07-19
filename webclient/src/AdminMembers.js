@@ -693,7 +693,7 @@ export function AdminCert(props) {
 				onClick={handleUncert}
 				loading={loading}
 			>
-				Uncertify
+				Disable
 			</Button>
 		:
 			<Button
@@ -701,7 +701,7 @@ export function AdminCert(props) {
 				onClick={handleCert}
 				loading={loading}
 			>
-				Certify {name}
+				Enable {name}
 			</Button>
 	);
 }
@@ -712,15 +712,15 @@ export function AdminMemberCertifications(props) {
 
 	return (
 		<div>
-			<Header size='medium'>Member Certifications</Header>
+			<Header size='medium'>Machine Access</Header>
 
-			<p>These certifications control access to the lockouts.</p>
+			<p>These control access to the lockouts.</p>
 
 			<Table basic='very'>
 				<Table.Header>
 					<Table.Row>
 						<Table.HeaderCell>Name</Table.HeaderCell>
-						<Table.HeaderCell>Certification</Table.HeaderCell>
+						<Table.HeaderCell>Enabled</Table.HeaderCell>
 						<Table.HeaderCell>Course</Table.HeaderCell>
 						<Table.HeaderCell></Table.HeaderCell>
 					</Table.Row>
@@ -734,29 +734,29 @@ export function AdminMemberCertifications(props) {
 						<Table.Cell><AdminCert name='Common' field='orientation_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Cell>Wood 1</Table.Cell>
+						<Table.Cell>SawStop</Table.Cell>
 						<Table.Cell>{member.wood_cert_date ? 'Yes, ' + member.wood_cert_date : 'No'}</Table.Cell>
-						<Table.Cell><Link to='/courses/261'>Woodworking Tools 1: Intro to Saws</Link></Table.Cell>
-						<Table.Cell><AdminCert name='Wood 1' field='wood_cert_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
+						<Table.Cell>SawStop course (WIP)</Table.Cell>
+						<Table.Cell><AdminCert name='SawStop' field='wood_cert_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Cell>Wood 2</Table.Cell>
+						<Table.Cell>Drum Sander</Table.Cell>
 						<Table.Cell>{member.wood2_cert_date ? 'Yes, ' + member.wood2_cert_date : 'No'}</Table.Cell>
 						<Table.Cell><Link to='/courses/401'>Woodworking Tools 2: Jointer, Thickness Planer, Drum Sander</Link></Table.Cell>
-						<Table.Cell><AdminCert name='Wood 2' field='wood2_cert_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
+						<Table.Cell><AdminCert name='Drum Sander' field='wood2_cert_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
 					</Table.Row>
-					<Table.Row>
+					{false && <Table.Row>
 						<Table.Cell>Lathe</Table.Cell>
 						<Table.Cell>{member.lathe_cert_date ? 'Yes, ' + member.lathe_cert_date : 'No'}</Table.Cell>
 						<Table.Cell><Link to='/courses/281'>Metal: Metal Cutting & Manual Lathe</Link></Table.Cell>
 						<Table.Cell><AdminCert name='Lathe' field='lathe_cert_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
-					</Table.Row>
-					<Table.Row>
+					</Table.Row>}
+					{false && <Table.Row>
 						<Table.Cell>Mill</Table.Cell>
 						<Table.Cell>{member.mill_cert_date ? 'Yes, ' + member.mill_cert_date : 'No'}</Table.Cell>
 						<Table.Cell><Link to='/courses/283'>Metal: Manual Mill & Advanced Lathe</Link></Table.Cell>
 						<Table.Cell><AdminCert name='Mill' field='mill_cert_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
-					</Table.Row>
+					</Table.Row>}
 					<Table.Row>
 						<Table.Cell>Tormach CNC</Table.Cell>
 						<Table.Cell>{member.tormach_cnc_cert_date ? 'Yes, ' + member.tormach_cnc_cert_date : 'No'}</Table.Cell>
