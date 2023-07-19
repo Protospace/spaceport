@@ -29,6 +29,7 @@ class LoggingThrottle(throttling.BaseThrottle):
             '/pinball/monthly_high_scores/',
             '/protocoin/printer_balance/',
             '/hosting/high_scores/',
+            '/hosting/monthly_high_scores/',
             '/stats/ord2/printer3d/',
             '/stats/ord3/printer3d/'
         ]:
