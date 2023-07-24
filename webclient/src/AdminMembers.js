@@ -736,7 +736,7 @@ export function AdminMemberCertifications(props) {
 					<Table.Row>
 						<Table.Cell>SawStop</Table.Cell>
 						<Table.Cell>{member.wood_cert_date ? 'Yes, ' + member.wood_cert_date : 'No'}</Table.Cell>
-						<Table.Cell>SawStop course (WIP)</Table.Cell>
+						<Table.Cell><Link to='/courses/463'>SawStop Update</Link></Table.Cell>
 						<Table.Cell><AdminCert name='SawStop' field='wood_cert_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
 					</Table.Row>
 					<Table.Row>
