@@ -29,6 +29,7 @@ $ yarn install
 Run the development server:
 
 ```
+$ export NODE_OPTIONS=--openssl-legacy-provider
 $ HOST=0.0.0.0 yarn start
 ```
 
