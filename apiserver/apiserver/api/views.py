@@ -1794,6 +1794,20 @@ class HostingViewSet(Base):
 
             logging.info('No current hosting for that user, new hosting #%s created.', h.id)
 
+            try:  # TODO: remove try / except
+                # send a message to Spacebar
+                message = 'A member just offered to host for {} hours from now until {}!'.format(
+                    hours,
+                    h.finished_at.astimezone(utils.TIMEZONE_CALGARY).strftime('%-I:%M %p'),
+                )
+                if hosting_user.member.discourse_username:
+                    message += ' Tag @{} here to get their attention.'.format(
+                        hosting_user.member.discourse_username,
+                    )
+                utils.spaceporter_host(message)
+            except:
+                pass
+
         # update "open until" time
         hosting = models.Hosting.objects.order_by('-finished_at').first()
         closing = dict(

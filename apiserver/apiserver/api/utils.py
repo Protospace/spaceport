@@ -22,7 +22,7 @@ from django.core.cache import cache
 from django.utils.timezone import now, pytz
 
 from . import models, serializers, utils_ldap, utils_stats, utils_auth, utils, utils_email
-from .. import settings
+from .. import settings, secrets
 
 STATIC_FOLDER = 'data/static/'
 
@@ -41,6 +41,23 @@ def alert_tanner(message):
         requests.get('https://tbot.tannercollin.com/message', params=params, timeout=4)
     except BaseException as e:
         logger.error('Problem alerting Tanner: ' + str(e))
+
+def spaceporter_host(message):
+    logger.info('Spaceporter bot sending to host chat: ' + message)
+
+    if secrets.SPACEPORTER_HOST_TOKEN:
+        url = 'https://forum.protospace.ca/chat/hooks/{}.json'.format(
+            secrets.SPACEPORTER_HOST_TOKEN,
+        )
+    else:
+        logger.info('Aborting Spaceporter bot message, no token.')
+        return
+
+    try:
+        data = dict(text=message)
+        requests.post(url, json=data, timeout=4)
+    except BaseException as e:
+        logger.error('Problem with bot: ' + str(e))
 
 def num_months_spanned(d1, d2):
     '''
