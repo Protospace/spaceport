@@ -243,7 +243,7 @@ export function Members(props) {
 											<>
 												<Item.Description>
 													Shelf: {x.member.storage.length ?
-														x.member.storage.sort((a, b) => a.location == 'member_shelves' ? -1 : 1).map((x, i) =>
+														x.member.storage.sort((a, b) => a.location === 'member_shelves' ? -1 : 1).map((x, i) =>
 															<StorageButton storage={x} />
 														)
 													:
@@ -253,7 +253,6 @@ export function Members(props) {
 												<Item.Description>Joined: {x.member.application_date || 'Unknown'}</Item.Description>
 											</>
 										}
-										<Item.Description>ID: {x.member.id}</Item.Description>
 									</Item.Content>
 								</Item>
 							)
