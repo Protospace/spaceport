@@ -171,7 +171,7 @@ export function AdminHistory(props) {
 									<React.Fragment key={x.id}>
 										<Table.Row>
 											<Table.Cell>
-												<a href='javascript:;' onClick={() => setFocus(x.id)}>
+												<a onClick={() => setFocus(x.id)}>
 													{moment.utc(x.history_date).tz('America/Edmonton').format('YYYY-MM-DD')}
 												</a>
 											</Table.Cell>

@@ -17,6 +17,10 @@ body {
 	margin: 0;
 }
 
+a {
+	cursor: pointer;
+}
+
 .hero {
 	padding-top: 1.5rem;
 	margin-bottom: 1.5rem;

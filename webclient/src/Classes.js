@@ -354,7 +354,7 @@ export function Classes(props) {
 				</>
 			}
 
-			<p>
+			<div>
 				<Button
 					onClick={() => {
 						setSortByCourse(true);
@@ -389,7 +389,7 @@ export function Classes(props) {
 						onClick={() => setSearch('')}
 					/>
 				}
-			</p>
+			</div>
 
 			<p>Filter by tag:</p>
 

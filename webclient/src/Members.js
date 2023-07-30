@@ -201,7 +201,7 @@ export function Members(props) {
 				Sort by{' '}
 				{Object.entries(memberSorts).map((x, i) =>
 					<React.Fragment key={x[0]}>
-						<a href='javascript:void(0)' onClick={() => doSort(x[0])}>{x[1]}</a>
+						<a onClick={() => doSort(x[0])}>{x[1]}</a>
 						{i < Object.keys(memberSorts).length - 1 && ', '}
 					</React.Fragment>
 				)}.
