@@ -1796,9 +1796,10 @@ class HostingViewSet(Base):
 
             try:  # TODO: remove try / except
                 # send a message to Spacebar
-                message = 'A member just offered to host for {} hours from now until {}!'.format(
+                message = '{} just offered to host for {} hours from now until {}!'.format(
+                    hosting_user.member.preferred_name,
                     hours,
-                    h.finished_at.astimezone(utils.TIMEZONE_CALGARY).strftime('%-I:%M %p'),
+                    h.finished_at.astimezone(utils.TIMEZONE_CALGARY).strftime('%-I:%M %p, %b %d'),
                 )
                 if hosting_user.member.discourse_username:
                     message += ' Tag @{} here to get their attention.'.format(
