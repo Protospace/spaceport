@@ -16,7 +16,7 @@ export const tags = {
 	Crafts: 'yellow',
 	//name: 'olive',
 	Electronics: 'green',
-	Computers: 'teal',
+	Software: 'teal',
 	Metal: 'blue',
 	//name: 'violet',
 	Event: 'purple',
