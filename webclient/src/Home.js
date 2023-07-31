@@ -63,7 +63,7 @@ function MemberInfo(props) {
 								<Table.Cell>Shelf:</Table.Cell>
 								<Table.Cell>
 									{user.storage.length ?
-										user.storage.sort((a, b) => a.location == 'member_shelves' ? -1 : 1).map((x, i) =>
+										user.storage.sort((a, b) => a.location === 'member_shelves' ? -1 : 1).map((x, i) =>
 											<StorageButton storage={x} />
 										)
 									:

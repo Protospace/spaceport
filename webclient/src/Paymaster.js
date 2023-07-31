@@ -114,7 +114,6 @@ export function SendProtocoin(props) {
 
 export function Paymaster(props) {
 	const { token, user, refreshUser } = props;
-	const [pop, setPop] = useState('20.00');
 	const [locker, setLocker] = useState('5.00');
 	const [consumables, setConsumables] = useState('');
 	const [buyProtocoin, setBuyProtocoin] = useState('10.00');
@@ -214,22 +213,20 @@ export function Paymaster(props) {
 						/>
 					</div>
 
-					<p>
+					<div>
 						Please explain what you bought:<br/>
 						<Input
 							value={consumablesMemo}
 							maxLength={50}
 							onChange={(e, v) => setConsumablesMemo(v.value)}
 						/>
-					</p>
+					</div>
 
 					<PayPalPayNow
 						amount={consumables}
 						name='Protospace Consumables'
 						custom={JSON.stringify({ category: 'Consumables', member: user.member.id, memo: consumablesMemo })}
 					/>
-
-					<p/>
 
 					<PayWithProtocoin
 						token={token} user={user} refreshUser={refreshUser}
@@ -255,14 +252,14 @@ export function Paymaster(props) {
 						/>
 					</div>
 
-					<p>
+					<div>
 						Optional memo:<br/>
 						<Input
 							value={memo}
 							maxLength={50}
 							onChange={(e, v) => setMemo(v.value)}
 						/>
-					</p>
+					</div>
 
 					<PayPalPayNow
 						amount={donate}

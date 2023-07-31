@@ -330,7 +330,7 @@ export function AdminMemberPause(props) {
 		<div>
 			<Header size='medium'>Pause / Unpause Membership</Header>
 
-			<p>
+			<div>
 				{result.member.paused_date ?
 					result.member.vetted_date && moment().diff(moment(result.member.paused_date), 'days') > 370 ?
 						<>
@@ -338,16 +338,16 @@ export function AdminMemberPause(props) {
 								{result.member.preferred_name} has been away for more than a year and will need to be re-vetted according to our
 								<a href='https://wiki.protospace.ca/Approved_policies/Membership' target='_blank' rel='noopener noreferrer'> policy</a>.
 							</p>
-							<p>
+							<div>
 								<Form.Checkbox
 									name='told1'
-									value={told1}
+									checked={told1}
 									label='Told member to get re-vetted'
 									required
 									onChange={(e, v) => setTold1(v.checked)}
 								/>
-							</p>
-							<p>
+							</div>
+							<div>
 								<Form.Checkbox
 									name='told2'
 									value={told2}
@@ -355,36 +355,36 @@ export function AdminMemberPause(props) {
 									required
 									onChange={(e, v) => setTold2(v.checked)}
 								/>
-							</p>
+							</div>
 
 							<Button onClick={handleUnpause} loading={loading} disabled={!told1 || !told2}>
 								Unpause
 							</Button>
 						</>
 					:
-						result.member.status == 'Expired Member' ?
+						result.member.status === 'Expired Member' ?
 							<>
 								<p>
 									{result.member.preferred_name} has expired due to lapse of payment.
 								</p>
-								<p>
+								<div>
 									<Form.Checkbox
 										name='told1'
-										value={told1}
+										checked={told1}
 										label='Member has paid any back-dues owed'
 										required
 										onChange={(e, v) => setTold1(v.checked)}
 									/>
-								</p>
-								<p>
+								</div>
+								<div>
 									<Form.Checkbox
 										name='told2'
-										value={told2}
+										checked={told2}
 										label='Recorded payment transaction on portal'
 										required
 										onChange={(e, v) => setTold2(v.checked)}
 									/>
-								</p>
+								</div>
 
 								<Button onClick={handleUnpause} loading={loading} disabled={!told1 || !told2}>
 									Unpause
@@ -398,31 +398,31 @@ export function AdminMemberPause(props) {
 					<>
 						<p>Pause members who are inactive, former, or on vacation.</p>
 
-						<p>
+						<div>
 							<Form.Checkbox
 								name='told1'
-								value={told1}
+								checked={told1}
 								label='Told member to stop any PayPal subscriptions'
 								required
 								onChange={(e, v) => setTold1(v.checked)}
 							/>
-						</p>
-						<p>
+						</div>
+						<div>
 							<Form.Checkbox
 								name='told2'
-								value={told2}
+								checked={told2}
 								label='Told member to clear any shelves'
 								required
 								onChange={(e, v) => setTold2(v.checked)}
 							/>
-						</p>
+						</div>
 
 						<Button onClick={handlePause} loading={loading} disabled={!told1 || !told2}>
 							Pause
 						</Button>
 					</>
 				}
-			</p>
+			</div>
 
 			{success && <div>Success!</div>}
 			{error && <p>Error, something went wrong.</p>}
