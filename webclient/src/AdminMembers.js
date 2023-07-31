@@ -324,6 +324,8 @@ export function AdminMemberPause(props) {
 			console.log(err);
 			setError(true);
 		});
+		setTold1(false);
+		setTold2(false);
 	};
 
 	return (
@@ -338,7 +340,7 @@ export function AdminMemberPause(props) {
 								{result.member.preferred_name} has been away for more than a year and will need to be re-vetted according to our
 								<a href='https://wiki.protospace.ca/Approved_policies/Membership' target='_blank' rel='noopener noreferrer'> policy</a>.
 							</p>
-							<div>
+							<div className='bottomMargin'>
 								<Form.Checkbox
 									name='told1'
 									checked={told1}
@@ -347,7 +349,7 @@ export function AdminMemberPause(props) {
 									onChange={(e, v) => setTold1(v.checked)}
 								/>
 							</div>
-							<div>
+							<div className='bottomMargin'>
 								<Form.Checkbox
 									name='told2'
 									value={told2}
@@ -367,7 +369,7 @@ export function AdminMemberPause(props) {
 								<p>
 									{result.member.preferred_name} has expired due to lapse of payment.
 								</p>
-								<div>
+								<div className='bottomMargin'>
 									<Form.Checkbox
 										name='told1'
 										checked={told1}
@@ -376,7 +378,7 @@ export function AdminMemberPause(props) {
 										onChange={(e, v) => setTold1(v.checked)}
 									/>
 								</div>
-								<div>
+								<div className='bottomMargin'>
 									<Form.Checkbox
 										name='told2'
 										checked={told2}
@@ -398,7 +400,7 @@ export function AdminMemberPause(props) {
 					<>
 						<p>Pause members who are inactive, former, or on vacation.</p>
 
-						<div>
+						<div className='bottomMargin'>
 							<Form.Checkbox
 								name='told1'
 								checked={told1}
@@ -407,7 +409,7 @@ export function AdminMemberPause(props) {
 								onChange={(e, v) => setTold1(v.checked)}
 							/>
 						</div>
-						<div>
+						<div className='bottomMargin'>
 							<Form.Checkbox
 								name='told2'
 								checked={told2}

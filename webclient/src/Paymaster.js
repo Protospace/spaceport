@@ -213,7 +213,7 @@ export function Paymaster(props) {
 						/>
 					</div>
 
-					<div>
+					<div className='bottomMargin'>
 						Please explain what you bought:<br/>
 						<Input
 							value={consumablesMemo}
@@ -252,7 +252,7 @@ export function Paymaster(props) {
 						/>
 					</div>
 
-					<div>
+					<div className='bottomMargin'>
 						Optional memo:<br/>
 						<Input
 							value={memo}
@@ -266,8 +266,6 @@ export function Paymaster(props) {
 						name='Protospace Donation'
 						custom={JSON.stringify({ category: 'Donation', member: user.member.id, memo: memo })}
 					/>
-
-					<p/>
 
 					<PayWithProtocoin
 						token={token} user={user} refreshUser={refreshUser}
