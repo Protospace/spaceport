@@ -24,8 +24,8 @@ function ClassTable(props) {
 						<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
 							<Table.Cell>{x.course_data.name}</Table.Cell>
 							<Table.Cell>
-								Date: <Link to={'/classes/'+x.id}>
-									{moment.utc(x.datetime).tz('America/Edmonton').format('ll')}
+								<Link to={'/classes/'+x.id}>
+									{moment.utc(x.datetime).tz('America/Edmonton').format('ddd, ll')}
 								</Link>
 								<span style={{float: 'right'}}>
 									Time: {x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}
@@ -72,7 +72,7 @@ function ClassTable(props) {
 							<Table.Cell>&nbsp;{x.course_data.name}</Table.Cell>
 							<Table.Cell>
 								<Link to={'/classes/'+x.id}>
-									{moment.utc(x.datetime).tz('America/Edmonton').format('ll')}
+									{moment.utc(x.datetime).tz('America/Edmonton').format('ddd, ll')}
 								</Link>
 							</Table.Cell>
 							<Table.Cell>{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}</Table.Cell>
