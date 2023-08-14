@@ -175,6 +175,18 @@ a {
 	padding-right: 0.5rem;
 }
 
+.interest .nonbutton {
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+	font-size: 0.85714286rem;
+	display: inline-block;
+	min-height: 1em;
+	font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;
+	margin: 0 .25em 0 0;
+	padding-top: 0.785714em;
+	padding-bottom: 0.785714em;
+}
+
 .ui.button.storage-button {
 	padding-left: 0.5rem;
 	padding-right: 0.5rem;
