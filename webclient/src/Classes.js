@@ -145,7 +145,7 @@ function NewClassTableCourse(props) {
 							<div
 								className='nonbutton'
 							>
-								{interested} interested ✅
+								{interested} interested <span className='dark-emoji'>✅</span>
 							</div>
 						:
 							<Button

@@ -350,3 +350,7 @@ a {
 .darkmode--activated .footer {
 	mix-blend-mode: difference;
 }
+
+.darkmode--activated .dark-emoji {
+	mix-blend-mode: difference;
+}
