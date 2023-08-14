@@ -669,7 +669,8 @@ export function ClassDetail(props) {
 						{clazz.instructor !== user.id &&
 							(userTraining ?
 								<div>
-									<p>Status: {userTraining.attendance_status}</p>
+									{ userTraining.attendance_status !== 'Failed' && <p>Status: {userTraining.attendance_status}</p>}
+								  { userTraining.attendance_status === 'Failed' && <p>Status: Attempted</p>}
 									<p>
 										{userTraining.attendance_status === 'Withdrawn' ?
 											<Button loading={loading} onClick={() => handleToggle('Waiting for payment')}>
@@ -751,4 +752,3 @@ export function ClassDetail(props) {
 		</Container>
 	);
 };
-
