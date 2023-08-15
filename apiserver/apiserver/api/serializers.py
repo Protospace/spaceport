@@ -285,6 +285,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'trotec_cert_date',
             'is_allowed_entry',
             'mediawiki_username',
+            'signup_helper',
         ]
 
     def get_protocoin(self, obj):
@@ -308,6 +309,11 @@ class MemberSerializer(serializers.ModelSerializer):
             instance.photo_small = small
             instance.photo_medium = medium
             instance.photo_large = large
+
+        helper_id = self.initial_data.get('helper_id', None)
+        if helper_id:
+            signup_helper = get_object_or_404(models.Member, id=helper_id)
+            instance.signup_helper = signup_helper.user
 
         if 'discourse_username' in validated_data:
             changed = validated_data['discourse_username'] != instance.discourse_username
@@ -533,12 +539,13 @@ class StorageSpaceSerializer(serializers.ModelSerializer):
             'id',
             'shelf_id',
             'location',
+            'user',
         ]
 
     def update(self, instance, validated_data):
         member_id = self.initial_data.get('member_id', None)
         if member_id:
-            member = get_object_or_404(models.Member, id=self.initial_data['member_id'])
+            member = get_object_or_404(models.Member, id=member_id)
             validated_data['user'] = member.user
         else:
             validated_data['user'] = None

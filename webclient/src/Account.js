@@ -4,6 +4,7 @@ import * as loadImage from 'blueimp-load-image';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import './light.css';
+import { MembersDropdown } from './Members.js';
 import { Button, Container, Form, Grid, Header, Message, Segment } from 'semantic-ui-react';
 import { requester, randomString } from './utils.js';
 
@@ -299,6 +300,17 @@ export function AccountForm(props) {
 					}
 				</>
 			}
+
+			{isSignup && <Form.Field error={error.member_id}>
+				<label>Who helped you sign up? (search)</label>
+				<MembersDropdown
+					token={token}
+					{...makeProps('helper_id')}
+					onChange={handleValues}
+					initial={''}
+					autofocus={''}
+				/>
+			</Form.Field>}
 
 			<Form.Button loading={loading} error={error.non_field_errors}>
 				Submit
