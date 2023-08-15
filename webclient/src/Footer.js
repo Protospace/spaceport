@@ -10,7 +10,7 @@ export const Footer = () => {
 	useEffect(() => {
 		if (!footerRef.current) return;
 		if (footerRef.current.clientWidth < 650) return
-		scene({ ref: footerRef });
+		if (window.location.hostname === 'my.protospace.ca') scene({ ref: footerRef });
 	}, [footerRef]);
 
 	return (
@@ -51,7 +51,7 @@ export const Footer = () => {
 					>
 						View the source code and license on GitHub.
 					</a>{' '}
-					
+
 				</p>
 
 				<p>
