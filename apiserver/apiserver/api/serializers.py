@@ -569,7 +569,7 @@ class TrainingSerializer(serializers.ModelSerializer):
         'Waiting for payment',
         'Withdrawn',
         'Rescheduled',
-        'Failed',
+        'Try-again',
         'No-show',
         'Attended',
         'Confirmed'

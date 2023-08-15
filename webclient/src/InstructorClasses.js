@@ -116,8 +116,8 @@ function AttendanceRow(props) {
 				Rescheduled
 			</Button>
 
-			<Button {...makeProps('Failed')}>
-				Failed
+			<Button {...makeProps('Try-again')}>
+				Try-again
 			</Button>
 
 			<Button {...makeProps('No-show')}>
