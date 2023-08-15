@@ -300,7 +300,7 @@ export function Home(props) {
 								<p>Next clean: {getDateStat('next_clean')}</p>
 								<p className='nowrap-stat'>Next class: {getNextStat('next_class')}</p>
 								<p className='nowrap-stat'>Last class: {getNextStat('prev_class')}</p>
-								<p>Member count: {getStat('member_count')} <Link to='/charts'>[more]</Link></p>
+								<p>Member count: {getStat('member_count')} <Link to='/charts'>[charts]</Link></p>
 								<p>Card scans today: {getZeroStat('card_scans')}</p>
 
 								<p>
