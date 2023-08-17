@@ -99,9 +99,9 @@ class SearchViewSet(Base, Retrieve):
                 queryset = queryset.order_by('-vetted_date', '-id')
             elif sort == 'newest_active':
                 queryset = queryset.filter(paused_date__isnull=True)
-                queryset = queryset.order_by('-application_date', '-id')
+                queryset = queryset.order_by('-current_start_date', '-id')
             elif sort == 'newest_overall':
-                queryset = queryset.order_by('-application_date', '-id')
+                queryset = queryset.order_by('-current_start_date', '-id')
             elif sort == 'oldest_active':
                 queryset = queryset.filter(paused_date__isnull=True)
                 queryset = queryset.order_by('application_date', 'id')
