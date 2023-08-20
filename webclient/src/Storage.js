@@ -47,7 +47,6 @@ function EditStorage(props) {
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
 	const { id } = useParams();
-	const history = useHistory();
 
 	const handleSubmit = (e) => {
 		if (loading) return;
@@ -69,25 +68,11 @@ function EditStorage(props) {
 		});
 	};
 
-	const saveAndNext = (e) => {
-		e.preventDefault();
-
-		handleSubmit(e)
-		.then(res => {
-			setStorage(false);
-			history.push('/storage/' + (parseInt(id) + 1));
-		});
-	};
-
 	return (
 		<div>
 			<Header size='medium'>Edit Storage {storage.shelf_id}</Header>
 
 			<Form onSubmit={handleSubmit}>
-				<Form.Button floated='right' onClick={saveAndNext} loading={loading} error={error.non_field_errors}>
-					Save and edit next
-				</Form.Button>
-
 				<StorageEditor token={token} input={input} setInput={setInput} error={error} />
 
 				<Form.Group widths='equal'>

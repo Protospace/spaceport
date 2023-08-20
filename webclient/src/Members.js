@@ -178,7 +178,7 @@ export function Members(props) {
 		<Container>
 			<Header size='large'>Member List</Header>
 
-			<p>Search by name, email, Spacebar username, or member ID:</p>
+			<p>Search by name, email, Spacebar username, member ID, or member shelf:</p>
 
 			<Input autoFocus focus icon='search'
 				placeholder='Search...'
@@ -250,7 +250,11 @@ export function Members(props) {
 														'None'
 													}
 												</Item.Description>
-												<Item.Description>Joined: {x.member.application_date || 'Unknown'}</Item.Description>
+												{sort === 'newest_active' ?
+													<Item.Description>Started: {x.member.current_start_date || 'Unknown'}</Item.Description>
+												:
+													<Item.Description>Joined: {x.member.application_date || 'Unknown'}</Item.Description>
+												}
 											</>
 										}
 									</Item.Content>
