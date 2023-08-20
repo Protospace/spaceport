@@ -1605,7 +1605,7 @@ class ProtocoinViewSet(Base):
 
                 memo = 'Protocoin - Purchase spent ₱ {} printing {}'.format(
                     total_cost,
-                    request.data['job_name'],
+                    request.data['job_name'][:100],
                 )
 
                 tx = models.Transaction.objects.create(
