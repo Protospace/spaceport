@@ -250,7 +250,11 @@ export function Members(props) {
 														'None'
 													}
 												</Item.Description>
-												<Item.Description>Joined: {x.member.application_date || 'Unknown'}</Item.Description>
+												{sort === 'newest_active' ?
+													<Item.Description>Started: {x.member.current_start_date || 'Unknown'}</Item.Description>
+												:
+													<Item.Description>Joined: {x.member.application_date || 'Unknown'}</Item.Description>
+												}
 											</>
 										}
 									</Item.Content>
