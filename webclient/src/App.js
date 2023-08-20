@@ -199,6 +199,11 @@ function App() {
 										to='/classes'
 									/>
 									<Dropdown.Item
+										content='Storage'
+										as={Link}
+										to='/storage'
+									/>
+									<Dropdown.Item
 										content='Utilities'
 										as={Link}
 										to='/utils'
