@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
 import { MembersDropdown } from './Members.js';
-import { StorageList } from './Storage.js';
 import { isAdmin, BasicTable, requester } from './utils.js';
 import { Button, Container, Form, Grid, Header, Message, Segment, Table } from 'semantic-ui-react';
 
@@ -34,11 +33,6 @@ export function Debug(props) {
 			<p><Link to='/display/lcars1'>LCARS1 Display</Link></p>
 
 			<p><Link to='/display/lcars2'>LCARS2 Display</Link></p>
-
-			<Header size='medium'>Storage</Header>
-
-			<StorageList token={token} />
-
 
 		</Container>
 	);
