@@ -178,7 +178,7 @@ export function Members(props) {
 		<Container>
 			<Header size='large'>Member List</Header>
 
-			<p>Search by name, email, Spacebar username, or member ID:</p>
+			<p>Search by name, email, Spacebar username, member ID, or member shelf:</p>
 
 			<Input autoFocus focus icon='search'
 				placeholder='Search...'

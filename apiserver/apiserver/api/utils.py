@@ -157,7 +157,7 @@ def gen_search_strings():
     start = time.time()
 
     search_strings = {}
-    for m in models.Member.objects.order_by('-expire_date'):
+    for m in models.Member.objects.order_by('-expire_date').prefetch_related('user__storage'):
         string = '{} {} | {} {}'.format(
             m.preferred_name,
             m.last_name,
@@ -166,11 +166,18 @@ def gen_search_strings():
         )
 
         string += ' | ' + m.user.email
-        string += ' | ' + m.discourse_username
+
+        if m.discourse_username:
+            string += ' | ' + m.discourse_username
+
         string += ' | ' + str(m.id)
+
+        for s in m.user.storage.all():
+            string += ' | ' + s.shelf_id
 
         string = string.lower()
         search_strings[string] = m.id
+
     cache.set('search_strings', search_strings)
 
     logger.info('Generated search strings in %s s.', time.time() - start)
