@@ -27,7 +27,7 @@ const memberSorts = {
 };
 
 export function MembersDropdown(props) {
-	const { token, name, onChange, value, initial, autofocus } = props;
+	const { token, name, onChange, value, initial, autofocus, filterActive } = props;
 	const [response, setResponse] = useState({ results: [] });
 	const searchDefault = {seq: 0, q: initial || '', sort: 'newest_active'};
 	const [search, setSearch] = useState(searchDefault);
@@ -36,7 +36,11 @@ export function MembersDropdown(props) {
 		requester('/search/', 'POST', token, search)
 		.then(res => {
 			if (!search.seq || res.seq > response.seq) {
-				setResponse(res);
+				if (filterActive) {
+					setResponse({...res, results: res.results.filter(x => ['Prepaid', 'Current', 'Due', 'Overdue'].includes(x.member.status))});
+				} else {
+					setResponse(res);
+				}
 			}
 		})
 		.catch(err => {

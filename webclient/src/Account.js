@@ -309,6 +309,7 @@ export function AccountForm(props) {
 					onChange={handleValues}
 					initial={''}
 					autofocus={''}
+					filterActive={true}
 				/>
 			</Form.Field>}
 
