@@ -256,7 +256,7 @@ export function Home(props) {
 
 	const alarmStat = () => stats && stats.alarm ? stats.alarm.toString() : 'Unknown';  // toString prevents crash from cached alarm Object
 
-	const closedStat = (x) => stats && stats.closing ? moment().unix() > stats.closing['time'] ? 'Closed' : 'Open until ' + stats.closing['time_str'] : 'Unknown';
+	const closedStat = (x) => stats && stats.closing ? moment().unix() > stats.closing['time'] ? 'Closed' : 'Open until ' + stats.closing['time_str'] + ' with ' + stats.closing['first_name'] : 'Unknown';
 
 	const printer3dStat = (x) => stats && stats.printer3d && stats.printer3d[x] ? stats.printer3d[x].state === 'Printing' ? 'Printing (' + stats.printer3d[x].progress + '%)' : stats.printer3d[x].state : 'Unknown';
 
