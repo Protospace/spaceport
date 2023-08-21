@@ -214,7 +214,7 @@ function MemberInfo(props) {
 
 export function Home(props) {
 	const { user, token } = props;
-	const [stats, setStats] = useState(JSON.parse(localStorage.getItem('stats', 'false')));
+	const [stats, setStats] = useState(JSON.parse(localStorage.getItem('stats')) || {});
 	const [refreshCount, refreshStats] = useReducer(x => x + 1, 0);
 
 	useEffect(() => {
@@ -229,12 +229,12 @@ export function Home(props) {
 		});
 	}, [refreshCount, token]);
 
-	const getStat = (x) => stats && stats[x] ? stats[x] : 'Unknown';
-	const getZeroStat = (x) => stats && stats[x] ? stats[x] : '0';
-	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz('America/Edmonton').format('MMM Do @ LT') : 'Unknown';
+	const getStat = (x) => stats[x] ? stats[x] : 'Unknown';
+	const getZeroStat = (x) => stats[x] ? stats[x] : '0';
+	const getDateStat = (x) => stats[x] ? moment.utc(stats[x]).tz('America/Edmonton').format('MMM Do @ LT') : 'Unknown';
 
 	const getNextStat = (x) => {
-		if (stats && stats[x]) {
+		if (stats[x]) {
 			const datetime = moment.utc(stats[x].datetime).tz('America/Edmonton');
 			if (datetime.isSame(moment().tz('America/Edmonton'), 'day') ) {
 				return <>{datetime.format('LT')} | <Link to={'/classes/' + stats[x].id}>{stats[x].name}</Link></>;
@@ -246,21 +246,21 @@ export function Home(props) {
 		}
 	};
 
-	const mcPlayers = stats && stats['minecraft_players'] ? stats['minecraft_players'] : [];
-	const mumbleUsers = stats && stats['mumble_users'] ? stats['mumble_users'] : [];
+	const mcPlayers = stats['minecraft_players'] ? stats['minecraft_players'] : [];
+	const mumbleUsers = stats['mumble_users'] ? stats['mumble_users'] : [];
 
-	const getTrackStat = (x) => stats && stats.track && stats.track[x] ? moment().unix() - stats.track[x]['time'] > 60 ? 'Free' : 'In Use' : 'Unknown';
-	const getTrackLast = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').format('llll') : 'Unknown';
-	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').fromNow() : '';
-	const getTrackName = (x) => stats && stats.track && stats.track[x] && stats.track[x]['first_name'] ? stats.track[x]['first_name'] : 'Unknown';
+	const getTrackStat = (x) => stats.track?.[x] ? moment().unix() - stats.track[x]['time'] > 60 ? 'Free' : 'In Use' : 'Unknown';
+	const getTrackLast = (x) => stats.track?.[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').format('llll') : 'Unknown';
+	const getTrackAgo = (x) => stats.track?.[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').fromNow() : '';
+	const getTrackName = (x) => stats.track?.[x]?.['first_name'] || 'Unknown';
 
-	const alarmStat = () => stats && stats.alarm ? stats.alarm.toString() : 'Unknown';  // toString prevents crash from cached alarm Object
+	const alarmStat = stats.alarm ? stats.alarm.toString() : 'Unknown';  // toString prevents crash from cached alarm Object
 
-	const closedStat = (x) => stats && stats.closing ? moment().unix() > stats.closing['time'] ? 'Closed' : 'Open until ' + stats.closing['time_str'] : 'Unknown';
+	const closedStat = stats.closing ? moment().unix() > stats.closing.time ? 'Closed' : `Open until ${moment.unix(stats.closing.time).format('h:mm A')} by ${stats.closing.first_name}` : 'Unknown';
 
-	const printer3dStat = (x) => stats && stats.printer3d && stats.printer3d[x] ? stats.printer3d[x].state === 'Printing' ? 'Printing (' + stats.printer3d[x].progress + '%)' : stats.printer3d[x].state : 'Unknown';
+	const printer3dStat = (x) => stats.printer3d?.[x] ? stats.printer3d[x].state === 'Printing' ? 'Printing (' + stats.printer3d[x].progress + '%)' : stats.printer3d[x].state : 'Unknown';
 
-	const show_signup = stats?.at_protospace;
+	const show_signup = stats.at_protospace;
 
 	return (
 		<Container>
@@ -300,7 +300,7 @@ export function Home(props) {
 								<p>Next clean: {getDateStat('next_clean')}</p>
 								<p className='nowrap-stat'>Next class: {getNextStat('next_class')}</p>
 								<p className='nowrap-stat'>Last class: {getNextStat('prev_class')}</p>
-								<p>Member count: {getStat('member_count')} <Link to='/charts'>[charts]</Link></p>
+								<p>Member count: {getStat('member_count')} <Link to='/charts'>[more]</Link></p>
 								<p>Card scans today: {getZeroStat('card_scans')}</p>
 
 								<p>
@@ -319,7 +319,7 @@ export function Home(props) {
 								{' '}<a href='http://games.protospace.ca:8123/?worldname=world&mapname=flat&zoom=3&x=74&y=64&z=354' target='_blank'>[map]</a>
 								</p>
 
-								{stats && stats.hasOwnProperty('mumble_users') && <p>
+								{stats.hasOwnProperty('mumble_users') && <p>
 									Mumble users: {mumbleUsers.length} <Popup content={
 										<React.Fragment>
 											<p>
@@ -397,9 +397,9 @@ export function Home(props) {
 
 								<p>ORD3 printer: {printer3dStat('ord3')}</p>
 
-								{user && <p>Alarm status: {alarmStat()}</p>}
+								{user && <p>Alarm status: {alarmStat}</p>}
 
-								{user && <p>Hosting status: {closedStat()}</p>}
+								{user && <p>Hosting status: {closedStat}</p>}
 							</div>
 
 							<SignForm token={token} />

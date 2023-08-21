@@ -99,9 +99,9 @@ class SearchViewSet(Base, Retrieve):
                 queryset = queryset.order_by('-vetted_date', '-id')
             elif sort == 'newest_active':
                 queryset = queryset.filter(paused_date__isnull=True)
-                queryset = queryset.order_by('-current_start_date', '-id')
+                queryset = queryset.order_by('-application_date', '-id')
             elif sort == 'newest_overall':
-                queryset = queryset.order_by('-current_start_date', '-id')
+                queryset = queryset.order_by('-application_date', '-id')
             elif sort == 'oldest_active':
                 queryset = queryset.filter(paused_date__isnull=True)
                 queryset = queryset.order_by('application_date', 'id')
@@ -1605,7 +1605,7 @@ class ProtocoinViewSet(Base):
 
                 memo = 'Protocoin - Purchase spent ₱ {} printing {}'.format(
                     total_cost,
-                    request.data['job_name'][:100],
+                    request.data['job_name'],
                 )
 
                 tx = models.Transaction.objects.create(
@@ -1813,7 +1813,6 @@ class HostingViewSet(Base):
         hosting = models.Hosting.objects.order_by('-finished_at').first()
         closing = dict(
             time=hosting.finished_at.timestamp(),
-            time_str=hosting.finished_at.astimezone(utils.TIMEZONE_CALGARY).strftime('%-I:%M %p'),
             first_name=hosting.user.member.preferred_name,
         )
         cache.set('closing', closing)

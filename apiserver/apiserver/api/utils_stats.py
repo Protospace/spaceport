@@ -24,12 +24,12 @@ DEFAULTS = {
     'minecraft_players': [],
     'card_scans': 0,
     'track': {},
-    'alarm': {},
+    'alarm': None,
     'sign': '',
     'link': '',
     'autoscan': '',
     'last_scan': {},
-    'closing': {},
+    'closing': None,
     'printer3d': {},
 }
 
