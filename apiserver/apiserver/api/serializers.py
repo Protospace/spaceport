@@ -315,6 +315,10 @@ class MemberSerializer(serializers.ModelSerializer):
             signup_helper = get_object_or_404(models.Member, id=helper_id)
             instance.signup_helper = signup_helper.user
 
+        is_student = self.initial_data.get('is_student', False)
+        if is_student:
+            instance.monthly_fees = 35
+
         if 'discourse_username' in validated_data:
             changed = validated_data['discourse_username'] != instance.discourse_username
             if changed and utils_auth.discourse_is_configured():

@@ -301,6 +301,21 @@ export function AccountForm(props) {
 				</>
 			}
 
+			{isSignup && <Form.Field>
+				<label>Are you a student / low-income?</label>
+				<Form.Checkbox
+					label='Yes'
+					name='is_student'
+					onChange={handleCheck}
+					checked={input.is_student}
+					error={error.is_student ?
+						{ content: error.is_student, pointing: 'left' }
+					:
+						false
+					}
+				/>
+			</Form.Field>}
+
 			{isSignup && <Form.Field error={error.member_id}>
 				<label>Who helped you sign up? (search)</label>
 				<MembersDropdown
