@@ -6,7 +6,9 @@ import 'react-image-crop/dist/ReactCrop.css';
 import './light.css';
 import { MembersDropdown } from './Members.js';
 import { Button, Container, Form, Grid, Header, Message, Segment } from 'semantic-ui-react';
+import './components/MembersList'
 import { requester, randomString } from './utils.js';
+import { MembersList } from './components/MembersList';
 
 function LogoutEverywhere(props) {
 	const { token } = props;
@@ -335,6 +337,19 @@ export function AccountForm(props) {
 	);
 };
 
+export function Sponsorship(props) {
+	const { user: { member } } = props;
+
+	return (
+		<div>
+			<Header size='medium'>My sponsors:</Header>
+			<MembersList list={ member.sponsored_by }/>
+			<Header size='medium'>I am sponsoring:</Header>
+			<MembersList list={ member.sponsorship }/>
+		</div>
+	);
+};
+
 export function BioNotesForm(props) {
 	const { token, user, refreshUser } = props;
 	const member = user.member;
@@ -401,6 +416,7 @@ export function Account(props) {
 			<Grid stackable columns={2}>
 				<Grid.Column>
 					<Segment padded><AccountForm {...props} /></Segment>
+					<Segment padded><Sponsorship {...props} /></Segment>
 				</Grid.Column>
 				<Grid.Column>
 					<Segment padded><BioNotesForm {...props} /></Segment>

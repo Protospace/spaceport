@@ -334,7 +334,7 @@ function App() {
 									</Route>
 
 									<Route path='/members/:id'>
-										<MemberDetail token={token} user={user} />
+										<MemberDetail token={token} user={user} setUser={setUserCache}/>
 									</Route>
 									<Route path='/members'>
 										<Members token={token} user={user} />

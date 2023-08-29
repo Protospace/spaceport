@@ -282,11 +282,16 @@ export function Members(props) {
 let resultCache = {};
 
 export function MemberDetail(props) {
-	const { id } = useParams();
+	const id = parseInt(useParams().id)
 	const [result, setResult] = useState(resultCache[id] || false);
 	const [refreshCount, refreshResult] = useReducer(x => x + 1, 0);
 	const [error, setError] = useState(false);
 	const { token, user } = props;
+	const member = result.member || false;
+	const memberFullName = [member.preferred_name, member.last_name].join(' ')
+	const isSponsoring = user.member.sponsorship?.find(m => m.id === id)
+	const isMe = user.member.id === id
+	const photo = member?.photo_large || member?.photo_small || false;
 
 	useEffect(() => {
 		requester('/search/'+id+'/', 'GET', token)
@@ -300,8 +305,23 @@ export function MemberDetail(props) {
 		});
 	}, [refreshCount]);
 
-	const member = result.member || false;
-	const photo = member?.photo_large || member?.photo_small || false;
+
+	function sponsorMember (value) {
+		return () => {
+			requester(`/sponsorship/${id}/offer/`, 'POST', token, { value })
+				.then(res => {
+					const _user = { ...user }
+					const sponsorship = _user.member.sponsorship
+					if (value) sponsorship.push({ id })
+					else sponsorship.splice(sponsorship.findIndex(m => m.id === id), 1)
+					props.setUser(_user)
+				})
+				.catch(err => {
+					console.log(err);
+					setError(true);
+				});
+		}
+	}
 
 	return (
 		<Container>
@@ -342,6 +362,8 @@ export function MemberDetail(props) {
 										<p className='bio-paragraph'>
 											{member.public_bio || 'None yet.'}
 										</p>
+										{ !isMe && !isSponsoring && <Button onClick={ sponsorMember(true) }>Vouch for { member.preferred_name }</Button> }
+										{ !isMe && isSponsoring && <Button onClick={ sponsorMember(false) }>Revoke guarantee</Button> }
 									</React.Fragment>
 								}
 							</Grid.Column>
@@ -386,4 +408,3 @@ export function MemberDetail(props) {
 		</Container>
 	);
 };
-

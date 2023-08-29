@@ -1895,6 +1895,24 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
         return Response(200)
 
 
+class SponsorshipViewSet(Base):
+    permission_classes = [AllowMetadata | IsAuthenticated]
+    queryset = models.Member.objects.all()
+
+    @action(detail=True, methods=['post'])
+    def offer(self, request, pk=None):
+        value = self.request.data['value']
+        member = self.get_object()
+        sponsor = self.request.user.member
+        if value == 'true':
+            sponsor.sponsorship.add(member.id)
+            logging.info('Member %s is now sponsoring member %s', sponsor.preferred_name, member.preferred_name)
+        else:
+            sponsor.sponsorship.remove(member.id)
+            logging.info('Member %s revoked sponsorship for member %s', sponsor.preferred_name, member.preferred_name)
+        sponsor.save()
+        return Response(200)
+
 class RegistrationView(RegisterView):
     serializer_class = serializers.MyRegisterSerializer
 
