@@ -155,7 +155,7 @@ export function Paymaster(props) {
 						custom={JSON.stringify({ category: 'Exchange', member: user.member.id })}
 					/>
 
-					<p>See a director to purchase Protocoin with a different payment method.</p>
+					<p>Or send e-Transfer to info@protospace.ca, or hand a Director cash.</p>
 				</Grid.Column>
 
 				<Grid.Column width={8}>
