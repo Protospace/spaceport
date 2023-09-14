@@ -819,6 +819,8 @@ class StatsViewSet(viewsets.ViewSet, List):
         return Response(200)
 
     # TODO: keep track of last report to ensure PS internet didn't cut out
+    # TODO: get rid of username request.data check
+    # TODO: only create one object when username's not valid, move check up
     @action(detail=False, methods=['post'])
     def usage(self, request):
         if 'device' not in request.data:
@@ -838,9 +840,10 @@ class StatsViewSet(viewsets.ViewSet, List):
                 username_isfrom_track = True
             except KeyError:
                 msg = 'Usage tracker problem finding username for device: {}'.format(device)
-                utils.alert_tanner(msg)
+                #utils.alert_tanner(msg)
                 logger.error(msg)
                 username = ''
+                return Response(200)
 
         logging.debug('Device %s data: %s', device, data)
 
@@ -860,17 +863,19 @@ class StatsViewSet(viewsets.ViewSet, List):
                 username_isexpired = time.time() - track[device]['time'] > 2*60*60  # two hours
                 if username_isfrom_track and username_isexpired:
                     msg = 'Usage tracker problem expired username {} for device: {}'.format(username, device)
-                    utils.alert_tanner(msg)
+                    #utils.alert_tanner(msg)
                     logger.error(msg)
                     username = ''
+                    return Response(200)
 
                 try:
                     user = User.objects.get(username__iexact=username)
                 except User.DoesNotExist:
                     msg = 'Usage tracker problem finding user for username: {}'.format(username or '[no username]')
-                    utils.alert_tanner(msg)
+                    #utils.alert_tanner(msg)
                     logger.error(msg)
                     user = None
+                    return Response(200)
 
                 last_use = models.Usage.objects.create(
                     user=user,
