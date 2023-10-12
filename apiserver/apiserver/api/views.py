@@ -1128,8 +1128,14 @@ class HistoryViewSet(Base, List, Retrieve):
     def get_queryset(self):
         queryset = models.HistoryIndex.objects
 
-        if 'exclude_system' in self.request.query_params:
+        exclude_system = self.request.query_params.get('exclude_system', '') == 'true'
+        member_id = self.request.query_params.get('member_id', '')
+
+        if exclude_system:
             queryset = queryset.filter(is_system=False)
+
+        if member_id:
+            queryset = queryset.filter(owner_id=member_id)
 
         return queryset.order_by('-history_date')[:50]
 

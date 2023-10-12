@@ -6,6 +6,7 @@ import { statusColor, isAdmin, isInstructor, BasicTable, staticUrl, requester } 
 import { NotFound } from './Misc.js';
 import { AdminMemberInfo, AdminMemberPause, AdminMemberForm, AdminMemberCards, AdminMemberTraining, AdminMemberCertifications } from './AdminMembers.js';
 import { AdminMemberTransactions } from './AdminTransactions.js';
+import { AdminHistory } from './Admin.js';
 import { StorageButton } from './Storage.js';
 import AbortController from 'abort-controller';
 
@@ -341,7 +342,8 @@ export function MemberDetail(props) {
 								<Link to={'/members/'+member.id+'/cards'}>Cards</Link>{' - '}
 								<Link to={'/members/'+member.id+'/lockouts'}>Lockouts</Link>{' - '}
 								<Link to={'/members/'+member.id+'/training'}>Training</Link>{' - '}
-								<Link to={'/members/'+member.id+'/transactions'}>Transactions</Link>
+								<Link to={'/members/'+member.id+'/transactions'}>Transactions</Link>{' - '}
+								<Link to={'/members/'+member.id+'/history'}>History</Link>
 							</p>
 						}
 
@@ -365,27 +367,23 @@ export function MemberDetail(props) {
 							</Route>}
 
 							{isAdmin(user) && <Route path='/members/:id/cards'>
-								<Segment padded>
-									<AdminMemberCards result={result} refreshResult={refreshResult} {...props} />
-								</Segment>
+								<AdminMemberCards result={result} refreshResult={refreshResult} {...props} />
 							</Route>}
 
 							{isAdmin(user) && <Route path='/members/:id/lockouts'>
-								<Segment padded>
-									<AdminMemberCertifications result={result} refreshResult={refreshResult} {...props} />
-								</Segment>
+								<AdminMemberCertifications result={result} refreshResult={refreshResult} {...props} />
 							</Route>}
 
 							{isAdmin(user) && <Route path='/members/:id/training'>
-								<Segment padded>
-									<AdminMemberTraining result={result} refreshResult={refreshResult} {...props} />
-								</Segment>
+								<AdminMemberTraining result={result} refreshResult={refreshResult} {...props} />
 							</Route>}
 
 							{isAdmin(user) && <Route path='/members/:id/transactions'>
-								<Segment padded>
-									<AdminMemberTransactions result={result} refreshResult={refreshResult} {...props} />
-								</Segment>
+								<AdminMemberTransactions result={result} refreshResult={refreshResult} {...props} />
+							</Route>}
+
+							{isAdmin(user) && <Route path='/members/:id/history'>
+								<AdminHistory filterMember={member.id} {...props} />
 							</Route>}
 
 							<Route path='/members/:id'>

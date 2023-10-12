@@ -118,7 +118,7 @@ export function AdminVetting(props) {
 }
 
 export function AdminHistory(props) {
-	const { token } = props;
+	const { token, filterMember } = props;
 	const [history, setHistory] = useState(historyCache);
 	const [excludeSystem, setExcludeSystem] = useState(excludeSystemCache);
 	const [focus, setFocus] = useState(focusCache);
@@ -131,7 +131,11 @@ export function AdminHistory(props) {
 	};
 
 	useEffect(() => {
-		const extra = excludeSystem ? '?exclude_system' : '';
+		let extra = '?exclude_system=' + excludeSystem;
+		if (filterMember) {
+			extra += '&member_id=' + filterMember;
+		}
+
 		requester('/history/'+extra, 'GET', token)
 		.then(res => {
 			setHistory(res.results);
@@ -148,6 +152,9 @@ export function AdminHistory(props) {
 			{!error ?
 				history ?
 					<>
+						<Header size='medium'>History</Header>
+						<p>Last 50 database changes:</p>
+
 						<Checkbox
 							label='Exclude System'
 							onChange={handleExcludeSystem}
@@ -160,13 +167,15 @@ export function AdminHistory(props) {
 									<Table.HeaderCell>Date</Table.HeaderCell>
 									<Table.HeaderCell>Username</Table.HeaderCell>
 									<Table.HeaderCell>Type</Table.HeaderCell>
-									<Table.HeaderCell>Owner</Table.HeaderCell>
+									{!filterMember && <Table.HeaderCell>Owner</Table.HeaderCell>}
 									<Table.HeaderCell>Object</Table.HeaderCell>
 									<Table.HeaderCell>Changed Fields</Table.HeaderCell>
 								</Table.Row>
 							</Table.Header>}
 
 							<Table.Body>
+								{!history.length && <p>None</p>}
+
 								{history.map(x =>
 									<React.Fragment key={x.id}>
 										<Table.Row>
@@ -177,7 +186,7 @@ export function AdminHistory(props) {
 											</Table.Cell>
 											<Table.Cell>{isMobile && 'User: '}{x.is_system ? 'System' : (x.history_user || 'Deleted User')}</Table.Cell>
 											<Table.Cell>{isMobile && 'Type: '}{x.history_type}</Table.Cell>
-											<Table.Cell>{isMobile && 'Owner: '}{x.owner_name}</Table.Cell>
+											{!filterMember && <Table.Cell>{isMobile && 'Owner: '}{x.owner_name}</Table.Cell>}
 											<Table.Cell>{isMobile && 'Object: '}{x.object_name}</Table.Cell>
 											<Table.Cell>{isMobile && 'Changed: '}{x.changes.map(x => x.field).join(', ')}</Table.Cell>
 										</Table.Row>
@@ -357,9 +366,7 @@ export function Admin(props) {
 			<p>All times are in Mountain time.</p>
 			<AdminUsage {...props} />
 
-
-			<Header size='medium'>History</Header>
-			<p>Last 50 database changes:</p>
+			<p/>
 
 			<AdminHistory {...props} />
 
