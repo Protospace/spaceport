@@ -12,9 +12,43 @@ export function TransactionEditor(props) {
 	const { token, input, setInput, error } = props;
 
 	const [prevInput] = useState(input);
+	const [prevTransactions, setPrevTransactions] = useState([]);
+	const [txError, setTxError] = useState(false);
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
+
+	const checkPrevTransactions = (member_id, date) => {
+		console.log(member_id, date);
+
+		const isValidISODate = /^\d{4}-\d{2}-\d{2}$/.test(date);
+
+		if (!member_id || !isValidISODate) {
+			return;
+		}
+
+		console.log('Checking previous transactions:', member_id, date);
+
+		requester('/transactions/?date=' + date + '&member_id=' + member_id, 'GET', token)
+		.then(res => {
+			setTxError(false);
+			setPrevTransactions(res.results);
+		})
+		.catch(err => {
+			console.log(err);
+			setTxError(true);
+		});
+	};
+
+	const handleMemberValue = (e, v) => {
+		checkPrevTransactions(v.value, input.date);
+		handleValues(e, v);
+	};
+
+	const handleDateValue = (e) => {
+		checkPrevTransactions(input.member_id, e.currentTarget.value);
+		handleChange(e);
+	};
 
 	const makeProps = (name) => ({
 		name: name,
@@ -70,17 +104,26 @@ export function TransactionEditor(props) {
 					<MembersDropdown
 						token={token}
 						{...makeProps('member_id')}
-						onChange={handleValues}
+						onChange={handleMemberValue}
 						initial={input.member_name}
 					/>
 				</Form.Field>
 
 				<Form.Input
-					label='Date'
+					label='Transaction Date (YYYY-MM-DD)'
 					fluid
 					{...makeProps('date')}
+					onChange={handleDateValue}
 				/>
 			</Form.Group>
+
+			{!!prevTransactions.length && <Form.Field>
+				<label>Potential Duplicates</label>
+				<p>These are from the same member, same day.</p>
+				<TransactionList noMember noDate addRef transactions={prevTransactions} />
+			</Form.Field>}
+
+			{txError && <p>Error checking for duplicate transactions.</p>}
 
 			<Form.Group widths='equal'>
 				<Form.Select
@@ -213,18 +256,19 @@ function EditTransaction(props) {
 
 
 export function TransactionList(props) {
-	const { transactions, noMember, noCategory } = props;
+	const { transactions, noMember, noCategory, noDate, addRef } = props;
 	const isMobile = useIsMobile();
 
 	return (
 		<Table basic='very'>
 			{!isMobile && <Table.Header>
 				<Table.Row>
-					<Table.HeaderCell>Date</Table.HeaderCell>
+					{!noDate && <Table.HeaderCell>Date</Table.HeaderCell>}
 					{!noMember && <Table.HeaderCell>Member</Table.HeaderCell>}
 					<Table.HeaderCell>Amount</Table.HeaderCell>
 					<Table.HeaderCell>Method</Table.HeaderCell>
 					{!noCategory && <Table.HeaderCell>Category</Table.HeaderCell>}
+					{!!addRef && <Table.HeaderCell>Reference</Table.HeaderCell>}
 					<Table.HeaderCell>Memo</Table.HeaderCell>
 				</Table.Row>
 			</Table.Header>}
@@ -233,9 +277,10 @@ export function TransactionList(props) {
 				{transactions.length ?
 					transactions.map(x =>
 						<Table.Row key={x.id}>
-							<Table.Cell style={{ minWidth: '8rem' }}>
+							{!noDate && <Table.Cell style={{ minWidth: '8rem' }}>
 								<Link to={'/transactions/'+x.id}>{moment(x.date).format('ll')}</Link>
-							</Table.Cell>
+							</Table.Cell>}
+
 							{!noMember && <Table.Cell>
 								{x.member_id ?
 									<Link to={'/members/'+x.member_id}>
@@ -248,6 +293,7 @@ export function TransactionList(props) {
 							<Table.Cell style={{ minWidth: '8rem' }}>{isMobile && 'Amount: '}{x.protocoin !== '0.00' ? '₱ ' + x.protocoin : '$ ' + x.amount}</Table.Cell>
 							<Table.Cell>{isMobile && 'Method: '}{x.account_type}</Table.Cell>
 							{!noCategory && <Table.Cell>{isMobile && 'Category: '}{x.category}</Table.Cell>}
+							{!!addRef && <Table.Cell>{isMobile && 'Reference: '}{x.reference_number}</Table.Cell>}
 							<Table.Cell>{x.memo || x.report_memo}</Table.Cell>
 						</Table.Row>
 					)

@@ -397,7 +397,11 @@ export function Home(props) {
 
 								<p>ORD3 printer: {printer3dStat('ord3')}</p>
 
-								{user && <p>Alarm status: {alarmStat()}</p>}
+								{user ?
+									<p>Alarm status: {alarmStat()}</p>
+								:
+									<p>Alarm status: Unauthorized</p>
+								}
 
 								{user && <p>Hosting status: {closedStat()}</p>}
 							</div>
