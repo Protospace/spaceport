@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { Link, useParams, useHistory } from 'react-router-dom';
+import { Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Dropdown, Grid, Header, Icon, Image, Input, Item, Segment, Table } from 'semantic-ui-react';
 import { statusColor, isAdmin, isInstructor, BasicTable, staticUrl, requester } from './utils.js';
@@ -334,75 +334,103 @@ export function MemberDetail(props) {
 					<div>
 						<Header size='large'>{member.preferred_name} {member.last_name}</Header>
 
-						<Grid stackable columns={2}>
-							<Grid.Column width={isAdmin(user) ? 8 : 5}>
-								<p>
-									<Image rounded size='medium' src={photo ? staticUrl + '/' + photo : '/nophoto.png'} />
-								</p>
+						{isAdmin(user) &&
+							<p>Admin: {' '}
+								<Link to={'/members/'+member.id}>Profile</Link>{' - '}
+								<Link to={'/members/'+member.id+'/details'}>Details</Link>{' - '}
+								<Link to={'/members/'+member.id+'/cards'}>Cards</Link>{' - '}
+								<Link to={'/members/'+member.id+'/lockouts'}>Lockouts</Link>{' - '}
+								<Link to={'/members/'+member.id+'/training'}>Training</Link>{' - '}
+								<Link to={'/members/'+member.id+'/transactions'}>Transactions</Link>
+							</p>
+						}
 
-								{isAdmin(user) ?
-									<AdminMemberInfo result={result} refreshResult={refreshResult} {...props} />
-								:
-									<React.Fragment>
-										<BasicTable>
-											<Table.Body>
-												<Table.Row>
-													<Table.Cell>Status:</Table.Cell>
-													<Table.Cell>
-														<Icon name='circle' color={statusColor[member.status]} />
-														{member.status || 'Unknown'}
-													</Table.Cell>
-												</Table.Row>
-												<Table.Row>
-													<Table.Cell>Joined:</Table.Cell>
-													<Table.Cell>{member.application_date || 'Unknown'}</Table.Cell>
-												</Table.Row>
-												<Table.Row>
-													<Table.Cell>Public Bio:</Table.Cell>
-												</Table.Row>
-											</Table.Body>
-										</BasicTable>
+						<Switch>
+							{isAdmin(user) && <Route path='/members/:id/details'>
+								<Grid stackable columns={2}>
+									<Grid.Column width={8}>
+										<AdminMemberInfo result={result} refreshResult={refreshResult} {...props} />
+									</Grid.Column>
 
-										<p className='bio-paragraph'>
-											{member.public_bio || 'None yet.'}
-										</p>
-										{ !isMe && !isSponsoring && <Button onClick={ sponsorMember(true) }>Vouch for { member.preferred_name }</Button> }
-										{ !isMe && isSponsoring && <Button onClick={ sponsorMember(false) }>Revoke guarantee</Button> }
-									</React.Fragment>
-								}
-							</Grid.Column>
+									<Grid.Column width={8}>
+										<Segment padded>
+											<AdminMemberForm result={result} refreshResult={refreshResult} {...props} />
+										</Segment>
 
-							<Grid.Column width={isAdmin(user) ? 8 : 11}>
-								{isInstructor(user) && !isAdmin(user) && <Segment padded>
+										<Segment padded>
+											<AdminMemberPause result={result} refreshResult={refreshResult} {...props} />
+										</Segment>
+									</Grid.Column>
+								</Grid>
+							</Route>}
+
+							{isAdmin(user) && <Route path='/members/:id/cards'>
+								<Segment padded>
+									<AdminMemberCards result={result} refreshResult={refreshResult} {...props} />
+								</Segment>
+							</Route>}
+
+							{isAdmin(user) && <Route path='/members/:id/lockouts'>
+								<Segment padded>
+									<AdminMemberCertifications result={result} refreshResult={refreshResult} {...props} />
+								</Segment>
+							</Route>}
+
+							{isAdmin(user) && <Route path='/members/:id/training'>
+								<Segment padded>
 									<AdminMemberTraining result={result} refreshResult={refreshResult} {...props} />
-								</Segment>}
+								</Segment>
+							</Route>}
 
-								{isAdmin(user) && <Segment padded>
-									<AdminMemberForm result={result} refreshResult={refreshResult} {...props} />
-								</Segment>}
+							{isAdmin(user) && <Route path='/members/:id/transactions'>
+								<Segment padded>
+									<AdminMemberTransactions result={result} refreshResult={refreshResult} {...props} />
+								</Segment>
+							</Route>}
 
-								{isAdmin(user) && <Segment padded>
-									<AdminMemberPause result={result} refreshResult={refreshResult} {...props} />
-								</Segment>}
-							</Grid.Column>
-						</Grid>
+							<Route path='/members/:id'>
+								<Grid stackable columns={2}>
+									<Grid.Column width={5}>
+										<p>
+											<Image rounded size='medium' src={photo ? staticUrl + '/' + photo : '/nophoto.png'} />
+										</p>
 
-						{isAdmin(user) && <Segment padded>
-							<AdminMemberCards result={result} refreshResult={refreshResult} {...props} />
-						</Segment>}
+										<>
+											<BasicTable>
+												<Table.Body>
+													<Table.Row>
+														<Table.Cell>Status:</Table.Cell>
+														<Table.Cell>
+															<Icon name='circle' color={statusColor[member.status]} />
+															{member.status || 'Unknown'}
+														</Table.Cell>
+													</Table.Row>
+													<Table.Row>
+														<Table.Cell>Joined:</Table.Cell>
+														<Table.Cell>{member.application_date || 'Unknown'}</Table.Cell>
+													</Table.Row>
+													<Table.Row>
+														<Table.Cell>Public Bio:</Table.Cell>
+													</Table.Row>
+												</Table.Body>
+											</BasicTable>
 
-						{isAdmin(user) && <Segment padded>
-							<AdminMemberCertifications result={result} refreshResult={refreshResult} {...props} />
-						</Segment>}
+											<p className='bio-paragraph'>
+												{member.public_bio || 'None yet.'}
+											</p>
+											{ !isMe && !isSponsoring && <Button onClick={ sponsorMember(true) }>Vouch for { member.preferred_name }</Button> }
+											{ !isMe && isSponsoring && <Button onClick={ sponsorMember(false) }>Revoke guarantee</Button> }
+										</>
+									</Grid.Column>
 
-						{isAdmin(user) && <Segment padded>
-							<AdminMemberTraining result={result} refreshResult={refreshResult} {...props} />
-						</Segment>}
-
-						{isAdmin(user) && <Segment padded>
-							<AdminMemberTransactions result={result} refreshResult={refreshResult} {...props} />
-						</Segment>}
-
+									<Grid.Column width={11}>
+										{isInstructor(user) && !isAdmin(user) && <Segment padded>
+											<AdminMemberTraining result={result} refreshResult={refreshResult} {...props} />
+										</Segment>}
+									</Grid.Column>
+								</Grid>
+							</Route>
+						</Switch>
 					</div>
 				:
 					<p>Loading...</p>
