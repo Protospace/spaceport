@@ -352,15 +352,15 @@ export function MemberDetail(props) {
 								<Grid stackable columns={2}>
 									<Grid.Column width={8}>
 										<AdminMemberInfo result={result} refreshResult={refreshResult} {...props} />
+
+										<Segment padded>
+											<AdminMemberPause result={result} refreshResult={refreshResult} {...props} />
+										</Segment>
 									</Grid.Column>
 
 									<Grid.Column width={8}>
 										<Segment padded>
 											<AdminMemberForm result={result} refreshResult={refreshResult} {...props} />
-										</Segment>
-
-										<Segment padded>
-											<AdminMemberPause result={result} refreshResult={refreshResult} {...props} />
 										</Segment>
 									</Grid.Column>
 								</Grid>
