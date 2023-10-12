@@ -259,6 +259,10 @@ export function Members(props) {
 												:
 													<Item.Description>Joined: {x.member.application_date || 'Unknown'}</Item.Description>
 												}
+												<Item.Description>
+													{x.member.public_bio.substring(0, 100)}
+													{x.member.public_bio.length > 100 && '...'}
+												</Item.Description>
 											</>
 										}
 									</Item.Content>
