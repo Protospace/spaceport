@@ -809,6 +809,7 @@ export function AdminAccounting(props) {
 	const transactions = result.transactions.filter(x => x.number_of_membership_months && x.date >= member.current_start_date);
 	const explain_fake = transactions.some(x => x.category === 'Memberships:Fake Months');
 	const total = transactions.reduce((accum, x) => accum + x.number_of_membership_months, 0);
+	const delta = Math.ceil(moment(member.expire_date).diff(moment(), 'days', true));
 
 	return (
 		<div>
@@ -858,6 +859,8 @@ export function AdminAccounting(props) {
 				<p>Expire date: {moment(member.expire_date).format('ll')}</p>
 
 				<p>Today's date: {moment().format('ll')}</p>
+
+				<p>{moment(member.expire_date).format('ll')} - {moment().format('ll')} = {delta} day{Math.abs(delta) === 1 ? '' : 's'}</p>
 
 				<Table collapsing unstackable basic='very'>
 					<Table.Header>
