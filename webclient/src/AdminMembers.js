@@ -802,3 +802,109 @@ export function AdminMemberCertifications(props) {
 		</div>
 	);
 };
+
+export function AdminAccounting(props) {
+	const { result } = props;
+	const member = result.member;
+	const transactions = result.transactions.filter(x => x.number_of_membership_months);
+	const explain_fake = transactions.some(x => x.category === 'Memberships:Fake Months');
+	const total = transactions.reduce((accum, x) => accum + x.number_of_membership_months, 0);
+
+	return (
+		<div>
+			<Header size='medium'>Membership Accounting</Header>
+
+			<p>Current start date: {moment(member.current_start_date).format('ll')}</p>
+
+			{!!member.current_start_date && <>
+				<p>Member dues transactions filtered since {moment(member.current_start_date).format('ll')}:</p>
+
+				<Table collapsing unstackable basic='very'>
+					<Table.Header>
+						<Table.Row>
+							<Table.HeaderCell>Date</Table.HeaderCell>
+							<Table.HeaderCell>Amount</Table.HeaderCell>
+							<Table.HeaderCell>Months</Table.HeaderCell>
+						</Table.Row>
+					</Table.Header>
+
+					<Table.Body>
+						{transactions.length ?
+							transactions.map(x =>
+								<Table.Row key={x.id}>
+									<Table.Cell style={{ minWidth: '8rem' }}>
+										<Link to={'/transactions/'+x.id}>{moment(x.date).format('ll')}</Link>
+									</Table.Cell>
+
+									<Table.Cell style={{ minWidth: '6rem' }}>{x.protocoin !== '0.00' ? '₱ ' + x.protocoin : '$ ' + x.amount} {x.category === 'Memberships:Fake Months' && '*'}</Table.Cell>
+									<Table.Cell>{x.number_of_membership_months}</Table.Cell>
+								</Table.Row>
+							)
+						:
+							<Table.Row><Table.Cell>None</Table.Cell></Table.Row>
+						}
+						<Table.Row>
+							<Table.Cell> </Table.Cell>
+							<Table.Cell><b>Total:</b></Table.Cell>
+							<Table.Cell active>{total}</Table.Cell>
+						</Table.Row>
+					</Table.Body>
+				</Table>
+
+				{explain_fake && <p>* these transactions were inferred while importing data from the old portal.</p>}
+
+				<p>{moment(member.current_start_date).format('ll')} + {total} months = {moment(member.expire_date).format('ll')}</p>
+
+				<p>Expire date: {moment(member.expire_date).format('ll')}</p>
+
+				<p>Today's date: {moment().format('ll')}</p>
+
+				<Table collapsing unstackable basic='very'>
+					<Table.Header>
+						<Table.Row>
+							<Table.HeaderCell>Status</Table.HeaderCell>
+							<Table.HeaderCell></Table.HeaderCell>
+						</Table.Row>
+					</Table.Header>
+
+					<Table.Body>
+						<Table.Row active={member.status === 'Prepaid'}>
+							<Table.Cell>
+								<Icon name='circle' color={statusColor['Prepaid']} />
+								Prepaid
+							</Table.Cell>
+							<Table.Cell>30+ days ahead</Table.Cell>
+						</Table.Row>
+
+						<Table.Row active={member.status === 'Current'}>
+							<Table.Cell>
+								<Icon name='circle' color={statusColor['Current']} />
+								Current
+							</Table.Cell>
+							<Table.Cell>1-29 days ahead</Table.Cell>
+						</Table.Row>
+
+						<Table.Row active={member.status === 'Due'}>
+							<Table.Cell>
+								<Icon name='circle' color={statusColor['Due']} />
+								Due
+							</Table.Cell>
+							<Table.Cell>0-29 days behind</Table.Cell>
+						</Table.Row>
+
+						<Table.Row active={member.status === 'Overdue'}>
+							<Table.Cell>
+								<Icon name='circle' color={statusColor['Overdue']} />
+								Overdue
+							</Table.Cell>
+							<Table.Cell>30d-3m behind</Table.Cell>
+						</Table.Row>
+					</Table.Body>
+				</Table>
+			</>}
+
+			<p>{member.preferred_name}'s status is: <Icon name='circle' color={statusColor[member.status]} />{member.status}</p>
+
+		</div>
+	);
+};

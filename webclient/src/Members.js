@@ -4,7 +4,7 @@ import './light.css';
 import { Button, Container, Dropdown, Grid, Header, Icon, Image, Input, Item, Segment, Table } from 'semantic-ui-react';
 import { statusColor, isAdmin, isInstructor, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound } from './Misc.js';
-import { AdminMemberInfo, AdminMemberPause, AdminMemberForm, AdminMemberCards, AdminMemberTraining, AdminMemberCertifications } from './AdminMembers.js';
+import { AdminMemberInfo, AdminAccounting, AdminMemberPause, AdminMemberForm, AdminMemberCards, AdminMemberTraining, AdminMemberCertifications } from './AdminMembers.js';
 import { AdminMemberTransactions } from './AdminTransactions.js';
 import { AdminHistory } from './Admin.js';
 import { StorageButton } from './Storage.js';
@@ -343,6 +343,7 @@ export function MemberDetail(props) {
 								<Link to={'/members/'+member.id+'/lockouts'}>Lockouts</Link>{' - '}
 								<Link to={'/members/'+member.id+'/training'}>Training</Link>{' - '}
 								<Link to={'/members/'+member.id+'/transactions'}>Transactions</Link>{' - '}
+								<Link to={'/members/'+member.id+'/accounting'}>Accounting</Link>{' - '}
 								<Link to={'/members/'+member.id+'/history'}>History</Link>
 							</p>
 						}
@@ -384,6 +385,10 @@ export function MemberDetail(props) {
 
 							{isAdmin(user) && <Route path='/members/:id/history'>
 								<AdminHistory filterMember={member.id} {...props} />
+							</Route>}
+
+							{isAdmin(user) && <Route path='/members/:id/accounting'>
+								<AdminAccounting result={result} {...props} />
 							</Route>}
 
 							<Route path='/members/:id'>
