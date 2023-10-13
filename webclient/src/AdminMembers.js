@@ -806,7 +806,7 @@ export function AdminMemberCertifications(props) {
 export function AdminAccounting(props) {
 	const { result } = props;
 	const member = result.member;
-	const transactions = result.transactions.filter(x => x.number_of_membership_months);
+	const transactions = result.transactions.filter(x => x.number_of_membership_months && x.date >= member.current_start_date);
 	const explain_fake = transactions.some(x => x.category === 'Memberships:Fake Months');
 	const total = transactions.reduce((accum, x) => accum + x.number_of_membership_months, 0);
 
