@@ -4,7 +4,6 @@ import './semantic-ui/semantic.min.css';
 import './light.css';
 import './dark.css';
 import { Container, Dropdown, Menu } from 'semantic-ui-react';
-import Darkmode from 'darkmode-js';
 import { isAdmin, requester } from './utils.js';
 import { ManageScroll } from './ManageScroll.js';
 import { Home } from './Home.js';
@@ -39,7 +38,13 @@ function App() {
 	const [user, setUser] = useState(JSON.parse(localStorage.getItem('user', 'false')));
 	const [refreshCount, refreshUser] = useReducer(x => x + 1, 0);
 	const [yousure, setYousure] = useState(false);
+	const isDark = localStorage.getItem('darkmode', null) === 'true';  // inherited from Darkmode.js
 	const history = useHistory();
+
+	useEffect(() => {
+		document.body.className = isDark ? 'dark' : '';
+		console.log('theme to:', document.body.className || 'light');
+	}, []);
 
 	function setTokenCache(x) {
 		setToken(x);
@@ -92,19 +97,6 @@ function App() {
 			});
 		}
 	}, [history.location]);
-
-	useEffect(() => {
-		const options = {
-			bottom: '16px',
-			right: '16px',
-			buttonColorDark: '#666',
-			buttonColorLight: '#aaa',
-			label: '🌓',
-			autoMatchOsTheme: false,
-		}
-		const darkmode = new Darkmode(options);
-		darkmode.showWidget();
-	}, []);
 
 	if (user && user?.app_version !== APP_VERSION) {
 		setUserCache(false);

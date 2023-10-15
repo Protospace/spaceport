@@ -262,6 +262,17 @@ export function Home(props) {
 
 	const show_signup = stats?.at_protospace;
 
+	const setLightMode = () => {
+		document.body.className = '';
+		localStorage.setItem('darkmode', false);
+	};
+
+	const setDarkMode = () => {
+		document.body.className = 'dark';
+		localStorage.setItem('darkmode', true);
+	};
+
+
 	return (
 		<Container>
 			<Grid stackable columns={2}>
@@ -291,6 +302,7 @@ export function Home(props) {
 							<p><a href='https://forum.protospace.ca' target='_blank' rel='noopener noreferrer'>Forum (Spacebar)</a> — <Link to='/auth/discourse'>[register]</Link></p>
 							{!!user && <p><a href='https://drive.google.com/drive/folders/0By-vvp6fxFekfmU1cmdxaVRlaldiYXVyTE9rRnNVNjhkc3FjdkFIbjBwQkZ3MVVQX2Ezc3M?resourcekey=0-qVLjcYr8ZCmLypdINk2svg' target='_blank' rel='noopener noreferrer'>Google Drive</a></p>}
 							{!!user && isAdmin(user) && <p><a href='https://estancia.hippocmms.ca/' target='_blank' rel='noopener noreferrer'>Property Management Portal</a></p>}
+							<p>Spaceport theme: <a onClick={setLightMode}>Light</a> / <a onClick={setDarkMode}>Dark</a></p>
 
 							<img className='swordfish' src='/swordfish.png' onClick={() => refreshStats()} />
 

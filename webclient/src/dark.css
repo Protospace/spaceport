@@ -1,96 +1,131 @@
-.darkmode-layer, .darkmode-toggle {
-	z-index: 500;
+.dark .content-wrap {
+	background-color: #1a1a1a;
+	color: white;
 }
 
-.darkmode--activated .ui.image,
-.darkmode--activated .bean,
-.darkmode--activated .photo-404 {
-	mix-blend-mode: difference;
-	filter: brightness(75%);
+.dark .ui.button,
+.dark img {
+	filter: brightness(80%);
 }
 
-.darkmode--activated i.green.circle.icon {
-	mix-blend-mode: difference;
-	color: #21ba4582 !important;
-
+.dark a {
+	color: #55aaff;
 }
 
-.darkmode--activated i.yellow.circle.icon {
-	mix-blend-mode: difference;
-	color: #fbbd0882 !important;
+.dark .footer a {
+	color: white;
 }
 
-.darkmode--activated i.red.circle.icon {
-	mix-blend-mode: difference;
-	color: #db282882 !important;
+.dark a:hover {
+	color: #1e70bf;
 }
 
-.darkmode--activated i.blue.circle.icon {
-	mix-blend-mode: difference;
-	color: #2185d0 !important;
+.dark .footer a:hover {
+	color: #aaa;
+	border-bottom: 1px solid #666;
 }
 
-.darkmode--activated i.brown.circle.icon {
-	mix-blend-mode: difference;
-	color: #a5673f !important;
+.dark .logo-long,
+.dark .swordfish {
+	filter: invert(1) brightness(80%);
 }
 
-.darkmode--activated .footer {
-	mix-blend-mode: difference;
+.dark .ql-snow .ql-stroke {
+	stroke: white;
 }
 
-.darkmode--activated .ReactCrop {
-	mix-blend-mode: difference;
+.dark .ui.segment,
+.dark .ui.menu .dropdown.item .menu,
+.dark .ui.dropdown .menu,
+.dark .ui.menu {
+	background-color: #1a1a1a !important;
 }
 
-.darkmode--activated .ql-toolbar.ql-snow,
-.darkmode--activated .ql-container.ql-snow,
-.darkmode--activated .ui.segment,
-.darkmode--activated .ui.form .field input,
-.darkmode--activated .ui.form .field .selection.dropdown,
-.darkmode--activated .ui.form .field .ui.checkbox label::before,
-.darkmode--activated .ui.form .field textarea {
-	border: 1px solid rgba(34,36,38,.50) !important;
+.dark .ui.table,
+.dark .ui.table thead th,
+.dark .ui.menu .item,
+.dark .ui.menu .ui.dropdown .menu > .item,
+.dark .ui.dropdown .menu > .item,
+.dark .ui.form .field > label,
+.dark .ui.items > .item > .content > .description,
+.dark .ui.items > .item > .content > .header,
+.dark .ui.checkbox label,
+.dark .ui.selection.visible.dropdown > .text:not(.default),
+.dark .ui.statistic > .label,
+.dark .ui.statistics .statistic > .label,
+.dark .ui.black.statistic > .value,
+.dark .ui.black.statistics .statistic > .value,
+.dark .ui.statistics .black.statistic > .value,
+.dark i.black.icon,
+.dark .ui.header {
+	color: white !important;
 }
 
-.darkmode--activated .ui.basic.table tbody tr {
-	border-bottom: 1px solid rgba(34,36,38,.50) !important;
+.dark .ui.menu,
+.dark .ui.dropdown .menu,
+.dark .ui.menu:not(.secondary):not(.text):not(.tabular):not(.borderless) > .container > .item:not(.right):not(.borderless):first-child,
+.dark .ui.segment {
+	border-color: #444 !important;
 }
 
-.darkmode--activated .ui.button {
-	background: #c9c9c9 !important;
+.dark .rdtPicker td.rdtDay:hover,
+.dark .rdtPicker td.rdtHour:hover,
+.dark .rdtPicker td.rdtMinute:hover,
+.dark .rdtPicker td.rdtSecond:hover,
+.dark .rdtPicker .rdtTimeToggle:hover,
+.dark .rdtMonth:hover,
+.dark td.rdtYear:hover,
+.dark .rdtPicker thead tr:first-child th:hover,
+.dark .rdtCounter .rdtBtn:hover,
+.dark .ui.menu .item::before {
+	background-color: #444 !important;
 }
 
-.darkmode--activated .ui.red.button {
-	mix-blend-mode: difference;
-	background: #db282882 !important;
+.dark .ql-snow .ql-editor code,
+.dark .ql-snow .ql-editor pre,
+.dark .ui.table td.active,
+.dark .ui.table tr.active {
+	color: white !important;
+	background-color: #444 !important;
 }
 
-.darkmode--activated .ui.green.button,
-.darkmode--activated .ui.button.toggle.active {
-	mix-blend-mode: difference;
-	background: #21ba4582 !important;
+.dark .ui.input,
+.dark .ui.input.focus > input,
+.dark .ui.input > input:focus,
+.dark .ui.input.focus > input,
+.dark .ui.input > input,
+.dark .ui.selection.dropdown,
+.dark .ui.dropdown .menu .selected.item,
+.dark .ui.dropdown.selected,
+.dark .ui.selection.dropdown .menu > .item,
+.dark .ui.form input,
+.dark .ui.form textarea,
+.dark .ui.menu .ui.dropdown .menu > .item:hover,
+.dark .rdtPicker,
+.dark .ui.popup,
+.dark .ui.popup::before,
+.dark .recharts-wrapper .recharts-default-tooltip,
+.dark .ui.labeled.input > .label,
+.dark .ql-snow .ql-picker-label,
+.dark .ql-snow .ql-picker-options,
+.dark .ql-snow .ql-tooltip,
+.dark .ql-tooltip .ql-editing > input,
+.dark .ui.menu .item:hover {
+	color: white !important;
+	background-color: #222 !important;
+	border-color: #444 !important;
 }
 
-.darkmode--activated .ui.grey.button {
-	mix-blend-mode: difference;
-	background: #767676 !important;
+.dark .ui.popup::before {
+	-webkit-box-shadow: 1px 1px 0 0 #444 !important;
+	box-shadow: 1px 1px 0 0 #444 !important;
 }
 
-.darkmode--activated .ui.blue.button {
-	mix-blend-mode: difference;
-	background: #2185d0 !important;
-}
-
-.darkmode--activated .ui.brown.button {
-	mix-blend-mode: difference;
-	background: #a5673f !important;
-}
-
-.darkmode--activated .ui.tag.label {
-	mix-blend-mode: difference;
-}
-
-.darkmode--activated .ui.black.tag.label {
-	mix-blend-mode: inherit;
+.dark .ui.black.labels .label:hover,
+.dark a.ui.black.label:hover,
+.dark .ui.black.label,
+.dark .ui.black.labels .label {
+	color: black !important;
+	background-color: #fff !important;
+	border-color: #fff !important;
 }
