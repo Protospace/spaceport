@@ -329,3 +329,7 @@ a {
 	margin-left: -3.5px;
 	margin-right: 0.5em;
 }
+
+.ui.dropdown .menu .item .text {
+	line-height: 1.5rem;
+}
