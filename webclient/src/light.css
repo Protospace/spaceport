@@ -200,6 +200,12 @@ a {
 .labelbox {
 	display: inline;
 	padding: 0.55rem 0.1rem;
+	border: 2px solid transparent;
+}
+
+.labelbox-selected {
+	display: inline;
+	padding: 0.55rem 0.1rem;
 	border: 2px solid black;
 }
 

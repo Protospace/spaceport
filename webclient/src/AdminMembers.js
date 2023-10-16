@@ -630,6 +630,7 @@ export function AdminMemberInfo(props) {
 					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Public Bio:</Table.Cell>
+						<Table.Cell></Table.Cell>
 					</Table.Row>
 				</Table.Body>
 			</BasicTable>

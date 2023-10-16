@@ -394,8 +394,7 @@ export function Classes(props) {
 
 			<div className='coursetags'>
 				<div
-					className='labelbox'
-					style={{borderColor: tagFilter === false ? 'black' : 'transparent'}}
+					className={tagFilter === false ? 'labelbox-selected' : 'labelbox'}
 				>
 					<Label
 						onClick={() => {
@@ -412,8 +411,7 @@ export function Classes(props) {
 				{Object.entries(tags).map(([name, color]) =>
 					<div
 						key={name}
-						className='labelbox'
-						style={{borderColor: tagFilter === name ? 'black' : 'transparent'}}
+						className={tagFilter === name ? 'labelbox-selected' : 'labelbox'}
 					>
 						<Label
 							onClick={() => {

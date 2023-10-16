@@ -138,7 +138,7 @@ function MemberInfo(props) {
 					{user.training.length > 3 &&
 						<Table.Row><Table.Cell>
 							<Link to='/training'>[more]</Link>
-						</Table.Cell></Table.Row>
+						</Table.Cell><Table.Cell/></Table.Row>
 					}
 				</Table.Body>
 			</BasicTable>
@@ -162,7 +162,7 @@ function MemberInfo(props) {
 					{user.transactions.length > 3 &&
 						<Table.Row><Table.Cell>
 							<Link to='/transactions'>[more]</Link>
-						</Table.Cell></Table.Row>
+						</Table.Cell><Table.Cell/><Table.Cell/></Table.Row>
 					}
 				</Table.Body>
 			</BasicTable>

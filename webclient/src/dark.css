@@ -34,6 +34,12 @@
 	stroke: white;
 }
 
+.dark .labelbox-selected {
+	display: inline;
+	padding: 0.55rem 0.1rem;
+	border: 2px solid white;
+}
+
 .dark .ui.segment,
 .dark .ui.menu .dropdown.item .menu,
 .dark .ui.dropdown .menu,
@@ -68,6 +74,11 @@
 	border-color: #444 !important;
 }
 
+.dark .ui.divided.items > .item,
+.dark .ui.table tr td {
+	border-top-color: #444 !important;
+}
+
 .dark .rdtPicker td.rdtDay:hover,
 .dark .rdtPicker td.rdtHour:hover,
 .dark .rdtPicker td.rdtMinute:hover,
@@ -78,7 +89,7 @@
 .dark .rdtPicker thead tr:first-child th:hover,
 .dark .rdtCounter .rdtBtn:hover,
 .dark .ui.menu .item::before {
-	background-color: #444 !important;
+	background-color: #555 !important;
 }
 
 .dark .ql-snow .ql-editor code,
@@ -86,7 +97,7 @@
 .dark .ui.table td.active,
 .dark .ui.table tr.active {
 	color: white !important;
-	background-color: #444 !important;
+	background-color: #555 !important;
 }
 
 .dark .ui.input,
@@ -113,12 +124,12 @@
 .dark .ui.menu .item:hover {
 	color: white !important;
 	background-color: #222 !important;
-	border-color: #444 !important;
+	border-color: #555 !important;
 }
 
 .dark .ui.popup::before {
-	-webkit-box-shadow: 1px 1px 0 0 #444 !important;
-	box-shadow: 1px 1px 0 0 #444 !important;
+	-webkit-box-shadow: 1px 1px 0 0 #555 !important;
+	box-shadow: 1px 1px 0 0 #555 !important;
 }
 
 .dark .ui.black.labels .label:hover,
