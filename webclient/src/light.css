@@ -69,7 +69,7 @@ a {
 
 .content-wrap {
 	min-height: 100%;
-	background: white;
+	background: #fafafa;
 }
 
 .content-wrap-inside {
@@ -332,4 +332,28 @@ a {
 
 .ui.dropdown .menu .item .text {
 	line-height: 1.5rem;
+}
+
+.ui.segment,
+.ui.menu .dropdown.item .menu,
+.ui.dropdown .menu,
+.ui.input,
+.ui.input.focus > input,
+.ui.input > input:focus,
+.ui.input.focus > input,
+.ui.input > input,
+.ui.selection.dropdown,
+.ui.form input,
+.ui.form textarea,
+.rdtPicker,
+.ui.popup,
+.ui.popup::before,
+.recharts-wrapper .recharts-default-tooltip,
+.ui.labeled.input > .label,
+.ql-snow .ql-picker-label,
+.ql-snow .ql-picker-options,
+.ql-snow .ql-tooltip,
+.ql-tooltip .ql-editing > input,
+.ui.menu {
+	background-color: #fafafa !important;
 }
