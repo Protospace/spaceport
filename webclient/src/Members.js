@@ -202,7 +202,7 @@ export function Members(props) {
 
 			<p></p>
 
-			<p>
+			<p className='links-menu'>
 				Sort by{' '}
 				{Object.entries(memberSorts).map((x, i) =>
 					<React.Fragment key={x[0]}>
@@ -336,7 +336,7 @@ export function MemberDetail(props) {
 						<Header size='large'>{member.preferred_name} {member.last_name}</Header>
 
 						{isAdmin(user) &&
-							<p>Admin: {' '}
+							<p className='links-menu'>Admin: {' '}
 								<Link to={'/members/'+member.id}>Profile</Link>{' - '}
 								<Link to={'/members/'+member.id+'/details'}>Details</Link>{' - '}
 								<Link to={'/members/'+member.id+'/cards'}>Cards</Link>{' - '}

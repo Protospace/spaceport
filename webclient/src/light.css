@@ -340,6 +340,10 @@ a {
 	line-height: 1.5rem;
 }
 
+.links-menu {
+	line-height: 1.75rem;
+}
+
 .ui.segment,
 .ui.menu .dropdown.item .menu,
 .ui.dropdown .menu,
