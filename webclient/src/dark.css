@@ -63,6 +63,7 @@
 .dark .ui.black.statistics .statistic > .value,
 .dark .ui.statistics .black.statistic > .value,
 .dark i.black.icon,
+.dark .list-num,
 .dark .ui.header {
 	color: white !important;
 }
