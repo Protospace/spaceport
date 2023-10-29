@@ -56,6 +56,10 @@ function MemberInfo(props) {
 								</Table.Cell>
 							</Table.Row>
 							<Table.Row>
+								<Table.Cell>Paid until:</Table.Cell>
+								<Table.Cell>{member.expire_date ? moment(member.expire_date).format('ll') : 'Unknown'}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
 								<Table.Cell>Protocoin:</Table.Cell>
 								<Table.Cell>₱&thinsp;{member.protocoin.toFixed(2)} <Link to='/paymaster'>[buy]</Link></Table.Cell>
 							</Table.Row>
@@ -70,10 +74,6 @@ function MemberInfo(props) {
 										<>None <Link to='/claimshelf'>[claim]</Link></>
 									}
 								</Table.Cell>
-							</Table.Row>
-							<Table.Row>
-								<Table.Cell>Expiry:</Table.Cell>
-								<Table.Cell>{member.expire_date ? moment(member.expire_date).format('ll') : 'Unknown'}</Table.Cell>
 							</Table.Row>
 						</Table.Body>
 					</BasicTable>
