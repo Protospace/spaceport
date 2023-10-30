@@ -213,6 +213,9 @@ function NewClassTable(props) {
 
 	let sortedClasses = [];
 	let seenCourseIds = [];
+
+	// this hacky mess ensures courses with classes are displayed first, then all the remaining courses
+	// while still maintaining the order they were sent by the server
 	if (classes.length && courses.length) {
 		for (const clazz of classes) {
 			const course_data = clazz.course_data;
@@ -221,13 +224,16 @@ function NewClassTable(props) {
 			if (course) {
 				course.classes.push(clazz);
 			} else {
-				sortedClasses.push({
-					course: courses.find(x => x.id === course_data.id),
-					classes: [clazz],
-				});
-				seenCourseIds.push(
-					course_data.id
-				);
+				const full_course = courses.find(x => x.id === course_data.id);
+				if (full_course) {
+					sortedClasses.push({
+						course: full_course,
+						classes: [clazz],
+					});
+					seenCourseIds.push(
+						course_data.id
+					);
+				}
 			}
 		}
 	}
@@ -339,6 +345,7 @@ export function Classes(props) {
 	const coursesByTag = (x) => tagFilter ? x.tags.includes(tagFilter) : true;
 	const classesBySearch = (x) => search ? x.course_data.name.toLowerCase().includes(search.toLowerCase()) : true;
 	const coursesBySearch = (x) => search ? x.name.toLowerCase().includes(search.toLowerCase()) : true;
+	const archivedCourses = (x) => !x.is_archived;
 
 	return (
 		<Container>
@@ -432,7 +439,7 @@ export function Classes(props) {
 				sortByCourse ?
 					<NewClassTable
 						classes={classes.filter(classesByTag).filter(classesBySearch)}
-						courses={courses.filter(coursesByTag).filter(coursesBySearch)}
+						courses={courses.filter(coursesByTag).filter(coursesBySearch).filter(archivedCourses)}
 						token={token}
 						user={user}
 						refreshUser={refreshUser}

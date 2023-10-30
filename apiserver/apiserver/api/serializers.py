@@ -624,6 +624,23 @@ class CourseSerializer(serializers.ModelSerializer):
         model = models.Course
         fields = ['id', 'name', 'is_old', 'description', 'tags', 'num_interested']
 
+class CourseListSerializer(CourseSerializer):
+    recent_date = serializers.DateTimeField(read_only=True)
+    is_archived = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Course
+        fields = ['id', 'name', 'is_old', 'description', 'tags', 'num_interested', 'recent_date', 'is_archived']
+
+    def get_is_archived(self, obj):
+        fourteen_months_ago = utils.now_alberta_tz() - datetime.timedelta(days=425)
+        recent_date = getattr(obj, 'recent_date', None)
+
+        if recent_date == None or recent_date < fourteen_months_ago:
+            return True
+        else:
+            return False
+
 class SessionSerializer(serializers.ModelSerializer):
     student_count = serializers.SerializerMethodField()
     course_data = serializers.SerializerMethodField()

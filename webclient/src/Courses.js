@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import './light.css';
-import { Button, Label, Container, Header, Segment, Table } from 'semantic-ui-react';
+import { Button, Label, Container, Header, Input, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
 import { isInstructor, getInstructor, requester, useIsMobile } from './utils.js';
 import { NotFound } from './Misc.js';
@@ -29,6 +29,7 @@ let tagFilterCache = false;
 
 export function Courses(props) {
 	const [courses, setCourses] = useState(courseCache);
+	const [search, setSearch] = useState('');
 	const [tagFilter, setTagFilter] = useState(tagFilterCache);
 	const { token, user } = props;
 	const isMobile = useIsMobile();
@@ -45,6 +46,9 @@ export function Courses(props) {
 	}, []);
 
 	const byTag = (x) => tagFilter ? x.tags.includes(tagFilter) : true;
+	const bySearch = (x) => search ? x.name.toLowerCase().includes(search.toLowerCase()) : true;
+
+	const brandNewCourses = courses && courses.length && courses.filter(x => !x.tags) || [];
 
 	return (
 		<Container>
@@ -54,12 +58,46 @@ export function Courses(props) {
 				<InstructorCourseList courses={courses} setCourses={setCourses} {...props} />
 			</Segment>}
 
+			{!!brandNewCourses.length &&
+				<>
+					<Header size='medium'>Brand New Courses</Header>
+
+					<Table basic='very'>
+						<Table.Body>
+							{brandNewCourses.map(x =>
+								<Table.Row key={x.id}>
+									<Table.Cell>
+										<Link to={'/courses/'+x.id}>{x.name}</Link>
+									</Table.Cell>
+								</Table.Row>
+							)}
+						</Table.Body>
+					</Table>
+				</>
+			}
+
+			<div>
+				<Input focus icon='search'
+					placeholder='Search...'
+					value={search}
+					onChange={(event) => setSearch(event.target.value)}
+					aria-label='search products'
+					style={{ margin: '0.5rem 0.5rem 0.5rem 0' }}
+				/>
+
+				{!!search.length &&
+					<Button
+						content='Clear'
+						onClick={() => setSearch('')}
+					/>
+				}
+			</div>
+
 			<p>Filter by tag:</p>
 
 			<div className='coursetags'>
 				<div
-					className='labelbox'
-					style={{borderColor: tagFilter === false ? 'black' : 'transparent'}}
+					className={tagFilter === false ? 'labelbox-selected' : 'labelbox'}
 				>
 					<Label
 						onClick={() => {
@@ -76,8 +114,7 @@ export function Courses(props) {
 				{Object.entries(tags).map(([name, color]) =>
 					<div
 						key={name}
-						className='labelbox'
-						style={{borderColor: tagFilter === name ? 'black' : 'transparent'}}
+						className={tagFilter === name ? 'labelbox-selected' : 'labelbox'}
 					>
 						<Label
 							onClick={() => {
@@ -106,7 +143,7 @@ export function Courses(props) {
 
 					<Table.Body>
 						{courses.length ?
-							courses.filter(byTag).map(x =>
+							courses.filter(byTag).filter(bySearch).map(x =>
 								<Table.Row key={x.id}>
 									<Table.Cell>
 										<Link to={'/courses/'+x.id}>{x.name}</Link>

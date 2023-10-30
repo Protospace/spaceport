@@ -167,7 +167,7 @@ export function InstructorCourseList(props) {
 			<Header size='medium'>Instructor Panel</Header>
 
 			{!open && success && <>
-				<p>Added to bottom of course list!</p>
+				<p>Added below!</p>
 				<p><Link to={'/courses/'+success}>View the course.</Link></p>
 			</>}
 
@@ -180,14 +180,34 @@ export function InstructorCourseList(props) {
 					<InstructorCourseEditor input={input} setInput={setInput} error={error} />
 
 					<Form.Checkbox
-						label='I understand the difference between a course and a class. There are no other courses for this topic.'
+						label='I understand the difference between a course and a class.'
 						required
 						{...makeProps('understand_courses')}
 						onChange={handleCheck}
 						checked={input.understand_courses}
 					/>
 
-					<Form.Button disabled={!input.understand_courses} loading={loading} error={error.non_field_errors}>
+					<Form.Checkbox
+						label='There are no other courses for this topic (search below)'
+						required
+						{...makeProps('no_other_courses')}
+						onChange={handleCheck}
+						checked={input.no_other_courses}
+					/>
+
+					<Form.Checkbox
+						label="I didn't just make this course, can't find it, so am making it again."
+						required
+						{...makeProps('not_making_again')}
+						onChange={handleCheck}
+						checked={input.not_making_again}
+					/>
+
+					<Form.Button
+						disabled={!input.understand_courses || !input.no_other_courses || !input.not_making_again}
+						loading={loading}
+						error={error.non_field_errors}
+					>
 						Submit
 					</Form.Button>
 				</Form>
