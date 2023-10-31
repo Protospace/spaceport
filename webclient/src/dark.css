@@ -71,6 +71,7 @@
 .dark .ui.menu,
 .dark .ui.dropdown .menu,
 .dark .ui.menu:not(.secondary):not(.text):not(.tabular):not(.borderless) > .container > .item:not(.right):not(.borderless):first-child,
+.dark .ui.table tbody tr,
 .dark .ui.segment {
 	border-color: #444 !important;
 }
