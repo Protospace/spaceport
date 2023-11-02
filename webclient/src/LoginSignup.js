@@ -130,7 +130,7 @@ export function SignupForm(props) {
 				<>
 					<Form.Group widths='equal'>
 						<Form.Input
-							label='Legal First Name'
+							label='Legal Given Name'
 							name='first_name'
 							autoComplete='off'
 							fluid
@@ -138,7 +138,7 @@ export function SignupForm(props) {
 							error={error.first_name}
 						/>
 						<Form.Input
-							label='Legal Last Name'
+							label='Legal Family Name'
 							name='last_name'
 							autoComplete='off'
 							fluid
@@ -149,7 +149,7 @@ export function SignupForm(props) {
 
 					<Form.Group widths='equal'>
 						<Form.Input
-							label='Preferred First Name'
+							label='Preferred Given Name'
 							name='preferred_name'
 							autoComplete='off'
 							fluid
@@ -169,7 +169,7 @@ export function SignupForm(props) {
 
 					<Form.Group grouped>
 						<Form.Radio
-							label='I have an account on the old portal'
+							label="I've been a Protospace member before"
 							name='existing_member'
 							value={true}
 							checked={input.existing_member === true}
@@ -188,7 +188,7 @@ export function SignupForm(props) {
 
 					{input.existing_member && <Message info>
 						<Message.Header>Welcome back!</Message.Header>
-						<p>Please do a <Link to='/password/reset'>password reset</Link> instead.</p>
+						<p>Please do a <Link to='/password/reset'>password reset</Link> instead. Creating two accounts will cause problems with account syncronization.</p>
 					</Message>}
 
 					{!!genUsername() &&
