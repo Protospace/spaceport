@@ -188,7 +188,7 @@ export function SignupForm(props) {
 
 					{input.existing_member && <Message info>
 						<Message.Header>Welcome back!</Message.Header>
-						<p>Please do a <Link to='/password/reset'>password reset</Link> instead. Creating two accounts will cause problems with account syncronization.</p>
+						<p>Please do a <Link to='/password/reset'>password reset</Link> instead. Creating two accounts will cause problems with account synchronization.</p>
 					</Message>}
 
 					{!!genUsername() &&
