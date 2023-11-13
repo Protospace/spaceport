@@ -121,6 +121,7 @@ def build_tx(data):
         info_source='PayPal IPN',
         payment_method=data.get('payment_type', 'unknown'),
         paypal_payer_id=data.get('payer_id', 'unknown'),
+        paypal_subscr_id=data.get('subscr_id', ''),  # only included in subscription payments
         paypal_txn_id=data.get('txn_id', 'unknown'),
         paypal_txn_type=data.get('txn_type', 'unknown'),
         reference_number=data.get('txn_id', 'unknown'),
@@ -356,17 +357,25 @@ def process_paypal_ipn(data):
 
     user = False
 
-    try:
-        user = hints.get(account=data['payer_id']).user
-    except models.PayPalHint.DoesNotExist:
-        logger.info('IPN - No PayPalHint found for %s', data['payer_id'])
-
-    if not user and 'member' in custom_json:
-        member_id = custom_json['member']
+    # trust custom json the most since it comes from webclient
+    if 'member' in custom_json:
         try:
-            user = members.get(id=member_id).user
+            user = members.get(id=custom_json['member']).user
         except models.Member.DoesNotExist:
-            pass
+            logger.info('IPN - No member found for custom json %s', str(custom_json))
+
+    if not user and 'subscr_id' in data:
+        try:
+            user = hints.get(account=data['subscr_id']).user
+        except models.PayPalHint.DoesNotExist:
+            logger.info('IPN - No PayPalHint found for subscr_id %s', data['subscr_id'])
+
+    if not user:
+        try:
+            user = hints.get(account=data['payer_id']).user
+        except models.PayPalHint.DoesNotExist:
+            logger.info('IPN - No PayPalHint found for payer_id %s', data['payer_id'])
+
 
     if not user:
         logger.info('IPN - Unable to associate with member, reporting')
@@ -376,7 +385,7 @@ def process_paypal_ipn(data):
     member = user.member
 
     hints.update_or_create(
-        account=data.get('payer_id', 'unknown'),
+        account=data.get('subscr_id', data['payer_id']),
         defaults=dict(user=user),
     )
 

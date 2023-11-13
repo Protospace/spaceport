@@ -556,6 +556,12 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
         utils.tally_membership_months(member)
 
     def train_paypal_hint(self, tx):
+        if tx.paypal_subscr_id:
+            models.PayPalHint.objects.update_or_create(
+                account=tx.paypal_subscr_id,
+                defaults=dict(user=tx.user),
+            )
+
         if tx.paypal_payer_id:
             models.PayPalHint.objects.update_or_create(
                 account=tx.paypal_payer_id,
@@ -699,7 +705,7 @@ class IpnView(views.APIView):
         try:
             utils_paypal.process_paypal_ipn(request.data)
         except BaseException as e:
-            logger.error('IPN route - {} - {}'.format(e.__class__.__name__, str(e)))
+            logger.exception('IPN route - {} - {}'.format(e.__class__.__name__, str(e)))
             return HttpResponseServerError()
 
         return Response(200)

@@ -514,8 +514,8 @@ def custom_exception_handler(exc, context):
 def log_transaction(tx):
     msg = 'Transaction log | {} | {} | {} | {} | {} | {} | {} | {} | {}'.format(
         tx.id,
-        tx.user.username,
-        tx.user.member.id,
+        tx.user.username if tx.user else 'None',
+        tx.user.member.id if tx.user else 'None',
         tx.account_type,
         tx.amount,
         tx.protocoin,
