@@ -83,6 +83,15 @@ export function LCARS2Display(props) {
 					<DisplayScores />
 				</div>
 
+				<div className='display-graphs'>
+					<iframe src="https://ps-grafana.dns.t0.vc/d-solo/CmQHr8c4z/sensors?from=now-3h&to=now&orgId=1&theme=dark&panelId=2&refresh=1m" width="100%" height="50%" frameborder="0"></iframe>
+					<iframe src="https://ps-grafana.dns.t0.vc/d-solo/CmQHr8c4z/sensors?from=now-3h&to=now&orgId=1&theme=dark&panelId=4&refresh=1m" width="100%" height="50%" frameborder="0"></iframe>
+				</div>
+
+				<div className='display-graphs'>
+					<iframe src="https://ps-grafana.dns.t0.vc/d-solo/CmQHr8c4z/sensors?from=now-3h&to=now&orgId=1&theme=dark&panelId=6&refresh=1m" width="100%" height="50%" frameborder="0"></iframe>
+				</div>
+
 				<div className='display-scores'>
 					<DisplayHosting />
 				</div>

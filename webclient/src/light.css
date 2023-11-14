@@ -226,6 +226,14 @@ a {
 	height: 75vh;
 }
 
+.display-graphs {
+	border: 1px solid white;
+	padding: 0em;
+	align-self: flex-end;
+	width: 25vw;
+	height: 75vh;
+}
+
 .display-scores {
 	border: 1px solid white;
 	padding: 0.5em;
