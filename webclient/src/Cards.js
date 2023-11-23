@@ -41,7 +41,7 @@ export function Cards(props) {
 						</Table.Header>}
 
 						<Table.Body>
-							{user.cards.map(x =>
+							{user.cards.sort((a, b) => a.last_seen < b.last_seen ? 1 : -1).map(x =>
 								<Table.Row key={x.id}>
 									<Table.Cell>{x.card_number}</Table.Cell>
 									<Table.Cell>{isMobile && 'Notes: '}{x.notes}</Table.Cell>
