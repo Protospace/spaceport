@@ -44,7 +44,7 @@ curl -H 'Authorization: Token 1fb8ef73f118c5de1f9ba4939a76b3f3b0bc7444' 'https:/
 
 ## API Routes
 
-API routes are not documented. They (used to be)[https://github.com/Protospace/spaceport/blob/5bf9b261802001b8038eba2dd272020fab0c0ebd/apiserver/docs/source/api.rst] but the utility for how much
+API routes are not documented. They [used to be](https://github.com/Protospace/spaceport/blob/5bf9b261802001b8038eba2dd272020fab0c0ebd/apiserver/docs/source/api.rst) but the utility for how much
 effort it took was not worth it.
 
 Use your browser's network inspector to learn how the API works.
