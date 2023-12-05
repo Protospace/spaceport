@@ -6,11 +6,11 @@ Live: https://my.protospace.ca
 
 ## Documentation
 
-https://docs.my.protospace.ca
+[docs/README.md](docs/README.md)
 
 ## Development Setup
 
-https://docs.my.protospace.ca/dev_apiserver.html
+[docs/dev_apiserver.md](docs/dev_apiserver.md)
 
 ## License
 
