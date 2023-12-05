@@ -1,7 +1,7 @@
 # Web Client Development Setup
 
 This guide assumes you are using [Debian GNU/Linux 11](https://cdimage.debian.org/cdimage/unofficial/non-free/images-including-firmware/archive/11.2.0+nonfree/amd64/iso-cd/firmware-11.2.0-amd64-netinst.iso) or [Ubuntu 20.04 LTS](https://releases.ubuntu.com/20.04/). If you
-aren't, just spin up a VM with the correct version. Things break if you don't.
+aren't, just spin up a VM with the correct version. Support is unavailable for other operating systems.
 
 ## Install Dependencies
 
@@ -29,7 +29,6 @@ $ yarn install
 Run the development server:
 
 ```
-$ export NODE_OPTIONS=--openssl-legacy-provider
 $ HOST=0.0.0.0 yarn start
 ```
 
