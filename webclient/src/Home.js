@@ -258,7 +258,29 @@ export function Home(props) {
 
 	const closedStat = (x) => stats && stats.closing ? moment().unix() > stats.closing['time'] ? 'Closed' : 'Open until ' + stats.closing['time_str'] + ' with ' + stats.closing['first_name'] : 'Unknown';
 
-	const printer3dStat = (x) => stats && stats.printer3d && stats.printer3d[x] ? stats.printer3d[x].state === 'Printing' ? 'Printing (' + stats.printer3d[x].progress + '%)' : stats.printer3d[x].state : 'Unknown';
+	const p1sPrinter3dStat = (x) => {
+		const data = stats?.printer3d?.[x];
+		const info = data?.info;
+		const online = data?.info?.online;
+
+		if (!data || !info || !online) {
+			return 'Unknown / Bad connection';
+		}
+
+		const gcode_states = {FINISH: 'Finished', RUNNING: 'Running', PAUSE: 'Paused', FAILED: 'Failed', PREPARE: 'Preparing'};
+
+		const printer_state = gcode_states?.[info?.gcode_state] || info?.gcode_state || 'Unknown';
+
+		if (printer_state !== 'Running') {
+			return 'Idle (' + printer_state + ')';
+		} else if (printer_state === 'Running' && info?.current_layer === 0) {
+			return 'Initializing';  // because it has non-zero percentage which may be confusing
+		} else if (printer_state === 'Running') {
+			return 'Layer ' + info?.current_layer + ' / ' + info?.total_layers + ' (' + info?.print_percentage + '%)';
+		} else {
+			return printer_state;
+		}
+	};
 
 	const show_signup = stats?.at_protospace;
 
@@ -405,9 +427,7 @@ export function Home(props) {
 									} trigger={<a>[more]</a>} />
 								</p>
 
-								<p>ORD2 printer: {printer3dStat('ord2')}</p>
-
-								<p>ORD3 printer: {printer3dStat('ord3')}</p>
+								<p>P1S printer: {p1sPrinter3dStat('p1s1')}</p>
 
 								{user ?
 									<p>Alarm status: {alarmStat()}</p>
