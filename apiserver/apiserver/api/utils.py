@@ -16,6 +16,7 @@ from bleach.sanitizer import Cleaner
 from PyPDF2 import PdfFileWriter, PdfFileReader
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
+import paho.mqtt.publish as publish
 
 from django.db.models import Sum
 from django.core.cache import cache
@@ -58,6 +59,31 @@ def spaceporter_host(message):
         requests.post(url, json=data, timeout=4)
     except BaseException as e:
         logger.error('Problem with bot: ' + str(e))
+
+def mqtt_publish(topic, message):
+    if not secrets.MQTT_WRITER_PASSWORD:
+        return False
+
+    if settings.DEBUG:
+        topic = 'dev_' + topic
+        client_id='dev_spaceport'
+    else:
+        client_id='spaceport'
+
+    try:
+        publish.single(
+            topic,
+            message,
+            hostname='webhost.protospace.ca',
+            port=8883,
+            client_id=client_id,
+            auth=dict(username='writer', password=secrets.MQTT_WRITER_PASSWORD),
+            tls=dict(ca_certs='/etc/ssl/certs/ISRG_Root_X1.pem'),
+            keepalive=5,  # timeout
+        )
+    except BaseException as e:
+        logger.error('Problem sending MQTT message: ' + str(e))
+
 
 def num_months_spanned(d1, d2):
     '''

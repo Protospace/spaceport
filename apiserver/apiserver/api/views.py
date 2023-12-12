@@ -24,6 +24,7 @@ import datetime, time
 import io
 import csv
 import xmltodict
+import json
 
 from . import models, serializers, utils, utils_paypal, utils_stats, utils_ldap, utils_email
 from .permissions import (
@@ -665,6 +666,8 @@ class DoorViewSet(viewsets.ViewSet, List):
         cache.set('last_scan', last_scan)
 
         utils_stats.calc_card_scans()
+
+        utils.mqtt_publish('spaceport/door/scan', json.dumps(last_scan))
 
         return Response(200)
 
