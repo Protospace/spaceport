@@ -115,6 +115,9 @@ class SearchViewSet(Base, Retrieve):
             elif sort == 'is_director':
                 queryset = queryset.filter(is_director=True)
                 queryset = queryset.order_by('application_date', 'id')
+            elif sort == 'is_admin':
+                queryset = queryset.exclude(is_director=False, is_staff=False, user__is_staff=False)
+                queryset = queryset.order_by('application_date', 'id')
             elif sort == 'is_instructor':
                 queryset = queryset.filter(paused_date__isnull=True, is_instructor=True)
                 queryset = queryset.order_by('application_date', 'id')

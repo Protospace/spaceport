@@ -20,6 +20,7 @@ const memberSorts = {
 	//oldest_overall: 'Oldest Overall',
 	recently_inactive: 'Recently Inactive',
 	is_director: 'Directors',
+	is_admin: 'Portal Admin',
 	is_instructor: 'Instructors',
 	due: 'Due',
 	overdue: 'Overdue',
