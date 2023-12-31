@@ -805,18 +805,19 @@ class StatsViewSet(viewsets.ViewSet, List):
 
         logging.info('Alarm data: %s', data)
 
-        alarm = None
+        state = None
         if data.startswith('Armed'):
-            alarm = 'Armed'
+            state = 'Armed'
         elif data.startswith('Disarmed'):
-            alarm = 'Disarmed'
+            state = 'Disarmed'
         elif data.startswith('Exit delay in progress'):
-            alarm = 'Exit delay'
+            state = 'Exit delay'
         elif data.startswith('Alarm'):
-            alarm = 'TRIGGERED!'
+            state = 'TRIGGERED!'
 
-        if alarm:
-            logging.info('Settings alarm status to: %s', alarm)
+        if state:
+            logging.info('Setting alarm status to: %s', state)
+            alarm = dict(time=time.time(), data=state)
             cache.set('alarm', alarm)
 
         return Response(200)

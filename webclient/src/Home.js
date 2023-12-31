@@ -254,7 +254,9 @@ export function Home(props) {
 	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').fromNow() : '';
 	const getTrackName = (x) => stats && stats.track && stats.track[x] && stats.track[x]['first_name'] ? stats.track[x]['first_name'] : 'Unknown';
 
-	const alarmStat = () => stats && stats.alarm ? stats.alarm.toString() : 'Unknown';  // toString prevents crash from cached alarm Object
+	const alarmStat = (x) => stats && stats.alarm && moment().unix() - stats.alarm.time < 60*60*24 ? stats.alarm.data : 'Unknown';
+	const alarmUpdateLast = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz('America/Edmonton').format('llll') : 'Unknown';
+	const alarmUpdateAgo = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz('America/Edmonton').fromNow() : 'Unknown';
 
 	const closedStat = (x) => stats && stats.closing ? moment().unix() > stats.closing['time'] ? 'Closed' : 'Open until ' + stats.closing['time_str'] + ' with ' + stats.closing['first_name'] : 'Unknown';
 
@@ -410,7 +412,17 @@ export function Home(props) {
 								<p>ORD3 printer: {printer3dStat('ord3')}</p>
 
 								{user ?
-									<p>Alarm status: {alarmStat()}</p>
+									<p>
+										Alarm status: {alarmStat()} <Popup content={
+											<React.Fragment>
+												<p>
+													Last update:<br />
+													{alarmUpdateLast()}<br />
+													{alarmUpdateAgo()}
+												</p>
+											</React.Fragment>
+										} trigger={<a>[more]</a>} />
+									</p>
 								:
 									<p>Alarm status: Unauthorized</p>
 								}
