@@ -176,6 +176,23 @@ class SearchViewSet(Base, Retrieve):
 
         return Response({'seq': seq, 'results': serializer.data, 'total': total})
 
+    @action(detail=False, methods=['get'], permission_classes=[])
+    def discourse(self, request):
+        # TODO: allow logged in users access? (use above vetted_date serializer check if so)
+        auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if secrets.PROTOGRAM_API_TOKEN and auth_token != 'Bearer ' + secrets.PROTOGRAM_API_TOKEN:
+            raise exceptions.PermissionDenied()
+
+        try:
+            discourse_username = request.query_params['discourse_username']
+        except KeyError:
+            raise exceptions.ValidationError(dict(discourse_username='This field is required.'))
+
+        member = get_object_or_404(models.Member, discourse_username__iexact=discourse_username)
+        serializer = serializers.VettedSearchSerializer(member)
+
+        return Response(serializer.data)
+
 
 class MemberViewSet(Base, Retrieve, Update):
     permission_classes = [AllowMetadata | IsAuthenticated, IsObjOwnerOrAdmin]
