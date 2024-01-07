@@ -269,13 +269,11 @@ export function Home(props) {
 			return 'Unknown / Bad connection';
 		}
 
-		const gcode_states = {FINISH: 'Finished', RUNNING: 'Running', PAUSE: 'Paused', FAILED: 'Failed', PREPARE: 'Preparing'};
+		const gcode_states = {IDLE: 'Idle', FINISH: 'Finished', RUNNING: 'Running', PAUSE: 'Paused', FAILED: 'Failed', PREPARE: 'Preparing'};
 
 		const printer_state = gcode_states?.[info?.gcode_state] || info?.gcode_state || 'Unknown';
 
-		if (printer_state !== 'Running') {
-			return 'Idle (' + printer_state + ')';
-		} else if (printer_state === 'Running' && info?.current_layer === 0) {
+		if (printer_state === 'Running' && info?.current_layer === 0) {
 			return 'Initializing';  // because it has non-zero percentage which may be confusing
 		} else if (printer_state === 'Running') {
 			return 'Layer ' + info?.current_layer + ' / ' + info?.total_layers + ' (' + info?.print_percentage + '%)';
