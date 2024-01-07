@@ -16,8 +16,11 @@ function ClassTable(props) {
 
 	const now = new Date().toISOString();
 
-	return (isMobile ?
+	return <>
+		<p>{classes.length} result{classes.length === 1 ? '' : 's'}:</p>
+		{isMobile ?
 		<Table basic='very'>
+
 			<Table.Body>
 				{classes.length ?
 					classes.map(x =>
@@ -95,7 +98,8 @@ function ClassTable(props) {
 				}
 			</Table.Body>
 		</Table>
-	);
+	}
+	</>;
 };
 
 function NewClassTableCourse(props) {
@@ -360,7 +364,7 @@ export function Classes(props) {
 	const byDate = (a, b) => a.datetime > b.datetime ? 1 : -1;
 	const classesByTag = (x) => tagFilter ? x.course_data.tags.includes(tagFilter) : true;
 	const coursesByTag = (x) => tagFilter ? x.tags.includes(tagFilter) : true;
-	const classesBySearch = (x) => search ? x.course_data.name.toLowerCase().includes(search.toLowerCase()) : true;
+	const classesBySearch = (x) => search ? x.instructor_name.toLowerCase().includes(search.toLowerCase()) || x.course_data.name.toLowerCase().includes(search.toLowerCase()) : true;
 	const coursesBySearch = (x) => search ? x.name.toLowerCase().includes(search.toLowerCase()) : true;
 	const archivedCourses = (x) => !x.is_archived;
 
