@@ -313,6 +313,7 @@ export function ClassFeed(props) {
 export function Classes(props) {
 	const [classes, setClasses] = useState(classesCache);
 	const [courses, setCourses] = useState(false);
+	const [loading, setLoading] = useState(false);
 	const [search, setSearch] = useState('');
 	const [sortByCourse, setSortByCourse] = useState(sortCache);
 	const [tagFilter, setTagFilter] = useState(tagFilterCache);
@@ -338,6 +339,22 @@ export function Classes(props) {
 			console.log(err);
 		});
 	}, []);
+
+	const loadAll = () => {
+		if (loading) return;
+		setLoading(true);
+		requester('/sessions/all/', 'GET', token)
+		.then(res => {
+			setLoading(false);
+			setClasses(res.results);
+			classesCache = res.results;
+			window.scrollTo(0, 0);
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+		});
+	};
 
 	const byTeaching = (x) => x.instructor_id === user.member.id;
 	const byDate = (a, b) => a.datetime > b.datetime ? 1 : -1;
@@ -445,7 +462,16 @@ export function Classes(props) {
 						refreshUser={refreshUser}
 					/>
 				:
+					<>
 					<ClassTable classes={classes.slice().filter(classesByTag).filter(classesBySearch).sort(byDate)} />
+
+					<Button
+						onClick={loadAll}
+						loading={loading}
+					>
+						Load all (slow)
+					</Button>
+					</>
 			:
 				<p>Loading...</p>
 			}

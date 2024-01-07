@@ -402,6 +402,19 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
 
         return Response(200)
 
+    @action(detail=False, methods=['get'])
+    def all(self, request):
+        sessions = models.Session.objects.order_by('datetime')
+        serializer = serializers.SessionListSerializer(sessions, many=True)
+
+        result = {
+            "count": sessions.count(),
+            "next": None,
+            "previous": None,
+            "results": serializer.data,
+        }
+        return Response(result)
+
 
 class TrainingViewSet(Base, Retrieve, Create, Update):
     permission_classes = [AllowMetadata | IsAuthenticated, IsObjOwnerOrAdmin | IsSessionInstructorOrAdmin | ReadOnly]
