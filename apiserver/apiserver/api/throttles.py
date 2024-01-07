@@ -31,7 +31,8 @@ class LoggingThrottle(throttling.BaseThrottle):
             '/hosting/high_scores/',
             '/hosting/monthly_high_scores/',
             '/stats/ord2/printer3d/',
-            '/stats/ord3/printer3d/'
+            '/stats/ord3/printer3d/',
+            '/stats/p1s1/printer3d/',
         ]:
             return True
 

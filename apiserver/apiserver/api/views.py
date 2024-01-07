@@ -1045,15 +1045,18 @@ class StatsViewSet(viewsets.ViewSet, List):
     @action(detail=True, methods=['post'])
     def printer3d(self, request, pk=None):
         printer3d = cache.get('printer3d', {})
-
         devicename = pk
-        status = request.data['result']['status']
 
-        printer3d[devicename] = dict(
-            progress=int(status['display_status']['progress'] * 100),
-            #filename=status['print_stats']['filename'],
-            state=status['idle_timeout']['state'],
-        )
+        if devicename.startswith('ord'):
+            status = request.data['result']['status']
+            printer3d[devicename] = dict(
+                progress=int(status['display_status']['progress'] * 100),
+                #filename=status['print_stats']['filename'],
+                state=status['idle_timeout']['state'],
+            )
+        elif devicename.startswith('p1s'):
+            printer3d[devicename] = request.data
+
         cache.set('printer3d', printer3d)
 
         return Response(200)
