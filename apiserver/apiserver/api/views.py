@@ -137,7 +137,7 @@ class SearchViewSet(Base, Retrieve):
                     queryset = []
             elif sort == 'pinball_score':
                 queryset = queryset.annotate(
-                    pinball_score=Max('user__scores__score'),
+                    pinball_score=Max('user__scores__score', filter=Q(user__scores__id__gte=6720)),
                 ).exclude(pinball_score__isnull=True).order_by('-pinball_score')
             elif sort == 'storage':
                 queryset = queryset.annotate(
@@ -1775,7 +1775,7 @@ class PinballViewSet(Base):
     def high_scores(self, request):
         members = models.Member.objects.all()
         members = members.annotate(
-            pinball_score=Max('user__scores__score'),
+            pinball_score=Max('user__scores__score', filter=Q(user__scores__id__gte=6720)),
         ).exclude(pinball_score__isnull=True).order_by('-pinball_score')
 
         scores = []
