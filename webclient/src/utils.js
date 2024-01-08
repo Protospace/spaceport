@@ -24,6 +24,17 @@ export const getInstructor = (x) => {
 	}
 };
 
+export const getInstructorDiscourseLink = (x) => {
+	if (x.course === 413 || x.course === 317 || x.course === 273) {
+		return false;
+	} else if (!x.instructor_discourse) {
+		return false;
+	} else {
+		return `https://forum.protospace.ca/new-message?username=${x.instructor_discourse}&title=${encodeURI(x.course_data.name)}%20class`;
+	}
+};
+
+
 export const statusColor = {
 	'Prepaid': 'green',
 	'Current': 'green',

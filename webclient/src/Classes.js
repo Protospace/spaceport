@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Label, Button, Container, Dropdown, Form, Header, Icon, Input, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
-import { apiUrl, isAdmin, getInstructor, BasicTable, requester, useIsMobile } from './utils.js';
+import { apiUrl, isAdmin, getInstructor, getInstructorDiscourseLink, BasicTable, requester, useIsMobile } from './utils.js';
 import { NotFound } from './Misc.js';
 import { InstructorClassDetail, InstructorClassAttendance } from './InstructorClasses.js';
 import { PayPalPayNow } from './PayPal.js';
@@ -666,7 +666,10 @@ export function ClassDetail(props) {
 								</Table.Row>
 								<Table.Row>
 									<Table.Cell>Instructor:</Table.Cell>
-									<Table.Cell>{getInstructor(clazz)}</Table.Cell>
+									<Table.Cell>
+										{getInstructor(clazz)}{' '}
+										{getInstructorDiscourseLink(clazz) && <a href={getInstructorDiscourseLink(clazz)} target='_blank'>[message]</a>}
+									</Table.Cell>
 								</Table.Row>
 								<Table.Row>
 									<Table.Cell>Cost:</Table.Cell>

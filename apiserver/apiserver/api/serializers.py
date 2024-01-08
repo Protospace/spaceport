@@ -646,6 +646,7 @@ class SessionSerializer(serializers.ModelSerializer):
     course_data = serializers.SerializerMethodField()
     instructor_name = serializers.SerializerMethodField()
     instructor_id = serializers.SerializerMethodField()
+    instructor_discourse = serializers.SerializerMethodField()
     datetime = serializers.DateTimeField()
     course = serializers.PrimaryKeyRelatedField(queryset=models.Course.objects.all())
     students = TrainingSerializer(many=True, read_only=True)
@@ -673,6 +674,12 @@ class SessionSerializer(serializers.ModelSerializer):
     def get_instructor_id(self, obj):
         if obj.instructor and hasattr(obj.instructor, 'member'):
             return obj.instructor.member.id
+        else:
+            return None
+
+    def get_instructor_discourse(self, obj):
+        if obj.instructor and hasattr(obj.instructor, 'member'):
+            return obj.instructor.member.discourse_username
         else:
             return None
 
