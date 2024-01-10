@@ -20,7 +20,8 @@ function MemberInfo(props) {
 	const lastTrain = user.training?.sort((a, b) => a.session.datetime < b.session.datetime ? 1 : -1).slice(0,3);
 	const lastCard = user.cards?.filter(x => x.last_seen).sort((a, b) => a.last_seen < b.last_seen ? 1 : -1)[0];
 
-	const unpaidTraining = user.training?.filter(x => x.attendance_status === 'Waiting for payment');
+	const weekAgo = moment().subtract(1, 'weeks').toISOString();
+	const unpaidTraining = user.training?.filter(x => x.attendance_status === 'Waiting for payment' && x.session.datetime > weekAgo);
 
 	return (
 		<div>
