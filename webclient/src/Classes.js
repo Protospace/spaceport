@@ -578,6 +578,9 @@ export function ClassDetail(props) {
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [override, setOverride] = useState(false);
+	const [check1, setCheck1] = useState(false);
+	const [check2, setCheck2] = useState(false);
+	const [check3, setCheck3] = useState(false);
 	const { token, user, refreshUser } = props;
 	const { id } = useParams();
 	const userTraining = clazz && clazz.students.find(x => x.user === user.id);
@@ -627,7 +630,9 @@ export function ClassDetail(props) {
 	}, [userTraining]);
 
 	const now = new Date().toISOString();
-	const signupDisabled = clazz && clazz.datetime < now && !override;
+	const isEvent = clazz && /Event|Outing|Protospace/.test(clazz.course_data.tags);
+	const isOld = clazz && clazz.datetime < now;
+	const isFree = clazz && clazz.cost === '0.00';
 
 	return (
 		<Container>
@@ -708,6 +713,16 @@ export function ClassDetail(props) {
 								<div>
 									<p>Status: {userTraining.attendance_status}</p>
 
+									{!isEvent && !['Withdrawn', 'Rescheduled'].includes(userTraining.attendance_status) && <p>
+										You are registered for this class. Some things to know:
+
+										<ul>
+											<li>Your spot is reserved.</li>
+											<li>You can contact the instructor with the [message] link by their name above.</li>
+											<li>Plan to arrive 5 minutes early, the class will start on time.</li>
+										</ul>
+									</p>}
+
 									<p>
 										{userTraining.attendance_status === 'Withdrawn' ?
 											<Button loading={loading} onClick={() => handleToggle('Waiting for payment')}>
@@ -723,7 +738,7 @@ export function ClassDetail(props) {
 									{clazz.cost !== '0.00' && !userTraining.paid_date && userTraining.attendance_status !== 'Withdrawn' &&
 										<div>
 											{userTraining.attendance_status === 'Waiting for payment' ?
-												<p>Please pay the course fee of ${clazz.cost} to confirm your attendance:</p>
+												<p>Please pay the course fee of ${clazz.cost}:</p>
 											:
 												<p>In case you haven't paid the course fee of ${clazz.cost} yet, you can do that here:</p>
 											}
@@ -757,7 +772,7 @@ export function ClassDetail(props) {
 										<p>The class is full.</p>
 									:
 										<>
-											{clazz.datetime < now &&
+											{clazz.datetime < now ?
 												<>
 													<p>This class has already ran.</p>
 													<p>
@@ -765,16 +780,50 @@ export function ClassDetail(props) {
 															name='override'
 															value={override}
 															label='Let me sign up anyway'
-															required
 															onChange={(e, v) => setOverride(v.checked)}
 														/>
 													</p>
+
+													<Button loading={loading} onClick={handleSignup} disabled={isOld && !override}>
+														Register
+													</Button>
+												</>
+											:
+												<>
+													{!isEvent && <>
+														<p>
+															<Form.Checkbox
+																name='check1'
+																value={check1}
+																label='I understand that instructors are unpaid volunteers and will actually attend'
+																onChange={(e, v) => setCheck1(v.checked)}
+															/>
+														</p>
+
+														<p>
+															<Form.Checkbox
+																name='check2'
+																value={check2}
+																label='I promise to inform the instructor if I’m unable to attend or running late'
+																onChange={(e, v) => setCheck2(v.checked)}
+															/>
+														</p>
+
+														{!isFree && <p>
+															<Form.Checkbox
+																name='check3'
+																value={check3}
+																label={'I\'m ready to pay the class fee of $' + clazz.cost}
+																onChange={(e, v) => setCheck3(v.checked)}
+															/>
+														</p>}
+													</>}
+
+													<Button loading={loading} onClick={handleSignup} disabled={(!check1 || !check2 || (!check3 && !isFree)) && !isEvent}>
+														Register
+													</Button>
 												</>
 											}
-
-											<Button loading={loading} onClick={handleSignup} disabled={signupDisabled}>
-												Sign me up!
-											</Button>
 										</>
 									)
 								)

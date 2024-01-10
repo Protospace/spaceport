@@ -110,8 +110,8 @@ function MemberInfo(props) {
 
 			{unpaidTraining.map(x =>
 				<Message warning>
-					<Message.Header>Please pay your course fee!</Message.Header>
-					<p>Pay ${x.session.cost} for <Link to={'/classes/'+x.session.id}>{x.session.course_data.name}</Link> to avoid losing your spot.</p>
+					<Message.Header>Please pay your class fee!</Message.Header>
+					<p>Pay ${x.session.cost} for <Link to={'/classes/'+x.session.id}>{x.session.course_data.name}</Link>.</p>
 				</Message>
 			)}
 
