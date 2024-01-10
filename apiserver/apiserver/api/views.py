@@ -506,7 +506,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
 
             training1 = models.Training.objects.filter(user=user, session=session)
             if training1.exists():
-                raise exceptions.ValidationError(dict(non_field_errors='Already registered.'))
+                raise exceptions.ValidationError(dict(non_field_errors='Already registered, refresh the page'))
 
             self.update_cert(session, member, status)
 
@@ -514,7 +514,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         else:
             training = models.Training.objects.filter(user=user, session=session)
             if training.exists():
-                raise exceptions.ValidationError(dict(non_field_errors='Already registered'))
+                raise exceptions.ValidationError(dict(non_field_errors='Already registered, refresh the page'))
             if user == session.instructor:
                 raise exceptions.ValidationError(dict(non_field_errors='You are teaching this session'))
             if status == 'Waiting for payment' and session.cost == 0:

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import './light.css';
-import { Label, Button, Container, Dropdown, Form, Header, Icon, Input, Segment, Table } from 'semantic-ui-react';
+import { Label, Button, Container, Dropdown, Form, FormField, Header, Icon, Input, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
 import { apiUrl, isAdmin, getInstructor, getInstructorDiscourseLink, BasicTable, requester, useIsMobile } from './utils.js';
 import { NotFound } from './Misc.js';
@@ -572,29 +572,16 @@ export function ICalButtons(props) {
 	);
 };
 
-export function ClassDetail(props) {
-	const [clazz, setClass] = useState(false);
-	const [refreshCount, refreshClass] = useReducer(x => x + 1, 0);
+export function Class(props) {
+	const { token, user, refreshUser, clazz, setClass, refreshClass } = props;
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [override, setOverride] = useState(false);
 	const [check1, setCheck1] = useState(false);
 	const [check2, setCheck2] = useState(false);
 	const [check3, setCheck3] = useState(false);
-	const { token, user, refreshUser } = props;
 	const { id } = useParams();
 	const userTraining = clazz && clazz.students.find(x => x.user === user.id);
-
-	useEffect(() => {
-		requester('/sessions/'+id+'/', 'GET', token)
-		.then(res => {
-			setClass(res);
-		})
-		.catch(err => {
-			console.log(err);
-			setError(true);
-		});
-	}, [refreshCount]);
 
 	const handleSignup = () => {
 		if (loading) return;
@@ -604,9 +591,12 @@ export function ClassDetail(props) {
 		.then(res => {
 			refreshClass();
 			refreshUser();
+			setError(false);
 		})
 		.catch(err => {
+			setLoading(false);
 			console.log(err);
+			setError(err.data.non_field_errors);
 		});
 	};
 
@@ -618,10 +608,12 @@ export function ClassDetail(props) {
 		.then(res => {
 			refreshClass();
 			refreshUser();
+			setError(false);
 		})
 		.catch(err => {
+			setLoading(false);
 			console.log(err);
-			setError(true);
+			setError(err.data.non_field_errors);
 		});
 	};
 
@@ -634,6 +626,234 @@ export function ClassDetail(props) {
 	const isOld = clazz && clazz.datetime < now;
 	const isFree = clazz && clazz.cost === '0.00';
 
+	return (<>
+		{(isAdmin(user) || clazz.instructor === user.id) &&
+			<Segment padded>
+				<InstructorClassDetail clazz={clazz} setClass={setClass} {...props} />
+			</Segment>
+		}
+
+		<BasicTable>
+			<Table.Body>
+				<Table.Row>
+					<Table.Cell>Name:</Table.Cell>
+					<Table.Cell>
+						<Link to={'/courses/'+clazz.course}>
+							{clazz.course_data.name}
+						</Link>
+					</Table.Cell>
+				</Table.Row>
+				<Table.Row>
+					<Table.Cell>Date:</Table.Cell>
+					<Table.Cell>
+						{moment.utc(clazz.datetime).tz('America/Edmonton').format('ll')}
+					</Table.Cell>
+				</Table.Row>
+				<Table.Row>
+					<Table.Cell>Time:</Table.Cell>
+					<Table.Cell>
+						{clazz.is_cancelled ? 'Cancelled' : moment.utc(clazz.datetime).tz('America/Edmonton').format('LT')}
+					</Table.Cell>
+				</Table.Row>
+				<Table.Row>
+					<Table.Cell>Instructor:</Table.Cell>
+					<Table.Cell>
+						{getInstructor(clazz)}{' '}
+						{getInstructorDiscourseLink(clazz) && <a href={getInstructorDiscourseLink(clazz)} target='_blank'>[message]</a>}
+					</Table.Cell>
+				</Table.Row>
+				<Table.Row>
+					<Table.Cell>Cost:</Table.Cell>
+					<Table.Cell>{clazz.cost === '0.00' ? 'Free' : '$'+clazz.cost}</Table.Cell>
+				</Table.Row>
+				<Table.Row>
+					<Table.Cell>Students:</Table.Cell>
+					<Table.Cell>{clazz.student_count} {!!clazz.max_students && '/ '+clazz.max_students}</Table.Cell>
+				</Table.Row>
+				<Table.Row>
+					<Table.Cell>Event:</Table.Cell>
+					<Table.Cell><ICalButtons token={token} clazz={clazz} /></Table.Cell>
+				</Table.Row>
+			</Table.Body>
+		</BasicTable>
+
+		<Header size='medium'>Course Description</Header>
+		{clazz.course_data.is_old ?
+			clazz.course_data.description.split('\n').map((x, i) =>
+				<p key={i}>{x}</p>
+			)
+		:
+			<div dangerouslySetInnerHTML={{__html: clazz.course_data.description}} />
+		}
+
+		<Header size='medium'>Attendance</Header>
+
+		{(isAdmin(user) || clazz.instructor === user.id) &&
+			<Segment padded>
+				<InstructorClassAttendance clazz={clazz} refreshClass={refreshClass} {...props} />
+			</Segment>
+		}
+
+		{clazz.instructor !== user.id &&
+			(userTraining ?
+				<div>
+					<p>Status: {userTraining.attendance_status}</p>
+
+					{!isEvent && !['Withdrawn', 'Rescheduled'].includes(userTraining.attendance_status) && <p>
+						You are registered for this class. Some things to know:
+
+						<ul>
+							<li>Your spot is reserved.</li>
+							<li>You can contact the instructor with the [message] link by their name above.</li>
+							<li>Plan to arrive 5 minutes early, the class will start on time.</li>
+						</ul>
+					</p>}
+
+					<p>
+						{userTraining.attendance_status === 'Withdrawn' ?
+							<Button loading={loading} onClick={() => handleToggle('Waiting for payment')}>
+								Sign back up
+							</Button>
+						:
+							<Button loading={loading} onClick={() => handleToggle('Withdrawn')}>
+								Withdraw from Class
+							</Button>
+						}
+
+						{error && <Form><FormField>
+							<Label pointing prompt>
+								{error}
+							</Label>
+						</FormField></Form>}
+					</p>
+
+					{clazz.cost !== '0.00' && !userTraining.paid_date && userTraining.attendance_status !== 'Withdrawn' &&
+						<div>
+							{userTraining.attendance_status === 'Waiting for payment' ?
+								<p>Please pay the course fee of ${clazz.cost}:</p>
+							:
+								<p>In case you haven't paid the course fee of ${clazz.cost} yet, you can do that here:</p>
+							}
+							<PayPalPayNow
+								amount={clazz.cost}
+								name={clazz.course_data.name}
+								custom={JSON.stringify({ training: userTraining.id })}
+							/>
+
+							<p/>
+
+							<p>Current Protocoin balance: ₱&thinsp;{user.member.protocoin.toFixed(2)}</p>
+
+							<PayWithProtocoin
+								token={token} user={user} refreshUser={refreshUser}
+								amount={clazz.cost}
+								onSuccess={() => {
+									refreshUser();
+									refreshClass();
+								}}
+								custom={{ category: 'OnAcct', training: userTraining.id }}
+							/>
+						</div>
+					}
+				</div>
+			:
+				(clazz.is_cancelled ?
+					<p>The class is cancelled.</p>
+				:
+					((clazz.max_students && clazz.student_count >= clazz.max_students) ?
+						<p>The class is full.</p>
+					:
+						<>
+							{clazz.datetime < now ?
+								<>
+									<p>This class has already ran.</p>
+									<p>
+										<Form.Checkbox
+											name='override'
+											value={override}
+											label='Let me sign up anyway'
+											onChange={(e, v) => setOverride(v.checked)}
+										/>
+									</p>
+
+									<Button loading={loading} onClick={handleSignup} disabled={isOld && !override}>
+										Register
+									</Button>
+
+									{error && <Form><FormField>
+										<Label pointing prompt>
+											{error}
+										</Label>
+									</FormField></Form>}
+								</>
+							:
+								<>
+									{!isEvent && <>
+										<p>
+											<Form.Checkbox
+												name='check1'
+												value={check1}
+												label='I understand that instructors are unpaid volunteers and will actually attend'
+												onChange={(e, v) => setCheck1(v.checked)}
+											/>
+										</p>
+
+										<p>
+											<Form.Checkbox
+												name='check2'
+												value={check2}
+												label='I promise to inform the instructor if I’m unable to attend or running late'
+												onChange={(e, v) => setCheck2(v.checked)}
+											/>
+										</p>
+
+										{!isFree && <p>
+											<Form.Checkbox
+												name='check3'
+												value={check3}
+												label={'I\'m ready to pay the class fee of $' + clazz.cost}
+												onChange={(e, v) => setCheck3(v.checked)}
+											/>
+										</p>}
+									</>}
+
+									<Button loading={loading} onClick={handleSignup} disabled={(!check1 || !check2 || (!check3 && !isFree)) && !isEvent}>
+										Register
+									</Button>
+
+									{error && <Form><FormField>
+										<Label pointing prompt>
+											{error}
+										</Label>
+									</FormField></Form>}
+								</>
+							}
+						</>
+					)
+				)
+			)
+		}
+	</>);
+};
+
+export function ClassDetail(props) {
+	const [clazz, setClass] = useState(false);
+	const [refreshCount, refreshClass] = useReducer(x => x + 1, 0);
+	const [error, setError] = useState(false);
+	const { token, user, refreshUser } = props;
+	const { id } = useParams();
+
+	useEffect(() => {
+		requester('/sessions/'+id+'/', 'GET', token)
+		.then(res => {
+			setClass(res);
+		})
+		.catch(err => {
+			console.log(err);
+			setError(true);
+		});
+	}, [refreshCount]);
+
 	return (
 		<Container>
 			{!error ?
@@ -641,194 +861,7 @@ export function ClassDetail(props) {
 					<div>
 						<Header size='large'>Class Details</Header>
 
-						{(isAdmin(user) || clazz.instructor === user.id) &&
-							<Segment padded>
-								<InstructorClassDetail clazz={clazz} setClass={setClass} {...props} />
-							</Segment>
-						}
-
-						<BasicTable>
-							<Table.Body>
-								<Table.Row>
-									<Table.Cell>Name:</Table.Cell>
-									<Table.Cell>
-										<Link to={'/courses/'+clazz.course}>
-											{clazz.course_data.name}
-										</Link>
-									</Table.Cell>
-								</Table.Row>
-								<Table.Row>
-									<Table.Cell>Date:</Table.Cell>
-									<Table.Cell>
-										{moment.utc(clazz.datetime).tz('America/Edmonton').format('ll')}
-									</Table.Cell>
-								</Table.Row>
-								<Table.Row>
-									<Table.Cell>Time:</Table.Cell>
-									<Table.Cell>
-										{clazz.is_cancelled ? 'Cancelled' : moment.utc(clazz.datetime).tz('America/Edmonton').format('LT')}
-									</Table.Cell>
-								</Table.Row>
-								<Table.Row>
-									<Table.Cell>Instructor:</Table.Cell>
-									<Table.Cell>
-										{getInstructor(clazz)}{' '}
-										{getInstructorDiscourseLink(clazz) && <a href={getInstructorDiscourseLink(clazz)} target='_blank'>[message]</a>}
-									</Table.Cell>
-								</Table.Row>
-								<Table.Row>
-									<Table.Cell>Cost:</Table.Cell>
-									<Table.Cell>{clazz.cost === '0.00' ? 'Free' : '$'+clazz.cost}</Table.Cell>
-								</Table.Row>
-								<Table.Row>
-									<Table.Cell>Students:</Table.Cell>
-									<Table.Cell>{clazz.student_count} {!!clazz.max_students && '/ '+clazz.max_students}</Table.Cell>
-								</Table.Row>
-								<Table.Row>
-									<Table.Cell>Event:</Table.Cell>
-									<Table.Cell><ICalButtons token={token} clazz={clazz} /></Table.Cell>
-								</Table.Row>
-							</Table.Body>
-						</BasicTable>
-
-						<Header size='medium'>Course Description</Header>
-						{clazz.course_data.is_old ?
-							clazz.course_data.description.split('\n').map((x, i) =>
-								<p key={i}>{x}</p>
-							)
-						:
-							<div dangerouslySetInnerHTML={{__html: clazz.course_data.description}} />
-						}
-
-						<Header size='medium'>Attendance</Header>
-
-						{(isAdmin(user) || clazz.instructor === user.id) &&
-							<Segment padded>
-								<InstructorClassAttendance clazz={clazz} refreshClass={refreshClass} {...props} />
-							</Segment>
-						}
-
-						{clazz.instructor !== user.id &&
-							(userTraining ?
-								<div>
-									<p>Status: {userTraining.attendance_status}</p>
-
-									{!isEvent && !['Withdrawn', 'Rescheduled'].includes(userTraining.attendance_status) && <p>
-										You are registered for this class. Some things to know:
-
-										<ul>
-											<li>Your spot is reserved.</li>
-											<li>You can contact the instructor with the [message] link by their name above.</li>
-											<li>Plan to arrive 5 minutes early, the class will start on time.</li>
-										</ul>
-									</p>}
-
-									<p>
-										{userTraining.attendance_status === 'Withdrawn' ?
-											<Button loading={loading} onClick={() => handleToggle('Waiting for payment')}>
-												Sign back up
-											</Button>
-										:
-											<Button loading={loading} onClick={() => handleToggle('Withdrawn')}>
-												Withdraw from Class
-											</Button>
-										}
-									</p>
-
-									{clazz.cost !== '0.00' && !userTraining.paid_date && userTraining.attendance_status !== 'Withdrawn' &&
-										<div>
-											{userTraining.attendance_status === 'Waiting for payment' ?
-												<p>Please pay the course fee of ${clazz.cost}:</p>
-											:
-												<p>In case you haven't paid the course fee of ${clazz.cost} yet, you can do that here:</p>
-											}
-											<PayPalPayNow
-												amount={clazz.cost}
-												name={clazz.course_data.name}
-												custom={JSON.stringify({ training: userTraining.id })}
-											/>
-
-											<p/>
-
-											<p>Current Protocoin balance: ₱&thinsp;{user.member.protocoin.toFixed(2)}</p>
-
-											<PayWithProtocoin
-												token={token} user={user} refreshUser={refreshUser}
-												amount={clazz.cost}
-												onSuccess={() => {
-													refreshUser();
-													refreshClass();
-												}}
-												custom={{ category: 'OnAcct', training: userTraining.id }}
-											/>
-										</div>
-									}
-								</div>
-							:
-								(clazz.is_cancelled ?
-									<p>The class is cancelled.</p>
-								:
-									((clazz.max_students && clazz.student_count >= clazz.max_students) ?
-										<p>The class is full.</p>
-									:
-										<>
-											{clazz.datetime < now ?
-												<>
-													<p>This class has already ran.</p>
-													<p>
-														<Form.Checkbox
-															name='override'
-															value={override}
-															label='Let me sign up anyway'
-															onChange={(e, v) => setOverride(v.checked)}
-														/>
-													</p>
-
-													<Button loading={loading} onClick={handleSignup} disabled={isOld && !override}>
-														Register
-													</Button>
-												</>
-											:
-												<>
-													{!isEvent && <>
-														<p>
-															<Form.Checkbox
-																name='check1'
-																value={check1}
-																label='I understand that instructors are unpaid volunteers and will actually attend'
-																onChange={(e, v) => setCheck1(v.checked)}
-															/>
-														</p>
-
-														<p>
-															<Form.Checkbox
-																name='check2'
-																value={check2}
-																label='I promise to inform the instructor if I’m unable to attend or running late'
-																onChange={(e, v) => setCheck2(v.checked)}
-															/>
-														</p>
-
-														{!isFree && <p>
-															<Form.Checkbox
-																name='check3'
-																value={check3}
-																label={'I\'m ready to pay the class fee of $' + clazz.cost}
-																onChange={(e, v) => setCheck3(v.checked)}
-															/>
-														</p>}
-													</>}
-
-													<Button loading={loading} onClick={handleSignup} disabled={(!check1 || !check2 || (!check3 && !isFree)) && !isEvent}>
-														Register
-													</Button>
-												</>
-											}
-										</>
-									)
-								)
-							)
-						}
+						<Class token={token} user={user} refreshUser={refreshUser} clazz={clazz} setClass={setClass} refreshClass={refreshClass} />
 					</div>
 				:
 					<p>Loading...</p>
