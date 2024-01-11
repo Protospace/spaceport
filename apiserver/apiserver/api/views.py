@@ -513,20 +513,36 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             serializer.save(user=user, attendance_status=status)
         else:
             training = models.Training.objects.filter(user=user, session=session)
+
             if training.exists():
                 raise exceptions.ValidationError(dict(non_field_errors='Already registered, refresh the page'))
             if user == session.instructor:
                 raise exceptions.ValidationError(dict(non_field_errors='You are teaching this session'))
+
             if status == 'Waiting for payment' and session.cost == 0:
                 status = 'Confirmed'
+
             serializer.save(user=user, attendance_status=status)
 
     def perform_update(self, serializer):
-        session_id = self.request.data['session']
-        status = self.request.data['attendance_status']
+        user = self.request.user
+        data = self.request.data
+        session_id = data['session']
+        status = data['attendance_status']
         session = get_object_or_404(models.Session, id=session_id)
+
         if status == 'Waiting for payment' and session.cost == 0:
             status = 'Confirmed'
+
+        if (
+            status == 'Withdrawn'
+            and 'Protospace' not in session.course.tags
+            and 'Event' not in session.course.tags
+            and 'Outing' not in session.course.tags
+            and now() + datetime.timedelta(days=1) > session.datetime
+            and not (is_admin_director(user) or session.instructor == user)
+        ):
+            raise exceptions.ValidationError(dict(non_field_errors='Can\'t withdraw 24h before class or after. Contact instructor.'))
 
         training = serializer.save(attendance_status=status)
         member = training.user.member
