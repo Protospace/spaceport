@@ -547,7 +547,9 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         training = serializer.save(attendance_status=status)
         member = training.user.member
 
-        self.update_cert(session, member, status)
+        if (is_admin_director(user) or session.instructor == user) and 'student_id' in data:
+            logging.info('Updating cert...')
+            self.update_cert(session, member, status)
 
 
 class TransactionViewSet(Base, List, Create, Retrieve, Update):
