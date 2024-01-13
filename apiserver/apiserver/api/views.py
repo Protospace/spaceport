@@ -540,7 +540,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             and 'Event' not in session.course.tags
             and 'Outing' not in session.course.tags
             and now() + datetime.timedelta(days=1) > session.datetime
-            and not (is_admin_director(user) or session.instructor == user)
+            and not ((is_admin_director(user) or session.instructor == user) and 'student_id' in data)
         ):
             raise exceptions.ValidationError(dict(non_field_errors='Can\'t withdraw 24h before class or after. Contact instructor.'))
 
