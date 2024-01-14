@@ -34,6 +34,14 @@ export const getInstructorDiscourseLink = (x) => {
 	}
 };
 
+export const getDiscourseLink = (x) => {
+	if (!x.discourse_username) {
+		return false;
+	} else {
+		return `https://forum.protospace.ca/new-message?username=${x.discourse_username}`;
+	}
+};
+
 
 export const statusColor = {
 	'Prepaid': 'green',

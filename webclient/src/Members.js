@@ -2,7 +2,7 @@ import React, { useState, useEffect, useReducer } from 'react';
 import { Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Dropdown, Grid, Header, Icon, Image, Input, Item, Segment, Table } from 'semantic-ui-react';
-import { statusColor, isAdmin, isInstructor, BasicTable, staticUrl, requester } from './utils.js';
+import { statusColor, getDiscourseLink, isAdmin, isInstructor, BasicTable, staticUrl, requester } from './utils.js';
 import { NotFound } from './Misc.js';
 import { AdminMemberInfo, AdminAccounting, AdminMemberPause, AdminMemberForm, AdminMemberCards, AdminMemberTraining, AdminMemberCertifications } from './AdminMembers.js';
 import { AdminMemberTransactions } from './AdminTransactions.js';
@@ -233,7 +233,6 @@ export function Members(props) {
 						{!!response.results.length &&
 							response.results.map((x, i) =>
 								<Item key={x.member.id} as={Link} to={'/members/'+x.member.id}>
-									<div className='list-num'>{i+1}</div>
 									<Item.Image size='tiny' src={x.member.photo_small ? staticUrl + '/' + x.member.photo_small : '/nophoto.png'} />
 									<Item.Content verticalAlign='top'>
 										<Item.Header>
@@ -247,6 +246,14 @@ export function Members(props) {
 											</>
 										:
 											<>
+												{sort === 'newest_active' ?
+													<Item.Description>Started: {x.member.current_start_date || 'Unknown'}</Item.Description>
+												:
+													<Item.Description>Joined: {x.member.application_date || 'Unknown'}</Item.Description>
+												}
+
+												<Item.Description>Vetted: {x.member.vetted_date || 'Probationary'}</Item.Description>
+
 												<Item.Description>
 													Shelf: {x.member.storage.length ?
 														x.member.storage.sort((a, b) => a.location === 'member_shelves' ? -1 : 1).map((x, i) =>
@@ -256,11 +263,7 @@ export function Members(props) {
 														'None'
 													}
 												</Item.Description>
-												{sort === 'newest_active' ?
-													<Item.Description>Started: {x.member.current_start_date || 'Unknown'}</Item.Description>
-												:
-													<Item.Description>Joined: {x.member.application_date || 'Unknown'}</Item.Description>
-												}
+
 												<Item.Description>
 													{x.member.public_bio.substring(0, 100)}
 													{x.member.public_bio.length > 100 && '...'}
@@ -335,6 +338,8 @@ export function MemberDetail(props) {
 				member ?
 					<div>
 						<Header size='large'>{member.preferred_name} {member.last_name}</Header>
+
+						{getDiscourseLink(member) && <p><a href={getDiscourseLink(member)} target='_blank'>[message]</a></p>}
 
 						{isAdmin(user) &&
 							<p className='links-menu'>Admin: {' '}
@@ -414,6 +419,10 @@ export function MemberDetail(props) {
 														<Table.Cell>{member.application_date || 'Unknown'}</Table.Cell>
 													</Table.Row>
 													<Table.Row>
+														<Table.Cell>Vetted:</Table.Cell>
+														<Table.Cell>{member.vetted_date ? member.vetted_date + ' ✅' : 'Probationary'}</Table.Cell>
+													</Table.Row>
+													<Table.Row>
 														<Table.Cell>Public Bio:</Table.Cell>
 														<Table.Cell></Table.Cell>
 													</Table.Row>
@@ -421,7 +430,7 @@ export function MemberDetail(props) {
 											</BasicTable>
 
 											<p className='bio-paragraph'>
-												{member.public_bio || 'None yet.'}
+												{member.public_bio || 'None'}
 											</p>
 											{ !isMe && !isSponsoring && <Button onClick={ sponsorMember(true) }>Vouch for { member.preferred_name }</Button> }
 											{ !isMe && isSponsoring && <Button onClick={ sponsorMember(false) }>Revoke guarantee</Button> }
@@ -429,9 +438,9 @@ export function MemberDetail(props) {
 									</Grid.Column>
 
 									<Grid.Column width={11}>
-										{isInstructor(user) && !isAdmin(user) && <Segment padded>
+										{isInstructor(user) && !isAdmin(user) &&
 											<AdminMemberTraining result={result} refreshResult={refreshResult} {...props} />
-										</Segment>}
+										}
 									</Grid.Column>
 								</Grid>
 							</Route>

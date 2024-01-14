@@ -97,7 +97,7 @@ export function TrainingList(props) {
 					<Table.Row key={x.id}>
 						<Table.Cell>{x.session.course_data.name}</Table.Cell>
 						<Table.Cell>
-							<Link to={'/classes/'+x.session.id}>{moment(x.session.datetime).tz('America/Edmonton').format('ll')}</Link>
+							<Link style={{whiteSpace: 'nowrap'}} to={'/classes/'+x.session.id}>{moment(x.session.datetime).tz('America/Edmonton').format('ll')}</Link>
 						</Table.Cell>
 						<Table.Cell>{isMobile && 'Attendance: '}{x.attendance_status}</Table.Cell>
 						<Table.Cell>{isMobile && 'Instructor: '}{getInstructor(x.session)}</Table.Cell>

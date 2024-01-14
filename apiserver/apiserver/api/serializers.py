@@ -197,10 +197,12 @@ class OtherMemberSerializer(serializers.ModelSerializer):
             'status',
             'current_start_date',
             'application_date',
+            'vetted_date',
             'photo_small',
             'public_bio',
             'pinball_score',
             'storage',
+            'discourse_username',
         ]
 
     def get_last_name(self, obj):
@@ -228,11 +230,13 @@ class VettedOtherMemberSerializer(serializers.ModelSerializer):
             'status',
             'current_start_date',
             'application_date',
+            'vetted_date',
             'photo_small',
             'photo_large',
             'public_bio',
             'pinball_score',
             'storage',
+            'discourse_username',
         ]
 
     def get_storage(self, obj):
@@ -288,6 +292,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'is_allowed_entry',
             'mediawiki_username',
             'signup_helper',
+            'discourse_username',
         ]
 
     def get_protocoin(self, obj):
