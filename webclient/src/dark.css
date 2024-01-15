@@ -146,3 +146,33 @@
 	background-color: #fff !important;
 	border-color: #fff !important;
 }
+
+.dark .ui.warning.message .header,
+.dark .ui.warning.message {
+	background-color: #392400;
+	color: #fffaf3;
+}
+
+.dark .ui.info.message .header,
+.dark .ui.info.message {
+	background-color: #003b4e;
+	color: #f8ffff;
+}
+
+.dark .ui.form .field.error .ui.dropdown,
+.dark .ui.form .field.error .ui.dropdown .item,
+.dark .ui.form .field.error .ui.dropdown .text,
+.dark .ui.form .fields.error .field .ui.dropdown,
+.dark .ui.form .fields.error .field .ui.dropdown .item,
+.dark .ui.form .field .prompt.label,
+.dark .ui.error.message .header,
+.dark .ui.error.message {
+	background-color: #380100 !important;
+	color: #fff6f6 !important;
+}
+
+.dark .ui.form .field.error .ui.dropdown .menu .active.item,
+.dark .ui.form .fields.error .field .ui.dropdown .menu .active.item {
+	background-color: #5d0000 !important;
+}
+
