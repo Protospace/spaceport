@@ -257,7 +257,7 @@ export function AccountForm(props) {
 			</div>}
 
 			{member.discourse_username && <Form.Input
-				label='Custom Forum Username'
+				label='Public Forum (Spacebar) Username'
 				autoComplete='off'
 				{...makeProps('discourse_username')}
 			/>}
@@ -265,7 +265,7 @@ export function AccountForm(props) {
 			{member.discourse_username && member.discourse_username !== input.discourse_username &&
 				<Message info>
 					<Message.Header>Make sure you remember</Message.Header>
-					<p>You'll use this to log into the Protospace Forum (Spacebar).</p>
+					<p>You'll use this to log into the Forum (Spacebar).</p>
 				</Message>
 			}
 
