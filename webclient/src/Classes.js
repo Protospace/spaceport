@@ -793,7 +793,7 @@ export function Class(props) {
 											<Form.Checkbox
 												name='check1'
 												value={check1}
-												label='I understand that instructors are unpaid volunteers and will actually attend'
+												label='I understand that instructors are unpaid volunteers and I will actually attend'
 												onChange={(e, v) => setCheck1(v.checked)}
 											/>
 										</p>
