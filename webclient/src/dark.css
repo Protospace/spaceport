@@ -147,15 +147,24 @@
 	border-color: #fff !important;
 }
 
+.dark .ui.message,
+.dark .ui.warning.message,
+.dark .ui.info.message,
+.dark .ui.error.message {
+	box-shadow: 0 0 0 1px #707070 inset,0 0 0 0 transparent;
+}
+
 .dark .ui.warning.message .header,
 .dark .ui.warning.message {
 	background-color: #392400;
 	color: #fffaf3;
 }
 
+.dark .ui.message .header,
+.dark .ui.message,
 .dark .ui.info.message .header,
 .dark .ui.info.message {
-	background-color: #003b4e;
+	background-color: #003243;
 	color: #f8ffff;
 }
 
