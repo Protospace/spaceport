@@ -218,7 +218,7 @@ export function Home(props) {
 	const [stats, setStats] = useState(JSON.parse(localStorage.getItem('stats', 'false')));
 	const [refreshCount, refreshStats] = useReducer(x => x + 1, 0);
 
-	useEffect(() => {
+	const getStats = () => {
 		requester('/stats/', 'GET', token)
 		.then(res => {
 			setStats(res);
@@ -228,6 +228,16 @@ export function Home(props) {
 			console.log(err);
 			setStats(false);
 		});
+	};
+
+	useEffect(() => {
+		getStats();
+		const interval = setInterval(getStats, 30000);
+		return () => clearInterval(interval);
+	}, []);
+
+	useEffect(() => {
+		getStats();
 	}, [refreshCount, token]);
 
 	const getStat = (x) => stats && stats[x] ? stats[x] : 'Unknown';
