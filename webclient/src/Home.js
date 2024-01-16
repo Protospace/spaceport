@@ -456,7 +456,11 @@ export function Home(props) {
 									<p>Alarm status: Unauthorized</p>
 								}
 
-								{user && <p>Hosting status: {closedStat()}</p>}
+								{user ?
+									<p>Hosting status: {closedStat()}</p>
+								:
+									<p>Hosting status: Unauthorized</p>
+								}
 							</div>
 
 							<SignForm token={token} />
