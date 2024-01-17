@@ -552,6 +552,48 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             self.update_cert(session, member, status)
 
 
+class QuizViewSet(Base):
+    permission_classes = [AllowMetadata | IsAuthenticated]
+
+    @action(detail=True, methods=['post'])
+    def submit(self, request, pk):
+        quiz = pk
+        data = request.data
+        user = request.user
+        member = user.member
+
+        if quiz not in ['sawstop']:
+            raise exceptions.ValidationError(dict(non_field_errors='Unknown quiz.'))
+
+        if quiz == 'sawstop' and member.wood_cert_date:
+            raise exceptions.ValidationError(dict(non_field_errors='Already certified.'))
+
+        # TODO: check if cert requires vetting?
+
+        WOOD1_COURSE = 261
+        attended_wood1 = models.Training.objects.filter(user=user, session__course__id=WOOD1_COURSE, attendance_status='Attended').exists()
+
+        NMO_COURSE = 249
+        attended_nmo = models.Training.objects.filter(user=user, session__course__id=NMO_COURSE, attendance_status='Attended').exists()
+
+        if quiz == 'sawstop' and not attended_nmo:
+            raise exceptions.ValidationError(dict(non_field_errors='You haven\'t attended a New Member Orientation yet.'))
+
+        if quiz == 'sawstop' and not attended_wood1:
+            raise exceptions.ValidationError(dict(non_field_errors='You haven\'t attended a Wood I class yet.'))
+
+        if quiz == 'sawstop' and data.dict() != {'agree1': 'true', 'agree2': 'true', 'agree3': 'true', 'material1': 'true', 'material2': 'false', 'material3': 'true', 'material4': 'true', 'material5': 'true', 'material6': 'true', 'material7': 'true', 'bypass1': 'false', 'bypass2': 'false', 'bypass3': 'true', 'bypass4': 'true', 'bypass5': 'true', 'tested1': 'true', 'tested2': 'false', 'tested3': 'false', 'tested4': 'false', 'tested5': 'true', 'tested6': 'true', 'led1': 'true', 'led2': 'false', 'led3': 'false', 'spin1': 'false', 'spin2': 'true', 'spin3': 'false', 'tape1': 'true', 'tape2': 'false'}:
+            raise exceptions.ValidationError(dict(non_field_errors='At least one answer is incorrect.'))
+
+        logging.info('Granting quiz certification: %s', quiz)
+
+        if quiz == 'sawstop':
+            member.wood_cert_date = utils.today_alberta_tz()
+            member.save()
+
+        return Response(200)
+
+
 class TransactionViewSet(Base, List, Create, Retrieve, Update):
     permission_classes = [AllowMetadata | IsAuthenticated, IsObjOwnerOrAdmin]
     serializer_class = serializers.TransactionSerializer

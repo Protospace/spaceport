@@ -10,6 +10,7 @@ from . import secrets, settings
 
 router = routers.DefaultRouter()
 router.register(r'door', views.DoorViewSet, basename='door')
+router.register(r'quiz', views.QuizViewSet, basename='quiz')
 router.register(r'lockout', views.LockoutViewSet, basename='lockout')
 router.register(r'cards', views.CardViewSet, basename='card')
 router.register(r'stats', views.StatsViewSet, basename='stats')

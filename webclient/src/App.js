@@ -29,6 +29,7 @@ import { Debug } from './Debug.js';
 import { Storage, StorageDetail, ClaimShelf } from './Storage.js';
 import { Garden } from './Garden.js';
 import { Footer } from './Footer.js';
+import { SawstopQuiz } from './Quiz.js';
 import { LCARS1Display, LCARS2Display } from './Display.js';
 
 const APP_VERSION = 6;  // TODO: automate this
@@ -311,6 +312,10 @@ function App() {
 
 									<Route path='/training'>
 										<Training user={user} />
+									</Route>
+
+									<Route path='/quiz/sawstop'>
+										<SawstopQuiz token={token} user={user} refreshUser={refreshUser} />
 									</Route>
 
 									<Route path='/courses/:id'>

@@ -35,7 +35,7 @@ export function CertList(props) {
 				<Table.Row>
 					<Table.Cell>SawStop</Table.Cell>
 					<Table.Cell>{isMobile && 'Enabled: '}{member.wood_cert_date ? 'Yes, ' + member.wood_cert_date : 'No'}</Table.Cell>
-					<Table.Cell><Link to='/courses/463'>SawStop Update</Link></Table.Cell>
+					<Table.Cell><Link to='/quiz/sawstop'>Sawstop Online Quiz</Link></Table.Cell>
 				</Table.Row>
 				<Table.Row>
 					<Table.Cell>Drum Sander</Table.Cell>
@@ -114,14 +114,6 @@ export function Training(props) {
 
 	return (
 		<Container>
-			<Header size='large'>Your Training</Header>
-
-			{user.training.length ?
-				<TrainingList training={user.training} />
-			:
-				<p>No training yet! Sign up for a course to take a class.</p>
-			}
-
 			<Header size='large'>Your Machine Access</Header>
 
 			<p>These control access to the machine lockout devices.</p>
@@ -129,6 +121,14 @@ export function Training(props) {
 			<CertList member={user.member} />
 
 			<p>Access is based on the courses you've taken. If there's any errors, please email <a href='mailto:directors@protospace.ca'>directors@protospace.ca</a>.</p>
+
+			<Header size='large'>Your Training</Header>
+
+			{user.training.length ?
+				<TrainingList training={user.training} />
+			:
+				<p>No training yet! Sign up for a course to take a class.</p>
+			}
 		</Container>
 	);
 };
