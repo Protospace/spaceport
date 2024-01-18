@@ -716,7 +716,7 @@ class PingView(views.APIView):
     permission_classes = [AllowMetadata | IsAuthenticated]
 
     def post(self, request):
-        return Response(200)
+        return Response(dict(app_version=settings.APP_VERSION))
 
 
 class DoorViewSet(viewsets.ViewSet, List):
