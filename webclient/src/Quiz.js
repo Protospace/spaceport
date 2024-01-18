@@ -65,7 +65,7 @@ export function SawstopQuiz(props) {
 
 			<p>
 				This quiz only covers SawStop safety brake features, not how to use a table saw.
-				<b> You must have attended a Wood I class and a New Member Orientation to pass the quiz.</b>
+				<b> You must have attended a Wood I class and a New Member Orientation for the quiz to work.</b>
 			</p>
 
 			<Header size='small'>What can you cut?</Header>
@@ -98,10 +98,10 @@ export function SawstopQuiz(props) {
 
 			<ul>
 				<li>Let the blade spin down to a stop before touching anything. Assume if the blade is spinning it could be triggered.</li>
-				<li>The safety system won't work if the SawStop loses power from the wall or lockout</li>
-				<li>Keep metal things away from the saw. </li>
-				<li>Clean blades before use. Choose blades that don't have coated teeth</li>
-				<li>Only use standard 10” blades with 3/32” to 3/16” kerf</li>
+				<li>Keep metal things away from the saw.</li>
+				<li>The safety system won't work if the SawStop loses power from the yellow on/off switch, RFID lockout, or wall.</li>
+				<li>Clean blades before use. Choose blades that don't have coated teeth.</li>
+				<li>Only use standard 10” blades with 3/32” to 3/16” kerf.</li>
 			</ul>
 
 			{!user.member.wood_cert_date &&
@@ -211,6 +211,34 @@ export function SawstopQuiz(props) {
 							</Form.Field>
 
 							<Form.Field>
+								<label>What materials should never be cut on the SawStop?</label>
+								<Form.Checkbox
+									label='Wet wood'
+									{...makeProps('never1')}
+								/>
+								<Form.Checkbox
+									label='Metal foil-faced foam'
+									{...makeProps('never2')}
+								/>
+								<Form.Checkbox
+									label='Green wood'
+									{...makeProps('never3')}
+								/>
+								<Form.Checkbox
+									label='Carbon fibre'
+									{...makeProps('never4')}
+								/>
+								<Form.Checkbox
+									label='Metals'
+									{...makeProps('never5')}
+								/>
+								<Form.Checkbox
+									label='Pressure treated wood'
+									{...makeProps('never6')}
+								/>
+							</Form.Field>
+
+							<Form.Field>
 								<label>What indicates material conductivity during bypass mode?</label>
 								<Form.Checkbox
 									label='The red LED flashes'
@@ -237,8 +265,12 @@ export function SawstopQuiz(props) {
 									{...makeProps('spin2')}
 								/>
 								<Form.Checkbox
-									label='No'
+									label='Yes, if turned off by the yellow on/off switch'
 									{...makeProps('spin3')}
+								/>
+								<Form.Checkbox
+									label='No'
+									{...makeProps('spin4')}
 								/>
 							</Form.Field>
 

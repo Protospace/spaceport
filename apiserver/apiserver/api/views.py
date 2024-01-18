@@ -582,7 +582,7 @@ class QuizViewSet(Base):
         if quiz == 'sawstop' and not attended_wood1:
             raise exceptions.ValidationError(dict(non_field_errors='You haven\'t attended a Wood I class yet.'))
 
-        if quiz == 'sawstop' and data.dict() != {'agree1': 'true', 'agree2': 'true', 'agree3': 'true', 'material1': 'true', 'material2': 'false', 'material3': 'true', 'material4': 'true', 'material5': 'true', 'material6': 'true', 'material7': 'true', 'bypass1': 'false', 'bypass2': 'false', 'bypass3': 'true', 'bypass4': 'true', 'bypass5': 'true', 'tested1': 'true', 'tested2': 'false', 'tested3': 'false', 'tested4': 'false', 'tested5': 'true', 'tested6': 'true', 'led1': 'true', 'led2': 'false', 'led3': 'false', 'spin1': 'false', 'spin2': 'true', 'spin3': 'false', 'tape1': 'true', 'tape2': 'false'}:
+        if quiz == 'sawstop' and data.dict() != {'agree1': 'true', 'agree2': 'true', 'agree3': 'true', 'material1': 'true', 'material2': 'false', 'material3': 'true', 'material4': 'true', 'material5': 'true', 'material6': 'true', 'material7': 'true', 'bypass1': 'false', 'bypass2': 'false', 'bypass3': 'true', 'bypass4': 'true', 'bypass5': 'true', 'tested1': 'true', 'tested2': 'false', 'tested3': 'false', 'tested4': 'false', 'tested5': 'true', 'tested6': 'true', 'never1': 'false', 'never2': 'true', 'never3': 'false', 'never4': 'true', 'never5': 'true', 'never6': 'false', 'led1': 'true', 'led2': 'false', 'led3': 'false', 'spin1': 'false', 'spin2': 'true', 'spin3': 'false', 'spin4': 'false', 'tape1': 'true', 'tape2': 'false'}:
             raise exceptions.ValidationError(dict(non_field_errors='At least one answer is incorrect.'))
 
         logging.info('Granting quiz certification: %s', quiz)
