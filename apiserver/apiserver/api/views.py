@@ -445,7 +445,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         # always update cert date incase member is returning and gets recertified
         if session.course.id == 249:
             member.orientation_date = check_attendance()
-        elif session.course.id == 463:
+        elif session.course.id in [463, 261]:
             member.wood_cert_date = check_attendance()
         elif session.course.id == 401:
             member.wood2_cert_date = check_attendance()

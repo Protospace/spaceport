@@ -35,7 +35,10 @@ export function CertList(props) {
 				<Table.Row>
 					<Table.Cell>SawStop</Table.Cell>
 					<Table.Cell>{isMobile && 'Enabled: '}{member.wood_cert_date ? 'Yes, ' + member.wood_cert_date : 'No'}</Table.Cell>
-					<Table.Cell><Link to='/quiz/sawstop'>Sawstop Online Quiz</Link></Table.Cell>
+					<Table.Cell>
+						<Link to='/quiz/sawstop'>Sawstop Online Quiz</Link>
+						{' '}or <Link to='/courses/261'>Woodworking Tools 1: Intro to Saws</Link>
+					</Table.Cell>
 				</Table.Row>
 				<Table.Row>
 					<Table.Cell>Drum Sander</Table.Cell>
