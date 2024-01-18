@@ -32,7 +32,7 @@ import { Footer } from './Footer.js';
 import { SawstopQuiz } from './Quiz.js';
 import { LCARS1Display, LCARS2Display } from './Display.js';
 
-const APP_VERSION = 6;  // TODO: automate this
+const APP_VERSION = 7;  // TODO: automate this
 
 function App() {
 	const [token, setToken] = useState(localStorage.getItem('token', ''));
