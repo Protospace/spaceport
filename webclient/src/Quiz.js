@@ -65,7 +65,8 @@ export function SawstopQuiz(props) {
 
 			<p>
 				This quiz only covers SawStop safety brake features, not how to use a table saw.
-				<b> You must have attended a Wood I class and a New Member Orientation for the quiz to work.</b>
+				<b> You must have been marked attended on a Wood I class and a New Member Orientation for the quiz to work.</b>
+				{' '}Check your attendance on the <Link to='/training'>Training page</Link>, contact a director if there's an error.
 			</p>
 
 			<Header size='small'>What can you cut?</Header>
