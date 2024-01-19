@@ -394,9 +394,15 @@ export function AdminMemberPause(props) {
 								</Button>
 							</>
 						:
-							<Button onClick={handleUnpause} loading={loading}>
-								Unpause
-							</Button>
+							<>
+								<p>
+									{result.member.preferred_name} was paused on {result.member.paused_date} by a Director or admin.
+								</p>
+
+								<Button onClick={handleUnpause} loading={loading}>
+									Unpause
+								</Button>
+							</>
 				:
 					<>
 						<p>Pause members who are inactive, former, or on vacation.</p>
