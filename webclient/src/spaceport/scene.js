@@ -1,4 +1,6 @@
 import * as THREE from 'three/build/three.module';
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
+import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect';
 import { Ship } from './Ship';
 import { Laser } from './Laser';
 
@@ -34,12 +36,12 @@ export const scene = ({ ref }) => {
 
 	ref.current.appendChild(renderer.domElement);
 
-	const light1 = new THREE.DirectionalLight('#fff', 1);
+	const light1 = new THREE.DirectionalLight('#fff', 0.2);
 	light1.position.x = 3;
 	light1.position.z = 1;
 	scene.add(light1);
 
-	const light2 = new THREE.PointLight('#fff', 2);
+	const light2 = new THREE.PointLight('#fff', 0.2);
 	light2.position.x = 5;
 	light2.position.y = 5;
 	light2.position.z = 1;
@@ -61,6 +63,26 @@ export const scene = ({ ref }) => {
 	}
 
 
+	const loader = new STLLoader()
+	loader.load(
+		'shelfish.stl',
+		function (geometry) {
+			const shelf_material = new THREE.MeshToonMaterial();
+			const mesh = new THREE.Mesh(geometry, shelf_material);
+			mesh.position.x = -10;
+			mesh.position.y = -5;
+			mesh.position.z = 0;
+			mesh.rotation.x = -3.14 / 2;
+			scene.add(mesh)
+		},
+		(xhr) => {
+			console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+		},
+		(error) => {
+			console.log(error)
+		}
+	)
+
 	let ships = [];
 	let bolts = [];
 
@@ -75,6 +97,8 @@ export const scene = ({ ref }) => {
 		camera.position.set(5, 2, ratio * 4 - 2);
 		camera.lookAt(new THREE.Vector3(0, 0, 0));
 	});
+
+	const effect = new OutlineEffect( renderer );
 
 	const animate = () => {
 		const deltaTime = 0.075;
@@ -126,7 +150,7 @@ export const scene = ({ ref }) => {
 
 	try {
 		animate();
-		renderer.render(scene, camera);
+		effect.render(scene, camera);
 	} catch(err) {
 		renderer.dispose();
 		return;
