@@ -34,7 +34,7 @@ export function SignForm(props) {
 		<Form onSubmit={handleSubmit}>
 			<p>Send a message to the sign:</p>
 
-			<Form.Group>
+			<Form.Group widths='equal'>
 				<Form.Input
 					name='sign'
 					onChange={handleChange}
