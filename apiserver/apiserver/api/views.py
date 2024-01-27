@@ -242,6 +242,7 @@ class MemberViewSet(Base, Retrieve, Update):
             member.wood2_cert_date = None
             member.tormach_cnc_cert_date = None
             member.precix_cnc_cert_date = None
+            member.embroidery_cert_date = None
             member.rabbit_cert_date = None
             member.trotec_cert_date = None
 
@@ -479,6 +480,9 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
                     utils_ldap.add_to_group(member, 'Trotec Users')
                 else:
                     utils_ldap.remove_from_group(member, 'Trotec Users')
+        elif session.course.id == 447:
+            member.embroidery_cert_date = check_attendance()
+
         member.save()
 
     # TODO: turn these into @actions
@@ -790,6 +794,7 @@ class LockoutViewSet(viewsets.ViewSet, List):
             authorization['cnc'] = bool(member.tormach_cnc_cert_date) and authorization['common']
             authorization['tormach_cnc'] = bool(member.tormach_cnc_cert_date) and authorization['common']
             authorization['precix_cnc'] = bool(member.precix_cnc_cert_date) and authorization['common']
+            authorization['embroidery'] = bool(member.embroidery_cert_date) and authorization['common']
 
             active_member_cards[card.card_number] = authorization
 

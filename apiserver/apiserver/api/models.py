@@ -54,6 +54,7 @@ class Member(models.Model):
     wood2_cert_date = models.DateField(blank=True, null=True, default=None)
     tormach_cnc_cert_date = models.DateField(blank=True, null=True, default=None)
     precix_cnc_cert_date = models.DateField(blank=True, null=True, default=None)
+    embroidery_cert_date = models.DateField(blank=True, null=True, default=None)
     rabbit_cert_date = models.DateField(blank=True, null=True, default=None)
     trotec_cert_date = models.DateField(blank=True, null=True, default=None)
     paused_date = models.DateField(blank=True, null=True)

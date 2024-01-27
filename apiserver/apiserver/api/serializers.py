@@ -287,6 +287,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'wood2_cert_date',
             'tormach_cnc_cert_date',
             'precix_cnc_cert_date',
+            'embroidery_cert_date',
             'rabbit_cert_date',
             'trotec_cert_date',
             'is_allowed_entry',

@@ -75,6 +75,11 @@ export function CertList(props) {
 					<Table.Cell>{isMobile && 'Enabled: '}{member.trotec_cert_date ? 'Yes, ' + member.trotec_cert_date : 'No'}</Table.Cell>
 					<Table.Cell><Link to='/courses/321'>Laser: Trotec Course</Link></Table.Cell>
 				</Table.Row>
+				<Table.Row>
+					<Table.Cell>Embroidery Machine</Table.Cell>
+					<Table.Cell>{isMobile && 'Enabled: '}{member.embroidery_cert_date ? 'Yes, ' + member.embroidery_cert_date : 'No'}</Table.Cell>
+					<Table.Cell><Link to='/courses/447'>Embroidery Machine Overview</Link></Table.Cell>
+				</Table.Row>
 			</Table.Body>
 		</Table>
 	);
