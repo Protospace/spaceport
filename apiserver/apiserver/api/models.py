@@ -292,6 +292,7 @@ class StorageSpace(models.Model):
         ('member_shelves', 'Member Shelves'),
         ('lockers', 'Lockers'),
         ('large_project_storage', 'Large Project Storage'),
+        ('accessible_project_storage', 'Accessible Project Storage'),
     ])
     memo = models.TextField(blank=True)
 

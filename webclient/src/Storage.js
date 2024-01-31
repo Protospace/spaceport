@@ -93,6 +93,7 @@ function StorageTable(props) {
 		member_shelves: 'Member Shelves',
 		lockers: 'Lockers',
 		large_project_storage: 'Large Project Storage',
+		accessible_project_storage: 'Accessible Project Storage',
 	};
 
 	return (
@@ -118,11 +119,14 @@ function StorageTable(props) {
 					<Table.Cell>Location:</Table.Cell>
 					<Table.Cell>
 						{locations[storage.location]}
-						<p>
+						{(storage.location === 'member_shelves' || storage.location === 'lockers') && <p>
 							Aisle {storage.shelf_id[0]} <br/>
 							Column {storage.shelf_id[1]} <br/>
 							Row {storage.shelf_id[2]}
-						</p>
+						</p>}
+						{storage.location === 'accessible_project_storage' && <p>
+							By the pinball machine
+						</p>}
 					</Table.Cell>
 				</Table.Row>
 				<Table.Row>
@@ -199,8 +203,9 @@ export function StorageButton(props) {
 
 	const buttonColors = {
 		member_shelves: 'grey',
-		lockers: 'blue',
+		lockers: 'red',
 		large_project_storage: 'brown',
+		accessible_project_storage: 'blue',
 	};
 
 	const handleStorageButton = (e, id) => {
@@ -338,8 +343,9 @@ export function StorageList(props) {
 		<div>
 			<p>
 				<Icon name='circle' color='grey' /> Member shelf <br/>
-				<Icon name='circle' color='blue' /> Locker <br/>
-				<Icon name='circle' color='brown' /> Large project storage
+				<Icon name='circle' color='red' /> Locker <br/>
+				<Icon name='circle' color='brown' /> Large Project Storage <br/>
+				<Icon name='circle' color='blue' /> Accessible Project Storage
 			</p>
 
 			<p>
