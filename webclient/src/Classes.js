@@ -83,10 +83,7 @@ function ClassTable(props) {
 							<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
 							<Table.Cell>
 								{!!x.max_students ?
-									x.max_students <= x.student_count ?
-										'Full'
-									:
-										x.student_count + ' / ' + x.max_students
+									x.student_count + ' / ' + x.max_students
 								:
 									x.student_count
 								}
