@@ -5,7 +5,7 @@ django.setup()
 import csv
 from apiserver.api import models
 
-sessions = models.Session.objects.filter(datetime__gte='2021-01-01')
+sessions = models.Session.objects.filter(datetime__gte='2022-01-01')
 
 with open('output.csv', 'w', newline='') as csvfile:
     fields = ['date', 'name', 'num_students','attended']
