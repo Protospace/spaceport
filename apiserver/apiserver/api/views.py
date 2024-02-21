@@ -1999,6 +1999,27 @@ class HostingViewSet(Base):
         return Response(scores)
 
 
+class SignupHelperViewSet(Base):
+    @action(detail=False, methods=['get'])
+    def high_scores(self, request):
+        members = models.Member.objects.all()
+        members = members.annotate(
+            signups=Count('user__signed_up', filter=Q(user__signed_up__status__in=['Current', 'Prepaid']), distinct=True),
+            #signups=Count('user__signed_up', filter=Q(user__signed_up__user__transactions__isnull=False), distinct=True),
+        ).exclude(signups=0).order_by('-signups')
+
+        helpers = []
+
+        for member in members:
+            helpers.append(dict(
+                name=member.preferred_name + ' ' + member.last_name[0],
+                signups=member.signups,
+                member_id=member.id,
+            ))
+
+        return Response(helpers)
+
+
 class StorageSpaceViewSet(Base, List, Retrieve, Update):
     permission_classes = [AllowMetadata | IsAuthenticated, IsAdminOrReadOnly]
     queryset = models.StorageSpace.objects.all().select_related('user__member').order_by('id')

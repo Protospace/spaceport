@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import moment from 'moment-timezone';
-import { Button, Container, Header } from 'semantic-ui-react';
+import { Button, Container, Header, Icon } from 'semantic-ui-react';
 import { requester } from './utils.js';
 import { TrotecUsage } from './Usage.js';
 
@@ -94,7 +94,7 @@ export function LCARS2Display(props) {
 				</div>
 
 				<div className='display-scores'>
-					<DisplayHosting />
+					<DisplaySignups />
 				</div>
 			</div>
 		</Container>
@@ -279,6 +279,42 @@ export function DisplayMonthlyHosting(props) {
 				<div key={i}>
 					<Header size='medium'>#{i+1} — {x.name}. {i === 0 ? '🚀' : ''}</Header>
 					<p>{x.hours.toFixed(2)} hours</p>
+				</div>
+			)}
+
+		</>
+	);
+};
+
+export function DisplaySignups(props) {
+	const { token, name } = props;
+	const [scores, setScores] = useState(false);
+
+	const getScores = () => {
+		requester('/signuphelper/high_scores/', 'GET')
+		.then(res => {
+			setScores(res);
+		})
+		.catch(err => {
+			console.log(err);
+			setScores(false);
+		});
+	};
+
+	useEffect(() => {
+		getScores();
+		const interval = setInterval(getScores, 60000);
+		return () => clearInterval(interval);
+	}, []);
+
+	return (
+		<>
+			<Header size='large'>Most 🟢 Signups</Header>
+
+			{scores && scores.slice(0, 5).map((x, i) =>
+				<div key={i}>
+					<Header size='medium'>#{i+1} — {x.name}. {i === 0 ? '📝' : ''}</Header>
+					<p>{x.signups} signups</p>
 				</div>
 			)}
 
