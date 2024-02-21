@@ -30,6 +30,8 @@ class LoggingThrottle(throttling.BaseThrottle):
             '/protocoin/printer_balance/',
             '/hosting/high_scores/',
             '/hosting/monthly_high_scores/',
+            '/signuphelper/high_scores/',
+            '/signuphelper/monthly_high_scores/',
             '/stats/ord2/printer3d/',
             '/stats/ord3/printer3d/',
             '/stats/p1s1/printer3d/',
