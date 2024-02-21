@@ -1810,6 +1810,9 @@ class PinballViewSet(Base):
         except ValueError:
             raise exceptions.ValidationError(dict(score='Invalid number.'))
 
+        if score % 10:
+            raise exceptions.ValidationError(dict(score='Score must end in a 0.'))
+
         _ = models.PinballScore.objects.update_or_create(
             game_id=game_id,
             player=player,
