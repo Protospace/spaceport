@@ -15,6 +15,7 @@ export function Charts(props) {
 	const [signupCount, setSignupCount] = useState(signupCountCache);
 	const [spaceActivity, setSpaceActivity] = useState(spaceActivityCache);
 	const [fullActivity, setFullActivity] = useState(false);
+	const [fullSignups, setFullSignups] = useState(false);
 	const [classroomDustLevel, setClassroomDustLevel] = useState(classroomDustLevelCache);
 	const [woodshopDustLevel, setWoodshopDustLevel] = useState(woodshopDustLevelCache);
 
@@ -295,7 +296,7 @@ export function Charts(props) {
 			<Header size='medium'>Space Activity</Header>
 
 			{fullActivity ?
-				<p>Daily since March 7th, 2020, updates hourly.</p>
+				<p>Daily since March 7th 2020, updates hourly.</p>
 			:
 				<p>
 					Last four weeks, updates hourly.
@@ -330,12 +331,20 @@ export function Charts(props) {
 
 			<Header size='medium'>Signup Count</Header>
 
-			<p>Monthly for the last sixteen months, updates daily.</p>
+
+			{fullSignups ?
+				<p>Monthly since January 2019, updates daily.</p>
+			:
+				<p>
+					Monthly for the last sixteen months, updates daily.
+					{' '}<Button size='tiny' onClick={() => setFullSignups(true)} >View All</Button>
+				</p>
+			}
 
 			<p>
 				{signupCount &&
 					<ResponsiveContainer width='100%' height={300}>
-						<BarChart data={signupCount}>
+						<BarChart data={fullSignups ? signupCount : signupCount.slice(-16)}>
 							<XAxis dataKey='month' minTickGap={10} />
 							<YAxis />
 							<CartesianGrid strokeDasharray='3 3'/>

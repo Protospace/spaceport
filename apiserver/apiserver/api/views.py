@@ -1148,11 +1148,8 @@ class MemberCountViewSet(Base, List):
 
 class SignupCountViewSet(Base, List):
     pagination_class = None
+    queryset = models.StatsSignupCount.objects.all()
     serializer_class = serializers.SignupCountSerializer
-
-    def get_queryset(self):
-        # have to use method as slicing breaks makemigrations
-        return models.StatsSignupCount.objects.order_by('-month')[:16][::-1]
 
 class SpaceActivityViewSet(Base, List):
     pagination_class = None
