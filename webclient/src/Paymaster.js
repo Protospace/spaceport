@@ -38,7 +38,7 @@ export function PayWithProtocoin(props) {
 
 	return (
 		<Form onSubmit={handleSubmit}>
-			<Form.Button disabled={!amount} color='green' loading={loading} error={error.amount}>
+			<Form.Button disabled={!amount} color='green' loading={loading} error={error.amount || error.balance}>
 				Pay with Protocoin
 			</Form.Button>
 			{success && <div>Success!</div>}
@@ -104,7 +104,7 @@ export function SendProtocoin(props) {
 				/>
 			</Form.Group>
 
-			<Form.Button loading={loading} error={error.non_field_errors}>
+			<Form.Button loading={loading} error={error.non_field_errors || error.balance}>
 				Send
 			</Form.Button>
 			{success && <div>Success!</div>}
