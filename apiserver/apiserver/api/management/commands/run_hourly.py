@@ -168,8 +168,8 @@ class Command(BaseCommand):
         self.generate_stats()
         self.stdout.write('Generated stats')
 
-        count = self.send_class_reminders()
-        self.stdout.write('Sent {} class reminders'.format(count))
+        #count = self.send_class_reminders()
+        #self.stdout.write('Sent {} class reminders'.format(count))
 
         count = self.send_attendance_reminders()
         self.stdout.write('Sent {} attendance reminders'.format(count))

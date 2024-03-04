@@ -53,8 +53,8 @@ class Command(BaseCommand):
         self.stdout.write('{} - Beginning weekly tasks'.format(str(now())))
         start = time.time()
 
-        count = self.send_rate_reminder()
-        self.stdout.write('Reminded {} subsidized members'.format(count))
+        #count = self.send_rate_reminder()
+        #self.stdout.write('Reminded {} subsidized members'.format(count))
 
         self.stdout.write('Completed tasks in {} s'.format(
             str(time.time() - start)[:4]
