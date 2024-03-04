@@ -739,7 +739,7 @@ export function Class(props) {
 
 							<p/>
 
-							<p>Current Protocoin balance: ₱&thinsp;{user.member.protocoin.toFixed(2)}</p>
+							<p>Current <Link to='/paymaster'>Protocoin</Link> balance: ₱&thinsp;{user.member.protocoin.toFixed(2)}</p>
 
 							<PayWithProtocoin
 								token={token} user={user} refreshUser={refreshUser}
