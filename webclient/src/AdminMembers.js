@@ -426,6 +426,8 @@ export function AdminMemberPause(props) {
 							/>
 						</div>
 
+						<p>If the member is having trouble cancelling any PayPal subscriptions, follow <a href="https://forum.protospace.ca/t/how-to-cancel-a-paypal-subscription-from-our-side/6141" target="_blank">these steps</a>.</p>
+
 						<Button onClick={handlePause} loading={loading} disabled={!told1 || !told2}>
 							Pause
 						</Button>
@@ -792,10 +794,10 @@ export function AdminMemberCertifications(props) {
 						<Table.Cell><AdminCert name='Precix CNC' field='precix_cnc_cert_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Cell>Rabbit Laser</Table.Cell>
+						<Table.Cell>Thunder Laser</Table.Cell>
 						<Table.Cell>{member.rabbit_cert_date ? 'Yes, ' + member.rabbit_cert_date : 'No'}</Table.Cell>
 						<Table.Cell><Link to='/courses/247'>Laser: Cutting and Engraving</Link></Table.Cell>
-						<Table.Cell><AdminCert name='Rabbit' field='rabbit_cert_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
+						<Table.Cell><AdminCert name='Thunder' field='rabbit_cert_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
 					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Trotec Laser</Table.Cell>
