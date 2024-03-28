@@ -393,7 +393,7 @@ export function Home(props) {
 								</p>
 
 								<p>
-									Rabbit availability: {getTrackStat('FRICKIN-LASER')} <Popup content={
+									Thunder availability: {getTrackStat('FRICKIN-LASER')} <Popup content={
 										<React.Fragment>
 											<p>
 												Last use:<br />

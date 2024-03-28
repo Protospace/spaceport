@@ -66,7 +66,7 @@ export function CertList(props) {
 					<Table.Cell><Link to='/courses/428'>Basic CNC Wood Router</Link></Table.Cell>
 				</Table.Row>
 				<Table.Row>
-					<Table.Cell>Rabbit Laser</Table.Cell>
+					<Table.Cell>Thunder Laser</Table.Cell>
 					<Table.Cell>{isMobile && 'Enabled: '}{member.rabbit_cert_date ? 'Yes, ' + member.rabbit_cert_date : 'No'}</Table.Cell>
 					<Table.Cell><Link to='/courses/247'>Laser: Cutting and Engraving</Link></Table.Cell>
 				</Table.Row>
