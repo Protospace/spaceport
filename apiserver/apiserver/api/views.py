@@ -342,11 +342,27 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
             logging.info('Session is in the past or too soon, not sending interest emails.')
             return
 
+        max_students = session.max_students or 0
+        unlimited_students = max_students == 0
+
+        # ensure session has enough slots available before sending emails
+        if not unlimited_students and max_students <= 2:
+            logging.info('Session doesn\'t have enough slots, not sending interest emails.')
+            return
+
+        num_emails_to_send = max_students * 3
+
+        if num_emails_to_send > 20:
+            num_emails_to_send = 20
+
+        if unlimited_students:
+            num_emails_to_send = 20
+
         interests = models.Interest.objects.filter(
             course=session.course,
             satisfied_by__isnull=True,
             user__member__paused_date__isnull=True
-        )[:20]
+        )[:num_emails_to_send]
 
         for num, interest in enumerate(interests):
             msg = 'Sending email {} / {}...'.format(num+1, len(interests))
