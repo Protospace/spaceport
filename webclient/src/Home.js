@@ -393,13 +393,13 @@ export function Home(props) {
 								</p>
 
 								<p>
-									Thunder availability: {getTrackStat('FRICKIN-LASER')} <Popup content={
+									Thunder availability: {getTrackStat('THUNDERLASER')} <Popup content={
 										<React.Fragment>
 											<p>
 												Last use:<br />
-												{getTrackLast('FRICKIN-LASER')}<br />
-												{getTrackAgo('FRICKIN-LASER')}<br />
-												by {getTrackName('FRICKIN-LASER')}
+												{getTrackLast('THUNDERLASER')}<br />
+												{getTrackAgo('THUNDERLASER')}<br />
+												by {getTrackName('THUNDERLASER')}
 											</p>
 										</React.Fragment>
 									} trigger={<a>[more]</a>} />
