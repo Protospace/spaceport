@@ -254,15 +254,19 @@ export function Members(props) {
 
 												<Item.Description>Vetted: {x.member.vetted_date || 'Probationary'}</Item.Description>
 
-												<Item.Description>
-													Shelf: {x.member.storage.length ?
-														x.member.storage.sort((a, b) => a.location === 'member_shelves' ? -1 : 1).map((x, i) =>
-															<StorageButton storage={x} />
-														)
-													:
-														'None'
-													}
-												</Item.Description>
+												{sort === 'newest_active' ?
+													<Item.Description>Helper: {x.member?.signup_helper?.name || 'Unknown'}</Item.Description>
+												:
+													<Item.Description>
+														Shelf: {x.member.storage.length ?
+															x.member.storage.sort((a, b) => a.location === 'member_shelves' ? -1 : 1).map((x, i) =>
+																<StorageButton storage={x} />
+															)
+														:
+															'None'
+														}
+													</Item.Description>
+												}
 
 												<Item.Description>
 													{x.member.public_bio.substring(0, 100)}
@@ -312,7 +316,7 @@ export function MemberDetail(props) {
 			console.log(err);
 			setError(true);
 		});
-	}, [refreshCount]);
+	}, [id, refreshCount]);
 
 
 	function sponsorMember (value) {
@@ -335,7 +339,7 @@ export function MemberDetail(props) {
 	return (
 		<Container>
 			{!error ?
-				member ?
+				member && member.id === id ?
 					<div>
 						<Header size='large'>{member.preferred_name} {member.last_name}</Header>
 
@@ -421,6 +425,16 @@ export function MemberDetail(props) {
 													<Table.Row>
 														<Table.Cell>Vetted:</Table.Cell>
 														<Table.Cell>{member.vetted_date ? member.vetted_date + ' ✅' : 'Probationary'}</Table.Cell>
+													</Table.Row>
+													<Table.Row>
+														<Table.Cell>Signup Helper:</Table.Cell>
+														<Table.Cell>
+															{member.signup_helper ?
+																<Link to={'/members/'+member.signup_helper.id}>{member.signup_helper.name}</Link>
+															:
+																'Unknown'
+															}
+														</Table.Cell>
 													</Table.Row>
 													<Table.Row>
 														<Table.Cell>Public Bio:</Table.Cell>

@@ -220,6 +220,7 @@ class OtherMemberSerializer(serializers.ModelSerializer):
 class VettedOtherMemberSerializer(serializers.ModelSerializer):
     pinball_score = serializers.IntegerField(required=False)
     storage = serializers.SerializerMethodField()
+    signup_helper = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Member
@@ -236,6 +237,7 @@ class VettedOtherMemberSerializer(serializers.ModelSerializer):
             'public_bio',
             'pinball_score',
             'storage',
+            'signup_helper',
             'discourse_username',
         ]
 
@@ -243,6 +245,12 @@ class VettedOtherMemberSerializer(serializers.ModelSerializer):
         serializer = StorageSpaceSerializer(data=obj.user.storage, many=True)
         serializer.is_valid()
         return serializer.data
+
+    def get_signup_helper(self, obj):
+        if not obj.signup_helper: return None
+        member = obj.signup_helper.member
+        name = member.preferred_name + ' ' + member.last_name
+        return dict(name=name, id=member.id)
 
 
 # member viewing his own details
@@ -255,6 +263,7 @@ class MemberSerializer(serializers.ModelSerializer):
     sponsorship = OtherMemberSerializer(many=True, read_only=True)
     sponsored_by = OtherMemberSerializer(many=True, read_only=True)
     total_protocoin = serializers.SerializerMethodField()
+    signup_helper = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Member
@@ -305,6 +314,12 @@ class MemberSerializer(serializers.ModelSerializer):
         transactions = models.Transaction.objects
         total = transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
         return total
+
+    def get_signup_helper(self, obj):
+        if not obj.signup_helper: return None
+        member = obj.signup_helper.member
+        name = member.preferred_name + ' ' + member.last_name
+        return dict(name=name, id=member.id)
 
     def update(self, instance, validated_data):
         instance.user.email = validated_data.get('email', instance.user.email)
