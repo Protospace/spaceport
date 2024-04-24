@@ -187,6 +187,7 @@ class OtherMemberSerializer(serializers.ModelSerializer):
     pinball_score = serializers.IntegerField(required=False)
     last_name = serializers.SerializerMethodField()
     storage = serializers.SerializerMethodField()
+    signup_helper = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Member
@@ -202,6 +203,7 @@ class OtherMemberSerializer(serializers.ModelSerializer):
             'public_bio',
             'pinball_score',
             'storage',
+            'signup_helper',
             'discourse_username',
         ]
 
@@ -215,6 +217,12 @@ class OtherMemberSerializer(serializers.ModelSerializer):
         serializer = SimpleStorageSpaceSerializer(data=obj.user.storage, many=True)
         serializer.is_valid()
         return serializer.data
+
+    def get_signup_helper(self, obj):
+        if not obj.signup_helper: return None
+        member = obj.signup_helper.member
+        name = member.preferred_name + ' ' + member.last_name[0] + '.'
+        return dict(name=name, id=member.id)
 
 # vetted member viewing other members
 class VettedOtherMemberSerializer(serializers.ModelSerializer):
