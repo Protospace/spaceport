@@ -337,6 +337,13 @@ class MemberSerializer(serializers.ModelSerializer):
         if helper_id:
             signup_helper = get_object_or_404(models.Member, id=helper_id)
             instance.signup_helper = signup_helper.user
+        elif (
+            # only require helper_id for new members after 2024-04-23, not returning old members
+            not helper_id
+            and instance.set_details == False
+            and instance.application_date > datetime.date(2024, 4, 23)
+        ):
+            raise ValidationError(dict(helper_id='This field is required.'))
 
         is_student = self.initial_data.get('is_student', False)
         if is_student:

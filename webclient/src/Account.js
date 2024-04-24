@@ -318,7 +318,7 @@ export function AccountForm(props) {
 				/>
 			</Form.Field>}
 
-			{isSignup && <Form.Field error={error.member_id}>
+			{isSignup && <Form.Field required error={error.helper_id}>
 				<label>Who helped you sign up? (search)</label>
 				<MembersDropdown
 					token={token}
