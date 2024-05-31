@@ -277,7 +277,7 @@ export function Home(props) {
 		const online = data?.info?.online;
 
 		if (!data || !info || !online) {
-			return 'Unknown / Bad connection';
+			return 'Unknown / Offline';
 		}
 
 		const gcode_states = {IDLE: 'Idle', FINISH: 'Finished', RUNNING: 'Running', PAUSE: 'Paused', FAILED: 'Failed', PREPARE: 'Preparing'};
@@ -439,6 +439,17 @@ export function Home(props) {
 								</p>
 
 								<p>P1S printer: {p1sPrinter3dStat('p1s1')}</p>
+
+								{stats && stats?.solar?.hasOwnProperty('total') && <p>
+									Members' solar power: {stats.solar.total.toLocaleString()} W <Popup content={
+										<React.Fragment>
+											<p>
+												Live rooftop solar production amounts:<br /><br />
+												{Object.entries(stats.solar.users).map(([user, data]) => <>{user}: {data.power.toLocaleString()} W {moment().unix() - data.time > 1800 ? 'Error?' : ''}<br/></>)}
+											</p>
+										</React.Fragment>
+									} trigger={<a>[more]</a>} />
+								</p>}
 
 								{user ?
 									<p>

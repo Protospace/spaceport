@@ -1155,6 +1155,34 @@ class StatsViewSet(viewsets.ViewSet, List):
 
         return Response(200)
 
+    @action(detail=False, methods=['post'])
+    def solar_data(self, request):
+        solar = cache.get('solar', {})
+
+        if 'user' not in request.data:
+            raise exceptions.ValidationError(dict(user='This field is required.'))
+
+        if 'power' not in request.data:
+            raise exceptions.ValidationError(dict(power='This field is required.'))
+
+        user = request.data['user']
+        power = request.data['power']
+
+        if 'users' not in solar:
+            solar['users'] = {}
+
+        solar['users'][user] = dict(power=int(power), time=time.time())
+
+        total = 0
+        for solar_user in solar['users'].values():
+            if time.time() - solar_user['time'] < 1800:
+                total += solar_user['power']
+        solar['total'] = total
+
+        cache.set('solar', solar)
+
+        return Response(200)
+
 
 
 class MemberCountViewSet(Base, List):

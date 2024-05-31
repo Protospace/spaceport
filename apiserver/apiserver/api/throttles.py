@@ -35,6 +35,7 @@ class LoggingThrottle(throttling.BaseThrottle):
             '/stats/ord2/printer3d/',
             '/stats/ord3/printer3d/',
             '/stats/p1s1/printer3d/',
+            '/stats/solar_data/',
         ]:
             return True
 

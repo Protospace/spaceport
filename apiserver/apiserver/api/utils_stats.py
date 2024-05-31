@@ -31,6 +31,7 @@ DEFAULTS = {
     'last_scan': {},
     'closing': {},
     'printer3d': {},
+    'solar': {},
 }
 
 if secrets.MUMBLE:
