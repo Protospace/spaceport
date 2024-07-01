@@ -4,7 +4,7 @@ django.setup()
 
 import datetime
 import json
-from apiserver.api import models, old_models, utils
+from apiserver.api import models, utils
 
 def find_name(t):
     try:
@@ -28,6 +28,9 @@ def build_tx(t):
     t_info = t['transaction_info']
     p_info = t['payer_info']
     amount = float(t_info['transaction_amount']['value'])
+
+    refund_text = 'Refund - ' if amount < 0 else ''
+
     return dict(
         account_type='PayPal',
         amount=amount,
@@ -37,7 +40,7 @@ def build_tx(t):
         paypal_payer_id=t_info['paypal_account_id'],
         paypal_txn_id=t_info['transaction_id'],
         reference_number=t_info['transaction_id'],
-        memo=t_info.get('transaction_subject', 'no memo') + ' (import missing paypal script)',
+        memo=refund_text + t_info.get('transaction_subject', 'no memo') + ' (import missing paypal script)',
     )
 
 def create_unmatched_member_tx(t):
@@ -45,10 +48,12 @@ def create_unmatched_member_tx(t):
     p_info = t['payer_info']
     transactions = models.Transaction.objects
 
-    report_memo = 'Cant link sender name, {}, email: {}, note: {}'.format(
+    report_memo = 'Cant link sender name, {}, email: {}, note: {} - {} {}'.format(
         find_name(t),
         p_info['email_address'],
-        '(import missing paypal script)',
+        t_info.get('transaction_subject', ''),
+        t_info.get('custom_field', ''),
+        '(import missing script)',
     )
 
     return transactions.create(
@@ -81,9 +86,11 @@ def create_unmatched_purchase_tx(t, member):
     transactions = models.Transaction.objects
 
     user = getattr(member, 'user', None)
-    report_memo = 'Unknown payment reason, {}, email: {}, note: {}'.format(
+    report_memo = 'Unknown payment reason, {}, email: {}, note: {} - {} {}'.format(
         find_name(t),
         p_info['email_address'],
+        t_info.get('transaction_subject', ''),
+        t_info.get('custom_field', ''),
         '(import missing paypal script)',
     )
 
@@ -119,10 +126,17 @@ num_noreason = 0
 for filename in paypal_json:
     with open(PAYPAL_FOLDER + filename) as f:
         j = json.load(f)
-        paypal_txs.extend(j['transaction_details'])
+        paypal_txs.extend(j)
 
 print('Num transactions found:', len(paypal_txs))
 print('Importing transactions into portal...')
+
+refs = transactions.values_list('reference_number', flat=True)
+existing_ids = set()
+for r in refs:
+    if r:
+        existing_ids.add(r[:11])
+print('Populated', len(existing_ids), 'existing IDs.')
 
 for t in paypal_txs:
     t_info = t['transaction_info']
@@ -138,29 +152,28 @@ for t in paypal_txs:
 
     reference = t_info['transaction_id'][:11]
 
-    similar = transactions.filter(reference_number__startswith=reference)
-    if similar.exists():
-        tx = similar.first()
-        print('Skipping tx id: {}, transaction already in portal:'.format(
-            t_info['transaction_id'],
-        ))
-        print('https://spaceport.dns.t0.vc/transactions/'+str(tx.id))
+    if reference in existing_ids:
+        print('Skipping tx id:', reference, ', transaction already in portal.')
         print()
         continue
     
-    print('Inspecting tx id:', t_info['transaction_id'])
+    print('Inspecting new tx id:', t_info['transaction_id'])
+    print(t)
+
+    existing_ids.add(reference)
 
     if not hints.filter(account=t_info['paypal_account_id']).exists():
         print('Unable to associate with member, reporting')
         create_unmatched_member_tx(t)
         num_unmatched += 1
+        print()
         continue
 
     amount = float(t_info['transaction_amount']['value'])
 
-    member_id = hints.get(account=t_info['paypal_account_id']).member_id
-    member = members.get(id=member_id)
-    print('Found member', member.first_name, member.last_name)
+    user = hints.get(account=t_info['paypal_account_id']).user
+    member = user.member
+    print('Found member', member.preferred_name, member.last_name)
     monthly_fees = member.monthly_fees
 
     if amount.is_integer() and monthly_fees and amount % monthly_fees == 0:
@@ -172,11 +185,13 @@ for t in paypal_txs:
         print('Amount valid for membership dues, adding months:', num_months)
         create_member_dues_tx(t, member, num_months)
         num_dues += 1
+        print()
         continue
 
     print('Unable to find a reason for payment, reporting')
     create_unmatched_purchase_tx(t, member)
     num_noreason += 1
+    print()
 
 
 print('Num unmatched members:', num_unmatched)
