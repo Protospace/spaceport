@@ -350,6 +350,7 @@ class MemberSerializer(serializers.ModelSerializer):
             not helper_id
             and instance.set_details == False
             and instance.application_date > datetime.date(2024, 4, 23)
+            and models.Member.objects.count() > 1
         ):
             raise ValidationError(dict(helper_id='This field is required.'))
 
