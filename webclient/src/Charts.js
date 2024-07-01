@@ -70,7 +70,7 @@ export function Charts(props) {
 		<Container>
 			<Header size='large'>Charts</Header>
 
-			{memberCount && signupCount &&
+			{memberCount.length > 30 && signupCount.length > 1 &&
 				<>
 					<div className='chartstats'>
 						<Statistic
