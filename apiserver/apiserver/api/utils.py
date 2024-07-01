@@ -471,6 +471,15 @@ def register_user(data, user):
         logger.exception(msg)
         alert_tanner(msg)
 
+    if user.id == 1:
+        logging.info('First user created, granting portal staff and vetting.')
+        user.is_staff = True
+        user.is_superuser = True
+        user.save()
+
+        user.member.vetted_date = today_alberta_tz()
+        user.member.save()
+
 
     if data['request_id']: utils_stats.set_progress(data['request_id'], 'Done!')
 

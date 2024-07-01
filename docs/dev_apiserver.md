@@ -46,13 +46,6 @@ Set up the database:
 (env) $ python manage.py migrate
 ```
 
-Create a super user so you can manage who's a director or staff. This is a special
-account and is not treated as a member.
-
-```
-(env) $ python manage.py createsuperuser --email admin@example.com --username admin
-```
-
 Generate static web files:
 
 ```

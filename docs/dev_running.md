@@ -15,15 +15,9 @@ Fill out the "Sign Up to Spaceport" form. If you see a "Please Visit Protospace"
 warning, this means the web client can't talk to the API server properly. Hit
 Sign Up and finish the registration.
 
-Navigate to [http://127.0.0.1:8000/admin/api/member/1/change/](http://127.0.0.1:8000/admin/api/member/1/change/) and log in with the
-super user credentials you created during the API server setup.
-
-Scroll down and check "Is staff" and click today by "Vetted date".
-
-Scroll to the bottom and click "Save".
-
-Go back and refresh Spaceport. You should now be Staff, which grants you the
-same powers as a director. Navigate to [http://127.0.0.1:3000/admin](http://127.0.0.1:3000/admin) to confirm.
+The first user is automatically granted superuser, staff, and vetted status. You should
+be able to log into the Django admin panel at
+[http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/) if you want to edit database values.
 
 ## Running Cron Jobs
 
