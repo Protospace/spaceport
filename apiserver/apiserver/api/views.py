@@ -594,7 +594,7 @@ class QuizViewSet(Base):
         attended_wood1 = models.Training.objects.filter(user=user, session__course__id=WOOD1_COURSE, attendance_status='Attended').exists()
 
         NMO_COURSE = 249
-        attended_nmo = models.Training.objects.filter(user=user, session__course__id=NMO_COURSE, attendance_status='Attended').exists()
+        attended_nmo = models.Training.objects.filter(user=user, session__course__id=NMO_COURSE, attendance_status='Attended').exists() or member.orientation_date
 
         if quiz == 'sawstop' and not attended_nmo:
             raise exceptions.ValidationError(dict(non_field_errors='You haven\'t attended a New Member Orientation yet.'))
