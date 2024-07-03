@@ -101,7 +101,7 @@ export function AdminVetting(props) {
 						<p>
 							{displayAll ?
 								<>
-									&#8627; <a href={'mailto:'+vetting.map(x => x.email).join(',')}>Email All</a>
+									&#8627; <a href={'mailto:'+vetting.filter(x => x.orientation_date).map(x => x.email).join(',')}>Email All</a>
 								</>
 							:
 								<Button onClick={() => setShowAll(true)}>Show All</Button>
