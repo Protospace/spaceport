@@ -1923,9 +1923,9 @@ class PinballViewSet(Base):
 class HostingViewSet(Base):
     @action(detail=False, methods=['post'])
     def offer(self, request):
-        #auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-        #if secrets.PINBALL_API_TOKEN and auth_token != 'Bearer ' + secrets.PINBALL_API_TOKEN:
-        #    raise exceptions.PermissionDenied()
+        auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if secrets.VANGUARD_API_TOKEN and auth_token != 'Bearer ' + secrets.VANGUARD_API_TOKEN:
+            raise exceptions.PermissionDenied()
 
         try:
             member_id = int(request.data['member_id'])
