@@ -312,7 +312,11 @@ export function Home(props) {
 				<Grid.Column>
 					{user ?
 						user.member.set_details ?
-							<MemberInfo user={user} />
+							<>
+								{user && !user.member.vetted_date && <p>Hosting status: <b>{closedStat()}</b><br/>This indicates when a volunteer has offered to host new members (you) at the space. You can show up and ring the doorbell when it's "open".<br/><br/></p>}
+
+								<MemberInfo user={user} />
+							</>
 						:
 							<AccountForm {...props} isSignup={true} />
 					:
