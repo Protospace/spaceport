@@ -128,7 +128,7 @@ export function SawstopQuiz(props) {
 							</Form.Field>
 
 							<Form.Field>
-								<label>What materials can lead to false activations of the SawStop?</label>
+								<label>What materials can lead to an accidental activation of the SawStop?</label>
 								<Form.Checkbox
 									label='Wet wood'
 									{...makeProps('material1')}
@@ -256,7 +256,7 @@ export function SawstopQuiz(props) {
 							</Form.Field>
 
 							<Form.Field>
-								<label>Can the SawStop trigger while spinning down?</label>
+								<label>Can the SawStop trigger while spinning down normally?</label>
 								<Form.Checkbox
 									label='Yes, if turned off by the lockout button'
 									{...makeProps('spin1')}
@@ -276,7 +276,7 @@ export function SawstopQuiz(props) {
 							</Form.Field>
 
 							<Form.Field>
-								<label>Can a metal tape measure trigger it while spinning down?</label>
+								<label>Can a metal tape measure trigger it while spinning down normally?</label>
 								<Form.Checkbox
 									label='Yes'
 									{...makeProps('tape1')}
