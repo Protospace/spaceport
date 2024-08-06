@@ -288,7 +288,10 @@ class CourseViewSet(Base, List, Retrieve, Create, Update):
     permission_classes = [AllowMetadata | IsAuthenticatedOrReadOnly, IsAdminOrReadOnly | IsInstructorOrReadOnly]
     queryset = models.Course.objects.annotate(
         recent_date=Max('sessions__datetime'),
-        num_interested=Count('interests', filter=Q(interests__satisfied_by__isnull=True), distinct=True),
+        num_interested=Count('interests', filter=Q(
+            interests__satisfied_by__isnull=True,
+            interests__user__member__paused_date__isnull=True,
+        ), distinct=True),
     ).order_by(
         '-num_interested',
         '-recent_date',
