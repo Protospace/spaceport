@@ -1503,6 +1503,8 @@ class ProtocoinViewSet(Base):
                 except ValueError:
                     raise exceptions.ValidationError(dict(amount='Invalid number.'))
 
+                user_memo = request.data.get('memo', '')
+
                 # also prevents negative spending
                 if amount < 1.00:
                     raise exceptions.ValidationError(dict(amount='Amount too small.'))
@@ -1533,6 +1535,9 @@ class ProtocoinViewSet(Base):
                     destination_member.preferred_name + ' ' + destination_member.last_name,
                     destination_member.id,
                 )
+
+                if user_memo:
+                    memo += ', memo: ' + user_memo
 
                 tx = models.Transaction.objects.create(
                     user=source_user,

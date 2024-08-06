@@ -53,6 +53,7 @@ export function SendProtocoin(props) {
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
+	const [memo, setMemo] = useState('');
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
@@ -104,9 +105,18 @@ export function SendProtocoin(props) {
 				/>
 			</Form.Group>
 
-			<Form.Button loading={loading} error={error.non_field_errors || error.balance}>
-				Send
-			</Form.Button>
+			<Form.Group widths='equal'>
+				<Form.Input
+					label='Optional memo'
+					fluid
+					{...makeProps('memo')}
+				/>
+
+				<Form.Button loading={loading} error={error.non_field_errors || error.balance}>
+					Send
+				</Form.Button>
+			</Form.Group>
+
 			{success && <div>Success!</div>}
 		</Form>
 	);
