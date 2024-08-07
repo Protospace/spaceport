@@ -288,7 +288,7 @@ export function Paymaster(props) {
 
 			<Header size='medium'>Locker Storage</Header>
 
-			<p>Confirm location and availability with <Link to='/members/392'>Scott Young</Link> before subscribing.</p>
+			<p>Confirm location and availability with a Director before subscribing.</p>
 
 			<Grid stackable padded columns={1}>
 				<Grid.Column>
