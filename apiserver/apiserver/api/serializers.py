@@ -310,7 +310,6 @@ class MemberSerializer(serializers.ModelSerializer):
             'is_allowed_entry',
             'mediawiki_username',
             'signup_helper',
-            'discourse_username',
         ]
 
     def get_protocoin(self, obj):
