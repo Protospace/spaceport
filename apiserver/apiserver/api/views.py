@@ -1729,12 +1729,6 @@ class ProtocoinViewSet(Base):
                     logger.error(msg)
                     return Response(200)
 
-                if not username:
-                    msg = 'Job {}: missing username, aborting.'.format(job_uuid)
-                    utils.alert_tanner(msg)
-                    logger.error(msg)
-                    return Response(200)
-
                 # status 0 = complete
                 # status 3 = cancelled
 
@@ -1749,14 +1743,6 @@ class ProtocoinViewSet(Base):
 
                 if not is_print:
                     msg = 'Job {} user {}: not a print, aborting.'.format(job_uuid, username)
-                    utils.alert_tanner(msg)
-                    logger.error(msg)
-                    return Response(200)
-
-                try:
-                    user = User.objects.get(username__iexact=username)
-                except User.DoesNotExist:
-                    msg = 'Job {}: unable to find username {}, aborting.'.format(job_uuid, username)
                     utils.alert_tanner(msg)
                     logger.error(msg)
                     return Response(200)
@@ -1787,6 +1773,20 @@ class ProtocoinViewSet(Base):
                 total_cost = round(total_cost, 2)
 
                 logging.info('Total cost: %s protocoin', str(total_cost))
+
+                if not username:
+                    msg = 'Job {}: missing username, aborting. Cost: {}'.format(job_uuid, str(total_cost))
+                    utils.alert_tanner(msg)
+                    logger.error(msg)
+                    return Response(200)
+
+                try:
+                    user = User.objects.get(username__iexact=username)
+                except User.DoesNotExist:
+                    msg = 'Job {}: unable to find username {}, aborting. Cost: {}'.format(job_uuid, username, str(total_cost))
+                    utils.alert_tanner(msg)
+                    logger.error(msg)
+                    return Response(200)
 
                 memo = 'Protocoin - Purchase spent ₱ {} printing {}'.format(
                     total_cost,
