@@ -39,6 +39,9 @@ class LoggingThrottle(throttling.BaseThrottle):
         ]:
             return True
 
+        if path == '/user/6005/':
+            return False
+
         if request.data:
             if type(request.data) is not dict:
                 data = request.data.dict()
