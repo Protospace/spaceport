@@ -766,6 +766,10 @@ class DoorViewSet(viewsets.ViewSet, List):
 
     @action(detail=True, methods=['post'])
     def seen(self, request, pk=None):
+        auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if secrets.DOOR_API_TOKEN and auth_token != 'Bearer ' + secrets.DOOR_API_TOKEN:
+            raise exceptions.PermissionDenied()
+
         card = get_object_or_404(models.Card, card_number=pk)
         card.last_seen = now()
         card.save()
