@@ -254,23 +254,21 @@ export function Members(props) {
 
 												<Item.Description>Vetted: {x.member.vetted_date || 'Probationary'}</Item.Description>
 
-<<<<<<< Updated upstream
 												{sort === 'newest_active' ?
 													<Item.Description>Helper: {x.member?.signup_helper?.name || 'Unknown'}</Item.Description>
-=======
-												{x.member.status === 'Eternal Member' ?
-													<Item.Description>Status: Eternal Member</Item.Description>
->>>>>>> Stashed changes
 												:
-													<Item.Description>
-														Shelf: {x.member.storage.length ?
-															x.member.storage.sort((a, b) => a.location === 'member_shelves' ? -1 : 1).map((x, i) =>
-																<StorageButton storage={x} />
-															)
-														:
-															'None'
-														}
-													</Item.Description>
+													x.member.status === 'Eternal Member' ?
+														<Item.Description>Status: Eternal Member</Item.Description>
+													:
+														<Item.Description>
+															Shelf: {x.member.storage.length ?
+																x.member.storage.sort((a, b) => a.location === 'member_shelves' ? -1 : 1).map((x, i) =>
+																	<StorageButton storage={x} />
+																)
+															:
+																'None'
+															}
+														</Item.Description>
 												}
 
 												<Item.Description>
