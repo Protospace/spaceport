@@ -254,8 +254,13 @@ export function Members(props) {
 
 												<Item.Description>Vetted: {x.member.vetted_date || 'Probationary'}</Item.Description>
 
+<<<<<<< Updated upstream
 												{sort === 'newest_active' ?
 													<Item.Description>Helper: {x.member?.signup_helper?.name || 'Unknown'}</Item.Description>
+=======
+												{x.member.status === 'Eternal Member' ?
+													<Item.Description>Status: Eternal Member</Item.Description>
+>>>>>>> Stashed changes
 												:
 													<Item.Description>
 														Shelf: {x.member.storage.length ?
