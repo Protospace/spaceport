@@ -352,6 +352,14 @@ a {
 	line-height: 1.75rem;
 }
 
+.protocoin-send.field {
+	display: flex;
+}
+
+.protocoin-send.field > button {
+	align-self: end;
+}
+
 .ui.segment,
 .ui.menu .dropdown.item .menu,
 .ui.dropdown .menu,
@@ -375,3 +383,4 @@ a {
 .ui.menu {
 	background-color: #fafafa !important;
 }
+

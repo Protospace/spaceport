@@ -112,7 +112,7 @@ export function SendProtocoin(props) {
 					{...makeProps('memo')}
 				/>
 
-				<Form.Button loading={loading} error={error.non_field_errors || error.balance}>
+				<Form.Button loading={loading} error={error.non_field_errors || error.balance} className='protocoin-send'>
 					Send
 				</Form.Button>
 			</Form.Group>
