@@ -860,26 +860,6 @@ class StatsViewSet(viewsets.ViewSet, List):
             raise exceptions.ValidationError(dict(request_id='This field is required.'))
 
     @action(detail=False, methods=['post'])
-    def bay_108_temp(self, request):
-        try:
-            cache.set('bay_108_temp', round(float(request.data['data']), 1))
-            return Response(200)
-        except ValueError:
-            raise exceptions.ValidationError(dict(data='Invalid float.'))
-        except KeyError:
-            raise exceptions.ValidationError(dict(data='This field is required.'))
-
-    @action(detail=False, methods=['post'])
-    def bay_110_temp(self, request):
-        try:
-            cache.set('bay_110_temp', round(float(request.data['data']), 1))
-            return Response(200)
-        except ValueError:
-            raise exceptions.ValidationError(dict(data='Invalid float.'))
-        except KeyError:
-            raise exceptions.ValidationError(dict(data='This field is required.'))
-
-    @action(detail=False, methods=['post'])
     def sign(self, request):
         try:
             sign = request.data['sign'][:500]
