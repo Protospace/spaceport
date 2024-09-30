@@ -268,8 +268,6 @@ class MemberSerializer(serializers.ModelSerializer):
     email = fields.UserEmailField(serializers.EmailField)
     phone = serializers.CharField()
     protocoin = serializers.SerializerMethodField()
-    sponsorship = OtherMemberSerializer(many=True, read_only=True)
-    sponsored_by = OtherMemberSerializer(many=True, read_only=True)
     total_protocoin = serializers.SerializerMethodField()
     signup_helper = serializers.SerializerMethodField()
 

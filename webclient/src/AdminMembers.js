@@ -5,7 +5,6 @@ import { Button, Checkbox, Dimmer, Form, Message, Header, Icon, Image, Segment, 
 import moment from 'moment-timezone';
 import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { TrainingList } from './Training.js';
-import { MembersList } from './components/MembersList';
 
 function AdminCardDetail(props) {
 	const { token, result, card } = props;
@@ -624,18 +623,6 @@ export function AdminMemberInfo(props) {
 						</Table.Cell>
 					</Table.Row>
 
-					<Table.Row>
-						<Table.Cell>Vouched by:</Table.Cell>
-						<Table.Cell>
-							<MembersList list={ member.sponsored_by }/>
-						</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Cell>Vouches for:</Table.Cell>
-						<Table.Cell>
-							<MembersList list={ member.sponsorship }/>
-						</Table.Cell>
-					</Table.Row>
 					<Table.Row>
 						<Table.Cell>Public Bio:</Table.Cell>
 						<Table.Cell></Table.Cell>

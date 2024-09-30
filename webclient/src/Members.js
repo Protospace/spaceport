@@ -304,9 +304,6 @@ export function MemberDetail(props) {
 	const [error, setError] = useState(false);
 	const { token, user } = props;
 	const member = result.member || false;
-	const memberFullName = [member.preferred_name, member.last_name].join(' ')
-	const isSponsoring = user.member.sponsorship?.find(m => m.id === id)
-	const isMe = user.member.id === id
 	const photo = member?.photo_large || member?.photo_small || false;
 
 	useEffect(() => {
@@ -320,24 +317,6 @@ export function MemberDetail(props) {
 			setError(true);
 		});
 	}, [id, refreshCount]);
-
-
-	function sponsorMember (value) {
-		return () => {
-			requester(`/sponsorship/${id}/offer/`, 'POST', token, { value })
-				.then(res => {
-					const _user = { ...user }
-					const sponsorship = _user.member.sponsorship
-					if (value) sponsorship.push({ id })
-					else sponsorship.splice(sponsorship.findIndex(m => m.id === id), 1)
-					props.setUser(_user)
-				})
-				.catch(err => {
-					console.log(err);
-					setError(true);
-				});
-		}
-	}
 
 	return (
 		<Container>
@@ -449,8 +428,6 @@ export function MemberDetail(props) {
 											<p className='bio-paragraph'>
 												{member.public_bio || 'None'}
 											</p>
-											{ !isMe && !isSponsoring && <Button onClick={ sponsorMember(true) }>Vouch for { member.preferred_name }</Button> }
-											{ !isMe && isSponsoring && <Button onClick={ sponsorMember(false) }>Revoke guarantee</Button> }
 										</>
 									</Grid.Column>
 
