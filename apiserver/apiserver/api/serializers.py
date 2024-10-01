@@ -268,6 +268,8 @@ class MemberSerializer(serializers.ModelSerializer):
     email = fields.UserEmailField(serializers.EmailField)
     phone = serializers.CharField()
     protocoin = serializers.SerializerMethodField()
+    sponsorship = serializers.SerializerMethodField()
+    sponsored_by = serializers.SerializerMethodField()
     total_protocoin = serializers.SerializerMethodField()
     signup_helper = serializers.SerializerMethodField()
 
@@ -309,6 +311,12 @@ class MemberSerializer(serializers.ModelSerializer):
             'mediawiki_username',
             'signup_helper',
         ]
+
+    def get_sponsored_by(self, obj):
+        return []
+
+    def get_sponsorship(self, obj):
+        return []
 
     def get_protocoin(self, obj):
         transactions = obj.user.transactions
