@@ -32,7 +32,7 @@ import { Footer } from './Footer.js';
 import { SawstopQuiz } from './Quiz.js';
 import { LCARS1Display, LCARS2Display } from './Display.js';
 
-const APP_VERSION = 7;  // TODO: automate this
+const APP_VERSION = 8;  // TODO: automate this
 
 function App() {
 	const [token, setToken] = useState(localStorage.getItem('token', ''));
@@ -88,7 +88,13 @@ function App() {
 				path: history.location.pathname,
 			};
 			requester('/ping/', 'POST', token, data)
-			.then()
+			.then(res => {
+				if (res.app_version > APP_VERSION) {
+					setUserCache(false);
+					history.push('/');
+					window.location.reload();
+				}
+			})
 			.catch(err => {
 				console.log(err);
 				if (err.data && err.data.detail === 'Invalid token.') {
@@ -99,7 +105,7 @@ function App() {
 		}
 	}, [history.location]);
 
-	if (user && user?.app_version !== APP_VERSION) {
+	if (user && user?.app_version > APP_VERSION) {
 		setUserCache(false);
 		window.location.reload();
 	}

@@ -299,7 +299,7 @@ DEFAULT_FROM_EMAIL = 'Protospace Portal <portal@mg.protospace.ca>'
 if DEBUG: logger.info('Debug mode ON')
 logger.info('Test logging for each thread')
 
-APP_VERSION = 7  # TODO: automate this
+APP_VERSION = 8  # TODO: automate this
 
 SHELL_PLUS = 'ipython'
 
