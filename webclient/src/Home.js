@@ -81,15 +81,6 @@ function MemberInfo(props) {
 				</Grid.Column>
 			</Grid>
 
-			{!lastTrans.length && <Message>
-				<Message.Header>Welcome, new member!</Message.Header>
-				<p>
-					<a href={staticUrl + '/' + member.member_forms} target='_blank'>
-						View your application forms.
-					</a>
-				</p>
-			</Message>}
-
 			{!!lastTrans.length && !member.photo_medium && <Message warning>
 				<Message.Header>Please set a member photo!</Message.Header>
 				<p>Visit the <Link to='/account'>account settings</Link> page to set one.</p>
@@ -313,6 +304,15 @@ export function Home(props) {
 					{user ?
 						user.member.set_details ?
 							<>
+								{!user.transactions.length && <Message>
+									<Message.Header>Welcome, new member!</Message.Header>
+									<p>
+										<a href={staticUrl + '/' + user.member.member_forms} target='_blank'>
+											View your application forms.
+										</a>
+									</p>
+								</Message>}
+
 								{user && !user.member.vetted_date && <p>Hosting status: <b>{closedStat()}</b><br/>This indicates when a volunteer has offered to host new members (you) at the space. You can show up and ring the doorbell when it's "open".<br/><br/></p>}
 
 								<MemberInfo user={user} />

@@ -88,19 +88,21 @@ export function Subscribe(props) {
 
 	return (
 		<Container>
-			<Header size='large'>Create a PayPal Subscription</Header>
+			<Header size='large'>PayPal Subscription</Header>
 
-			<p>Use this page to set up a Protospace membership subscription.</p>
+			<p>Use this button to set up a Protospace membership subscription:</p>
 
-			{monthly_fees && id ?
-				<PayPalSubscribeDeal
-					amount={monthly_fees}
-					name='Protospace Membership'
-					custom={JSON.stringify({ deal: 3, member: id })}
-				/>
-			:
-				<p>Error, invalid subscribe link.</p>
-			}
+			<p style={{margin: '3rem'}}>
+				{monthly_fees && id ?
+					<PayPalSubscribeDeal
+						amount={monthly_fees}
+						name='Protospace Membership'
+						custom={JSON.stringify({ deal: 3, member: id })}
+					/>
+				:
+					<p>Error, invalid subscribe link.</p>
+				}
+			</p>
 
 			<p>Click "Checkout as Guest" if you don't have a PayPal account.</p>
 		</Container>
