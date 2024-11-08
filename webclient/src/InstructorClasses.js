@@ -180,7 +180,7 @@ export function InstructorClassAttendance(props) {
 
 					<Header size='small'>Mark Attendance</Header>
 
-					{!!clazz.students.length && <div>
+					{!!clazz.students.length && <div style={{marginBottom: '1rem'}}>
 						<div style={{ display: 'none' }}>
 							<AttendanceSheet clazz={clazz} ref={printRef} />
 						</div>
@@ -189,6 +189,16 @@ export function InstructorClassAttendance(props) {
 							content={() => printRef.current}
 						/>
 					</div>}
+
+					<p>
+						Legend:<br/>
+						<b>Withdrawn:</b> withdrew from class, contacted ahead of time<br/>
+						<b>Confirmed:</b> confirmed to be attending the class (and paid)<br/>
+						<b>Rescheduled:</b> needs to take a different time / class cancelled<br/>
+						<b>Try-again:</b> attended, but failed to learn the course material<br/>
+						<b>No-show:</b> was not physically present, no contact ahead of time<br/>
+						<b>Attended:</b> was physically present / learned course material<br/>
+					</p>
 
 					{clazz.students.length ?
 						clazz.students.map(x =>
