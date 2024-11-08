@@ -12,7 +12,7 @@ import { MembersDropdown } from './Members.js';
 class AttendanceSheet extends React.Component {
 	render() {
 		const clazz = this.props.clazz;
-		const num = clazz.students.filter(x => x.attendance_status !== 'Withdrawn').length;
+		const num = clazz.students.length;
 
 		return (
 			<div style={{ padding: '3rem', background: 'white', width: '100%', height: '100%' }}>
@@ -26,7 +26,6 @@ class AttendanceSheet extends React.Component {
 					<Grid.Column>
 						<Table collapsing unstackable basic='very'>
 							{clazz.students
-								.filter(x => x.attendance_status !== 'Withdrawn')
 								.slice(0, 15)
 								.map(x =>
 									<Table.Row key={x.id}>
@@ -44,7 +43,6 @@ class AttendanceSheet extends React.Component {
 					<Grid.Column>
 						<Table collapsing unstackable basic='very'>
 							{clazz.students
-								.filter(x => x.attendance_status !== 'Withdrawn')
 								.slice(15)
 								.map(x =>
 									<Table.Row key={x.id}>
