@@ -994,7 +994,7 @@ class StatsViewSet(viewsets.ViewSet, List):
                     return Response(200)
 
                 try:
-                    user = User.objects.get(username__iexact=username)
+                    user = User.objects.get(username__istartswith=username)
                 except User.DoesNotExist:
                     msg = 'Usage tracker problem finding user for username: {}'.format(username or '[no username]')
                     #utils.alert_tanner(msg)
@@ -1585,7 +1585,7 @@ class ProtocoinViewSet(Base):
         track_time = track_graphics_computer['time']
 
         try:
-            source_user = User.objects.get(username__iexact=track_username)
+            source_user = User.objects.get(username__istartswith=track_username)
         except User.DoesNotExist:
             return Response(200)
 
@@ -1765,7 +1765,7 @@ class ProtocoinViewSet(Base):
                     return Response(200)
 
                 try:
-                    user = User.objects.get(username__iexact=username)
+                    user = User.objects.get(username__istartswith=username)
                 except User.DoesNotExist:
                     msg = 'Job {}: unable to find username {}, aborting. Cost: {}'.format(job_uuid, username, str(total_cost))
                     utils.alert_tanner(msg)
