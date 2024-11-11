@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title|striptags  }} | Protospace Guide Book{% endblock %}
+
+{% block head %}
+{{ super() }}
+
+	{% if article.date %}
+		<meta name="date" content="{{article.date}}" />
+	{% endif %}
+
+	{% if article.summary %}
+		<meta name="description" content="{{article.summary|striptags}}" />
+		<meta name="summary" content="{{article.summary|striptags}}" />
+	{% endif %}
+
+	{% if article.category %}
+		<meta name="category" content="{{article.category}}" />
+	{% endif %}
+
+	{% for tag in article.tags %}
+		<meta name="tags" content="{{tag}}" />
+	{% endfor %}
+
+{% endblock %}
+
+{% block content %}
+			<div class="content">
+					<h1>{{ article.title }}</h1>
+
+{{ article.content }}
+
+					<p class="metadata">
+						{% if article.modified %}
+							Modified {{ article.locale_modified }}
+						{% endif %}
+					</p>
+
+			</div>
+{% endblock %}
+

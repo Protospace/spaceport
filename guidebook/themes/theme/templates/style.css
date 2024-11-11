@@ -1,0 +1,431 @@
+			html,
+			body {
+				font-size: 16px;
+				height: 100%;
+				margin: 0;
+			}
+
+			body {
+				background: black;
+				overflow-y: scroll;
+				font-family: 'protofont',Lato,'Helvetica Neue',Arial,Helvetica,sans-serif !important;
+			}
+
+			.content p {
+			}
+
+			.content p + ul {
+				margin-top: -1rem;
+			}
+
+			.content a {
+				color: rgb(51, 102, 204);
+			}
+
+			.content h1 a,
+			.content h2 a,
+			.content h3 a,
+			.content h4 a,
+			.content h5 a,
+			.content h6 a {
+				color: #000;
+			}
+
+			.content p a:visited {
+				color: #6a60b0;
+			}
+
+			.content pre {
+				white-space: pre-wrap;
+			}
+
+			.content blockquote {
+				border-left: 5px solid #ccc;
+				margin-left: 0;
+				padding-left: 1rem;
+			}
+
+			a.external {
+				background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%23fff' stroke='%23000' d='M1.5 4.518h5.982V10.5H1.5z'/%3E%3Cpath fill='%23000' d='M5.765 1H11v5.39L9.427 7.937l-1.31-1.31L5.393 9.35l-2.69-2.688 2.81-2.808L4.2 2.544z'/%3E%3Cpath fill='%23fff' d='m9.995 2.004.022 4.885L8.2 5.07 5.32 7.95 4.09 6.723l2.882-2.88-1.85-1.852z'/%3E%3C/svg%3E%0A");
+				background-position: center right;
+				background-repeat: no-repeat;
+				padding-right: 15px;
+			}
+
+			.metadata {
+				text-align: right;
+				margin-top: 2rem;
+			}
+
+			#root {
+				position: relative;
+				height: 100%;
+				margin: 0;
+			}
+
+			a {
+				cursor: pointer;
+			}
+
+			.hero {
+				padding-top: 1.5rem;
+				margin-bottom: 1.5rem;
+			}
+
+			.hero .logo-long {
+				max-width: 100%;
+				height: 2rem;
+				display: block;
+				margin: auto;
+			}
+
+			.hero a {
+				outline: none;
+			}
+
+			#ps-menu .menu .item {
+				padding: 1.25rem 1rem !important;
+			}
+
+			#ps-menu .dropdown.icon {
+				display: none;
+			}
+
+			.topPadding {
+				padding-top: 1rem;
+			}
+
+			.topPadding > .ui.container {
+				min-height: 45rem;
+			}
+
+			.bottomMargin {
+				margin-bottom: 1rem;
+			}
+
+			.photo-404 {
+				max-width: 100%;
+				height: auto;
+			}
+
+			.swordfish {
+				width: 100%;
+				margin-top: -1rem;
+			}
+
+			.content-wrap {
+				min-height: 100%;
+				background: #fafafa;
+			}
+
+			.content-wrap-inside {
+				padding-bottom: 24rem;
+			}
+
+			.ui.floating.dropdown.button.icon {
+				border-left: 1px;
+				border-left-color: #c0c1c2;
+				border-left-style: solid;
+			}
+
+			.list-num {
+				display: flex;
+				align-items: center;
+				margin-right: 1rem;
+				color: black;
+			}
+
+			.ui.tag.label {
+				padding-left: 1rem;
+				padding-right: 0.5rem;
+			}
+
+			.labelbox {
+				display: inline;
+				padding: 0.55rem 0.1rem;
+				border: 2px solid transparent;
+			}
+
+			.labelbox-selected {
+				display: inline;
+				padding: 0.55rem 0.1rem;
+				border: 2px solid black;
+			}
+
+			.footer {
+				margin-top: -20rem;
+				background: black;
+				color: white;
+				display: grid;
+			}
+
+			@media (min-width: 650px) {
+				.footer-content {
+					transition: all 0.2s ease-in;
+					opacity: 0.5;
+				}
+
+				.footer-content:hover {
+					opacity: 1;
+				}
+			}
+
+			/* grid bottom */
+			.footer canvas {
+				grid-row: 1/2;
+				grid-column: 1/2;
+				margin: auto;
+			}
+
+			/* grid top */
+			.footer .container {
+				z-index: 2;
+				grid-row: 1/2;
+				grid-column: 1/2;
+				padding-top: 3rem;
+				padding-bottom: 3rem;
+			}
+
+			.footer p {
+				color: white;
+			}
+
+			.footer .logo {
+				filter: invert(100%);
+				height: 2rem;
+			}
+
+			.footer a {
+				color: white;
+				outline: 0;
+			}
+
+			.footer .text a {
+				border-bottom: 1px solid #ddd;
+				padding-bottom: 2px;
+			}
+
+			.footer i {
+				margin-top: 3px;
+				margin-left: -3.5px;
+				margin-right: 0.5em;
+			}
+
+			.ui.dropdown .menu .item .text {
+				line-height: 1.5rem;
+			}
+
+			.links-menu {
+				line-height: 1.75rem;
+			}
+
+			.ui.segment,
+			.ui.menu .dropdown.item .menu,
+			.ui.dropdown .menu,
+			.ui.input,
+			.ui.input.focus > input,
+			.ui.input > input:focus,
+			.ui.input.focus > input,
+			.ui.input > input,
+			.ui.selection.dropdown,
+			.ui.form input,
+			.ui.form textarea,
+			.rdtPicker,
+			.ui.popup,
+			.ui.popup::before,
+			.recharts-wrapper .recharts-default-tooltip,
+			.ui.labeled.input > .label,
+			.ql-snow .ql-picker-label,
+			.ql-snow .ql-picker-options,
+			.ql-snow .ql-tooltip,
+			.ql-tooltip .ql-editing > input,
+			.ui.menu {
+				background-color: #fafafa !important;
+			}
+
+			.dark .content-wrap {
+				background-color: #1a1a1a;
+				color: white;
+			}
+
+			.dark .ui.button,
+			.dark img {
+				filter: brightness(80%);
+			}
+
+			.dark a {
+				color: #55aaff;
+			}
+
+			.dark .footer a {
+				color: white;
+			}
+
+			.dark a:hover {
+				color: #1e70bf;
+			}
+
+			.dark .footer a:hover {
+				color: #aaa;
+				border-bottom: 1px solid #666;
+			}
+
+			.dark .logo-long,
+			.dark .swordfish {
+				filter: invert(1) brightness(80%);
+			}
+
+			.dark .ql-snow .ql-stroke {
+				stroke: white;
+			}
+
+			.dark .recharts-text.recharts-label > tspan {
+				fill: white;
+			}
+
+			.dark .labelbox-selected {
+				display: inline;
+				padding: 0.55rem 0.1rem;
+				border: 2px solid white;
+			}
+
+			.dark .ui.segment,
+			.dark .ui.menu .dropdown.item .menu,
+			.dark .ui.dropdown .menu,
+			.dark .ui.menu {
+				background-color: #1a1a1a !important;
+			}
+
+			.dark .ui.table,
+			.dark .ui.table thead th,
+			.dark .ui.menu .item,
+			.dark .ui.menu .ui.dropdown .menu > .item,
+			.dark .ui.dropdown .menu > .item,
+			.dark .ui.form .field > label,
+			.dark .ui.items > .item > .content > .description,
+			.dark .ui.items > .item > .content > .header,
+			.dark .ui.checkbox label,
+			.dark .ui.selection.visible.dropdown > .text:not(.default),
+			.dark .ui.statistic > .label,
+			.dark .ui.statistics .statistic > .label,
+			.dark .ui.black.statistic > .value,
+			.dark .ui.black.statistics .statistic > .value,
+			.dark .ui.statistics .black.statistic > .value,
+			.dark i.black.icon,
+			.dark .list-num,
+			.dark .ui.header {
+				color: white !important;
+			}
+
+			.dark .ui.menu,
+			.dark .ui.dropdown .menu,
+			.dark .ui.menu:not(.secondary):not(.text):not(.tabular):not(.borderless) > .container > .item:not(.right):not(.borderless):first-child,
+			.dark .ui.table tbody tr,
+			.dark .ui.segment {
+				border-color: #444 !important;
+			}
+
+			.dark .ui.divided.items > .item,
+			.dark .ui.table tr td {
+				border-top-color: #444 !important;
+			}
+
+			.dark .rdtPicker td.rdtDay:hover,
+			.dark .rdtPicker td.rdtHour:hover,
+			.dark .rdtPicker td.rdtMinute:hover,
+			.dark .rdtPicker td.rdtSecond:hover,
+			.dark .rdtPicker .rdtTimeToggle:hover,
+			.dark .rdtMonth:hover,
+			.dark td.rdtYear:hover,
+			.dark .rdtPicker thead tr:first-child th:hover,
+			.dark .rdtCounter .rdtBtn:hover,
+			.dark .ui.menu .item::before {
+				background-color: #555 !important;
+			}
+
+			.dark .ql-snow .ql-editor code,
+			.dark .ql-snow .ql-editor pre,
+			.dark .ui.table td.active,
+			.dark .ui.table tr.active {
+				color: white !important;
+				background-color: #555 !important;
+			}
+
+			.dark .ui.input,
+			.dark .ui.input.focus > input,
+			.dark .ui.input > input:focus,
+			.dark .ui.input.focus > input,
+			.dark .ui.input > input,
+			.dark .ui.selection.dropdown,
+			.dark .ui.dropdown .menu .selected.item,
+			.dark .ui.dropdown.selected,
+			.dark .ui.selection.dropdown .menu > .item,
+			.dark .ui.form input,
+			.dark .ui.form textarea,
+			.dark .ui.menu .ui.dropdown .menu > .item:hover,
+			.dark .rdtPicker,
+			.dark .ui.popup,
+			.dark .ui.popup::before,
+			.dark .recharts-wrapper .recharts-default-tooltip,
+			.dark .ui.labeled.input > .label,
+			.dark .ql-snow .ql-picker-label,
+			.dark .ql-snow .ql-picker-options,
+			.dark .ql-snow .ql-tooltip,
+			.dark .ql-tooltip .ql-editing > input,
+			.dark .ui.menu .item:hover {
+				color: white !important;
+				background-color: #222 !important;
+				border-color: #555 !important;
+			}
+
+			.dark .ui.popup::before {
+				box-shadow: 1px 1px 0 0 #555 !important;
+			}
+
+			.dark .ui.black.labels .label:hover,
+			.dark a.ui.black.label:hover,
+			.dark .ui.black.label,
+			.dark .ui.black.labels .label {
+				color: black !important;
+				background-color: #fff !important;
+				border-color: #fff !important;
+			}
+
+			.dark .ui.message,
+			.dark .ui.warning.message,
+			.dark .ui.info.message,
+			.dark .ui.error.message {
+				box-shadow: 0 0 0 1px #707070 inset,0 0 0 0 transparent;
+			}
+
+			.dark .ui.warning.message .header,
+			.dark .ui.warning.message {
+				background-color: #392400;
+				color: #fffaf3;
+			}
+
+			.dark .ui.message .header,
+			.dark .ui.message,
+			.dark .ui.info.message .header,
+			.dark .ui.info.message {
+				background-color: #003243;
+				color: #f8ffff;
+			}
+
+			.dark .ui.form .field.error .ui.dropdown,
+			.dark .ui.form .field.error .ui.dropdown .item,
+			.dark .ui.form .field.error .ui.dropdown .text,
+			.dark .ui.form .fields.error .field .ui.dropdown,
+			.dark .ui.form .fields.error .field .ui.dropdown .item,
+			.dark .ui.form .field .prompt.label,
+			.dark .ui.error.message .header,
+			.dark .ui.error.message {
+				background-color: #380100 !important;
+				color: #fff6f6 !important;
+			}
+
+			.dark .ui.form .field.error .ui.dropdown .menu .active.item,
+			.dark .ui.form .fields.error .field .ui.dropdown .menu .active.item {
+				background-color: #5d0000 !important;
+			}
+
