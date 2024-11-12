@@ -227,6 +227,14 @@ function App() {
 								</Dropdown.Menu>
 							</Dropdown>
 
+							{user && user.member.id === 1685 && <Menu.Item
+								link
+								name='guide'
+								href='/guide/protospace-guide-book/'
+							>
+								Guide
+							</Menu.Item>}
+
 							{user && <Menu.Menu position='right'>
 								<Menu.Item
 									content={yousure ? 'Log out?' : ''}
