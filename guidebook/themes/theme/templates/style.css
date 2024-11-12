@@ -11,15 +11,26 @@
 				font-family: 'protofont',Lato,'Helvetica Neue',Arial,Helvetica,sans-serif !important;
 			}
 
+			.content {
+				margin-left: -0.5em;
+				margin-right: -0.5em;
+			}
+
 			.content p {
 			}
 
+			.content ul,
+			.content ol {
+				padding-left: 1.5rem;
+			}
+
 			.content p + ul {
-				margin-top: -1rem;
+				margin-top: -0.5rem;
 			}
 
 			.content a {
 				color: rgb(51, 102, 204);
+				word-wrap: break-word;
 			}
 
 			.content h1 a,

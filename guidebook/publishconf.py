@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 
 PATH = 'content'
 
+SITEURL = 'https://my.protospace.ca/guide'
+
 TIMEZONE = 'Canada/Mountain'
 
 DEFAULT_LANG = 'en'
@@ -60,6 +62,7 @@ INDEX_SAVE_AS = 'index.html'
 ARTICLE_URL = '{slug}/'
 ARTICLE_SAVE_AS = '{slug}/index.html'
 
+DEFAULT_DATE_FORMAT = '%b %d, %Y'
 FILENAME_METADATA = '(?P<title>.*)'   # required to not need Title: metadata
 DEFAULT_DATE = 'fs'
 ARTICLE_ORDER_BY = 'filename'

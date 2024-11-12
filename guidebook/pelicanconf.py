@@ -55,6 +55,7 @@ AUTHORS_SAVE_AS = ''
 CATEGORIES_SAVE_AS = ''
 TAGS_SAVE_AS = ''
 
+DEFAULT_DATE_FORMAT = '%d %B %Y'
 FILENAME_METADATA = '(?P<title>.*)'   # required to not need Title: metadata
 DEFAULT_DATE = 'fs'
 ARTICLE_ORDER_BY = 'filename'

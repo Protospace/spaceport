@@ -10,12 +10,12 @@
 	{% endif %}
 
 	{% if article.summary %}
-		<meta name="description" content="{{article.summary|striptags}}" />
-		<meta name="summary" content="{{article.summary|striptags}}" />
+		<meta name="description" content="{{article.summary|striptags|escape|safe}}" />
+		<meta name="summary" content="{{article.summary|striptags|escape|safe}}" />
 	{% endif %}
 
 	{% if article.category %}
-		<meta name="category" content="{{article.category}}" />
+		<meta name="category" content="guide" />
 	{% endif %}
 
 	{% for tag in article.tags %}
