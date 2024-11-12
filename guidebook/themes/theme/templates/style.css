@@ -264,6 +264,15 @@
 				filter: brightness(80%);
 			}
 
+			.dark .content h1 a,
+			.dark .content h2 a,
+			.dark .content h3 a,
+			.dark .content h4 a,
+			.dark .content h5 a,
+			.dark .content h6 a {
+				color: #fff;
+			}
+
 			.dark a {
 				color: #55aaff;
 			}
@@ -272,9 +281,10 @@
 				color: white;
 			}
 
-			.dark a:hover {
-				color: #1e70bf;
+			.dark .content p a:visited {
+				color: #877ae2;
 			}
+
 
 			.dark .footer a:hover {
 				color: #aaa;

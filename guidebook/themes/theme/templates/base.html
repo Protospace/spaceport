@@ -70,6 +70,10 @@
 
 		<script>
 			$('.ui.dropdown').dropdown();
+
+			if (localStorage.getItem('darkmode') === 'true') {
+				document.body.classList.add('dark');
+			}
 		</script>
 	</body>
 </html>
