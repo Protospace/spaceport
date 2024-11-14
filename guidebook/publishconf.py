@@ -58,7 +58,7 @@ CATEGORIES_SAVE_AS = ''
 TAGS_SAVE_AS = ''
 
 OUTPUT_PATH = 'output/guide/'  # for nginx location idiocy
-INDEX_SAVE_AS = 'index.html'
+INDEX_SAVE_AS = 'index/index.html'
 ARTICLE_URL = '{slug}/'
 ARTICLE_SAVE_AS = '{slug}/index.html'
 

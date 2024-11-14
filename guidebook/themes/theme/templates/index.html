@@ -11,7 +11,7 @@
 				<h1>Index</h1>
 
 				{% for article in articles_page.object_list %}
-				<p><a href="{{ article.url }}">{{ article.title }}</a></p>
+				<p><a href="{{SITEURL}}/{{ article.url }}">{{ article.title }}</a></p>
 
 				{% endfor %}
 			</div>
