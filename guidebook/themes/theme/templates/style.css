@@ -46,6 +46,11 @@
 				color: #6a60b0;
 			}
 
+			.content img {
+				max-width: 100%;
+				margin: 0 auto;
+			}
+
 			.content pre {
 				white-space: pre-wrap;
 			}
