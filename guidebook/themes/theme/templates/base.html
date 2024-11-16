@@ -76,7 +76,26 @@
 			if (localStorage.getItem('darkmode') === 'true') {
 				document.body.classList.add('dark');
 			}
+
+			const token = localStorage.getItem('token', '');
+			const data = {path: window.location.pathname};
+
+			if (token) (
+				fetch('https://api.my.protospace.ca/ping/', {
+					headers: {
+						'Authorization': 'Token ' + token,
+						'Content-Type': 'application/json',
+					},
+					method: 'POST',
+					body: JSON.stringify(data),
+				})
+				.then(res => {
+					console.log('ping:', res);
+				})
+				.catch(err => {
+					console.log('ping:', err);
+				})
+			)
 		</script>
 	</body>
 </html>
-		
