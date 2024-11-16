@@ -35,6 +35,7 @@ MARKDOWN = {
 PLUGINS = [
     'obsidian',
     'linkclass',
+    'search',
 ]
 
 #STATIC_PATHS = ['media']
@@ -43,8 +44,8 @@ EXTRA_PATH_METADATA = {
     'extra/favicon.svg': {'path': 'favicon.svg'},
 }
 
-# Uncomment following line if you want document-relative URLs when developing
-#RELATIVE_URLS = True
+# set true if you want document-relative URLs when developing
+RELATIVE_URLS = False
 
 THEME = 'themes/theme'
 
@@ -66,5 +67,13 @@ DEFAULT_DATE_FORMAT = '%b %d, %Y'
 FILENAME_METADATA = '(?P<title>.*)'   # required to not need Title: metadata
 DEFAULT_DATE = 'fs'
 ARTICLE_ORDER_BY = 'filename'
+
+# doesn't work in the version installed by pip on Debian 10
+# hardcode in env/lib/python3.7/site-packages/pelican/plugins/search/search.py
+# line 104 instead:
+# url_prefix = "https://my.protospace.ca/guide"
+#STORK_INPUT_OPTIONS = {
+#    'url_prefix': SITEURL,
+#}
 
 PROD = True

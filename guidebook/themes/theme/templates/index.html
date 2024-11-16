@@ -4,10 +4,23 @@
 {{ super() }}
 		<meta name="description" content="Protospace Guide Book Index" />
 		<meta name="summary" content="Protospace Guide Book Index" />
+
+		<link rel="stylesheet" href="{{ SITEURL }}/theme/stork/basic.css">
+		<link rel="stylesheet" href="{{ SITEURL }}/theme/stork/dark.css">
+		<script src="{{ SITEURL }}/theme/stork/stork.js"></script>
+
 {% endblock %}
 
 {% block content %}
 			<div class="content index">
+				<h1>Search</h1>
+
+				<div style="margin-right: 0.5rem;" class="ui focus icon input">
+					<input data-stork="sitesearch" placeholder="Search..." aria-label="search products" type="text" value="">
+					<i aria-hidden="true" class="search icon"></i>
+				</div>
+				<div data-stork="sitesearch-output"></div>
+
 				<h1>Index</h1>
 
 				{% for article in articles_page.object_list %}
@@ -15,4 +28,10 @@
 
 				{% endfor %}
 			</div>
+
+			<script>
+				stork.initialize("{{ SITEURL }}/theme/stork/stork.wasm")
+				stork.downloadIndex("sitesearch", "{{ SITEURL }}/search-index.st")
+				stork.attach("sitesearch")
+			</script>
 {% endblock %}
