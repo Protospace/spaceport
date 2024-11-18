@@ -36,6 +36,7 @@ PLUGINS = [
     'obsidian',
     'linkclass',
     'search',
+    'neighbors',
 ]
 
 #STATIC_PATHS = ['media']

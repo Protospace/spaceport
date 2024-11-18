@@ -32,6 +32,32 @@
 {{ article.content }}
 					</main>
 
+					<div class="article-hr">
+						<hr />
+					</div>
+
+					{% if article.category == 'recommended' %}
+						<div class="nav">
+							<div class="nav-prev">
+								{% if article.prev_article_in_category %}
+									<a href="{{ SITEURL }}/{{ article.prev_article_in_category.url}}">
+										← {{ article.prev_article_in_category.title }}
+									</a>
+								{% else %}
+									<b>Navigation</b>
+								{% endif %}
+							</div>
+
+							<div class="nav-next">
+								{% if article.next_article_in_category %}
+									<a href="{{ SITEURL }}/{{ article.next_article_in_category.url}}">
+										{{ article.next_article_in_category.title }} →
+									</a>
+								{% endif %}
+							</div>
+						</div>
+					{% endif %}
+
 					<p class="metadata">
 						{% if article.modified %}
 							Modified {{ article.locale_modified }}

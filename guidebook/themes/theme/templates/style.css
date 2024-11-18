@@ -83,6 +83,28 @@
 				cursor: pointer;
 			}
 
+			.article-hr {
+				margin-top: 2rem;
+				margin-bottom: 1.75rem;
+			}
+
+			.nav {
+				display: flex;
+				justify-content: space-between;
+				flex-wrap: wrap;
+			}
+
+			.nav .nav-prev {
+				padding-right: 0.5rem;
+				margin-top: 0.25rem;
+			}
+
+			.nav .nav-next {
+				padding-left: 0.5rem;
+				margin-top: 0.25rem;
+				margin-left: auto;
+			}
+
 			.hero {
 				padding-top: 1.5rem;
 				margin-bottom: 1.5rem;
