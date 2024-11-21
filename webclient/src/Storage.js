@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
+import moment from 'moment-timezone';
 import { MembersDropdown } from './Members.js';
 import { statusColor, isAdmin, BasicTable, requester, useIsMobile } from './utils.js';
 import { Button, Checkbox, Container, Form, Grid, Header, Icon, Input, Message, Segment, Table } from 'semantic-ui-react';
@@ -183,6 +184,23 @@ function StorageTable(props) {
 	);
 }
 
+export function StorageTakeover(props) {
+	const { storage } = props;
+
+	const daysRemaining = 180 - moment().diff(moment(storage.member_paused), 'days');
+
+	return (
+		<>
+			<p>Shelf owner expired / paused on {storage.member_paused}.</p>
+			{daysRemaining >= 1 ?
+				<p>Shelf can be taken over in {daysRemaining} more day{daysRemaining == 1 ? '' : 's'}.</p>
+			:
+				<p>Shelf can be <Link to={'/claimshelf/'+storage.shelf_id}>taken over</Link> now.</p>
+			}
+		</>
+	);
+}
+
 export function StorageDetail(props) {
 	const { token, user } = props;
 	const [storage, setStorage] = useState(false);
@@ -214,6 +232,10 @@ export function StorageDetail(props) {
 						<Grid stackable columns={2}>
 							<Grid.Column width={6}>
 								<StorageTable storage={storage} refreshStorage={refreshStorage} {...props} />
+
+								{storage.member_paused &&
+									<StorageTakeover storage={storage} />
+								}
 							</Grid.Column>
 
 							<Grid.Column width={10}>
@@ -483,7 +505,8 @@ export function Storage(props) {
 export function ClaimShelfForm(props) {
 	const { token, user, refreshUser } = props;
 	const member = user.member;
-	const [input, setInput] = useState({});
+	const { id } = useParams();
+	const [input, setInput] = useState({shelf_id: id});
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
 	const history = useHistory();

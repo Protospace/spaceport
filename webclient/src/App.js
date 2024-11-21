@@ -303,6 +303,9 @@ function App() {
 
 							{user && user.member.set_details ?
 								<Switch>
+									<Route path='/claimshelf/:id'>
+										<ClaimShelf token={token} user={user} refreshUser={refreshUser} />
+									</Route>
 									<Route path='/claimshelf'>
 										<ClaimShelf token={token} user={user} refreshUser={refreshUser} />
 									</Route>

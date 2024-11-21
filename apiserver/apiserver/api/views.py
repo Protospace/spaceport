@@ -2079,8 +2079,16 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
             raise exceptions.ValidationError(dict(shelf_id='Not a member shelf. Please see a Director.'))
 
         if storage.user:
-            owner = storage.user.member.preferred_name
-            raise exceptions.ValidationError(dict(shelf_id='Shelf already belongs to {}.'.format(owner)))
+            owner_name = storage.user.member.preferred_name
+            six_months_ago = utils.today_alberta_tz() - datetime.timedelta(days=178)  # 2 days slack from the UI
+            owner_paused_date = storage.user.member.paused_date
+            owner_long_expired = owner_paused_date and owner_paused_date <= six_months_ago
+
+            if not owner_long_expired:
+                raise exceptions.ValidationError(dict(shelf_id='Shelf already belongs to {}.'.format(owner_name)))
+
+        if user.member.paused_date:
+            raise exceptions.ValidationError(dict(shelf_id='Only active members can claim shelves.'))
 
         storage.user = user
         storage.save()
