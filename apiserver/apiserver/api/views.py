@@ -2087,6 +2087,28 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
 
         return Response(200)
 
+    @action(detail=False, methods=['post'], permission_classes=[AllowMetadata | IsAuthenticated])
+    def release(self, request):
+        user = self.request.user
+
+        try:
+            shelf_id = str(request.data['shelf_id']).upper()
+        except KeyError:
+            raise exceptions.ValidationError(dict(shelf_id='This field is required.'))
+
+        try:
+            storage = models.StorageSpace.objects.get(shelf_id=shelf_id)
+        except models.StorageSpace.DoesNotExist:
+            raise exceptions.ValidationError(dict(shelf_id='Shelf ID not found.'))
+
+        if storage.user.id != user.id:
+            raise exceptions.ValidationError(dict(shelf_id='Shelf does not belong to you.'))
+
+        storage.user = None
+        storage.save()
+
+        return Response(200)
+
 
 class RegistrationView(RegisterView):
     serializer_class = serializers.MyRegisterSerializer

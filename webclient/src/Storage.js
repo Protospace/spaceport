@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { Link, useParams, useHistory } from 'react-router-dom';
 import './light.css';
 import { MembersDropdown } from './Members.js';
@@ -86,6 +86,45 @@ function EditStorage(props) {
 	);
 };
 
+export function ReleaseShelf(props) {
+	const { token, user, shelf_id, refreshUser, refreshStorage } = props;
+	const member = user.member;
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(false);
+	const [yousure, setYousure] = useState(false);
+
+	const handleRelease = (e) => {
+		e.preventDefault();
+
+		if (yousure) {
+			setLoading(true);
+			const data = {shelf_id: shelf_id};
+			requester('/storage/release/', 'POST', token, data)
+			.then(res => {
+				refreshUser();
+				refreshStorage();
+			})
+			.catch(err => {
+				setLoading(false);
+				console.log(err);
+				setError(err.data);
+			});
+		} else {
+			setYousure(true);
+		}
+	};
+
+	return (
+		<Button
+			color='red'
+			onClick={handleRelease}
+			loading={loading}
+		>
+			{yousure ? 'You Sure?' : 'Release Shelf'}
+		</Button>
+	);
+}
+
 function StorageTable(props) {
 	const { storage, user } = props;
 
@@ -110,6 +149,12 @@ function StorageTable(props) {
 							<Link to={'/members/'+storage.member_id}>
 								{storage.member_name}
 							</Link>
+							{storage.member_id == user.member.id &&
+								<>
+									<p>This shelf belongs to you.</p>
+									<p><ReleaseShelf shelf_id={storage.shelf_id} {...props} /></p>
+								</>
+							}
 						</Table.Cell>
 					:
 						<Table.Cell>None</Table.Cell>
@@ -141,6 +186,7 @@ function StorageTable(props) {
 export function StorageDetail(props) {
 	const { token, user } = props;
 	const [storage, setStorage] = useState(false);
+	const [refreshCount, refreshStorage] = useReducer(x => x + 1, 0);
 	const [error, setError] = useState(false);
 	const { id } = useParams();
 
@@ -154,7 +200,7 @@ export function StorageDetail(props) {
 			console.log(err);
 			setError(true);
 		});
-	}, [id]);
+	}, [id, refreshCount]);
 
 	return (
 		<Container>
@@ -167,7 +213,7 @@ export function StorageDetail(props) {
 
 						<Grid stackable columns={2}>
 							<Grid.Column width={6}>
-								<StorageTable user={user} storage={storage} />
+								<StorageTable storage={storage} refreshStorage={refreshStorage} {...props} />
 							</Grid.Column>
 
 							<Grid.Column width={10}>

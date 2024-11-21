@@ -255,7 +255,7 @@ function App() {
 
 						<Switch>
 							<Route path='/storage/:id'>
-								<StorageDetail token={token} user={user} />
+								<StorageDetail token={token} user={user} refreshUser={refreshUser} />
 							</Route>
 
 							<Route path='/storage'>
