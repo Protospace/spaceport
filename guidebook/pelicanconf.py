@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 
 PATH = 'content'
 
+SITEURL = 'http://127.0.0.1:8000'
+
 TIMEZONE = 'Canada/Mountain'
 
 DEFAULT_LANG = 'en'
@@ -33,6 +35,8 @@ MARKDOWN = {
 PLUGINS = [
     'obsidian',
     'linkclass',
+    #'search',  # disable in dev
+    'neighbors',
 ]
 
 #STATIC_PATHS = ['media']
@@ -41,8 +45,8 @@ EXTRA_PATH_METADATA = {
     'extra/favicon.svg': {'path': 'favicon.svg'},
 }
 
-# Uncomment following line if you want document-relative URLs when developing
-#RELATIVE_URLS = True
+# set true if you want document-relative URLs when developing
+RELATIVE_URLS = False
 
 THEME = 'themes/theme'
 
@@ -54,6 +58,11 @@ ARCHIVES_SAVE_AS = ''
 AUTHORS_SAVE_AS = ''
 CATEGORIES_SAVE_AS = ''
 TAGS_SAVE_AS = ''
+
+OUTPUT_PATH = 'output/guide/'  # for nginx location idiocy
+INDEX_SAVE_AS = 'index/index.html'
+ARTICLE_URL = '{slug}/'
+ARTICLE_SAVE_AS = '{slug}/index.html'
 
 DEFAULT_DATE_FORMAT = '%d %B %Y'
 FILENAME_METADATA = '(?P<title>.*)'   # required to not need Title: metadata
