@@ -37,21 +37,23 @@
 					</div>
 
 					{% if article.category == 'recommended' %}
+						<div>
+							<b>Navigation</b>
+						</div>
+
 						<div class="nav">
 							<div class="nav-prev">
 								{% if article.prev_article_in_category %}
 									<a href="{{ SITEURL }}/{{ article.prev_article_in_category.url}}">
-										← {{ article.prev_article_in_category.title }}
+										🠘 {{ article.prev_article_in_category.title }}
 									</a>
-								{% else %}
-									<b>Navigation</b>
 								{% endif %}
 							</div>
 
 							<div class="nav-next">
 								{% if article.next_article_in_category %}
 									<a href="{{ SITEURL }}/{{ article.next_article_in_category.url}}">
-										{{ article.next_article_in_category.title }} →
+										{{ article.next_article_in_category.title }} ➙
 									</a>
 								{% endif %}
 							</div>

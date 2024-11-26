@@ -89,10 +89,11 @@
 
 			.article-hr {
 				margin-top: 2rem;
-				margin-bottom: 1.75rem;
+				margin-bottom: 1rem;
 			}
 
 			.nav {
+				margin-top: 0.5rem;
 				display: flex;
 				justify-content: space-between;
 				flex-wrap: wrap;
