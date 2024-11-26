@@ -11,6 +11,10 @@
 				font-family: 'protofont',Lato,'Helvetica Neue',Arial,Helvetica,sans-serif !important;
 			}
 
+			.recommended-list + ol > li {
+				margin-top: 1rem;
+			}
+
 			.content {
 				margin-left: -0.5em;
 				margin-right: -0.5em;
