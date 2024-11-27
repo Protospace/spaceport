@@ -8,7 +8,7 @@
 			body {
 				background: black;
 				overflow-y: scroll;
-				font-family: 'protofont',Lato,'Helvetica Neue',Arial,Helvetica,sans-serif !important;
+				font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif !important;
 			}
 
 			.recommended-list + ol > li {
