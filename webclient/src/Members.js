@@ -186,7 +186,7 @@ export function Members(props) {
 
 			<p>Search by name, email, Spacebar username, member ID, or member shelf:</p>
 
-			<Input autoFocus focus icon='search'
+			<Input focus icon='search'
 				placeholder='Search...'
 				value={search}
 				onChange={handleChange}
