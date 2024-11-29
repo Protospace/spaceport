@@ -1551,6 +1551,26 @@ class ProtocoinViewSet(Base):
         except OperationalError:
             self.send_to_member(request)
 
+    def get_sessions_teaching(self, user):
+        two_hours_ago = now() - datetime.timedelta(hours=2)
+        in_two_hours = now() + datetime.timedelta(hours=2)
+
+        current_classes = models.Session.objects.exclude(
+            course__in=[317, 413, 273, 478],
+        ).exclude(
+            course__tags='Event',
+        ).exclude(
+            course__tags__contains='Outing',
+        ).filter(
+            is_cancelled=False,
+            datetime__gte=two_hours_ago,
+            datetime__lte=in_two_hours,
+            instructor=user,
+        )
+
+        return current_classes
+
+
     @action(detail=True, methods=['get'])
     def card_vend_balance(self, request, pk=None):
         auth_token = request.META.get('HTTP_AUTHORIZATION', '')
@@ -1560,13 +1580,23 @@ class ProtocoinViewSet(Base):
         source_card = get_object_or_404(models.Card, card_number=pk)
         source_user = source_card.user
 
-        user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
-        user_balance = float(user_balance)
+        sessions_teaching = self.get_sessions_teaching(source_user)
 
-        res = dict(
-            balance=user_balance,
-            first_name=source_user.member.preferred_name,
-        )
+        if sessions_teaching:
+            logging.info('Current instructor %s balance scan.', source_user.member)
+            res = dict(
+                balance=5.0,
+                first_name='INSTRUCTOR FREE'
+            )
+        else:
+            user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
+            user_balance = float(user_balance)
+
+            res = dict(
+                balance=user_balance,
+                first_name=source_user.member.preferred_name,
+            )
+
         return Response(res)
 
     @action(detail=False, methods=['get'])
@@ -1636,6 +1666,29 @@ class ProtocoinViewSet(Base):
                 # also prevents negative spending
                 if amount < 0.25:
                     raise exceptions.ValidationError(dict(amount='Amount too small.'))
+
+
+                # check for instructor teaching comp
+                sessions_teaching = self.get_sessions_teaching(source_user)
+
+                if sessions_teaching:
+                    session = sessions_teaching.first()
+                    creation = session.history.earliest().history_date
+                    age = (now() - creation).days
+                    msg = 'Instructor {} comp vend, machine: {}, amount: {}, number: {}, course: {}, students: {}, created: {} days ago, class:\nhttps://my.protospace.ca/classes/{}'.format(
+                        str(source_user),
+                        machine,
+                        amount,
+                        number,
+                        session.course.name,
+                        session.students.count(),
+                        age,
+                        session.id,
+                    )
+                    utils.alert_tanner(msg)
+                    logging.info(msg)
+
+                    return Response(200)
 
 
                 source_user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
