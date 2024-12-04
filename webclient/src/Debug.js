@@ -34,6 +34,8 @@ export function Debug(props) {
 
 			<p><Link to='/display/lcars2'>LCARS2 Display</Link></p>
 
+			<p><Link to='/display/lcars3'>LCARS3 Display</Link></p>
+
 		</Container>
 	);
 };

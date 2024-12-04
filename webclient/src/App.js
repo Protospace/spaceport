@@ -30,7 +30,7 @@ import { Storage, StorageDetail, ClaimShelf } from './Storage.js';
 import { Garden } from './Garden.js';
 import { Footer } from './Footer.js';
 import { SawstopQuiz } from './Quiz.js';
-import { LCARS1Display, LCARS2Display } from './Display.js';
+import { LCARS1Display, LCARS2Display, LCARS3Display } from './Display.js';
 
 const APP_VERSION = 8;  // TODO: automate this
 
@@ -132,6 +132,10 @@ function App() {
 
 				<Route exact path='/display/lcars2'>
 					<LCARS2Display token={token} />
+				</Route>
+
+				<Route exact path='/display/lcars3'>
+					<LCARS3Display token={token} />
 				</Route>
 
 				<Route path='/'>

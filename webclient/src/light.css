@@ -234,6 +234,24 @@ a {
 	height: 75vh;
 }
 
+.display-classes {
+	border: 1px solid white;
+	padding: 0.5em;
+	align-self: flex-end;
+	width: 50vw;
+	height: 75vh;
+}
+
+.display-classes p {
+	font-size: 1.5em;
+	text-align: right;
+}
+
+.display .display-classes .today,
+.display .display-classes .today .ui.header{
+	color: #4baafe !important;
+}
+
 .display-scores {
 	border: 1px solid white;
 	padding: 0.5em;

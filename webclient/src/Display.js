@@ -101,6 +101,43 @@ export function LCARS2Display(props) {
 	);
 };
 
+export function LCARS3Display(props) {
+	const { token } = props;
+	const [fullElement, setFullElement] = useState(false);
+	const ref = useRef(null);
+
+	const goFullScreen = () => {
+		if ('wakeLock' in navigator) {
+			navigator.wakeLock.request('screen');
+		}
+
+		ref.current.requestFullscreen({ navigationUI: 'hide' }).then(() => {
+			setFullElement(true);
+		});
+	};
+
+	return (
+		<Container>
+			<div className='display' ref={ref}>
+
+				{!fullElement &&
+					<p>
+						<Button onClick={goFullScreen}>Fullscreen</Button>
+					</p>
+				}
+
+				<div className='display-scores'>
+					<DisplayScores />
+				</div>
+
+				<div className='display-classes'>
+					<DisplayClasses />
+				</div>
+			</div>
+		</Container>
+	);
+};
+
 export function DisplayUsage(props) {
 	const { token, name } = props;
 	const title = deviceNames[name].title;
@@ -318,6 +355,54 @@ export function DisplaySignups(props) {
 				</div>
 			)}
 
+		</>
+	);
+};
+
+export function DisplayClasses(props) {
+	const [classes, setClasses] = useState(false);
+
+	useEffect(() => {
+		const get = async() => {
+			requester('/sessions/', 'GET', '')
+			.then(res => {
+				setClasses(res.results);
+			})
+			.catch(err => {
+				console.log(err);
+			});
+		};
+
+		get();
+		const interval = setInterval(get, 60000);
+		return () => clearInterval(interval);
+	}, []);
+
+	const now = new Date().toISOString();
+
+	const isTodayOrFuture = (x) => moment.utc(x.datetime).tz('America/Edmonton') > moment().tz('America/Edmonton').startOf('day');
+	const isToday = (x) => moment().tz('America/Edmonton').isSame(moment.utc(x.datetime).tz('America/Edmonton'), 'day');
+
+	return (
+		<>
+			<Header size='large'>Upcoming Classes / Events</Header>
+
+			{classes ? classes.filter(isTodayOrFuture).sort((a, b) => a.datetime > b.datetime ? 1 : -1).slice(0, 5).map((x, i) =>
+				<div key={i} className={isToday(x) ? 'today' : ''}>
+					<Header size='medium'>{x.course_data.name}</Header>
+					<p>
+						{isToday(x) ?
+							'Today' + moment.utc(x.datetime).tz('America/Edmonton').format(' @ LT')
+						:
+							moment.utc(x.datetime).tz('America/Edmonton').format('ddd, ll @ LT')
+						}
+
+					</p>
+				</div>
+			)
+			:
+				<p>Loading...</p>
+			}
 		</>
 	);
 };
