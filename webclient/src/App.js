@@ -32,7 +32,7 @@ import { Footer } from './Footer.js';
 import { SawstopQuiz } from './Quiz.js';
 import { LCARS1Display, LCARS2Display, LCARS3Display } from './Display.js';
 
-const APP_VERSION = 8;  // TODO: automate this
+const APP_VERSION = 9;  // TODO: automate this
 
 function App() {
 	const [token, setToken] = useState(localStorage.getItem('token', ''));
@@ -232,7 +232,7 @@ function App() {
 							</Dropdown>
 
 							<Menu.Menu position='right'>
-								{user && user.member.id === 1685 && !yousure && <Menu.Item
+								{!yousure && <Menu.Item
 									link
 									name='guide'
 									href='/guide/'
@@ -240,14 +240,13 @@ function App() {
 									Guide
 								</Menu.Item>}
 
-								{user && <>
-									<Menu.Item
-										content={yousure ? 'Log out?' : ''}
-										onClick={logout}
-										icon='sign out'
-									/>
-									<Menu.Item fitted content='' />
-								</>}
+								{user && <Menu.Item
+									content={yousure ? 'Log out?' : ''}
+									onClick={logout}
+									icon='sign out'
+								/>}
+
+								<Menu.Item fitted content='' />
 							</Menu.Menu>
 						</Container>
 					</Menu>
