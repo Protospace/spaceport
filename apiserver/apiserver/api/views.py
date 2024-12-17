@@ -717,7 +717,7 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
 
         result = []
 
-        for category in ['Membership', 'Snacks', 'OnAcct', 'Donation', 'Consumables', 'Purchases']:
+        for category in ['Membership', 'Snacks', 'OnAcct', 'Donation', 'Consumables', 'Purchases', 'Reimburse']:
             result.append(dict(
                 category = category,
                 dollar = txs.filter(category=category).aggregate(Sum('amount'))['amount__sum'] or 0,
