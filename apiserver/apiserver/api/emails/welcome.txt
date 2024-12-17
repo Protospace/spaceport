@@ -1,30 +1,17 @@
 Hi [name],
 
-You just signed up to Spaceport with the username: [username]
+You just signed up to Protospace with the username: [username]
 
-To manage your Protospace membership go to:
+Visit the portal "Spaceport" to manage your membership here:
 https://my.protospace.ca
 
-You have automatically been added to our forum Spacebar at:
+You have automatically been added to our forum "Spacebar" at:
 https://forum.protospace.ca
 
-Please introduce yourself here:
-https://forum.protospace.ca/c/chattymcchatface/new-user-introductions/31
-
-If you have any questions, you will get the fastest response there.
-
-Your next goal is to become vetted after:
-- paying your member dues
-- being a member for four weeks
-- attending a New Member Orientation
-- finding two members to sponsor (vouch for) you
-
-You can meet members Tuesday evenings during our open house.
+Read about the process of becoming a member here:
+https://my.protospace.ca/guide/welcome-to-protospace/
 
 Mark [date] on your calendar as the day you can get vetted.
-
-Sign up for a New Member Orientation here:
-https://my.protospace.ca/classes
 
 Good luck,
 Spaceport
