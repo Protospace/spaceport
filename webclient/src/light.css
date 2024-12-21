@@ -292,6 +292,18 @@ a {
 	margin-bottom: 0;
 }
 
+.display-printers {
+	border: 1px solid white;
+	padding: 0;
+	align-self: flex-start;
+	width: 50vw;
+	height: 100vh;
+}
+
+.display .printer-pic {
+	width: 100%;
+}
+
 .nowrap-stat {
 	white-space: nowrap;
 	overflow: hidden;

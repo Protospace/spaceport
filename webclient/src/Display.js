@@ -126,8 +126,9 @@ export function LCARS3Display(props) {
 					</p>
 				}
 
-				<div className='display-scores'>
-					<DisplayScores />
+				<div className='display-printers'>
+					<DisplayBambuCamera name={'p1s1'} />
+					<DisplayBambuCamera name={'p1s2'} />
 				</div>
 
 				<div className='display-classes'>
@@ -403,6 +404,39 @@ export function DisplayClasses(props) {
 			:
 				<p>Loading...</p>
 			}
+		</>
+	);
+};
+
+export function DisplayBambuCamera(props) {
+	const { token, name } = props;
+	const [pic, setPic] = useState(false);
+
+	const getPic = () => {
+		requester('http://localhost/' + name + '/pic', 'GET')
+		.then(res => res.blob())
+		.then(imageBlob => {
+			const imageObjectURL = URL.createObjectURL(imageBlob);
+			setPic(oldPic => {
+				URL.revokeObjectURL(oldPic);
+				return imageObjectURL;
+			});
+		})
+		.catch(err => {
+			console.log(err);
+			setPic(false);
+		});
+	};
+
+	useEffect(() => {
+		getPic();
+		const interval = setInterval(getPic, 1000);
+		return () => clearInterval(interval);
+	}, []);
+
+	return (
+		<>
+			{pic && <img className='printer-pic' src={pic} />}
 		</>
 	);
 };
