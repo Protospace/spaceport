@@ -313,7 +313,13 @@ export function Home(props) {
 									</p>
 								</Message>}
 
-								{user && !user.member.vetted_date && <p>Hosting status: <b>{closedStat()}</b><br/>This indicates when a volunteer has offered to host new members (you) at the space. You can show up and ring the doorbell when it's "open".<br/><br/></p>}
+								{user && !user.member.vetted_date &&
+									<p>
+										Hosting status: <b>{closedStat()}</b><br/>
+										This indicates when a volunteer has offered to host new members (you) at the space. You can show up and ring the doorbell when it's "open".<br/>
+										<a href='https://forum.protospace.ca/t/view-hosting-alerts-or-configure-notifications/8427' target='_blank' rel='noopener noreferrer'>View hosting alerts and configure notifications</a> (login first).<br/><br/>
+									</p>
+								}
 
 								<MemberInfo user={user} />
 							</>
