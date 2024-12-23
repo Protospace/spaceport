@@ -1919,6 +1919,7 @@ class PinballViewSet(Base):
 
         def get_favourite_drink(member):
             drinks = {
+                # max drink length 11 chars
                 '1': 'Coke',
                 '2': 'Coke Zero',
                 '3': 'Root Beer',
@@ -1932,7 +1933,7 @@ class PinballViewSet(Base):
             memos = list(txs.filter(category='Snacks', memo__contains='pop vending machine').values_list('memo'))
             favs = sorted(memos, key=memos.count, reverse=True)
             if len(favs) < 10:
-                return 'Cold Pop'
+                return 'can of Pop'
             favourite_number = favs[0][0][-1]
             return drinks[favourite_number]
 
