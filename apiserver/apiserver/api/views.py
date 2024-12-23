@@ -2190,6 +2190,18 @@ class SpaceportAuthView(LoginView):
 class MyLoginView(LoginView):
     serializer_class = serializers.MyLoginSerializer
 
+class ToolsViewSet(Base, Create):
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request):
+        data = request.data
+        print(request.data)
+
+        # Perform your logic here
+        del data["photo"]
+        response_data = {"message": "POST successful", "data_received": data}
+
+        return Response(response_data, status=201)
 
 @api_view()
 def null_view(request, *args, **kwargs):

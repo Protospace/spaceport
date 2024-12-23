@@ -18,6 +18,7 @@ import { Paste } from './Paste.js';
 import { Sign } from './Sign.js';
 import { Courses, CourseDetail } from './Courses.js';
 import { ClassFeed, Classes, ClassDetail } from './Classes.js';
+import { AddNewTool } from './AddNewTool.js';
 import { Members, MemberDetail } from './Members.js';
 import { Charts } from './Charts.js';
 import { Usage } from './Usage.js';
@@ -216,6 +217,11 @@ function App() {
 										as={Link}
 										to='/charts'
 									/>
+									<Dropdown.Item
+										content='Add New Tool'
+										as={Link}
+										to='/add-new-tool'
+									/>
 
 									{user && isAdmin(user) && <Dropdown.Item
 										content='Admin'
@@ -298,6 +304,10 @@ function App() {
 
 							<Route exact path='/classes'>
 								<Classes token={token} user={user} refreshUser={refreshUser} />
+							</Route>
+
+							<Route exact path='/add-new-tool'>
+								<AddNewTool token={token} user={user} refreshUser={refreshUser} />
 							</Route>
 
 							<Route path='/garden'>
