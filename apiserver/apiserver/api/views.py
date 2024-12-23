@@ -1917,11 +1917,36 @@ class PinballViewSet(Base):
         if secrets.PINBALL_API_TOKEN and auth_token != 'Bearer ' + secrets.PINBALL_API_TOKEN:
             raise exceptions.PermissionDenied()
 
+        def get_favourite_drink(member):
+            drinks = {
+                '1': 'Coke',
+                '2': 'Coke Zero',
+                '3': 'Root Beer',
+                '4': 'Iced Tea',
+                '5': 'Crush Pop',
+                '6': 'Dr. Pepper',
+                '7': 'Arizona Tea',
+                '8': 'Mystery Pop',
+            }
+            txs = member.user.transactions
+            memos = list(txs.filter(category='Snacks', memo__contains='pop vending machine').values_list('memo'))
+            favs = sorted(memos, key=memos.count, reverse=True)
+            if len(favs) < 10:
+                return 'Cold Pop'
+            favourite_number = favs[0][0][-1]
+            return drinks[favourite_number]
+
         card = get_object_or_404(models.Card, card_number=pk)
         member = card.user.member
+        name = member.preferred_name + ' ' + member.last_name[0]
+
+        favourite_drink = get_favourite_drink(member)
+
+        logging.info('%s pinball scan, favourite drink: %s', name, favourite_drink)
 
         res = dict(
-            name=member.preferred_name + ' ' + member.last_name[0]
+            name=name,
+            drink=favourite_drink,
         )
         return Response(res)
 
