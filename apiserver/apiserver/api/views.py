@@ -26,7 +26,7 @@ import csv
 import xmltodict
 import json
 
-from . import models, serializers, utils, utils_paypal, utils_stats, utils_ldap, utils_email
+from . import models, serializers, utils, utils_paypal, utils_stats, utils_ldap, utils_email, utils_mediawiki
 from .permissions import (
     is_admin_director,
     AllowMetadata,
@@ -2190,18 +2190,28 @@ class SpaceportAuthView(LoginView):
 class MyLoginView(LoginView):
     serializer_class = serializers.MyLoginSerializer
 
-class ToolsViewSet(Base, Create):
+class ToolsViewSet(Base, Create, Destroy):
     permission_classes = [IsAuthenticated]
 
     def create(self, request):
         data = request.data
-        print(request.data)
 
-        # Perform your logic here
-        del data["photo"]
-        response_data = {"message": "POST successful", "data_received": data}
+        # TODO: validate request schema
 
-        return Response(response_data, status=201)
+        tool_url = utils_mediawiki.create_tool_page(data)
+
+        return Response(tool_url, status=303)
+
+    def destroy(self, request, *args, **kwargs):
+        pk = kwargs['pk']
+        # TODO: clean up this mess, handle exceptions from utils_mediawiki properly
+        try:
+            utils_mediawiki.delete_tool_page(pk)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception:
+            return Response(status=status.HTTP_500)
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 @api_view()
 def null_view(request, *args, **kwargs):

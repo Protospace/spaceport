@@ -12,21 +12,49 @@ import { tags } from './Courses.js';
 
 export function AddNewTool(props) {
 	const { token, user, refreshUser } = props;
+
+	const loanStatusOptions = [
+		{ key: 'owned', text: 'Owned by Protospace', value: 'Owned by Protospace' },
+		{ key: 'owned', text: 'Donated to Protospace', value: 'Donated to Protospace' },
+		{ key: 'long', text: 'Long term loan', value: 'Long term loan' },
+		{ key: 'na', text: 'Other', value: 'Other' },
+	];
+
+	const functionalStatusOptions = [
+		{ key: 'functional', text: 'Yes', value: 'Functional' },
+		{ key: 'nonfunctional', text: 'No', value: 'Non functional' },
+		{ key: 'unknown', text: 'Unknown', value: 'Unknown' },
+	]
+
 	const [loading, setLoading] = useState(false);
-	const [formData, setFormData] = useState({});
+	const [formData, setFormData] = useState({
+		// TODO: proper handler methods for dropdowns
+		"owner": "Protospace",
+		"loanstatus": loanStatusOptions[0].value,
+		"functionalstatus": functionalStatusOptions[0].value,
+
+		// FOR TESTING ONLY
+		'toolname': "Testing tool",
+		'make': "Testing Inc",
+		'model': "Test101",
+		'arrived': '2025-12-25',
+		// 'location': str,
+		'permission': "All",
+		'certification': "None"
+
+	});
 	const [error, setError] = useState(false);
 
 	const handleChange = (e, v) => setFormData({ ...formData, [v.name]: v.value });
   	const handleFileChange = (e) => { setFormData({ ...formData, photo: e.target.files[0] }); };
-
 	const postTool = () => {
-		console.log("Adding thing");
 		if (loading) return;
 		setLoading();
 		requester('/tools/', 'POST', token, formData)
 		.then(res => {
-			console.log('success')
+			console.log('success', res);
 			// setError(false);
+			// TODO: redirect to new tool page
 		})
 		.catch(err => {
 			console.log(err);
@@ -34,21 +62,9 @@ export function AddNewTool(props) {
 		});
 	};
 
-	const loanStatusOptions = [
-		{ key: 'owned', text: 'Owned by Protospace', value: 'owned' },
-		{ key: 'long', text: 'Long Term', value: 'long' },
-		{ key: 'na', text: 'Other', value: 'na' },
-	];
-
-	const toolStatusOptions = [
-		{ key: 'functional', text: 'Functional', value: 'func' },
-		{ key: 'nonfunctional', text: 'Non Functional', value: 'nonfunc' },
-		{ key: 'unknown', text: 'Unknown', value: 'unk' },
-	]
-
 	return (
 		<Container>
-			<Header size='large'>Create a new tool</Header>
+			<Header size='large'>Add a New Tool Page to the Wiki</Header>
 
 			<p>Fill out the following form for your tool</p>
 
@@ -56,20 +72,25 @@ export function AddNewTool(props) {
 		      <Form.Field>
 		        <label>Tool Name</label>
 			<Input
-				placeholder="Tool
-				Name"
+				placeholder="Tool Name"
 				name="toolname"
 				required
 				onChange={handleChange}
+
+				// TODO: TESTING ONLY
+				value={formData.toolname}
 			/>
 		      </Form.Field>
 		
 		      <Form.Field>
-		        <label>Model</label>
+		        <label>Manufacturer</label>
 			<Input
 				placeholder="Make"
 				name="make"
 				onChange={handleChange}
+
+				// TODO: TESTING ONLY
+				value={formData.make}
 			/>
 		      </Form.Field>
 		
@@ -79,6 +100,9 @@ export function AddNewTool(props) {
 				placeholder="Model"
 				name="model"
 				onChange={handleChange}
+
+				// TODO: TESTING ONLY
+				value={formData.model}
 			/>
 		      </Form.Field>
 		
@@ -110,7 +134,7 @@ export function AddNewTool(props) {
 				selection 
 				options={loanStatusOptions} 
 				required
-				name="loanstatus" 
+				name="loanstatus"
 				onChange={handleChange}
 		        />
 		      </Form.Field>
@@ -122,6 +146,9 @@ export function AddNewTool(props) {
 				name="arrived" 
 				required 
 				onChange={handleChange}
+
+				// TODO: TESTING ONLY
+				value={formData.arrived}
 			/>
 		      </Form.Field>
 		
@@ -135,13 +162,15 @@ export function AddNewTool(props) {
 		      </Form.Field>
 		
 		      <Form.Field>
-		        <label>Status</label>
+		        <label>Is the tool functioning as expected?</label>
 		        <Dropdown 
-				placeholder="Enter Status" 
-				name="status" 
-				options={toolStatusOptions} 
+				name="functionalStatus"
+				options={functionalStatusOptions}
 				required
 				onChange={handleChange}
+
+				// TODO: TESTING ONLY
+				value={formData.functionalstatus}
 			/>
 		      </Form.Field>
 		
@@ -152,6 +181,9 @@ export function AddNewTool(props) {
 				name="permission" 
 				required
 				onChange={handleChange}
+
+				// TODO: TESTING ONLY
+				value={formData.permission}
 			/>
 		      </Form.Field>
 		
@@ -161,6 +193,9 @@ export function AddNewTool(props) {
 				placeholder="Certification Details" 
 				name="certification"
 				onChange={handleChange}
+
+				// TODO: TESTING ONLY
+				value={formData.certification}
 			/>
 		      </Form.Field>
 		
