@@ -10,7 +10,7 @@ from django.http import HttpResponse, Http404, FileResponse, HttpResponseServerE
 from django.core.files.base import File
 from django.core.cache import cache
 from django.utils.timezone import now
-from rest_framework import viewsets, views, mixins, generics, exceptions
+from rest_framework import viewsets, views, mixins, generics, exceptions, status as drfstatus
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
@@ -2204,14 +2204,16 @@ class ToolsViewSet(Base, Create, Destroy):
 
     def destroy(self, request, *args, **kwargs):
         pk = kwargs['pk']
-        # TODO: clean up this mess, handle exceptions from utils_mediawiki properly
         try:
             utils_mediawiki.delete_tool_page(pk)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except Exception:
-            return Response(status=status.HTTP_500)
+            return Response(status=drfstatus.HTTP_204_NO_CONTENT)
+        except FileNotFoundError:
+            # tool page doesnt exist, thats fine
+            pass
+        except Exception as ex:
+            return Response(ex, status=drfstatus.HTTP_500)
 
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(status=drfstatus.HTTP_404_NOT_FOUND)
 
 @api_view()
 def null_view(request, *args, **kwargs):

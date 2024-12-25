@@ -42,12 +42,21 @@ def create_tool_page(form_data):
     """
     tool_id = get_next_tool_id()
 
-    photo = "NoImage.png"
+    photo_name = 'NoImage.png'
     if 'photo' in form_data:
-        # TODO upload photo
-        photo = "name of uploaded file.jpg"
+        # upload photo
+        photo_data = form_data['photo']
+        # TODO: select the right MIME type?
+        photo_name = f'{tool_id}.jpg'
+        site.upload(photo_data, photo_name, 1, f"Photo of tool {tool_id}")
 
-    form_copy = form_data.copy()
+    # make a copy of form_data specifically avoiding the 'photo' field, which either:
+    # 1 - doesnt exist
+    # 2 - if it does exist, is an I/O object that is already closed because of the photo upload above and throws an exception on form_data.copy()
+    form_copy = {}
+    for k, v in form_data.items():
+        if k is not 'photo':
+            form_copy[k] = v
     # fill in empty fields
     for field in ['serial', 'caption', 'location']:
         if field not in form_data:
@@ -64,7 +73,7 @@ def create_tool_page(form_data):
 | status = {form_copy['functionalstatus']}
 | permission = {form_copy['permission'] or "All"}
 | certification = {form_copy['certification'] or "None"}
-| photo = {photo}
+| photo = {photo_name}
 | caption = {form_copy['caption'] or ""}
 | id = {tool_id}
 }}}}
@@ -83,31 +92,37 @@ TBD
 
 """
 
-    name = f"{form_copy['toolname']} ({form_copy['make']} {form_copy['model']} ID:{tool_id})"
+    name = f'{form_copy["toolname"]} ({form_copy["make"]} {form_copy["model"]} ID:{tool_id})'
 
     # create tool page
     page = site.pages[name]
-    page.save(body, summary="Creating new tool page")
+    page.save(body, summary='Creating new tool page')
 
     # create redirect page
     redirect = site.pages[tool_id]
-    redirect.save("#REDIRECT [[" + name + "]]{{id/after-redirect}}")
+    redirect.save('#REDIRECT [[' + name + ']]{{id/after-redirect}}')
 
-    return secrets.WIKI_ENDPOINT + f"/{tool_id}"
+    return secrets.WIKI_ENDPOINT + f'/{tool_id}'
     # TODO: add to gallery
 
 def delete_tool_page(tool_id):
     """Delete a tool page and its redirect page. Use when tool page has been created in error"""
-    page = site.pages[tool_id]
 
-    # TODO except if page doesnt exist
+    redirect_page = site.pages[tool_id]
+    if redirect_page.text() == '':
+        # BUG: what about cases where redirect page doesnt exist, but tool_page and image do?
+        raise FileNotFoundError(f'Tool ID {tool_id} does not exist')
 
     # delete the tool page
-    for link in page.links():
-        if f"ID:{tool_id}" in link.page_title:
-            link.delete(reason="Requested deletion")
+    tool_page = redirect_page.resolve_redirect()
+    for image in tool_page.images():
+        # if tool_id is in image title, there's a good chance its the tool picture
+        # and we should get rid of it too
+        if tool_id in image.page_title:
+            image.delete('Requested deletion')
+    tool_page.delete(reason='Requested deletion')
 
     # delete the redirect page
-    page.delete(reason="Requested deletion")
+    redirect_page.delete(reason='Requested deletion')
 
     return tool_id
