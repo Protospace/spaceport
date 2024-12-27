@@ -1,3 +1,4 @@
+import logging
 from mwclient import Site
 from apiserver import secrets
 
@@ -32,7 +33,6 @@ def create_tool_page(form_data):
         'functionalstatus': 'functional',
         'owner': 'Protospace',
         'toolname': str,
-        'make': str,
         'model': str,
         'arrived': '2025-12-25',
         'location': str,
@@ -50,9 +50,9 @@ def create_tool_page(form_data):
         photo_name = f'{tool_id}.jpg'
         site.upload(photo_data, photo_name, 1, f"Photo of tool {tool_id}")
 
-    # make a copy of form_data specifically avoiding the 'photo' field, which either:
-    # 1 - doesnt exist
-    # 2 - if it does exist, is an I/O object that is already closed because of the photo upload above and throws an exception on form_data.copy()
+    # make a copy of form_data specifically avoiding the 'photo' field
+    # if photo is provided, is an I/O object that is already closed because of the above 
+    # so ignore it to avoid the exception from form_data.copy()
     form_copy = {}
     for k, v in form_data.items():
         if k is not 'photo':
@@ -92,7 +92,7 @@ TBD
 
 """
 
-    name = f'{form_copy["toolname"]} ({form_copy["make"]} {form_copy["model"]} ID:{tool_id})'
+    name = f'{form_copy["toolname"]} {form_copy["model"]} ID:{tool_id})'
 
     # create tool page
     page = site.pages[name]

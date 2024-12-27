@@ -2211,7 +2211,7 @@ class ToolsViewSet(Base, Create, Destroy):
             # tool page doesnt exist, thats fine
             pass
         except Exception as ex:
-            return Response(ex, status=drfstatus.HTTP_500)
+            return Response(str(ex), status=drfstatus.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(status=drfstatus.HTTP_404_NOT_FOUND)
 
