@@ -2194,13 +2194,17 @@ class ToolsViewSet(Base, Create, Destroy):
     permission_classes = [IsAuthenticated]
 
     def create(self, request):
-        data = request.data
+        try:
+            data = request.data
 
-        # TODO: validate request schema
+            # TODO: validate request schema
 
-        tool_url = utils_mediawiki.create_tool_page(data)
-
-        return Response(tool_url, status=303)
+             tool_url = utils_mediawiki.create_tool_page(data)
+             return Response(tool_url, status=drfstatus.HTTP_201_CREATED)
+        # except exceptions.ValidationError as ex:
+        #     return Response(str(ex), status=drfstatus.HTTP_400_BAD_REQUEST)
+        except Exception as ex:
+            return Response(str(ex), status=drfstatus.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def destroy(self, request, *args, **kwargs):
         pk = kwargs['pk']

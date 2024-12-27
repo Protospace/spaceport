@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useReducer, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import './light.css';
-import { Label, Button, Container, Dropdown, Form, FormField, Header, Icon, Input, Segment, Table, TextArea } from 'semantic-ui-react';
+import { Label, Button, Container, Dimmer, Dropdown, Form, FormField, Header, Icon, Loader, Input, Segment, Table, TextArea } from 'semantic-ui-react';
 import moment from 'moment-timezone';
 import { apiUrl, isAdmin, getInstructor, getInstructorDiscourseLink, BasicTable, requester, useIsMobile } from './utils.js';
 import { NotFound } from './Misc.js';
@@ -15,9 +15,9 @@ export function AddNewTool(props) {
 
 	const loanStatusOptions = [
 		{ key: 'owned', text: 'Owned by Protospace', value: 'Owned by Protospace' },
-		{ key: 'owned', text: 'Donated to Protospace', value: 'Donated to Protospace' },
-		{ key: 'long', text: 'Long term loan', value: 'Long term loan' },
-		{ key: 'na', text: 'Other', value: 'Other' },
+		{ key: 'donated', text: 'Donated to Protospace', value: 'Donated to Protospace' },
+		{ key: 'longtermloan', text: 'Long term loan', value: 'Long term loan' },
+		{ key: 'other', text: 'Other', value: 'Other' },
 	];
 
 	const functionalStatusOptions = [
@@ -36,6 +36,7 @@ export function AddNewTool(props) {
 		"photo": null
 	});
 	const [error, setError] = useState(false);
+	const [toolUrl, setToolUrl] = useState('');
 	const [photoKey, setPhotoKey] = useState(Date.now());
 	const handleChange = (e, v) => setFormData({ ...formData, [v.name]: v.value });
   	const handleFileChange = (e) => { setFormData({ ...formData, photo: e.target.files[0] }); };
@@ -46,28 +47,47 @@ export function AddNewTool(props) {
 		// force rerender
 		setPhotoKey(Date.now());
 	};
+
 	const postTool = () => {
 		if (loading) return;
-		setLoading();
+		setLoading(true);
 		requester('/tools/', 'POST', token, formData)
 		.then(res => {
-			console.log('success', res);
-			// setError(false);
-			// TODO: redirect to new tool page
+			setLoading(false);
+			setError(false);
+			setToolUrl(res.toolUrl);
 		})
 		.catch(err => {
-			console.log(err);
+			setLoading(false);
 			setError(true);
 		});
 	};
 
 	return (
-		<Container>
+		<>
+		{ error && (<Container>
+				<Header size='large'>Mistake</Header>
+
+				<p>Something messed up</p>
+			</Container>)}
+		{ toolUrl != "" && !error && (<Container>
+				<Header size='large'>Successfully created tool wiki page</Header>
+
+				<p>Go to it here: <a href={toolUrl}>{toolUrl}</a></p>
+
+				<Button onClick={() => window.location.reload(false)}>Make another tool page</Button>
+			</Container>)}
+
+		{ toolUrl == "" && !error && (<Container>
 			<Header size='large'>Add a New Tool Page to the Wiki</Header>
 
 			<p>Fill out the following form for your tool</p>
-
 		    <Form>
+			{loading && 
+				<Dimmer active>
+					<Loader />
+				</Dimmer>
+			}
 		      <Form.Field required>
 		        <label>What is this tool called in simple terms? (e.g. Laser cutter, table saw, hand planer, etc)</label>
 			<Input
@@ -203,11 +223,17 @@ export function AddNewTool(props) {
 			</Form.Field>
 		)}
 		
-		      <Button type="submit" onClick={postTool} primary>
+		      <Button 
+				type="submit" 
+				onClick={postTool} 
+				primary
+				loading={loading}
+			>
 		        Submit
 		      </Button>
 		    </Form>
 
-		</Container>
+		</Container>)}
+		</>
 	);
 };
