@@ -38,12 +38,33 @@ export function AddNewTool(props) {
 	const [error, setError] = useState(false);
 	const [toolUrl, setToolUrl] = useState('');
 	const [photoKey, setPhotoKey] = useState(Date.now());
+	const [photoProblem, setPhotoProblem] = useState(false)
 	const handleChange = (e, v) => setFormData({ ...formData, [v.name]: v.value });
-  	const handleFileChange = (e) => { setFormData({ ...formData, photo: e.target.files[0] }); };
+  	const handleFileChange = (e) => { 
+		let file = e.target.files[0];
+		setFormData({ ...formData, photo: file });
+
+		// the wiki only allows certain image formats: https://wiki.protospace.ca/Special:Upload
+		const allowedExtensions = [
+			'image/png',
+			'image/gif',
+			'image/jpg',
+			'image/jpeg',
+			'image/webp'
+		];
+		if (!allowedExtensions.includes(file.type))
+			setPhotoProblem('Photo is not in an allowed format. It must be one of: ' + allowedExtensions.join(', ').replace(/image\//g, ''));
+
+		// the wiki only allows files under 8 mb
+		const allowedSize = 8;
+		if (file.size >= allowedSize * 1024 * 1024)
+			setPhotoProblem(`Photo is too big. It must be smaller than ${allowedSize} MB`);
+	};
 	const handleDeletePhoto = () => {
 		const updatedFormData = { ...formData };
 		delete updatedFormData['photo'];
 		setFormData(updatedFormData);
+		setPhotoProblem(false);
 		// force rerender
 		setPhotoKey(Date.now());
 	};
@@ -60,15 +81,16 @@ export function AddNewTool(props) {
 		.catch(err => {
 			setLoading(false);
 			setError(true);
+			setToolUrl('');
 		});
 	};
 
 	return (
 		<>
 		{ error && (<Container>
-				<Header size='large'>Mistake</Header>
+				<Header size='large'>Something went wrong!</Header>
 
-				<p>Something messed up</p>
+				<p>Please try again one more time. If it fails again, do not try again. There's probably something we need to fix</p>
 			</Container>)}
 		{ toolUrl != "" && !error && (<Container>
 				<Header size='large'>Successfully created tool wiki page</Header>
@@ -99,9 +121,9 @@ export function AddNewTool(props) {
 		      </Form.Field>
 		
 		      <Form.Field>
-		        <label>Make/Model</label>
+		        <label>Please write the Make and Model of the tool. Be careful of typos!</label>
 		        <Input 
-				placeholder="Make/Model"
+				placeholder="Make - Model"
 				name="model"
 				onChange={handleChange}
 			/>
@@ -204,21 +226,27 @@ export function AddNewTool(props) {
 				key={photoKey}
 				onChange={handleFileChange}
 			/>
+			<div>
 			{formData.photo && (
-				<Button onClick={handleDeletePhoto}>
+				<Button 
+					onClick={handleDeletePhoto}
+					style={{ display: 'inline-block', marginRight: '10px' }}
+				>
 					<i className="trash icon"></i>	
 					Remove Photo 
 				</Button>
 			)}
+			{photoProblem && (<p style={{ display: 'inline-block', margin: 0, color: 'red' }}>{photoProblem}</p>)}
+			</div>
 		      </Form.Field>
 		
 		{ formData.photo && (
 			<Form.Field>
 			<label>Caption</label>
 			<TextArea
-			placeholder="Add a caption for the photo"
-			name="caption"
-			onChange={handleChange}
+				placeholder="Add a caption for the photo"
+				name="caption"
+				onChange={handleChange}
 			/>
 			</Form.Field>
 		)}
@@ -228,6 +256,7 @@ export function AddNewTool(props) {
 				onClick={postTool} 
 				primary
 				loading={loading}
+				disabled={photoProblem}
 			>
 		        Submit
 		      </Button>

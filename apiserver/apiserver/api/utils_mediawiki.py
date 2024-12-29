@@ -43,11 +43,10 @@ def create_tool_page(form_data):
     tool_id = get_next_tool_id()
 
     photo_name = 'NoImage.png'
-    if 'photo' in form_data:
+    if 'photo' in form_data and form_data['photo']:
         # upload photo
         photo_data = form_data['photo']
-        # TODO: select the right MIME type?
-        photo_name = f'{tool_id}.jpg'
+        photo_name = f'{tool_id}.{photo_data.content_type.replace("image/", "")}'
         site.upload(photo_data, photo_name, 1, f"Photo of tool {tool_id}")
 
     # make a copy of form_data specifically avoiding the 'photo' field
@@ -55,7 +54,7 @@ def create_tool_page(form_data):
     # so ignore it to avoid the exception from form_data.copy()
     form_copy = {}
     for k, v in form_data.items():
-        if k is not 'photo':
+        if k != 'photo':
             form_copy[k] = v
     # fill in empty fields
     for field in ['serial', 'caption', 'location']:
@@ -92,7 +91,7 @@ TBD
 
 """
 
-    name = f'{form_copy["toolname"]} {form_copy["model"]} ID:{tool_id})'
+    name = f'{form_copy["toolname"]} ({form_copy["model"]}) ID:{tool_id}'
 
     # create tool page
     page = site.pages[name]
@@ -102,8 +101,10 @@ TBD
     redirect = site.pages[tool_id]
     redirect.save('#REDIRECT [[' + name + ']]{{id/after-redirect}}')
 
-    return secrets.WIKI_ENDPOINT + f'/{tool_id}'
     # TODO: add to gallery
+    # leaving unimplemented atm because idk how locate the right section of the gallery
+
+    return 'https://' + secrets.WIKI_ENDPOINT + f'/{tool_id}'
 
 def delete_tool_page(tool_id):
     """Delete a tool page and its redirect page. Use when tool page has been created in error"""
