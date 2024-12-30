@@ -2223,8 +2223,9 @@ class ToolsViewSet(Base, Create, Destroy):
         try:
             tool_url = utils_mediawiki.create_tool_page(request.data)
             return Response({'toolUrl': tool_url}, status=drfstatus.HTTP_201_CREATED)
-        except Exception as ex:
-            return Response({'error': str(ex)}, status=drfstatus.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            logger.exception('Create Tool view - {} - {}'.format(e.__class__.__name__, str(e)))
+            return Response({'error': str(e)}, status=drfstatus.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def destroy(self, request, *args, **kwargs):
         pk = kwargs['pk']
@@ -2234,8 +2235,9 @@ class ToolsViewSet(Base, Create, Destroy):
         except FileNotFoundError:
             # tool page doesnt exist, thats fine
             pass
-        except Exception as ex:
-            return Response({'error': str(ex)}, status=drfstatus.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            logger.exception('Destroy Tool view - {} - {}'.format(e.__class__.__name__, str(e)))
+            return Response({'error': str(e)}, status=drfstatus.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(status=drfstatus.HTTP_404_NOT_FOUND)
 
