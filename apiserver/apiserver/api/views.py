@@ -2217,7 +2217,7 @@ class MyLoginView(LoginView):
     serializer_class = serializers.MyLoginSerializer
 
 class ToolsViewSet(Base, Create, Destroy):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowMetadata | IsAuthenticated]
 
     def create(self, request):
         try:
