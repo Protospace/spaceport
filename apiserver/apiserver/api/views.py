@@ -10,7 +10,7 @@ from django.http import HttpResponse, Http404, FileResponse, HttpResponseServerE
 from django.core.files.base import File
 from django.core.cache import cache
 from django.utils.timezone import now
-from rest_framework import viewsets, views, mixins, generics, exceptions
+from rest_framework import viewsets, views, mixins, generics, exceptions, status as drfstatus
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
@@ -26,7 +26,7 @@ import csv
 import xmltodict
 import json
 
-from . import models, serializers, utils, utils_paypal, utils_stats, utils_ldap, utils_email
+from . import models, serializers, utils, utils_paypal, utils_stats, utils_ldap, utils_email, utils_mediawiki
 from .permissions import (
     is_admin_director,
     AllowMetadata,
@@ -2216,6 +2216,28 @@ class SpaceportAuthView(LoginView):
 class MyLoginView(LoginView):
     serializer_class = serializers.MyLoginSerializer
 
+class ToolsViewSet(Base, Create, Destroy):
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request):
+        try:
+            tool_url = utils_mediawiki.create_tool_page(request.data)
+            return Response({'toolUrl': tool_url}, status=drfstatus.HTTP_201_CREATED)
+        except Exception as ex:
+            return Response({'error': str(ex)}, status=drfstatus.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def destroy(self, request, *args, **kwargs):
+        pk = kwargs['pk']
+        try:
+            utils_mediawiki.delete_tool_page(pk)
+            return Response(status=drfstatus.HTTP_204_NO_CONTENT)
+        except FileNotFoundError:
+            # tool page doesnt exist, thats fine
+            pass
+        except Exception as ex:
+            return Response({'error': str(ex)}, status=drfstatus.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=drfstatus.HTTP_404_NOT_FOUND)
 
 @api_view()
 def null_view(request, *args, **kwargs):
