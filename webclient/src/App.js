@@ -302,7 +302,7 @@ function App() {
 							</Route>
 
 							<Route exact path='/add-new-tool'>
-								<AddNewTool token={token} user={user} refreshUser={refreshUser} />
+								<AddNewTool token={token} />
 							</Route>
 
 							<Route path='/garden'>

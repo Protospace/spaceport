@@ -2,16 +2,10 @@ import React, { useState, useEffect, useReducer, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Label, Button, Container, Dimmer, Dropdown, Form, FormField, Header, Icon, Loader, Input, Segment, Table, TextArea } from 'semantic-ui-react';
-import moment from 'moment-timezone';
 import { apiUrl, isAdmin, getInstructor, getInstructorDiscourseLink, BasicTable, requester, useIsMobile } from './utils.js';
-import { NotFound } from './Misc.js';
-import { InstructorClassDetail, InstructorClassAttendance } from './InstructorClasses.js';
-import { PayPalPayNow } from './PayPal.js';
-import { PayWithProtocoin } from './Paymaster.js';
-import { tags } from './Courses.js';
 
 export function AddNewTool(props) {
-	const { token, user, refreshUser } = props;
+	const { token } = props;
 
 	const loanStatusOptions = [
 		{ key: 'owned', text: 'Owned by Protospace', value: 'Owned by Protospace' },
