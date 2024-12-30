@@ -96,7 +96,7 @@ export function AddNewTool(props) {
 			{toolUrl != '' && !error && <>
 				<Header size='large'>Successfully created tool wiki page</Header>
 
-				<p>Go to it here: <a href={toolUrl}>{toolUrl}</a></p>
+				<p>Go to it here: <a href={toolUrl} target='_blank'>{toolUrl}</a></p>
 
 				<Button onClick={() => window.location.reload(false)}>Make another tool page</Button>
 			</>}
