@@ -1,4 +1,6 @@
 import logging
+logger = logging.getLogger(__name__)
+
 from mwclient import Site
 from apiserver import secrets
 
@@ -27,6 +29,7 @@ def get_next_tool_id(site):
         if line.startswith('* '):
             candidate_id = line.replace('* [[', '').replace(']]', '')
             if site.pages[candidate_id].text() == '':
+                logger.info('Found empty Wiki-ID: %s', candidate_id)
                 return candidate_id
     
     raise Exception('No next tool ID found. Please update the list: https://wiki.protospace.ca/Protospace_Wiki:Wiki-ID_system#Next_available_wiki-ID_numbers')
@@ -116,7 +119,11 @@ TBD
     # TODO: add to gallery
     # leaving unimplemented atm because idk how locate the right section of the gallery
 
-    return 'https://' + secrets.WIKI_ENDPOINT + f'/{tool_id}'
+    tool_url = 'https://' + secrets.WIKI_ENDPOINT + f'/{tool_id}'
+
+    logger.info('Created tool page: %s, url: %s', name, tool_url)
+
+    return tool_url
 
 def delete_tool_page(tool_id):
     '''Delete a tool page and its redirect page. Use when tool page has been created in error'''
@@ -142,5 +149,7 @@ def delete_tool_page(tool_id):
 
     # delete the redirect page
     redirect_page.delete(reason='Requested deletion')
+
+    logger.info('Deleted tool page ID: %s', tool_id)
 
     return tool_id
