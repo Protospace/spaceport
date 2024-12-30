@@ -217,11 +217,6 @@ function App() {
 										as={Link}
 										to='/charts'
 									/>
-									<Dropdown.Item
-										content='Add New Tool'
-										as={Link}
-										to='/add-new-tool'
-									/>
 
 									{user && isAdmin(user) && <Dropdown.Item
 										content='Admin'
