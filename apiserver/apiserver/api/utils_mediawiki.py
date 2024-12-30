@@ -2,10 +2,15 @@ import logging
 from mwclient import Site
 from apiserver import secrets
 
-site = Site(secrets.WIKI_ENDPOINT, path='/')
-site.login(username=secrets.WIKI_USERNAME, password=secrets.WIKI_PASSWORD)
+def is_configured():
+    return bool(secrets.WIKI_ENDPOINT and secrets.WIKI_USERNAME and secrets.WIKI_PASSWORD)
 
-def get_next_tool_id():
+def wiki_site_login():
+    site = Site(secrets.WIKI_ENDPOINT, path='/')
+    site.login(username=secrets.WIKI_USERNAME, password=secrets.WIKI_PASSWORD)
+    return site
+
+def get_next_tool_id(site):
     '''Get the next available tool ID from the wiki'''
     # Tool IDs are managed on this page
     # https://wiki.protospace.ca/Protospace_Wiki:Wiki-ID_system#Next_available_wiki-ID_numbers
@@ -40,7 +45,13 @@ def create_tool_page(form_data):
         'permission': str,
         'certification': str
     '''
-    tool_id = get_next_tool_id()
+
+    if not is_configured():
+        raise Exception('Mediawiki integration not configured, edit secrets.py')
+
+    site = wiki_site_login()
+
+    tool_id = get_next_tool_id(site)
 
     photo_name = 'NoImage.png'
     if 'photo' in form_data and form_data['photo']:
@@ -109,6 +120,11 @@ TBD
 
 def delete_tool_page(tool_id):
     '''Delete a tool page and its redirect page. Use when tool page has been created in error'''
+
+    if not is_configured():
+        raise Exception('Mediawiki integration not configured, edit secrets.py')
+
+    site = wiki_site_login()
 
     redirect_page = site.pages[tool_id]
     if redirect_page.text() == '':
