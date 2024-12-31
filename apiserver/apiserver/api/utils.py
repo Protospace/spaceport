@@ -287,7 +287,7 @@ def process_garden_image(upload):
     pic.save(STATIC_FOLDER + large)
 
     medium = 'garden-medium' + ext
-    pic.thumbnail([GARDEN_MEDIUM_SIZE, GARDEN_MEDIUM_SIZE], Image.ANTIALIAS)
+    pic.thumbnail([GARDEN_MEDIUM_SIZE, GARDEN_MEDIUM_SIZE], Image.LANCZOS)
     pic.save(STATIC_FOLDER + medium)
 
     return medium, large
