@@ -163,7 +163,7 @@ export function DisplayUsage(props) {
 	}, []);
 
 	const inUse = usage && moment().unix() - usage.track.time <= 60;
-	const showUsage = usage && inUse && usage.track.username === usage.username;
+	const showUsage = usage && inUse && usage.username.startsWith(usage.track.username);
 
 	return (
 		<>
