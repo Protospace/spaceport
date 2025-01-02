@@ -260,7 +260,7 @@ export function Home(props) {
 	const alarmUpdateLast = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz('America/Edmonton').format('llll') : 'Unknown';
 	const alarmUpdateAgo = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz('America/Edmonton').fromNow() : 'Unknown';
 
-	const closedStat = (x) => stats && stats.closing ? moment().unix() > stats.closing['time'] ? 'Closed' : 'Open until ' + stats.closing['time_str'] + ' with ' + stats.closing['first_name'] : 'Unknown';
+	const closedStat = (x) => stats && stats.closing ? moment().unix() > stats.closing['time'] ? 'No host' : 'Open until ' + stats.closing['time_str'] + ' with ' + stats.closing['first_name'] : 'Unknown';
 
 	const p1sPrinter3dStat = (x) => {
 		const data = stats?.printer3d?.[x];
