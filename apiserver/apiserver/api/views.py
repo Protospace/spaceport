@@ -1918,6 +1918,8 @@ class PinballViewSet(Base):
             raise exceptions.PermissionDenied()
 
         def get_favourite_drink(member):
+            if member.allow_last_scanned is False:
+                return 'Slug-O-Cola'
             drinks = {
                 # max drink length 11 chars
                 '1': 'Coke',
