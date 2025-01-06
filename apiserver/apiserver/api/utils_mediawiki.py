@@ -104,6 +104,8 @@ TBD
 ==Documentation==
 TBD
 
+==Links==
+{form_copy['links']}
 '''
 
     name = f'{form_copy["toolname"]} ({form_copy["model"]}) ID:{tool_id}'

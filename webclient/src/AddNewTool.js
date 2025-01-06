@@ -218,13 +218,14 @@ export function AddNewTool(props) {
 						/>
 					</Form.Field>
 
-					<Form.Field>
+					<Form.Field required>
 						<label>Photo</label>
 						<Input
 							type='file'
 							name='photo'
 							key={photoKey}
 							onChange={handleFileChange}
+							required
 						/>
 						<div>
 							{formData.photo &&
@@ -248,6 +249,22 @@ export function AddNewTool(props) {
 							onChange={handleChange}
 						/>
 					</Form.Field>}
+
+					<Form.Field>
+						<label>Relevant Links</label>
+						<p>Please copy and paste links that provide more detail about the tool. Examples:</p>
+						<ul>
+							<li>Forum posts</li>
+							<li>Google group posts</li>
+							<li>Manufacturer information pages</li>
+						</ul>
+						<p>Please only have one link per line</p>
+						<TextArea
+							placeholder='Add hyperlinks for pages that provide more detail about this tool'
+							name='links'
+							onChange={handleChange}
+						/>
+					</Form.Field>
 
 					<Button
 						type='submit'
