@@ -2230,6 +2230,7 @@ class ToolsViewSet(Base, Create, Destroy):
             return Response({'toolUrl': tool_url}, status=drfstatus.HTTP_201_CREATED)
         except Exception as e:
             logger.exception('Create Tool view - {} - {}'.format(e.__class__.__name__, str(e)))
+            # TODO: alert via Telegram
             return Response({'error': str(e)}, status=drfstatus.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def destroy(self, request, *args, **kwargs):

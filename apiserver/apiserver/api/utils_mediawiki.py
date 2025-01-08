@@ -56,6 +56,11 @@ def create_tool_page(form_data):
 
     tool_id = get_next_tool_id(site)
 
+    # collect calls for rolling back this operation incase it fails partway
+    # each rollback item is a tuple: (rollback_function, dict of kwargs)
+    # each rollback function will be called in the event of an Exception
+    rollbacks = [ ]
+
     photo_name = 'NoImage.png'
     if 'photo' in form_data and form_data['photo']:
         # upload photo
@@ -63,6 +68,7 @@ def create_tool_page(form_data):
         photo_extn = photo_data.content_type.replace('image/', '')
         photo_name = f'{tool_id}.{photo_extn}'
         site.upload(photo_data, photo_name, 1, f'Photo of tool {tool_id}')
+        # TODO: implement rollback
 
     # make a copy of form_data specifically avoiding the 'photo' field
     # if photo is provided, is an I/O object that is already closed because of the above 
@@ -105,21 +111,27 @@ TBD
 TBD
 
 ==Links==
-{form_copy.get('links', 'TBD') or 'TBD'}
+{ form_copy['links'] if 'links' in form_copy else 'TBD' }
 '''
 
     name = f'{form_copy["toolname"]} ({form_copy["model"]}) ID:{tool_id}'
 
     # create tool page
     page = site.pages[name]
+    # TODO: credit uploader
     page.save(body, summary='Creating new tool page')
+    # TODO: implement rollback
 
     # create redirect page
     redirect = site.pages[tool_id]
     redirect.save('#REDIRECT [[' + name + ']]{{id/after-redirect}}')
+    # TODO: implement rollback
 
     # TODO: add to gallery
     # leaving unimplemented atm because idk how locate the right section of the gallery
+    # here's the template to adapt:
+    # File:197.jpeg|link=197|[[Vacuum,_13_gal_1.5_HP_(Shop_Vac_3333.0E)_ID:197]]
+    # TODO: implement rollback
 
     tool_url = 'https://' + secrets.WIKI_ENDPOINT + f'/{tool_id}'
 

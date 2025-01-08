@@ -267,6 +267,7 @@ export function AddNewTool(props) {
 					</Form.Field>
 
 					<Button
+						// TODO: implement validation as per LoginSignup
 						type='submit'
 						onClick={postTool}
 						primary
