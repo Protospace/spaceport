@@ -448,10 +448,6 @@ export function Home(props) {
 									} trigger={<a>[more]</a>} />
 								</p>
 
-								<p>P1S printer L: {p1sPrinter3dStat('p1s1')}</p>
-
-								<p>P1S printer R: {p1sPrinter3dStat('p1s2')}</p>
-
 								{stats && stats?.solar?.hasOwnProperty('total') && <p>
 									Members' solar power: {stats.solar.total.toLocaleString()} W <Popup content={
 										<React.Fragment>

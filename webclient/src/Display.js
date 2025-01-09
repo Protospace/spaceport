@@ -127,8 +127,6 @@ export function LCARS3Display(props) {
 				}
 
 				<div className='display-printers'>
-					<DisplayBambuCamera name={'p1s1'} />
-					<DisplayBambuCamera name={'p1s2'} />
 				</div>
 
 				<div className='display-classes'>
