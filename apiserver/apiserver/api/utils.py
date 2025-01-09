@@ -243,15 +243,15 @@ def process_image_upload(upload, crop):
         pic = pic.crop((left, top, right, bottom))
 
     large = str(uuid4()) + ext
-    pic.thumbnail([LARGE_SIZE, LARGE_SIZE], Image.ANTIALIAS)
+    pic.thumbnail([LARGE_SIZE, LARGE_SIZE], Image.LANCZOS)
     pic.save(STATIC_FOLDER + large)
 
     medium = str(uuid4()) + ext
-    pic.thumbnail([MEDIUM_SIZE, MEDIUM_SIZE], Image.ANTIALIAS)
+    pic.thumbnail([MEDIUM_SIZE, MEDIUM_SIZE], Image.LANCZOS)
     pic.save(STATIC_FOLDER + medium)
 
     small = str(uuid4()) + ext
-    pic.thumbnail([SMALL_SIZE, SMALL_SIZE], Image.ANTIALIAS)
+    pic.thumbnail([SMALL_SIZE, SMALL_SIZE], Image.LANCZOS)
     pic.save(STATIC_FOLDER + small)
 
     return small, medium, large
@@ -303,7 +303,7 @@ def gen_card_photo(member):
     card_template = Image.open(CARD_TEMPLATE_FILE)
 
     member_photo = Image.open(STATIC_FOLDER + member.photo_large)
-    member_photo.thumbnail([CARD_PHOTO_SIZE, CARD_PHOTO_SIZE], Image.ANTIALIAS)
+    member_photo.thumbnail([CARD_PHOTO_SIZE, CARD_PHOTO_SIZE], Image.LANCZOS)
     member_photo = ImageOps.expand(member_photo, border=10)
     mx, my = member_photo.size
 
