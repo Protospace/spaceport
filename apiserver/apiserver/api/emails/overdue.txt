@@ -1,6 +1,6 @@
 Hi [name],
 
-Your Protospace member dues are behind by two months and you are now "overdue".
+Your Protospace member dues are behind by a month and you are now "overdue".
 
 You are paid up until [date]. Please pay your dues to prevent having your
 account and any cards (if applicable) deactivated by the system.
