@@ -271,7 +271,7 @@ export function Home(props) {
 			return 'Unknown / Offline';
 		}
 
-		const gcode_states = {IDLE: 'Idle', FINISH: 'Finished', RUNNING: 'Running', PAUSE: 'Paused', FAILED: 'Failed', PREPARE: 'Preparing'};
+		const gcode_states = {IDLE: 'Idle', FINISH: 'Finished', RUNNING: 'Running', PAUSE: 'Paused', FAILED: 'Failed', PREPARE: 'Preparing', OFFLINE: 'Offline'};
 
 		const printer_state = gcode_states?.[info?.gcode_state] || info?.gcode_state || 'Unknown';
 
@@ -447,6 +447,10 @@ export function Home(props) {
 										</React.Fragment>
 									} trigger={<a>[more]</a>} />
 								</p>
+
+								<p>P1S printer L: {p1sPrinter3dStat('p1s1')}</p>
+
+								<p>P1S printer R: {p1sPrinter3dStat('p1s2')}</p>
 
 								{stats && stats?.solar?.hasOwnProperty('total') && <p>
 									Members' solar power: {stats.solar.total.toLocaleString()} W <Popup content={

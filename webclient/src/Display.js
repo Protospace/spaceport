@@ -127,6 +127,8 @@ export function LCARS3Display(props) {
 				}
 
 				<div className='display-printers'>
+					<DisplayBambuCamera name={'p1s1'} />
+					<DisplayBambuCamera name={'p1s2'} />
 				</div>
 
 				<div className='display-classes'>
@@ -411,7 +413,7 @@ export function DisplayBambuCamera(props) {
 	const [pic, setPic] = useState(false);
 
 	const getPic = () => {
-		requester('http://localhost/' + name + '/pic', 'GET')
+		requester('http://localhost/' + name + '/pic.jpg', 'GET')
 		.then(res => res.blob())
 		.then(imageBlob => {
 			const imageObjectURL = URL.createObjectURL(imageBlob);
