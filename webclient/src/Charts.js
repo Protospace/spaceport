@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Statistic, Button, Container, Header } from 'semantic-ui-react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
-import { requester } from './utils.js';
+import { requester, useIsMobile } from './utils.js';
 import moment from 'moment-timezone';
 
 let memberCountCache = false;
@@ -14,6 +14,8 @@ export function Charts(props) {
 	const [spaceActivity, setSpaceActivity] = useState(spaceActivityCache);
 	const [fullActivity, setFullActivity] = useState(false);
 	const [fullSignups, setFullSignups] = useState(false);
+	const [stats, setStats] = useState(false);
+	const isMobile = useIsMobile();
 
 	useEffect(() => {
 		requester('/charts/membercount/', 'GET')
@@ -41,6 +43,16 @@ export function Charts(props) {
 		})
 		.catch(err => {
 			console.log(err);
+		});
+
+		requester('/stats/', 'GET')
+		.then(res => {
+			setStats(res);
+			localStorage.setItem('stats', JSON.stringify(res));
+		})
+		.catch(err => {
+			console.log(err);
+			setStats(false);
 		});
 	}, []);
 
@@ -110,6 +122,39 @@ export function Charts(props) {
 					</p>
 				</>
 			}
+
+			<Header size='medium'>Drink Sales</Header>
+
+			<p>Drinks sold over the last six months.</p>
+
+			<p>
+				{!!stats?.drinks_6mo?.length &&
+					<ResponsiveContainer width='100%' height={300}>
+						<BarChart
+							margin={isMobile? {bottom: 50} : {}}
+							data={stats.drinks_6mo.map((x, i) => (
+								{...x, fill: ['#e7223a', 'black', '#9a4423', '#1582ae', '#d77a2d', '#6f0e21', '#3fad96', '#ab316e'][i]}
+							))}
+						>
+							<XAxis dataKey='name' interval={0} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip />
+
+							<Bar
+								type='monotone'
+								dataKey='count'
+								name='Cans'
+								fill='#2185d0'
+								maxBarSize={40}
+								animationDuration={250}
+							/>
+						</BarChart>
+					</ResponsiveContainer>
+				}
+			</p>
+
+			<p>Count: number of cans of pop sold over the last six months.</p>
 
 			<Header size='medium'>Member Counts</Header>
 

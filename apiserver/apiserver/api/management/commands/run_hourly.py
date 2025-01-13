@@ -30,6 +30,8 @@ class Command(BaseCommand):
             defaults=dict(signup_count=signup_count),
         )
 
+        utils_stats.calc_drink_sales()
+
         utils_stats.calc_card_scans()
 
         utils.gen_search_strings()

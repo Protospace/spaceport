@@ -32,6 +32,7 @@ DEFAULTS = {
     'closing': {},
     'printer3d': {},
     'solar': {},
+    'drinks_6mo': [],
 }
 
 if secrets.MUMBLE:
@@ -195,6 +196,35 @@ def calc_card_scans():
         date=date,
         defaults=dict(card_scans=count),
     )
+
+def calc_drink_sales():
+    six_months_ago = utils.today_alberta_tz() - timedelta(days=183)
+
+    drinks = {
+        '1': 'Coke',
+        '2': 'Coke Zero',
+        '3': 'Root Beer',
+        '4': 'Iced Tea',
+        '5': 'Crush Pop',
+        '6': 'Dr Pepper',
+        '7': 'Arizona Tea',
+        '8': 'Cherry Coke',
+    }
+    results = []
+
+    txs = models.Transaction.objects
+
+    for number, name in drinks.items():
+        count = txs.filter(
+            category='Snacks',
+            memo__contains='pop vending machine item #' + number,
+            date__gte=six_months_ago,
+        ).count()
+
+        results.append(dict(name=name, count=count))
+
+    cache.set('drinks_6mo', results)
+
 
 def get_progress(request_id):
     return cache.get('request-progress-' + request_id, [])
