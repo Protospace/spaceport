@@ -7,8 +7,6 @@ import moment from 'moment-timezone';
 let memberCountCache = false;
 let signupCountCache = false;
 let spaceActivityCache = false;
-let classroomDustLevelCache = false;
-let woodshopDustLevelCache = false;
 
 export function Charts(props) {
 	const [memberCount, setMemberCount] = useState(memberCountCache);
@@ -16,8 +14,6 @@ export function Charts(props) {
 	const [spaceActivity, setSpaceActivity] = useState(spaceActivityCache);
 	const [fullActivity, setFullActivity] = useState(false);
 	const [fullSignups, setFullSignups] = useState(false);
-	const [classroomDustLevel, setClassroomDustLevel] = useState(classroomDustLevelCache);
-	const [woodshopDustLevel, setWoodshopDustLevel] = useState(woodshopDustLevelCache);
 
 	useEffect(() => {
 		requester('/charts/membercount/', 'GET')
@@ -42,24 +38,6 @@ export function Charts(props) {
 		.then(res => {
 			setSpaceActivity(res);
 			spaceActivityCache = res;
-		})
-		.catch(err => {
-			console.log(err);
-		});
-
-		requester('https://ps-iot.dns.t0.vc/sensors/air/0/pm25/week', 'GET')
-		.then(res => {
-			setClassroomDustLevel(res.result);
-			classroomDustLevelCache = res.result;
-		})
-		.catch(err => {
-			console.log(err);
-		});
-
-		requester('https://ps-iot.dns.t0.vc/sensors/air/1/pm25/week', 'GET')
-		.then(res => {
-			setWoodshopDustLevel(res.result);
-			woodshopDustLevelCache = res.result;
 		})
 		.catch(err => {
 			console.log(err);
@@ -385,61 +363,6 @@ export function Charts(props) {
 			<p>Later Vetted Count: number of those signups who eventually got vetted (at a later date).</p>
 
 			<p>Retained Count: number of those signups who are still a member currently.</p>
-
-
-			<Header size='medium'>Protodust Level</Header>
-
-			<p>Averaged every 15 minutes for the past week. They are cheap sensors so don't trust the absolute value of the readings.</p>
-
-			<p>
-				{classroomDustLevel && woodshopDustLevel &&
-					<>
-					<ResponsiveContainer width='100%' height={300}>
-						<LineChart data={classroomDustLevel} syncId={1}>
-							<XAxis dataKey='time' tickFormatter={(t) => moment(t).format('ddd h:mm a')} minTickGap={10} />
-							<YAxis domain={[0, 60]} />
-							<CartesianGrid strokeDasharray='3 3'/>
-							<Tooltip formatter={v => v.toFixed(2) + ' μg/m³'} labelFormatter={t => 'Time: ' + moment(t).format('ddd h:mm a')}  />
-							<Legend />
-
-							<Line
-								type='monotone'
-								dataKey='value'
-								name='Classroom PM2.5'
-								stroke='#2185d0'
-								strokeWidth={2}
-								dot={false}
-								animationDuration={250}
-							/>
-						</LineChart>
-					</ResponsiveContainer>
-
-					<ResponsiveContainer width='100%' height={300}>
-						<LineChart data={woodshopDustLevel} syncId={1}>
-							<XAxis dataKey='time' tickFormatter={(t) => moment(t).format('ddd h:mm a')} minTickGap={10} />
-							<YAxis domain={[0, 60]} />
-							<CartesianGrid strokeDasharray='3 3'/>
-							<Tooltip formatter={v => v.toFixed(2) + ' μg/m³'} labelFormatter={t => 'Time: ' + moment(t).format('ddd h:mm a')}  />
-							<Legend />
-
-							<Line
-								type='monotone'
-								dataKey='value'
-								name='Woodshop PM2.5'
-								stroke='#82ca9d'
-								strokeWidth={2}
-								dot={false}
-								animationDuration={250}
-							/>
-						</LineChart>
-					</ResponsiveContainer>
-					</>
-				}
-			</p>
-
-			<p>Classroom PM2.5: Amount of PM2.5 particles measured from the classroom ceiling. Units are μg/m³.</p>
-
-			<p>Woodshop PM2.5: Amount of PM2.5 particles measured from the woodshop ceiling. Units are μg/m³.</p>
 
 		</Container>
 	);
