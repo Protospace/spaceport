@@ -105,7 +105,7 @@ TBD
 TBD
 
 ==Links==
-{form_copy['links']}
+{form_copy.get('links', 'TBD') or 'TBD'}
 '''
 
     name = f'{form_copy["toolname"]} ({form_copy["model"]}) ID:{tool_id}'
