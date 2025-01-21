@@ -1798,14 +1798,17 @@ class ProtocoinViewSet(Base):
                 logging.info('    %s ul ink cost: %s', str(microliters), str(cost))
 
                 PAPER_COSTS = {
-                    'Plain Paper': 0.25,
+                    # Prices: https://forum.protospace.ca/t/issue-with-plotter-printer-protocoin/6928/20
+                    'Plain Paper': 2.16,
+                    'Photo Gloss Paper': 8.77,
                 }
 
+                paper_name = request.data['paper_name']
                 squareinches = float(request.data['paper_sqi'])
                 squaremetres = squareinches / 1550.0
-                cost = squaremetres * PAPER_COSTS.get(request.data['paper_name'], DEFAULT_PAPER_PROTOCOIN_PER_M)
+                cost = squaremetres * PAPER_COSTS.get(paper_name, DEFAULT_PAPER_PROTOCOIN_PER_M)
                 total_cost += cost
-                logging.info('    %s sqi paper cost: %s', str(squareinches), str(cost))
+                logging.info('    %s sqi %s cost: %s', str(squareinches), paper_name, str(cost))
 
                 total_cost = round(total_cost, 2)
 
