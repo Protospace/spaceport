@@ -255,7 +255,7 @@ export function AddNewTool(props) {
 
 					{formData.photo && <Form.Field>
 						<label>Caption</label>
-						<TextArea
+						<Input
 							placeholder='Add a caption for the photo'
 							name='caption'
 							onChange={handleChange}
