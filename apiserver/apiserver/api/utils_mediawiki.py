@@ -76,30 +76,31 @@ def create_tool_page(form_data, user=None):
     # collect calls for rolling back this operation incase it fails partway
     # each rollback item is a tuple: (rollback_function, dict of kwargs)
     # each rollback function will be called in the event of an Exception
-    rollback = [ ]
+    rollbacks = [ ]
 
-    # Step 1. Create redirect page first
-    # This is the fastest way to reserve the tool ID and derisk collisions
-    # TODO: exclude model if empty?
-    name = f'{form_copy["toolname"]} ({form_copy["model"]}) ID:{tool_id}'
-    redirect = site.pages[tool_id]
-    redirect.save('#REDIRECT [[' + name + ']]{{id/after-redirect}}', summary='Creating new tool redirect page' + credit)
-    rollback.append((redirect.delete, {'reason': 'Failed to complete tool creation, initiating rollback'}))
-    logger.info('Created redirect page: %s', tool_id)
+    try:
+        # Step 1. Create redirect page first
+        # This is the fastest way to reserve the tool ID and derisk collisions
+        # TODO: exclude model if empty?
+        name = f'{form_copy["toolname"]} ({form_copy["model"]}) ID:{tool_id}'
+        redirect = site.pages[tool_id]
+        redirect.save('#REDIRECT [[' + name + ']]{{id/after-redirect}}', summary='Creating new tool redirect page' + credit)
+        rollbacks.append((redirect.delete, {'reason': 'Failed to complete tool creation, initiating rollback'}))
+        logger.info('Created redirect page: %s', tool_id)
 
-    # Step 2. Upload photo
-    photo_name = 'NoImage.png'
-    if 'photo' in form_data and form_data['photo']:
-        # upload photo
-        photo_data = form_data['photo']
-        photo_extn = photo_data.content_type.replace('image/', '')
-        photo_name = f'{tool_id}.{photo_extn}'
-        site.upload(photo_data, photo_name, 1, f'Photo of tool {tool_id}', comment=f'Uploaded tool picture' + credit)
-        rollback.append((site.pages[f'File:{photo_name}'].delete, {}))
-        logger.info('Uploaded photo: %s', photo_name)
+        # Step 2. Upload photo
+        photo_name = 'NoImage.png'
+        if 'photo' in form_data and form_data['photo']:
+            # upload photo
+            photo_data = form_data['photo']
+            photo_extn = photo_data.content_type.replace('image/', '')
+            photo_name = f'{tool_id}.{photo_extn}'
+            site.upload(photo_data, photo_name, 1, f'Photo of tool {tool_id}', comment=f'Uploaded tool picture' + credit)
+            rollbacks.append((site.pages[f'File:{photo_name}'].delete, {}))
+            logger.info('Uploaded photo: %s', photo_name)
 
-    # Step 3. Create tool page
-    body = f'''{{{{Equipment page
+        # Step 3. Create tool page
+        body = f'''{{{{Equipment page
 | toolname = {form_copy['toolname']}
 | model = {form_copy['model']}
 | serial = {form_copy['serial'] or ''}
@@ -130,20 +131,30 @@ TBD
 ==Links==
 { form_copy['links'] if 'links' in form_copy else 'TBD' }
 '''
-    page = site.pages[name]
-    summary = 'Creating new tool page'
-    page.save(body, summary=summary + credit)
-    rollback.append((page.delete, {'reason': 'Failed to complete tool creation'}))
-    logger.info('Created tool page: %s', name)
+        page = site.pages[name]
+        summary = 'Creating new tool page'
+        page.save(body, summary=summary + credit)
+        rollbacks.append((page.delete, {'reason': 'Failed to complete tool creation'}))
+        logger.info('Created tool page: %s', name)
 
-    # Step 4. Add tool to gallery
-    # TODO: allow user to pick which section of the gallery to add the tool to
-    add_to_gallery(tool_id, photo_name, name, credit=credit)
-    rollback.append((remove_tool_from_gallery, {'tool_id': tool_id}))
+        # Step 4. Add tool to gallery
+        # TODO: allow user to pick which section of the gallery to add the tool to
+        add_to_gallery(tool_id, photo_name, name, credit=credit)
+        rollbacks.append((remove_tool_from_gallery, {'tool_id': tool_id}))
 
-    tool_url = 'https://' + secrets.WIKI_ENDPOINT + f'/{tool_id}'
-    logger.info('tool page available at: %s', tool_url)
-    return tool_url
+        tool_url = 'https://' + secrets.WIKI_ENDPOINT + f'/{tool_id}'
+        logger.info('tool page available at: %s', tool_url)
+
+        raise Exception('Rollback test')
+
+        return tool_url
+    except Exception as e:
+        logger.error('error ocurred, initating rollback: %s', e)
+        for rollback, kwargs in rollbacks:
+            try:
+                rollback(**kwargs)
+            except Exception as rollback_error:
+                logger.error('Rollback failed: %s', rollback_error)
 
 def add_to_gallery(tool_id, photo_name, tool_name, PAGE_NAME='Tools_we_have', NEW_TOOL_SECTION=1, credit=''):
     '''Add a tool to the gallery page'''
