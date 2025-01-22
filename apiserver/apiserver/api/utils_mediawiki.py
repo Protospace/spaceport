@@ -3,12 +3,19 @@ logger = logging.getLogger(__name__)
 
 from mwclient import Site
 from apiserver import secrets
+from .. import settings
+
+
+if settings.DEBUG:
+    WIKI_ENDPOINT = 'ps-wiki.dns.t0.vc'
+else:
+    WIKI_ENDPOINT = secrets.WIKI_ENDPOINT
 
 def is_configured():
-    return bool(secrets.WIKI_ENDPOINT and secrets.WIKI_USERNAME and secrets.WIKI_PASSWORD)
+    return bool(WIKI_ENDPOINT and secrets.WIKI_USERNAME and secrets.WIKI_PASSWORD)
 
 def wiki_site_login():
-    site = Site(secrets.WIKI_ENDPOINT, path='/')
+    site = Site(WIKI_ENDPOINT, path='/')
     site.login(username=secrets.WIKI_USERNAME, password=secrets.WIKI_PASSWORD)
     return site
 
@@ -141,7 +148,7 @@ TBD
         add_to_gallery(tool_id, photo_name, name, credit=credit, NEW_TOOL_SECTION=form_copy.get('category', None))
         rollbacks.append((remove_tool_from_gallery, {'tool_id': tool_id}))
 
-        tool_url = 'https://' + secrets.WIKI_ENDPOINT + f'/{tool_id}'
+        tool_url = 'https://' + WIKI_ENDPOINT + f'/{tool_id}'
         logger.info('tool page available at: %s', tool_url)
 
         return tool_url
