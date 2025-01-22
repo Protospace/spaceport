@@ -152,6 +152,8 @@ TBD
                 rollback(**kwargs)
             except Exception as rollback_error:
                 logger.error('Rollback failed: %s', rollback_error)
+            finally:
+                raise e
 
 def add_to_gallery(tool_id, photo_name, tool_name, PAGE_NAME='Tools_we_have', NEW_TOOL_SECTION=None, credit=''):
     '''Add a tool to the gallery page'''
