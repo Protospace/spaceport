@@ -153,14 +153,14 @@ TBD
 
         return tool_url
     except Exception as e:
-        logger.error('error ocurred, initating rollback: %s', e)
+        logger.error('Error ocurred, initating rollback: %s', e)
         for rollback, kwargs in rollbacks:
             try:
                 rollback(**kwargs)
+                logging.info('Rolled back %s, args: %s', rollback, kwargs)
             except Exception as rollback_error:
                 logger.error('Rollback failed: %s', rollback_error)
-            finally:
-                raise e
+        raise e
 
 def add_to_gallery(tool_id, photo_name, tool_name, PAGE_NAME='Tools_we_have', NEW_TOOL_SECTION=None, credit=''):
     '''Add a tool to the gallery page'''
