@@ -2226,7 +2226,7 @@ class ToolsViewSet(Base, Create, Destroy):
 
     def create(self, request):
         try:
-            tool_url = utils_mediawiki.create_tool_page(request.data, user=request.user.username)
+            tool_url = utils_mediawiki.create_tool_page(request.data, username=request.user.username)
             return Response({'toolUrl': tool_url}, status=drfstatus.HTTP_201_CREATED)
         except Exception as e:
             logger.exception('Create Tool view - {} - {}'.format(e.__class__.__name__, str(e)))
@@ -2250,18 +2250,18 @@ class ToolsViewSet(Base, Create, Destroy):
     @action(detail=False, methods=['get'], url_path='categories')
     def categories(self, request):
         categories = [
-                # copy the ToC from https://wiki.protospace.ca/Tools_we_have
-                '1 3D Printer',
-                '2 Laser Cutter',
-                '3 Wood/Plastic CNC',
-                '4 Automotive tool',
-                '5 Electronics equipment',
-                '6 Metalworking tool',
-                '7 Woodworking and plasticworking tool',
-                '8 Textile, Leather, Vinyl, and Media tool',
-                '9 Measuring and inspection tool',
-                '10 Miscellaneous or other',
-                ]
+            # copy the ToC from https://wiki.protospace.ca/Tools_we_have
+            '1 3D Printer',
+            '2 Laser Cutter',
+            '3 Wood/Plastic CNC',
+            '4 Automotive tool',
+            '5 Electronics equipment',
+            '6 Metalworking tool',
+            '7 Woodworking and plasticworking tool',
+            '8 Textile, Leather, Vinyl, and Media tool',
+            '9 Measuring and inspection tool',
+            '10 Miscellaneous or other',
+        ]
         return Response([{'value': item.split(' ', 1)[0], 'text': item.split(' ', 1)[1]} for item in categories])
 
 @api_view()

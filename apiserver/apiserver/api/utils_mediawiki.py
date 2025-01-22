@@ -41,7 +41,7 @@ def get_next_tool_id(site):
     
     raise Exception('No next tool ID found. Please update the list: https://wiki.protospace.ca/Protospace_Wiki:Wiki-ID_system#Next_available_wiki-ID_numbers')
 
-def create_tool_page(form_data, user=None):
+def create_tool_page(form_data, username=None):
     '''Create a new tool page on the wiki
     Use the following schema:
         'loanstatus': 'owned',
@@ -62,8 +62,8 @@ def create_tool_page(form_data, user=None):
     site = wiki_site_login()
 
     credit = ''
-    if user:
-        credit = ' on behalf of ' + user
+    if username:
+        credit = ' on behalf of ' + username
 
     # make a copy of form_data specifically avoiding the 'photo' field
     # if photo is provided, is an I/O object that only works once
@@ -83,10 +83,11 @@ def create_tool_page(form_data, user=None):
     # collect calls for rolling back this operation incase it fails partway
     # each rollback item is a tuple: (rollback_function, dict of kwargs)
     # each rollback function will be called in the event of an Exception
-    rollbacks = [ ]
-    UNKNOWN_MODEL = 'Unknown make/model'
+    rollbacks = []
 
     try:
+        UNKNOWN_MODEL = 'Unknown make/model'
+
         # Step 1. Create redirect page first
         # This is the fastest way to reserve the tool ID and derisk collisions
         name = f'{form_copy["toolname"]} ({form_copy.get("model", UNKNOWN_MODEL)}) ID:{tool_id}'
@@ -145,7 +146,7 @@ TBD
         logger.info('Created tool page: %s', name)
 
         # Step 4. Add tool to gallery
-        add_to_gallery(tool_id, photo_name, name, credit=credit, NEW_TOOL_SECTION=form_copy.get('category', None))
+        add_to_gallery(tool_id, photo_name, name, credit=credit, new_tool_section=form_copy.get('category', None))
         rollbacks.append((remove_tool_from_gallery, {'tool_id': tool_id}))
 
         tool_url = 'https://' + WIKI_ENDPOINT + f'/{tool_id}'
@@ -162,7 +163,7 @@ TBD
                 logger.error('Rollback failed: %s', rollback_error)
         raise e
 
-def add_to_gallery(tool_id, photo_name, tool_name, PAGE_NAME='Tools_we_have', NEW_TOOL_SECTION=None, credit=''):
+def add_to_gallery(tool_id, photo_name, tool_name, page_name='Tools_we_have', new_tool_section=None, credit=''):
     '''Add a tool to the gallery page'''
 
     if not is_configured():
@@ -170,18 +171,18 @@ def add_to_gallery(tool_id, photo_name, tool_name, PAGE_NAME='Tools_we_have', NE
 
     site = wiki_site_login()
 
-    if not NEW_TOOL_SECTION:
+    if not new_tool_section:
         # find the section we should add the tool to
         # let's try to infer by using API to get the sections of the page
-        response = site.api('parse', page=PAGE_NAME, prop='sections')
+        response = site.api('parse', page=page_name, prop='sections')
 
         # just add to the last section
         sections = response['parse']['sections']
-        NEW_TOOL_SECTION = sections[-2]['index']
+        new_tool_section = sections[-2]['index']
 
     # grab the gallery page and the text
-    gallery_page = site.pages[PAGE_NAME]
-    gallery_text = gallery_page.text(section=NEW_TOOL_SECTION)
+    gallery_page = site.pages[page_name]
+    gallery_text = gallery_page.text(section=new_tool_section)
 
     # check if tool already exists in gallery
     if f'|link={tool_id}|' in gallery_page.text():
@@ -195,7 +196,7 @@ def add_to_gallery(tool_id, photo_name, tool_name, PAGE_NAME='Tools_we_have', NE
     # construct entry and insert into gallery
     new_line = f'File:{photo_name}|link={tool_id}|[[{tool_name}]]'
     new_text = gallery_text.replace('</gallery>', f'{new_line}\n</gallery>')
-    gallery_page.save(new_text, summary=f'Added tool {tool_id} to gallery' + credit, section=NEW_TOOL_SECTION)
+    gallery_page.save(new_text, summary=f'Added tool {tool_id} to gallery' + credit, section=new_tool_section)
 
     logger.info('Added tool ID: %s to gallery', tool_id)
 
@@ -229,7 +230,7 @@ def delete_tool_page(tool_id):
 
     return tool_id
 
-def remove_tool_from_gallery(tool_id, PAGE_NAME='Tools_we_have', credit=''):
+def remove_tool_from_gallery(tool_id, page_name='Tools_we_have', credit=''):
     '''Remove a tool from the gallery page'''
 
     if not is_configured():
@@ -237,11 +238,11 @@ def remove_tool_from_gallery(tool_id, PAGE_NAME='Tools_we_have', credit=''):
 
     site = wiki_site_login()
 
-    gallery_page = site.pages[PAGE_NAME]
+    gallery_page = site.pages[page_name]
     gallery_text = gallery_page.text()
 
     # remove the line for the tool by looking for its link
-    new_text = "\n".join(line for line in gallery_text.splitlines() if f'|link={tool_id}|' not in line)
+    new_text = '\n'.join(line for line in gallery_text.splitlines() if f'|link={tool_id}|' not in line)
     gallery_page.save(new_text, summary=f'Removed tool {tool_id} from gallery')
 
     logger.info('Removed tool ID: %s from gallery', tool_id)
