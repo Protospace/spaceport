@@ -54,17 +54,40 @@ def create_tool_page(form_data, user=None):
 
     site = wiki_site_login()
 
-    tool_id = get_next_tool_id(site)
-
     credit = ''
     if user:
         credit = ' on behalf of ' + user
 
+    # make a copy of form_data specifically avoiding the 'photo' field
+    # if photo is provided, is an I/O object that only works once
+    # so ignore it to avoid the exception from form_data.copy()
+    form_copy = {}
+    for k, v in form_data.items():
+        if k != 'photo':
+            form_copy[k] = v
+    # fill in empty fields
+    OPTIONAL_FIELDS = ['serial', 'caption', 'location', 'model']
+    for field in OPTIONAL_FIELDS:
+        if field not in form_data:
+            form_copy[field] = ''
+
+    tool_id = get_next_tool_id(site)
+
     # collect calls for rolling back this operation incase it fails partway
     # each rollback item is a tuple: (rollback_function, dict of kwargs)
     # each rollback function will be called in the event of an Exception
-    rollbacks = [ ]
+    rollback = [ ]
 
+    # Step 1. Create redirect page first
+    # This is the fastest way to reserve the tool ID and derisk collisions
+    # TODO: exclude model if empty?
+    name = f'{form_copy["toolname"]} ({form_copy["model"]}) ID:{tool_id}'
+    redirect = site.pages[tool_id]
+    redirect.save('#REDIRECT [[' + name + ']]{{id/after-redirect}}', summary='Creating new tool redirect page' + credit)
+    rollback.append((redirect.delete, {'reason': 'Failed to complete tool creation, initiating rollback'}))
+    logger.info('Created redirect page: %s', tool_id)
+
+    # Step 2. Upload photo
     photo_name = 'NoImage.png'
     if 'photo' in form_data and form_data['photo']:
         # upload photo
@@ -73,20 +96,9 @@ def create_tool_page(form_data, user=None):
         photo_name = f'{tool_id}.{photo_extn}'
         site.upload(photo_data, photo_name, 1, f'Photo of tool {tool_id}', comment=f'Uploaded tool picture' + credit)
         rollback.append((site.pages[f'File:{photo_name}'].delete, {}))
+        logger.info('Uploaded photo: %s', photo_name)
 
-    # make a copy of form_data specifically avoiding the 'photo' field
-    # if photo is provided, is an I/O object that is already closed because of the above 
-    # so ignore it to avoid the exception from form_data.copy()
-    form_copy = {}
-    for k, v in form_data.items():
-        if k != 'photo':
-            form_copy[k] = v
-    # fill in empty fields
-    for field in ['serial', 'caption', 'location']:
-        if field not in form_data:
-            form_copy[field] = ''
-
-    # create tool page
+    # Step 3. Create tool page
     body = f'''{{{{Equipment page
 | toolname = {form_copy['toolname']}
 | model = {form_copy['model']}
@@ -118,27 +130,22 @@ TBD
 ==Links==
 { form_copy['links'] if 'links' in form_copy else 'TBD' }
 '''
-    name = f'{form_copy["toolname"]} ({form_copy["model"]}) ID:{tool_id}'
     page = site.pages[name]
     summary = 'Creating new tool page'
     page.save(body, summary=summary + credit)
     rollback.append((page.delete, {'reason': 'Failed to complete tool creation'}))
+    logger.info('Created tool page: %s', name)
 
-    # create redirect page
-    redirect = site.pages[tool_id]
-    redirect.save('#REDIRECT [[' + name + ']]{{id/after-redirect}}', summary='Creating new tool redirect page' + credit)
-    rollback.append((redirect.delete, {'reason': 'Failed to complete tool creation, initiating rollback'}))
-
-    add_to_gallery(tool_id, photo_name, name)
-    # TODO: rollback.append((remove_from_gallery, {'tool_id': tool_id}))
+    # Step 4. Add tool to gallery
+    # TODO: allow user to pick which section of the gallery to add the tool to
+    add_to_gallery(tool_id, photo_name, name, credit=credit)
+    rollback.append((remove_tool_from_gallery, {'tool_id': tool_id}))
 
     tool_url = 'https://' + secrets.WIKI_ENDPOINT + f'/{tool_id}'
-
-    logger.info('Created tool page: %s, url: %s', name, tool_url)
-
+    logger.info('tool page available at: %s', tool_url)
     return tool_url
 
-def add_to_gallery(tool_id, photo_name, tool_name, PAGE_NAME='Tools_we_have', NEW_TOOL_SECTION=1):
+def add_to_gallery(tool_id, photo_name, tool_name, PAGE_NAME='Tools_we_have', NEW_TOOL_SECTION=1, credit=''):
     '''Add a tool to the gallery page'''
 
     if not is_configured():
@@ -164,7 +171,6 @@ def add_to_gallery(tool_id, photo_name, tool_name, PAGE_NAME='Tools_we_have', NE
     # grab the gallery page and the text
     gallery_page = site.pages[PAGE_NAME]
     gallery_text = gallery_page.text(section=NEW_TOOL_SECTION)
-    # print(gallery_text)
 
     # check if tool already exists in gallery
     if f'|link={tool_id}|' in gallery_page.text():
@@ -178,9 +184,7 @@ def add_to_gallery(tool_id, photo_name, tool_name, PAGE_NAME='Tools_we_have', NE
     # construct entry and insert into gallery
     new_line = f'File:{photo_name}|link={tool_id}|[[{tool_name}]]'
     new_text = gallery_text.replace('</gallery>', f'{new_line}\n</gallery>')
-    # print(new_text)
-
-    gallery_page.save(new_text, summary=f'Added tool {tool_id} to gallery', section=NEW_TOOL_SECTION)
+    gallery_page.save(new_text, summary=f'Added tool {tool_id} to gallery' + credit, section=NEW_TOOL_SECTION)
 
     logger.info('Added tool ID: %s to gallery', tool_id)
 
@@ -207,9 +211,28 @@ def delete_tool_page(tool_id):
             image.delete('Requested deletion')
     tool_page.delete(reason='Requested deletion')
 
-    # delete the redirect page
     redirect_page.delete(reason='Requested deletion')
+    remove_tool_from_gallery(tool_id)
 
     logger.info('Deleted tool page ID: %s', tool_id)
+
+    return tool_id
+
+def remove_tool_from_gallery(tool_id, PAGE_NAME='Tools_we_have'):
+    '''Remove a tool from the gallery page'''
+
+    if not is_configured():
+        raise Exception('Mediawiki integration not configured, edit secrets.py')
+
+    site = wiki_site_login()
+
+    gallery_page = site.pages[PAGE_NAME]
+    gallery_text = gallery_page.text()
+
+    # remove the line for the tool by looking for its link
+    new_text = "\n".join(line for line in gallery_text.splitlines() if f'|link={tool_id}|' not in line)
+    gallery_page.save(new_text, summary=f'Removed tool {tool_id} from gallery')
+
+    logger.info('Removed tool ID: %s from gallery', tool_id)
 
     return tool_id

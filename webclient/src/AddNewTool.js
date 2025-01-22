@@ -263,6 +263,8 @@ export function AddNewTool(props) {
 							placeholder='Add hyperlinks for pages that provide more detail about this tool'
 							name='links'
 							onChange={handleChange}
+							// TODO: select category for where to insert in gallery
+							// TODO: section for general/misc notes
 						/>
 					</Form.Field>
 
