@@ -1504,7 +1504,7 @@ class ProtocoinViewSet(Base):
                 source_user_balance = float(source_user_balance)
 
                 if abs(source_user_balance - balance) > 0.01:  # stupid https://docs.djangoproject.com/en/4.2/ref/databases/#decimal-handling
-                    raise exceptions.ValidationError(dict(balance='Incorrect current balance.'))
+                    raise exceptions.ValidationError(dict(balance='Incorrect current balance. Try refreshing the page.'))
 
                 if source_user_balance < amount:
                     raise exceptions.ValidationError(dict(amount='Insufficient funds.'))
