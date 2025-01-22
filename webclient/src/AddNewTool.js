@@ -33,6 +33,18 @@ export function AddNewTool(props) {
 	const [toolUrl, setToolUrl] = useState('');
 	const [photoKey, setPhotoKey] = useState(Date.now());
 	const [photoProblem, setPhotoProblem] = useState(false)
+	const [categoryOptions, setCategoryOptions] = useState([])
+
+	useEffect(() => {
+		requester('/tools/categories/', 'GET', token)
+		.then(res => {
+			setCategoryOptions(res);
+			handleChange(null, { name: 'category', value: res[res.length - 1].value });
+		})
+		.catch(err => {
+			console.log(err);
+		});
+	}, [token]);
 
 	const handleChange = (e, v) => setFormData({ ...formData, [v.name]: v.value });
 
@@ -263,13 +275,27 @@ export function AddNewTool(props) {
 							placeholder='Add hyperlinks for pages that provide more detail about this tool'
 							name='links'
 							onChange={handleChange}
-							// TODO: select category for where to insert in gallery
-							// TODO: section for general/misc notes
+						/>
+					</Form.Field>
+
+					<Form.Field>
+						<label>What category best describes this tool?</label>
+						<p>This determines where the tool appears in the <a href='https://wiki.protospace.ca/Tools_we_have' target='_blank'>Gallery</a></p>
+						<Dropdown
+							placeholder=''
+							fluid
+							selection
+							options={categoryOptions}
+							required
+							name='category'
+							onChange={handleChange}
+							value={formData.category}
 						/>
 					</Form.Field>
 
 					<Button
 						// TODO: implement validation as per LoginSignup
+						// TODO: section for general/misc notes
 						type='submit'
 						onClick={postTool}
 						primary

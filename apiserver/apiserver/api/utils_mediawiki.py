@@ -66,7 +66,7 @@ def create_tool_page(form_data, user=None):
         if k != 'photo':
             form_copy[k] = v
     # fill in empty fields
-    OPTIONAL_FIELDS = ['serial', 'caption', 'location', 'model']
+    OPTIONAL_FIELDS = ['serial', 'caption', 'location']
     for field in OPTIONAL_FIELDS:
         if field not in form_data:
             form_copy[field] = ''
@@ -77,12 +77,12 @@ def create_tool_page(form_data, user=None):
     # each rollback item is a tuple: (rollback_function, dict of kwargs)
     # each rollback function will be called in the event of an Exception
     rollbacks = [ ]
+    UNKNOWN_MODEL = 'Unknown make/model'
 
     try:
         # Step 1. Create redirect page first
         # This is the fastest way to reserve the tool ID and derisk collisions
-        # TODO: exclude model if empty?
-        name = f'{form_copy["toolname"]} ({form_copy["model"]}) ID:{tool_id}'
+        name = f'{form_copy["toolname"]} ({form_copy.get("model", UNKNOWN_MODEL)}) ID:{tool_id}'
         redirect = site.pages[tool_id]
         redirect.save('#REDIRECT [[' + name + ']]{{id/after-redirect}}', summary='Creating new tool redirect page' + credit)
         rollbacks.append((redirect.delete, {'reason': 'Failed to complete tool creation, initiating rollback'}))
@@ -102,7 +102,7 @@ def create_tool_page(form_data, user=None):
         # Step 3. Create tool page
         body = f'''{{{{Equipment page
 | toolname = {form_copy['toolname']}
-| model = {form_copy['model']}
+| model = {form_copy.get('model', UNKNOWN_MODEL)}
 | serial = {form_copy['serial'] or ''}
 | owner = {form_copy['owner']}
 | loanstatus = {form_copy['loanstatus']}
@@ -138,14 +138,11 @@ TBD
         logger.info('Created tool page: %s', name)
 
         # Step 4. Add tool to gallery
-        # TODO: allow user to pick which section of the gallery to add the tool to
-        add_to_gallery(tool_id, photo_name, name, credit=credit)
+        add_to_gallery(tool_id, photo_name, name, credit=credit, NEW_TOOL_SECTION=form_copy.get('category', None))
         rollbacks.append((remove_tool_from_gallery, {'tool_id': tool_id}))
 
         tool_url = 'https://' + secrets.WIKI_ENDPOINT + f'/{tool_id}'
         logger.info('tool page available at: %s', tool_url)
-
-        raise Exception('Rollback test')
 
         return tool_url
     except Exception as e:
@@ -156,7 +153,7 @@ TBD
             except Exception as rollback_error:
                 logger.error('Rollback failed: %s', rollback_error)
 
-def add_to_gallery(tool_id, photo_name, tool_name, PAGE_NAME='Tools_we_have', NEW_TOOL_SECTION=1, credit=''):
+def add_to_gallery(tool_id, photo_name, tool_name, PAGE_NAME='Tools_we_have', NEW_TOOL_SECTION=None, credit=''):
     '''Add a tool to the gallery page'''
 
     if not is_configured():
@@ -164,20 +161,14 @@ def add_to_gallery(tool_id, photo_name, tool_name, PAGE_NAME='Tools_we_have', NE
 
     site = wiki_site_login()
 
-    # find the section we should add the tool to
-    # praying no one changes the page too much
-    # avoiding card coding incase someone changes it and break this code
-    # let's try to infer instead
-    # Use the API to get the sections of the page
-    response = site.api('parse', page=PAGE_NAME, prop='sections')
+    if not NEW_TOOL_SECTION:
+        # find the section we should add the tool to
+        # let's try to infer by using API to get the sections of the page
+        response = site.api('parse', page=PAGE_NAME, prop='sections')
 
-    # iterate through sections and find the one with the right title
-    for section in response['parse']['sections']:
-        # grab whatever section has misc in the title
-        # hopefully that section sticks around
-        if 'misc' in section['line'].lower():
-            NEW_TOOL_SECTION = section['index']
-            break
+        # just add to the last section
+        sections = response['parse']['sections']
+        NEW_TOOL_SECTION = sections[-2]['index']
 
     # grab the gallery page and the text
     gallery_page = site.pages[PAGE_NAME]
@@ -229,7 +220,7 @@ def delete_tool_page(tool_id):
 
     return tool_id
 
-def remove_tool_from_gallery(tool_id, PAGE_NAME='Tools_we_have'):
+def remove_tool_from_gallery(tool_id, PAGE_NAME='Tools_we_have', credit=''):
     '''Remove a tool from the gallery page'''
 
     if not is_configured():

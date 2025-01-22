@@ -2247,6 +2247,23 @@ class ToolsViewSet(Base, Create, Destroy):
 
         return Response(status=drfstatus.HTTP_404_NOT_FOUND)
 
+    @action(detail=False, methods=['get'], url_path='categories')
+    def categories(self, request):
+        categories = [
+                # copy the ToC from https://wiki.protospace.ca/Tools_we_have
+                '1 3D Printer',
+                '2 Laser Cutter',
+                '3 Wood/Plastic CNC',
+                '4 Automotive tool',
+                '5 Electronics equipment',
+                '6 Metalworking tool',
+                '7 Woodworking and plasticworking tool',
+                '8 Textile, Leather, Vinyl, and Media tool',
+                '9 Measuring and inspection tool',
+                '10 Miscellaneous or other',
+                ]
+        return Response([{'value': item.split(' ', 1)[0], 'text': item.split(' ', 1)[1]} for item in categories])
+
 @api_view()
 def null_view(request, *args, **kwargs):
     raise Http404
