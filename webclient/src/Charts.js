@@ -123,39 +123,6 @@ export function Charts(props) {
 				</>
 			}
 
-			<Header size='medium'>Drink Sales</Header>
-
-			<p>Drinks sold over the last six months.</p>
-
-			<p>
-				{!!stats?.drinks_6mo?.length &&
-					<ResponsiveContainer width='100%' height={300}>
-						<BarChart
-							margin={isMobile? {bottom: 50} : {}}
-							data={stats.drinks_6mo.map((x, i) => (
-								{...x, fill: ['#e7223a', 'black', '#9a4423', '#1582ae', '#d77a2d', '#6f0e21', '#3fad96', '#ab316e'][i]}
-							))}
-						>
-							<XAxis dataKey='name' interval={0} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
-							<YAxis />
-							<CartesianGrid strokeDasharray='3 3'/>
-							<Tooltip />
-
-							<Bar
-								type='monotone'
-								dataKey='count'
-								name='Cans'
-								fill='#2185d0'
-								maxBarSize={40}
-								animationDuration={250}
-							/>
-						</BarChart>
-					</ResponsiveContainer>
-				}
-			</p>
-
-			<p>Count: number of cans of pop sold over the last six months.</p>
-
 			<Header size='medium'>Member Counts</Header>
 
 			<p>Daily since March 2nd, 2020.</p>
@@ -408,6 +375,39 @@ export function Charts(props) {
 			<p>Later Vetted Count: number of those signups who eventually got vetted (at a later date).</p>
 
 			<p>Retained Count: number of those signups who are still a member currently.</p>
+
+			<Header size='medium'>Drink Sales</Header>
+
+			<p>Drinks sold over the last six months.</p>
+
+			<p>
+				{!!stats?.drinks_6mo?.length &&
+					<ResponsiveContainer width='100%' height={300}>
+						<BarChart
+							margin={isMobile? {bottom: 50} : {}}
+							data={stats.drinks_6mo.map((x, i) => (
+								{...x, fill: ['#e7223a', 'black', '#9a4423', '#1582ae', '#d77a2d', '#6f0e21', '#3fad96', '#ab316e'][i]}
+							))}
+						>
+							<XAxis dataKey='name' interval={0} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip />
+
+							<Bar
+								type='monotone'
+								dataKey='count'
+								name='Cans'
+								fill='#2185d0'
+								maxBarSize={40}
+								animationDuration={250}
+							/>
+						</BarChart>
+					</ResponsiveContainer>
+				}
+			</p>
+
+			<p>Count: number of cans of pop sold over the last six months.</p>
 
 		</Container>
 	);
