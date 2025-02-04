@@ -914,6 +914,7 @@ class UserSerializer(serializers.ModelSerializer):
     interests = InterestSerializer(many=True)
     door_code = serializers.SerializerMethodField()
     wifi_pass = serializers.SerializerMethodField()
+    gate_code = serializers.SerializerMethodField()
     app_version = serializers.SerializerMethodField()
 
     class Meta:
@@ -928,6 +929,7 @@ class UserSerializer(serializers.ModelSerializer):
             'is_staff',
             'door_code',
             'wifi_pass',
+            'gate_code',
             'app_version',
             #'usages',
             'interests',
@@ -967,6 +969,12 @@ class UserSerializer(serializers.ModelSerializer):
     def get_wifi_pass(self, obj):
         if not obj.member.paused_date:
             return secrets.WIFI_PASS
+        else:
+            return None
+
+    def get_gate_code(self, obj):
+        if not obj.member.paused_date:
+            return secrets.GATE_CODE
         else:
             return None
 

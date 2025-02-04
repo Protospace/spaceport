@@ -102,6 +102,14 @@ export function Cards(props) {
 				<p>{user.door_code}</p>
 			</React.Fragment>}
 
+			{!!user.gate_code && <React.Fragment>
+				<Header size='medium'>Lot Gate Code</Header>
+
+				<p>Only share this with active Protospace members:</p>
+
+				<p>{user.gate_code}</p>
+			</React.Fragment>}
+
 			{!!user.wifi_pass && <React.Fragment>
 				<Header size='medium'>Wi-Fi Password</Header>
 
