@@ -1801,6 +1801,8 @@ class ProtocoinViewSet(Base):
                     # Prices: https://forum.protospace.ca/t/issue-with-plotter-printer-protocoin/6928/20
                     'Plain Paper': 2.16,
                     'Photo Gloss Paper': 8.77,
+                    # Canvas price: https://forum.protospace.ca/t/motion-canvas-roll-for-44-t1200-large-format-printer/8640/8
+                    'Adhesive Polypropylene Matte': 20.54,
                 }
 
                 paper_name = request.data['paper_name']
