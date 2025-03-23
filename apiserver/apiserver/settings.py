@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'apiserver.api',
+    'oidc_provider',
     'rest_auth',
     'allauth',
     'allauth.account',
@@ -281,6 +282,8 @@ ACCOUNT_AUTHENTICATION_METHOD = 'username'
 OLD_PASSWORD_FIELD_ENABLED = True
 LOGOUT_ON_PASSWORD_CHANGE = False
 ACCOUNT_PRESERVE_USERNAME_CASING = False
+
+LOGIN_URL = '/accounts/login/'  # oidc_provider
 
 if not secrets.EMAIL_USER or not secrets.EMAIL_PASS:
     logger.info('Logging outgoing emails to console')

@@ -50,6 +50,7 @@ urlpatterns = [
     url(r'^ping/', views.PingView.as_view(), name='ping'),
     url(r'^paste/', views.PasteView.as_view(), name='paste'),
     url(r'^backup/', views.BackupView.as_view(), name='backup'),
+    path('openid/', include('oidc_provider.urls', namespace='oidc_provider')),
 ]
 
 if secrets.IPN_RANDOM:
