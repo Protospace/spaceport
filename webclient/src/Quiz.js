@@ -99,8 +99,8 @@ export function SawstopQuiz(props) {
 
 			<ul>
 				<li>Let the blade spin down to a stop before touching anything. Assume if the blade is spinning it could be triggered.</li>
+				<li>The safety system only works if the SawStop is turned off via the <b>red paddle</b>. It will not trigger if it loses power from the yellow switch, RFID lockout, or wall.</li>
 				<li>Keep metal things away from the saw.</li>
-				<li>The safety system won't work if the SawStop loses power from the yellow on/off switch, RFID lockout, or wall.</li>
 				<li>Clean blades before use. Choose blades that don't have coated teeth.</li>
 				<li>Only use standard 10” blades with 3/32” to 3/16” kerf.</li>
 			</ul>
@@ -256,7 +256,19 @@ export function SawstopQuiz(props) {
 							</Form.Field>
 
 							<Form.Field>
-								<label>Can the SawStop trigger while spinning down normally?</label>
+								<label>Can a metal tape measure trigger it while spinning down?</label>
+								<Form.Checkbox
+									label='Yes'
+									{...makeProps('tape1')}
+								/>
+								<Form.Checkbox
+									label='No'
+									{...makeProps('tape2')}
+								/>
+							</Form.Field>
+
+							<Form.Field>
+								<label>Can it trigger while spinning down?</label>
 								<Form.Checkbox
 									label='Yes, if turned off by the lockout button'
 									{...makeProps('spin1')}
@@ -272,18 +284,6 @@ export function SawstopQuiz(props) {
 								<Form.Checkbox
 									label='No'
 									{...makeProps('spin4')}
-								/>
-							</Form.Field>
-
-							<Form.Field>
-								<label>Can a metal tape measure trigger it while spinning down normally?</label>
-								<Form.Checkbox
-									label='Yes'
-									{...makeProps('tape1')}
-								/>
-								<Form.Checkbox
-									label='No'
-									{...makeProps('tape2')}
 								/>
 							</Form.Field>
 
