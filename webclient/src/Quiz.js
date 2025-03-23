@@ -71,14 +71,34 @@ export function SawstopQuiz(props) {
 
 			<Header size='small'>What can you cut?</Header>
 
+			Fine to cut:
 			<ul>
 				<li>Soft and hardwoods</li>
 				<li>Plywood</li>
 				<li>MDF</li>
 				<li>Hardboard</li>
-				<li>Test wet wood, pressure treated wood, and green wood in bypass mode</li>
-				<li>Plastics, foam, charred / laser cut wood in bypass mode all the time</li>
-				<li>Don't cut foil backed foam, any metals, or carbon fiber: the bits can trigger the brake from inside the saw after you leave</li>
+			</ul>
+
+			Test first in bypass mode first:
+			<ul>
+				<li>Wet wood</li>
+				<li>Pressure treated wood</li>
+				<li>Green wood</li>
+			</ul>
+
+			Cut in bypass mode all the time:
+			<ul>
+				<li>Plastics</li>
+				<li>Foam</li>
+				<li>Charred / laser cut wood</li>
+			</ul>
+
+			Never cut:
+			<ul>
+				<li>Foil-backed foam</li>
+				<li>Metals</li>
+				<li>Carbon fibre</li>
+				<li>...the bits can trigger the brake from inside after you leave</li>
 			</ul>
 
 			<Header size='small'>Bypass mode video</Header>
