@@ -823,6 +823,28 @@ class LockoutViewSet(viewsets.ViewSet, List):
 
         return Response(active_member_cards)
 
+    @action(detail=True, methods=['post'])
+    def authorize(self, request, pk=None):
+        #auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        #if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.DOOR_API_TOKEN:
+        #    raise exceptions.PermissionDenied()
+
+        card = get_object_or_404(models.Card, card_number=pk)
+        user = card.user
+        name = user.member.preferred_name + ' ' + user.member.last_name
+
+        if 'cert' not in request.data:
+            raise exceptions.ValidationError(dict(cert='This field is required.'))
+
+        cert = request.data['cert']
+
+        logging.info('Lockout authorization requested by: %s (%s), cert: %s', name, user.member.id, cert)
+
+        if cert != 'scanner':
+            raise exceptions.PermissionDenied()
+
+        return Response(200)
+
 
 class IpnView(views.APIView):
     def post(self, request):
