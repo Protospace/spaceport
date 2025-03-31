@@ -843,7 +843,10 @@ class LockoutViewSet(viewsets.ViewSet, List):
         if cert != 'scanner':
             raise exceptions.PermissionDenied()
 
-        return Response(200)
+        # disable for now
+        raise exceptions.PermissionDenied()
+
+        #return Response(200)
 
 
 class IpnView(views.APIView):
