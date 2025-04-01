@@ -834,22 +834,38 @@ class LockoutViewSet(viewsets.ViewSet, List):
 
         card = get_object_or_404(models.Card, card_number=pk)
         user = card.user
-        name = user.member.preferred_name + ' ' + user.member.last_name
+        member = user.member
+        name = member.preferred_name + ' ' + member.last_name
 
         if 'cert' not in request.data:
             raise exceptions.ValidationError(dict(cert='This field is required.'))
 
         cert = request.data['cert']
 
-        logging.info('Lockout authorization requested by: %s (%s), cert: %s', name, user.member.id, cert)
+        logging.info('Lockout authorization requested by: %s (%s), cert: %s', name, member.id, cert)
 
-        if cert != 'scanner':
+        if member.paused_date:
+            logging.info('    Denying, member not active.')
             raise exceptions.PermissionDenied()
 
-        # disable for now
-        raise exceptions.PermissionDenied()
+        if not member.is_allowed_entry:
+            logging.info('    Denying, member not allowed entry.')
+            raise exceptions.PermissionDenied()
 
-        #return Response(200)
+        if not member.orientation_date:
+            logging.info('    Denying, member hasn\'t done NMO.')
+            raise exceptions.PermissionDenied()
+
+        if cert == 'scanner':
+            if not member.scanner_cert_date:
+                logging.info('    Denying, member not certified.')
+                raise exceptions.PermissionDenied()
+        else:
+            logging.info('    Denying, certificate not found.')
+            raise Http404
+
+        logging.info('    Approving authorization.')
+        return Response(200)
 
 
 class IpnView(views.APIView):
