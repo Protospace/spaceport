@@ -5,6 +5,400 @@ import { MembersDropdown } from './Members.js';
 import { isAdmin, BasicTable, requester } from './utils.js';
 import { Button, Container, Form, Grid, Header, Message, Segment, Table } from 'semantic-ui-react';
 
+export function ScannerQuiz(props) {
+	const { token, user, refreshUser } = props;
+	const [input, setInput] = useState({});
+	const [error, setError] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const [success, setSuccess] = useState(false);
+
+	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
+
+	const handleSubmit = (e) => {
+		if (loading) return;
+		setLoading(true);
+		setSuccess(false);
+		const data = { ...input };
+		requester('/quiz/scanner/submit/', 'POST', token, data)
+		.then(res => {
+			setLoading(false);
+			setSuccess(true);
+			setError(false);
+			refreshUser();
+			window.scrollTo(0, 0);
+		})
+		.catch(err => {
+			setLoading(false);
+			console.log(err);
+			setError(err.data);
+		});
+	};
+
+	const makeProps = (name) => {
+		input[name] = input[name] ?? false;
+
+		return {
+			name: name,
+			onChange: handleCheck,
+			checked: input[name] || false,
+			value: input[name] || false,
+			error: error[name],
+		};
+	};
+
+	return (
+		<Container>
+			<Header size='large'>3D Scanner Online Quiz</Header>
+
+			{user.member.scanner_cert_date ?
+				<>
+					<p>You have access to the 3D Scanner ✅</p>
+					<p>Enabled: {user.member.scanner_cert_date}</p>
+
+				</>
+			:
+				<p>Please review the following info and take the quiz.</p>
+			}
+
+			<p>
+				This quiz only covers an agreement to check out the Creality RaptorX 3D Scanner.
+				<b> You must have been marked attended on the New Member Orientation for the quiz to work.</b>
+				{' '}Check your attendance on the <Link to='/training'>Training page</Link>, contact a director if there's an error.
+			</p>
+
+			<Header size='medium'>Protospace Scanner Checkout Agreement</Header>
+
+			<p>
+				By checking out a scanner from Protospace, you agree to the following terms and conditions:
+			</p>
+
+			<Header size='small'>1. Liability for Damage or Loss:</Header>
+
+			<p>
+				You accept full responsibility for the scanner and its components while it is in your possession. In the event of damage, loss, or the return of the scanner with missing parts, you agree to cover repair or replacement costs up to a possible maximum of $1,000 CAD.
+			</p>
+
+			<Header size='small'>2. Condition Validation Upon Checkout:</Header>
+
+			<p>
+				You are required to thoroughly validate the condition of the scanner and its components at the time of checkout. Failure to perform this validation will result in the assumption of liability for any pre-existing damage caused by the previous user, unless otherwise documented.
+			</p>
+
+			<Header size='small'>3. Condition Upon Return:</Header>
+
+			<p>
+				You must return the scanner in fully functional condition, including the following parts and accessories:
+			</p>
+
+			<ul>
+				<li>Creality RaptorX 3D Scanner</li>
+				<li>Scan Bridge Wireless Scanning Charging Handle</li>
+				<li>High Precision Glass Calibration Plate</li>
+				<li>Hand-tightening quick-release card</li>
+				<li>Magnetic phone holder</li>
+				<li>WIFI 6 USB Wireless adapter</li>
+				<li>Adapter + adapter</li>
+				<li>USB 3.0 data cable (Type-C/Type-A)</li>
+				<li>Scan Bridge Data Cable</li>
+				<li>Fast charging data cable</li>
+				<li>Type-C Adapter</li>
+				<li>Cleaning cloth</li>
+				<li>Lanyard</li>
+			</ul>
+
+			<p>
+				Failure to return the scanner with all listed parts in working order may result in financial liability as outlined in Section 1 and may also affect your membership status with Protospace.
+			</p>
+
+			<Header size='small'>4. Property Restrictions:</Header>
+
+			<p>
+				The scanner must remain on Protospace premises at all times. Removing the scanner from Protospace property will be considered a violation of this agreement and may result in the termination of your membership.
+			</p>
+
+			<Header size='small'>5. Reporting Damage or Missing Components:</Header>
+
+			<p>
+				Any damage to the scanner or missing components discovered during checkout, use, or return must be promptly reported to the Protospace members or directors. Failure to report such issues may result in additional liability.
+			</p>
+
+			<Header size='small'>6. Membership Impact:</Header>
+
+			<p>
+				Protospace reserves the right to review and potentially suspend or terminate your membership privileges if the scanner is not returned in compliance with the terms outlined above.
+			</p>
+
+			<Header size='small'>7. Acknowledgment and Agreement:</Header>
+
+			<p>
+				By checking the agree box below in the quiz, you acknowledge that you read and accept these terms and conditions above as a binding agreement.
+			</p>
+
+			<Header size='medium'>The Check Out and In Process</Header>
+
+			<Header size='small'>1. Access the Locker:</Header>
+
+			<p>
+				Tap your access card on the badge scanner to unlock the locker.
+			</p>
+
+			<Header size='small'>2. Retrieve the Scanner Case:</Header>
+
+			<p>
+				Carefully pull out the case containing the 3D laser scanner.
+			</p>
+
+			<Header size='small'>3. Inspect the Contents:</Header>
+
+			<p>
+				Open the case and check that all components are present and undamaged. Verify the presence of the following items:
+			</p>
+
+			<ul>
+				<li>Creality RaptorX 3D Scanner</li>
+				<li>Scan Bridge Wireless Scanning Charging Handle</li>
+				<li>High Precision Glass Calibration Plate</li>
+				<li>Hand-tightening quick-release card</li>
+				<li>Magnetic phone holder</li>
+				<li>WIFI 6 USB Wireless adapter</li>
+				<li>Adapter + adapter</li>
+				<li>USB 3.0 data cable (Type-C/Type-A)</li>
+				<li>Scan Bridge Data Cable</li>
+				<li>Fast charging data cable</li>
+				<li>Type-C Adapter</li>
+				<li>Cleaning cloth</li>
+				<li>Lanyard</li>
+			</ul>
+
+			<Header size='small'>4. Address Issues (If Any):</Header>
+
+			<p>
+				If anything is missing or damaged, close the case, return it to its locker, and report the findings to the membership or directors.
+			</p>
+
+			<Header size='small'>5. Proceed with Checkout (If No Issues):</Header>
+
+			<p>
+				If everything is in order, use the 3D laser scanner as needed.
+			</p>
+
+			<Header size='small'>6. Post-Use Verification:</Header>
+
+			<p>
+				Once completed with your use, open the case again and verify the contents to ensure all components are intact and properly organized.
+			</p>
+
+			<Header size='small'>7. Scan and Return the Case:</Header>
+
+			<p>
+				Finally, tap your access card on the badge scanner to log the return, and place the case back into its locker.
+			</p>
+
+
+
+			{!user.member.scanner_cert_date &&
+				<>
+					<Header size='medium'>Quiz</Header>
+
+					<Segment>
+						<Form onSubmit={handleSubmit}>
+							<Form.Field>
+								<label>Agreement</label>
+								<Form.Checkbox
+									label='I agree to the Protospace Scanner Checkout Agreement'
+									{...makeProps('agree1')}
+								/>
+							</Form.Field>
+
+							<Form.Field>
+								<label>What is the maximum financial liability a user could face for damage or loss of the scanner and its components?</label>
+								<Form.Checkbox
+									label='$500 CAD'
+									{...makeProps('value1')}
+								/>
+								<Form.Checkbox
+									label='$750 CAD'
+									{...makeProps('value2')}
+								/>
+								<Form.Checkbox
+									label='$1000 CAD'
+									{...makeProps('value3')}
+								/>
+								<Form.Checkbox
+									label='$1500 CAD'
+									{...makeProps('value4')}
+								/>
+							</Form.Field>
+
+							<Form.Field>
+								<label>What must a user do before accepting the scanner during checkout?</label>
+								<Form.Checkbox
+									label='Read the instruction manual'
+									{...makeProps('before1')}
+								/>
+								<Form.Checkbox
+									label='Thoroughly validate the condition of the scanner and its components'
+									{...makeProps('before2')}
+								/>
+								<Form.Checkbox
+									label='Sign a paper agreement'
+									{...makeProps('before3')}
+								/>
+								<Form.Checkbox
+									label='Test the scanner'
+									{...makeProps('before4')}
+								/>
+							</Form.Field>
+
+							<Form.Field>
+								<label>What is the consequence of failing to validate the scanner's condition upon checkout?</label>
+								<Form.Checkbox
+									label='A fine of $200 CAD'
+									{...makeProps('validate1')}
+								/>
+								<Form.Checkbox
+									label='Immediate membership suspension'
+									{...makeProps('validate2')}
+								/>
+								<Form.Checkbox
+									label='Assumption of liability for pre-existing damage unless documented'
+									{...makeProps('validate3')}
+								/>
+								<Form.Checkbox
+									label='Inability to check out the scanner'
+									{...makeProps('validate4')}
+								/>
+							</Form.Field>
+
+							<Form.Field>
+								<label>Which item is <i>not</i> listed as part of the scanner’s accessories?</label>
+								<Form.Checkbox
+									label='WIFI 6 USB Wireless Adapter'
+									{...makeProps('items1')}
+								/>
+								<Form.Checkbox
+									label='Hand-tightening quick-release card'
+									{...makeProps('items2')}
+								/>
+								<Form.Checkbox
+									label='3D Laser Calibration Stand'
+									{...makeProps('items3')}
+								/>
+								<Form.Checkbox
+									label='Cleaning cloth'
+									{...makeProps('items4')}
+								/>
+							</Form.Field>
+
+							<Form.Field>
+								<label>What is the rule regarding the scanner’s location during checkout?</label>
+								<Form.Checkbox
+									label='It must remain on Protospace premises at all times'
+									{...makeProps('location1')}
+								/>
+								<Form.Checkbox
+									label='It can only be taken home for 24 hours'
+									{...makeProps('location2')}
+								/>
+								<Form.Checkbox
+									label='It must be used only in the designated scanner room'
+									{...makeProps('location3')}
+								/>
+								<Form.Checkbox
+									label='It can be transported within a 5 km radius'
+									{...makeProps('location4')}
+								/>
+							</Form.Field>
+
+							<Form.Field>
+								<label>What should a user do if they discover damage or missing components during checkout?</label>
+								<Form.Checkbox
+									label='Attempt to repair the damage themselves'
+									{...makeProps('damage1')}
+								/>
+								<Form.Checkbox
+									label='Report the findings to membership or directors'
+									{...makeProps('damage2')}
+								/>
+								<Form.Checkbox
+									label='Continue using the scanner regardless'
+									{...makeProps('damage3')}
+								/>
+							</Form.Field>
+
+							<Form.Field>
+								<label>What could happen if a user fails to return the scanner in compliance with the agreement?</label>
+								<Form.Checkbox
+									label='Their Protospace membership may be reviewed, suspended, or terminated'
+									{...makeProps('compliance1')}
+								/>
+								<Form.Checkbox
+									label='They may receive a warning but no other consequences'
+									{...makeProps('compliance2')}
+								/>
+								<Form.Checkbox
+									label='They will lose access to Protospace for one week'
+									{...makeProps('compliance3')}
+								/>
+								<Form.Checkbox
+									label='They will be fined $50'
+									{...makeProps('compliance4')}
+								/>
+							</Form.Field>
+
+							<Form.Field>
+								<label>Which of the following actions is <i>not</i> part of the return process?</label>
+								<Form.Checkbox
+									label='Logging the return by tapping an access card on the badge scanner'
+									{...makeProps('return1')}
+								/>
+								<Form.Checkbox
+									label='Verifying the contents of the case after use'
+									{...makeProps('return2')}
+								/>
+								<Form.Checkbox
+									label='Reporting any issues to the Protospace directors'
+									{...makeProps('return3')}
+								/>
+								<Form.Checkbox
+									label='Leaving the locker unlocked in the shared workspace'
+									{...makeProps('return4')}
+								/>
+							</Form.Field>
+
+							<Form.Field>
+								<label>What is the first step when accessing the scanner?</label>
+								<Form.Checkbox
+									label='Inspecting the contents of the case'
+									{...makeProps('access1')}
+								/>
+								<Form.Checkbox
+									label='Tapping the access card on the badge scanner to unlock the locker'
+									{...makeProps('access2')}
+								/>
+								<Form.Checkbox
+									label='Logging the scanner usage online'
+									{...makeProps('access3')}
+								/>
+								<Form.Checkbox
+									label='Reporting to the front desk'
+									{...makeProps('access4')}
+								/>
+							</Form.Field>
+
+							<Form.Button loading={loading} error={error.non_field_errors}>
+								Submit
+							</Form.Button>
+							{success && <div>Success!</div>}
+						</Form>
+					</Segment>
+				</>
+			}
+
+		</Container>
+	);
+};
+
 export function SawstopQuiz(props) {
 	const { token, user, refreshUser } = props;
 	const [input, setInput] = useState({});

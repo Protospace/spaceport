@@ -612,6 +612,24 @@ class QuizViewSet(Base):
             member.wood_cert_date = utils.today_alberta_tz()
             member.save()
 
+        elif quiz == 'scanner':
+            if member.scanner_cert_date:
+                raise exceptions.ValidationError(dict(non_field_errors='Already certified.'))
+
+            NMO_COURSE = 249
+            attended_nmo = models.Training.objects.filter(user=user, session__course__id=NMO_COURSE, attendance_status='Attended').exists() or member.orientation_date
+
+            if not attended_nmo:
+                raise exceptions.ValidationError(dict(non_field_errors='You haven\'t attended a New Member Orientation yet.'))
+
+            if data.dict() != {'agree1': 'true', 'value1': 'false', 'value2': 'false', 'value3': 'true', 'value4': 'false', 'before1': 'false', 'before2': 'true', 'before3': 'false', 'before4': 'false', 'validate1': 'false', 'validate2': 'false', 'validate3': 'true', 'validate4': 'false', 'items1': 'false', 'items2': 'false', 'items3': 'true', 'items4': 'false', 'location1': 'true', 'location2': 'false', 'location3': 'false', 'location4': 'false', 'damage1': 'false', 'damage2': 'true', 'damage3': 'false', 'compliance1': 'true', 'compliance2': 'false', 'compliance3': 'false', 'compliance4': 'false', 'return1': 'false', 'return2': 'false', 'return3': 'false', 'return4': 'true', 'access1': 'false', 'access2': 'true', 'access3': 'false', 'access4': 'false'}:
+                raise exceptions.ValidationError(dict(non_field_errors='At least one answer is incorrect.'))
+
+            logging.info('Granting quiz certification: %s', quiz)
+
+            member.scanner_cert_date = utils.today_alberta_tz()
+            member.save()
+
         else:
             raise exceptions.ValidationError(dict(non_field_errors='Unknown quiz.'))
 

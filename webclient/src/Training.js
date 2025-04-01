@@ -83,7 +83,7 @@ export function CertList(props) {
 				<Table.Row>
 					<Table.Cell>3D Scanner</Table.Cell>
 					<Table.Cell>{isMobile && 'Enabled: '}{member.scanner_cert_date ? 'Yes, ' + member.scanner_cert_date : 'No'}</Table.Cell>
-					<Table.Cell></Table.Cell>
+					<Table.Cell><Link to='/quiz/scanner'>3D Scanner Online Quiz</Link></Table.Cell>
 				</Table.Row>
 			</Table.Body>
 		</Table>

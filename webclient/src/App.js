@@ -30,7 +30,7 @@ import { Debug } from './Debug.js';
 import { Storage, StorageDetail, ClaimShelf } from './Storage.js';
 import { Garden } from './Garden.js';
 import { Footer } from './Footer.js';
-import { SawstopQuiz } from './Quiz.js';
+import { ScannerQuiz, SawstopQuiz } from './Quiz.js';
 import { LCARS1Display, LCARS2Display, LCARS3Display } from './Display.js';
 
 const APP_VERSION = 9;  // TODO: automate this
@@ -339,6 +339,10 @@ function App() {
 
 									<Route path='/training'>
 										<Training user={user} />
+									</Route>
+
+									<Route path='/quiz/scanner'>
+										<ScannerQuiz token={token} user={user} refreshUser={refreshUser} />
 									</Route>
 
 									<Route path='/quiz/sawstop'>
