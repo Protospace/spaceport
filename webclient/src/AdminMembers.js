@@ -798,6 +798,12 @@ export function AdminMemberCertifications(props) {
 						<Table.Cell><Link to='/courses/447'>Embroidery Machine Overview</Link></Table.Cell>
 						<Table.Cell><AdminCert name='Embroidery' field='embroidery_cert_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
 					</Table.Row>
+					<Table.Row>
+						<Table.Cell>3D Scanner</Table.Cell>
+						<Table.Cell>{member.scanner_cert_date ? 'Yes, ' + member.scanner_cert_date : 'No'}</Table.Cell>
+						<Table.Cell></Table.Cell>
+						<Table.Cell><AdminCert name='Scanner' field='scanner_cert_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
+					</Table.Row>
 				</Table.Body>
 			</Table>
 

@@ -307,6 +307,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'embroidery_cert_date',
             'rabbit_cert_date',
             'trotec_cert_date',
+            'scanner_cert_date',
             'is_allowed_entry',
             'mediawiki_username',
             'signup_helper',

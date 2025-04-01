@@ -245,6 +245,7 @@ class MemberViewSet(Base, Retrieve, Update):
             member.embroidery_cert_date = None
             member.rabbit_cert_date = None
             member.trotec_cert_date = None
+            member.scanner_cert_date = None
 
         member.current_start_date = today
         member.paused_date = None
@@ -819,6 +820,7 @@ class LockoutViewSet(viewsets.ViewSet, List):
             authorization['tormach_cnc'] = bool(member.tormach_cnc_cert_date) and authorization['common']
             authorization['precix_cnc'] = bool(member.precix_cnc_cert_date) and authorization['common']
             authorization['embroidery'] = bool(member.embroidery_cert_date) and authorization['common']
+            authorization['scanner'] = bool(member.scanner_cert_date) and authorization['common']
 
             active_member_cards[card.card_number] = authorization
 
