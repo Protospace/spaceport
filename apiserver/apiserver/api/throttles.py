@@ -16,9 +16,13 @@ class LoggingThrottle(throttling.BaseThrottle):
         if method == 'OPTIONS':
             return True
 
-        if path.startswith('/lockout/'):
+        if path.startswith('/lockout/') and path.endswith('/authorize/'):
+            pass  # log this one
+        elif path.startswith('/lockout/'):
             return True
         elif path == '/stats/sign/':
+            pass  # log this one
+        elif path == '/stats/raptorx1/scanner3d/':
             pass  # log this one
         elif path.startswith('/stats/'):
             return True
