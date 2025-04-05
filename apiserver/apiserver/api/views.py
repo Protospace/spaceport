@@ -1204,6 +1204,41 @@ class StatsViewSet(viewsets.ViewSet, List):
 
         return Response(200)
 
+    @action(detail=True, methods=['post'])
+    def scanner3d(self, request, pk=None):
+        scanner3d = cache.get('scanner3d', {})
+        devicename = pk
+
+        if devicename.startswith('raptorx1'):
+            if 'status' not in request.data:
+                raise exceptions.ValidationError(dict(status='This field is required.'))
+
+            if 'card_number' not in request.data:
+                raise exceptions.ValidationError(dict(card_number='This field is required.'))
+
+            status = request.data['status']
+            card_number = request.data['card_number']
+            card = get_object_or_404(models.Card, card_number=card_number)
+            user = card.user
+            username = user.username
+            first_name = user.member.preferred_name
+
+            STATUSES = {
+                'FREE': 'Free',
+                'IN_USE': 'In Use',
+            }
+
+            scanner3d[devicename] = dict(
+                time=time.time(),
+                username=username,
+                first_name=first_name,
+                status=STATUSES[status],
+            )
+
+        cache.set('scanner3d', scanner3d)
+
+        return Response(200)
+
     @action(detail=False, methods=['post'])
     def solar_data(self, request):
         solar = cache.get('solar', {})

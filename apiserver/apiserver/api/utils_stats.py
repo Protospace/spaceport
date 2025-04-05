@@ -31,6 +31,7 @@ DEFAULTS = {
     'last_scan': {},
     'closing': {},
     'printer3d': {},
+    'scanner3d': {},
     'solar': {},
     'drinks_6mo': [],
 }
