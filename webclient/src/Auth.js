@@ -154,6 +154,11 @@ export function Auth(props) {
 
 			<p>Use this page to link different applications to your Spaceport account.</p>
 
+			<Message warning>
+				<Message.Header>Only need to do this once</Message.Header>
+				<p>Note: you should only ever need to do this once if you are an old returning member. Otherwise, just sign into each app with your Spaceport login.</p>
+			</Message>
+
 			<Route path='/auth/wiki'>
 				<AuthWiki user={user} />
 			</Route>
