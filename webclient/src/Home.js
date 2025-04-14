@@ -491,7 +491,7 @@ export function Home(props) {
 							<p>Protogarden:</p>
 
 							<Link to='/garden'>
-								<Image src={staticUrl + '/garden-medium.jpg'} />
+								<Image src={staticUrl + '/garden-medium.jpg?' + moment().unix()} />
 							</Link>
 
 						</Segment>
