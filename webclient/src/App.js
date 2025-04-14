@@ -22,7 +22,7 @@ import { AddNewTool } from './AddNewTool.js';
 import { Members, MemberDetail } from './Members.js';
 import { Charts } from './Charts.js';
 import { Usage } from './Usage.js';
-import { Auth } from './Auth.js';
+import { Auth, AuthOIDC } from './Auth.js';
 import { Subscribe } from './PayPal.js';
 import { PasswordReset, ConfirmReset } from './PasswordReset.js';
 import { NotFound, PleaseLogin } from './Misc.js';
@@ -290,7 +290,7 @@ function App() {
 							</Route>
 
 							<Route path='/auth'>
-								<Auth user={user} />
+								<Auth token={token} user={user} />
 							</Route>
 
 							<Route path='/subscribe'>
@@ -311,6 +311,10 @@ function App() {
 
 							{user && user.member.set_details ?
 								<Switch>
+									<Route path='/oidc'>
+										<AuthOIDC token={token} user={user} />
+									</Route>
+
 									<Route path='/claimshelf/:id'>
 										<ClaimShelf token={token} user={user} refreshUser={refreshUser} />
 									</Route>

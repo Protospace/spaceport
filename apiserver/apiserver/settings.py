@@ -283,7 +283,12 @@ OLD_PASSWORD_FIELD_ENABLED = True
 LOGOUT_ON_PASSWORD_CHANGE = False
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 
-LOGIN_URL = '/accounts/login/'  # oidc_provider
+# OIDC login page
+if DEBUG:
+    LOGIN_URL = 'https://spaceport.dns.t0.vc/oidc'
+else:
+    LOGIN_URL = 'https://my.protospace.ca/oidc'
+
 
 if not secrets.EMAIL_USER or not secrets.EMAIL_PASS:
     logger.info('Logging outgoing emails to console')

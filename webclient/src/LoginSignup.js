@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useHistory } from 'react-router-dom';
 import './light.css';
 import { Form, Header, Message } from 'semantic-ui-react';
-import { requester, randomString } from './utils.js';
+import { requester, randomString, siteUrl } from './utils.js';
 
 export function LoginForm(props) {
 	const [input, setInput] = useState({ username: '' });
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
+	const qs = useLocation().search;
+	const params = new URLSearchParams(qs);
+	const next = params.get('next') || false;
+	const history = useHistory();
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
@@ -23,7 +27,11 @@ export function LoginForm(props) {
 			.then(res => {
 				setError({});
 				props.setTokenCache(res.key);
-				window.scrollTo(0, 0);
+				if (next) {
+					history.push(next);
+				} else {
+					window.scrollTo(0, 0);
+				}
 			})
 			.catch(err => {
 				setLoading(false);

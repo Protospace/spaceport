@@ -4,11 +4,13 @@ import './light.css';
 import { Container, Message } from 'semantic-ui-react';
 
 export function PleaseLogin() {
+	const next = encodeURIComponent(window.location.pathname + window.location.search);
+
 	return (
 		<Container text>
 			<Message warning>
 				<Message.Header>You must login before you can do that!</Message.Header>
-				<p>Visit our <Link to='/'>login page</Link>, then try again.</p>
+				<p>Visit our <Link to={'/?next=' + next}>login page</Link>, then try again.</p>
 			</Message>
 
 			<img className='photo-404' src='/404.jpg' />
