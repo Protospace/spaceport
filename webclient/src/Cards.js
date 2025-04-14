@@ -108,6 +108,8 @@ export function Cards(props) {
 				<p>Only share this with active Protospace members:</p>
 
 				<p>{user.gate_code}</p>
+
+				<p><b>Note: The numbers must align with the notch 45° off-centre, not the very bottom.</b></p>
 			</React.Fragment>}
 
 			{!!user.wifi_pass && <React.Fragment>
