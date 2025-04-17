@@ -234,6 +234,7 @@ export function Home(props) {
 	const getStat = (x) => stats && stats[x] ? stats[x] : 'Unknown';
 	const getZeroStat = (x) => stats && stats[x] ? stats[x] : '0';
 	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz('America/Edmonton').format('MMM Do @ LT') : 'Unknown';
+	const showMeetingLink = () => stats && stats['next_meeting'] && moment().add(30, 'minutes').isAfter(moment.utc(stats['next_meeting']));
 
 	const getNextStat = (x) => {
 		if (stats && stats[x]) {
@@ -351,7 +352,7 @@ export function Home(props) {
 
 							<div>
 								<Header size='medium'>Protospace Stats</Header>
-								<p>Next meeting: {getDateStat('next_meeting')}</p>
+								<p>Next meeting: {getDateStat('next_meeting')} {showMeetingLink() && <a href='https://protospace.ca/meet' target='_blank' rel='noopener noreferrer'>[remote link]</a>}</p>
 								<p>Next clean: {getDateStat('next_clean')}</p>
 								<p className='nowrap-stat'>Next class: {getNextStat('next_class')}</p>
 								<p className='nowrap-stat'>Last class: {getNextStat('prev_class')}</p>
