@@ -350,7 +350,8 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
         unlimited_students = max_students == 0
 
         # ensure session has enough slots available before sending emails
-        if not unlimited_students and max_students <= 2:
+        # except for the 3D printing course which often has two
+        if not unlimited_students and session.course.id != 471 and max_students <= 2:
             logging.info('Session doesn\'t have enough slots, not sending interest emails.')
             return
 
