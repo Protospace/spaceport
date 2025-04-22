@@ -289,6 +289,9 @@ if DEBUG:
 else:
     LOGIN_URL = 'https://my.protospace.ca/oidc'
 
+OIDC_EXTRA_SCOPE_CLAIMS = 'apiserver.api.utils.CustomScopeClaims'
+OIDC_IDTOKEN_INCLUDE_CLAIMS = True
+
 
 if not secrets.EMAIL_USER or not secrets.EMAIL_PASS:
     logger.info('Logging outgoing emails to console')

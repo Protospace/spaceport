@@ -21,6 +21,8 @@ import paho.mqtt.publish as publish
 from django.db.models import Sum
 from django.core.cache import cache
 from django.utils.timezone import now, pytz
+from django.utils.translation import ugettext_lazy as _
+from oidc_provider.lib.claims import ScopeClaims
 
 from . import models, serializers, utils_ldap, utils_stats, utils_auth, utils, utils_email
 from .. import settings, secrets
@@ -560,3 +562,26 @@ def log_transaction(tx):
     )
 
     logging.info(msg)
+
+
+class CustomScopeClaims(ScopeClaims):
+    info_vikunja_scope = (
+        _(u'vikunja_scope'),
+        _(u'Auto assign Vikunja groups'),
+    )
+
+    def scope_vikunja_scope(self):
+        dic = {
+            'vikunja_groups': [
+                {
+                    'name': 'Sandbox',   # seems like everyone must have at least one team,
+                    'oidcID': 'sandbox'  # so keep this one around for expired members
+                }
+            ]
+        }
+
+        if not self.user.member.paused_date:
+            group = {'name': 'Protospace', 'oidcID': 'protospace'}
+            dic['vikunja_groups'].append(group)
+
+        return dic
