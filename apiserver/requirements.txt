@@ -14,10 +14,12 @@ Django==3.1.14
 django-allauth==0.41.0
 django-cors-headers==3.11.0
 django-extensions==3.1.5
+django-oidc-provider==0.8.3
 django-rest-auth==0.9.5
 django-simple-history==2.8.0
 djangorestframework==3.11.2
 docutils==0.16
+future==1.0.0
 fuzzywuzzy==0.17.0
 gunicorn==20.0.4
 icalendar==4.0.9
@@ -45,7 +47,9 @@ Pillow==9.5.0
 prompt-toolkit==3.0.29
 ptyprocess==0.7.0
 pycparser==2.19
+pycryptodomex==3.22.0
 Pygments==2.7.4
+pyjwkest==1.4.2
 pyparsing==2.4.6
 PyPDF2==1.26.0
 python-dateutil==2.8.1
