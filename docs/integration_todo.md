@@ -43,7 +43,7 @@ auth:
     redirecturl: https://todo.protospace.ca/auth/openid/spaceport
     providers:
       - name: "spaceport"
-        authurl: https://api.spaceport.dns.t0.vc/openid
+        authurl: https://api.my.protospace.ca/openid
         clientid: 111111
         clientsecret: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
         scope: openid profile email vikunja_scope
