@@ -15,3 +15,4 @@
 ### Integrations
 
 - [LDAP Integration](integration_ldap.md)
+- [Todo Integration](integration_todo.md)
