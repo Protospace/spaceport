@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'apiserver.api',
+    'oidc_provider',
     'rest_auth',
     'allauth',
     'allauth.account',
@@ -281,6 +282,16 @@ ACCOUNT_AUTHENTICATION_METHOD = 'username'
 OLD_PASSWORD_FIELD_ENABLED = True
 LOGOUT_ON_PASSWORD_CHANGE = False
 ACCOUNT_PRESERVE_USERNAME_CASING = False
+
+# OIDC login page
+if DEBUG:
+    LOGIN_URL = 'https://spaceport.dns.t0.vc/oidc'
+else:
+    LOGIN_URL = 'https://my.protospace.ca/oidc'
+
+OIDC_EXTRA_SCOPE_CLAIMS = 'apiserver.api.utils.CustomScopeClaims'
+OIDC_IDTOKEN_INCLUDE_CLAIMS = True
+
 
 if not secrets.EMAIL_USER or not secrets.EMAIL_PASS:
     logger.info('Logging outgoing emails to console')

@@ -16,6 +16,7 @@ from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_MET
 from rest_framework.response import Response
 from rest_auth.views import PasswordChangeView, PasswordResetView, PasswordResetConfirmView, LoginView
 from rest_auth.registration.views import RegisterView
+from oidc_provider.views import AuthorizeView
 from fuzzywuzzy import fuzz, process
 from collections import OrderedDict
 from dateutil import relativedelta
@@ -2363,6 +2364,12 @@ class ToolsViewSet(Base, Create, Destroy):
             '10 Miscellaneous or other',
         ]
         return Response([{'value': item.split(' ', 1)[0], 'text': item.split(' ', 1)[1]} for item in categories])
+
+class OIDCAuthView(views.APIView, AuthorizeView):
+    def get(self, request, *args, **kwargs):
+        r = super().get(request, args, kwargs)
+        location = r._headers['location'][1]
+        return Response({'url': location})
 
 @api_view()
 def null_view(request, *args, **kwargs):

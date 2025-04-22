@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Route, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Route, Link, useLocation } from 'react-router-dom';
 import './light.css';
 import { Container, Form, Header, Image, Message, Segment } from 'semantic-ui-react';
 import { requester } from './utils.js';
@@ -145,8 +145,29 @@ export function AuthDiscourse(props) {
 	);
 }
 
+export function AuthOIDC(props) {
+	const { token, user } = props;
+	const qs = decodeURIComponent(useLocation().search.replace('?next=/openid/authorize', ''));
+
+	useEffect(() => {
+		requester('/oidc/' + qs, 'GET', token)
+		.then(res => {
+			window.location = res.url;
+		})
+		.catch(err => {
+			console.log(err);
+		});
+	}, []);
+
+	return (
+		<Segment compact padded>
+			<p>Authorizing OIDC...</p>
+		</Segment>
+	);
+}
+
 export function Auth(props) {
-	const { user } = props;
+	const { token, user } = props;
 
 	return (
 		<Container>
