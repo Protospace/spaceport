@@ -26,6 +26,8 @@ class LoggingThrottle(throttling.BaseThrottle):
             pass  # log this one
         elif path.startswith('/stats/'):
             return True
+        elif path.startswith('/todo/tasks/'):
+            return True
         elif path == '/sessions/' and user == None:
             return True
         elif path in [

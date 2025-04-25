@@ -153,7 +153,7 @@ def add_task_or_bump(project_name, title):
 def get_task_list(project_name):
     # gets a list of tasks for a given project
 
-    logging.info('Getting tasks for project: %s.', project_name)
+    logging.debug('Getting tasks for project: %s.', project_name)
 
     if not is_configured():
         raise Exception('Vikunja integration not configured.')
