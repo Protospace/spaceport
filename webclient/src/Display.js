@@ -4,6 +4,7 @@ import moment from 'moment-timezone';
 import { Button, Container, Header, Icon } from 'semantic-ui-react';
 import { requester } from './utils.js';
 import { TrotecUsage } from './Usage.js';
+import QRCode from 'react-qr-code';
 
 const deviceNames = {
 	'trotec': {title: 'Trotec', device: 'TROTECS300'},
@@ -34,8 +35,8 @@ export function LCARS1Display(props) {
 					</p>
 				}
 
-				<div className='display-scores'>
-					<DisplayMonthlyScores />
+				<div className='display-tasks'>
+					<DisplayTaskList project='Test' projectId='2' />
 				</div>
 
 				<div className='display-scores'>
@@ -437,6 +438,45 @@ export function DisplayBambuCamera(props) {
 	return (
 		<>
 			{pic && <img className='printer-pic' src={pic} />}
+		</>
+	);
+};
+
+export function DisplayTaskList(props) {
+	const { project, projectId } = props;
+	const [tasks, setTasks] = useState(false);
+
+	const getTasks = () => {
+		requester('/todo/tasks/?project=' + project, 'GET')
+		.then(res => {
+			setTasks(res);
+		})
+		.catch(err => {
+			console.log(err);
+			setTasks(false);
+		});
+	};
+
+	useEffect(() => {
+		getTasks();
+		const interval = setInterval(getTasks, 10000);
+		return () => clearInterval(interval);
+	}, []);
+
+	return (
+		<>
+			<Header size='large'>{project}</Header>
+
+			<div className='qr'>
+				<QRCode size={128} value={'https://todo.protospace.ca/projects/' + projectId} />
+			</div>
+
+			{tasks && tasks.slice(0, 12).map((x, i) =>
+				<div key={i}>
+					<Header size='medium'>#{i+1} — {x.title}</Header>
+				</div>
+			)}
+
 		</>
 	);
 };

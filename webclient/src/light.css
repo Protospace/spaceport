@@ -252,6 +252,28 @@ a {
 	color: #4baafe !important;
 }
 
+.display-tasks {
+	position: relative;
+	border: 1px solid white;
+	padding: 0.5em;
+	align-self: flex-end;
+	width: 25vw;
+	height: 100vh;
+}
+
+.display-tasks p {
+	font-size: 1.5em;
+	text-align: right;
+}
+
+.display-tasks .qr {
+	position: absolute;
+	top: 0;
+	right: 0;
+	background: white;
+	padding: 16px;
+}
+
 .display-scores {
 	border: 1px solid white;
 	padding: 0.5em;

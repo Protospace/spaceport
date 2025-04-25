@@ -150,6 +150,29 @@ def add_task_or_bump(project_name, title):
     return True
 
 
+def get_task_list(project_name):
+    # gets a list of tasks for a given project
+
+    logging.info('Getting tasks for project: %s.', project_name)
+
+    if not is_configured():
+        raise Exception('Vikunja integration not configured.')
+
+    projects = api_find_projects(project_name)
+
+    for project in projects:
+        if project['title'] == project_name:
+            project_id = project['id']
+            view_id = project['views'][0]['id']
+            break
+    else:  # for
+        raise Exception('Project not found.')
+
+    all_tasks = api_get_tasks(project_id, view_id)
+
+    return all_tasks
+
+
 
 if __name__ == '__main__':
     logger.info('Test putting task...')

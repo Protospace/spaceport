@@ -2239,6 +2239,20 @@ class SignupHelperViewSet(Base):
 
 
 class TodoViewSet(viewsets.ViewSet):
+    @action(detail=False, methods=['get'])
+    def tasks(self, request):
+        try:
+            project = request.query_params['project']
+        except KeyError:
+            raise exceptions.ValidationError(dict(project='This field is required.'))
+
+        try:
+            tasks = utils_todo.get_task_list(project)
+            return Response(tasks)
+        except Exception as e:
+            logger.exception('Problem getting tasks: {} - {}'.format(e.__class__.__name__, str(e)))
+            return Response({'error': str(e)}, status=drfstatus.HTTP_500_INTERNAL_SERVER_ERROR)
+
     @action(detail=False, methods=['post'])
     def out_of_stock(self, request):
         try:
