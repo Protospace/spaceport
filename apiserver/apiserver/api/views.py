@@ -27,7 +27,7 @@ import csv
 import xmltodict
 import json
 
-from . import models, serializers, utils, utils_paypal, utils_stats, utils_ldap, utils_email, utils_mediawiki
+from . import models, serializers, utils, utils_paypal, utils_stats, utils_ldap, utils_email, utils_mediawiki, utils_todo
 from .permissions import (
     is_admin_director,
     AllowMetadata,
@@ -2236,6 +2236,23 @@ class SignupHelperViewSet(Base):
             ))
 
         return Response(helpers)
+
+
+class TodoViewSet(viewsets.ViewSet):
+    @action(detail=False, methods=['post'])
+    def out_of_stock(self, request):
+        try:
+            item = request.data['item']
+        except KeyError:
+            raise exceptions.ValidationError(dict(item='This field is required.'))
+
+        try:
+            utils_todo.add_task_or_bump('Consumables', item)
+            return Response(200)
+        except Exception as e:
+            logger.exception('Problem adding task: {} - {}'.format(e.__class__.__name__, str(e)))
+            return Response({'error': str(e)}, status=drfstatus.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 class StorageSpaceViewSet(Base, List, Retrieve, Update):

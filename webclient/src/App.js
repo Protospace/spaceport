@@ -16,6 +16,7 @@ import { AdminTransactions } from './AdminTransactions.js';
 import { Admin } from './Admin.js';
 import { Paste } from './Paste.js';
 import { Sign } from './Sign.js';
+import { OutOfStock } from './Todo.js';
 import { Courses, CourseDetail } from './Courses.js';
 import { ClassFeed, Classes, ClassDetail } from './Classes.js';
 import { AddNewTool } from './AddNewTool.js';
@@ -283,6 +284,10 @@ function App() {
 
 							<Route path='/sign'>
 								<Sign token={token} />
+							</Route>
+
+							<Route path='/out-of-stock'>
+								<OutOfStock token={token} />
 							</Route>
 
 							<Route path='/charts'>
