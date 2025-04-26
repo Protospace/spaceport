@@ -36,7 +36,7 @@ export function LCARS1Display(props) {
 				}
 
 				<div className='display-tasks'>
-					<DisplayTaskList project='Test' projectId='2' />
+					<DisplayTaskList project='Consumables' projectId='4' />
 				</div>
 
 				<div className='display-scores'>
@@ -471,7 +471,9 @@ export function DisplayTaskList(props) {
 				<QRCode size={128} value={'https://todo.protospace.ca/projects/' + projectId} />
 			</div>
 
-			{tasks && tasks.slice(0, 12).map((x, i) =>
+			<Header size='medium'>Task list:</Header>
+
+			{tasks && tasks.slice(0, 10).map((x, i) =>
 				<div key={i}>
 					<Header size='medium'>#{i+1} — {x.title}</Header>
 				</div>
