@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table } from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
 
 export const randomString = () => Math.random().toString(36).substr(2, 10);
 
@@ -20,7 +21,7 @@ export const getInstructor = (x) => {
 	if (x.course === 413 || x.course === 317 || x.course === 273) {
 		return 'Protospace';
 	} else {
-		return x.instructor_name;
+		return <><Link to={'/members/'+x.instructor_id}>{x.instructor_name}</Link>{' —'}</>;
 	}
 };
 
