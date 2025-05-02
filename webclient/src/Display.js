@@ -36,7 +36,7 @@ export function LCARS1Display(props) {
 				}
 
 				<div className='display-tasks'>
-					<DisplayTaskList project='Consumables' projectId='4' />
+					<DisplayShoppingList />
 				</div>
 
 				<div className='display-scores'>
@@ -442,12 +442,11 @@ export function DisplayBambuCamera(props) {
 	);
 };
 
-export function DisplayTaskList(props) {
-	const { project, projectId } = props;
+export function DisplayShoppingList(props) {
 	const [tasks, setTasks] = useState(false);
 
 	const getTasks = () => {
-		requester('/todo/tasks/?project=' + project, 'GET')
+		requester('/todo/tasks/?project=Consumables', 'GET')
 		.then(res => {
 			setTasks(res);
 		})
@@ -465,13 +464,13 @@ export function DisplayTaskList(props) {
 
 	return (
 		<>
-			<Header size='large'>{project}</Header>
+			<Header size='large'>Consumables</Header>
 
 			<div className='qr'>
-				<QRCode size={128} value={'https://todo.protospace.ca/projects/' + projectId} />
+				<QRCode size={128} value={'https://todo.protospace.ca/projects/4'} />
 			</div>
 
-			<Header size='medium'>Task list:</Header>
+			<Header size='medium'>Shopping list:</Header>
 
 			{tasks && tasks.slice(0, 10).map((x, i) =>
 				<div key={i}>
