@@ -656,7 +656,7 @@ export function Class(props) {
 					<Table.Cell>Instructor:</Table.Cell>
 					<Table.Cell>
 						{getInstructor(clazz)}{' '}
-						{getInstructorDiscourseLink(clazz) && <a href={getInstructorDiscourseLink(clazz)} target='_blank'>[message]</a>}
+						{getInstructorDiscourseLink(clazz) && <>{'— '}<a href={getInstructorDiscourseLink(clazz)} target='_blank'>[message]</a></>}
 					</Table.Cell>
 				</Table.Row>
 				<Table.Row>

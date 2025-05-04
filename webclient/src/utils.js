@@ -21,7 +21,7 @@ export const getInstructor = (x) => {
 	if (x.course === 413 || x.course === 317 || x.course === 273) {
 		return 'Protospace';
 	} else {
-		return <><Link to={'/members/'+x.instructor_id}>{x.instructor_name}</Link>{' —'}</>;
+		return <Link to={'/members/'+x.instructor_id}>{x.instructor_name}</Link>;
 	}
 };
 
