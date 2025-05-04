@@ -149,8 +149,9 @@ class Course(models.Model):
     description = models.TextField(blank=True, null=True)
     is_old = models.BooleanField(default=False)
     tags = models.CharField(max_length=128, blank=True)
+    num_interested = models.IntegerField(blank=True, null=True)  # cached / denormalized
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(excluded_fields=['num_interested'])
 
     list_display = ['name', 'id']
     search_fields = ['name', 'id']

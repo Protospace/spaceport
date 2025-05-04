@@ -290,10 +290,6 @@ class CourseViewSet(Base, List, Retrieve, Create, Update):
     permission_classes = [AllowMetadata | IsAuthenticatedOrReadOnly, IsAdminOrReadOnly | IsInstructorOrReadOnly]
     queryset = models.Course.objects.annotate(
         recent_date=Max('sessions__datetime'),
-        num_interested=Count('interests', filter=Q(
-            interests__satisfied_by__isnull=True,
-            interests__user__member__paused_date__isnull=True,
-        ), distinct=True),
     ).order_by(
         '-num_interested',
         '-recent_date',
@@ -383,6 +379,10 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
 
         interest_ids = interests.values('id')
         num_satisfied = models.Interest.objects.filter(id__in=interest_ids).update(satisfied_by=session)
+
+        msg = 'Recounting interests...'
+        if data['request_id']: utils_stats.set_progress(data['request_id'], msg)
+        utils_stats.calc_num_interested()
 
         logging.info('Satisfied %s interests.', num_satisfied)
 
@@ -1450,6 +1450,8 @@ class InterestViewSet(Base, Retrieve, Create):
             user=user,
             satisfied_by=None
         )
+
+        utils_stats.calc_num_interested()
 
 
 class ProtocoinViewSet(Base):

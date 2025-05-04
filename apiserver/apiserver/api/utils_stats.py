@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 import time
 from datetime import date, datetime, timedelta
 import requests
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Count, Q
 from django.core.cache import cache
 from django.utils.timezone import now, pytz
 from apiserver.api import models, utils
@@ -225,6 +225,27 @@ def calc_drink_sales():
         results.append(dict(name=name, count=count))
 
     cache.set('drinks_6mo', results)
+
+
+def calc_num_interested():
+    courses = models.Course.objects.annotate(
+        num_interested_calc=Count(
+            'interests',
+            filter=Q(
+                interests__satisfied_by__isnull=True,
+                interests__user__member__paused_date__isnull=True,
+            ),
+            distinct=True,
+        )
+    )
+
+    course_list = []
+    for course in courses:
+        course.num_interested = course.num_interested_calc
+        course_list.append(course)
+
+    models.Course.objects.bulk_update(course_list, ['num_interested'])
+
 
 
 def get_progress(request_id):
