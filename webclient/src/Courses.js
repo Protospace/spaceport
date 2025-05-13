@@ -239,7 +239,7 @@ export function CourseDetail(props) {
 						{user &&
 							<p>
 								{user.interests.filter(x => !x.satisfied_by).map(x => x.course).includes(course.id) ?
-									'Interested ✅'
+									'You are marked Interested ✅'
 								:
 									<Button
 										size='tiny'
