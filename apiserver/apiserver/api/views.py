@@ -583,6 +583,27 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         training.attendance_status = 'Withdrawn'
         training.paid_date = None
         training.save()
+
+        cost = training.session.cost
+        if cost > 0:
+            memo = 'Protocoin - Transaction refund ₱ {} for {}, session: {}, training: {}'.format(
+                cost,
+                training.session.course.name,
+                str(training.session.id),
+                str(training.id),
+            )
+            tx = models.Transaction.objects.create(
+                user=training.user,
+                protocoin=cost,
+                amount=0,
+                number_of_membership_months=0,
+                account_type='Protocoin',
+                category='OnAcct',
+                info_source='System',
+                memo=memo,
+            )
+            utils.log_transaction(tx)
+
         # TODO: should we also revoke certs here if applicable? For now, following request scope.
         return Response(200)
 
