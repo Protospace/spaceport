@@ -121,9 +121,11 @@ function AttendanceRow(props) {
 			<p>
 				<Link to={'/members/'+student.student_id}>{student.student_name}</Link>
 				{student.paid_date &&
-					<Button
-						onClick={handleRefund}
-						loading={refundLoading}
+					<>
+						{' | Paid '}
+						<Button
+							onClick={handleRefund}
+							loading={refundLoading}
 						disabled={loading}
 						negative
 						compact
@@ -132,6 +134,7 @@ function AttendanceRow(props) {
 					>
 						Refund
 					</Button>
+					</>
 				}
 				{student.attendance_status === 'Waiting for payment' && ' (Waiting for payment)'}:
 			</p>
