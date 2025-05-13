@@ -577,7 +577,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             logging.info('Updating cert...')
             self.update_cert(session, member, status)
 
-    @action(detail=True, methods=['post'], permission_classes=[IsSessionInstructorOrAdmin])
+    @action(detail=True, methods=['post'], permission_classes=[AllowMetadata | IsAuthenticated, IsSessionInstructorOrAdmin])
     def refund(self, request, pk=None):
         training = self.get_object()
 
