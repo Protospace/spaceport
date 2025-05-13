@@ -605,6 +605,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
                 category='OnAcct',
                 info_source='System',
                 memo=memo,
+                recorder=request.user,
             )
             utils.log_transaction(tx)
 
