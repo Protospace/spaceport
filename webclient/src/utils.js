@@ -72,9 +72,11 @@ export const requester = (route, method, token, data, signal=null) => {
 		// pass
 	} else if (['POST', 'PUT', 'PATCH'].includes(method)) {
 		const formData = new FormData();
-		Object.keys(data).forEach(key =>
-			formData.append(key, data[key] === null ? '' : data[key])
-		);
+		if (typeof data === 'object' && data !== null) {
+			Object.keys(data).forEach(key =>
+				formData.append(key, data[key] === null ? '' : data[key])
+			);
+		}
 
 		options = {
 			...options,
