@@ -226,6 +226,12 @@ export function CourseDetail(props) {
 							)}
 						</p>
 
+						{!!course.num_interested &&
+							<p>
+								{course.num_interested} member{course.num_interested !== 1 && 's'} interested.
+							</p>
+						}
+
 						{user &&
 							<p>
 								{user.interests.filter(x => !x.satisfied_by).map(x => x.course).includes(course.id) ?
