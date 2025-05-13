@@ -130,7 +130,6 @@ function AttendanceRow(props) {
 						negative
 						compact
 						size='mini'
-						style={{ marginLeft: '10px' }}
 					>
 						Refund
 					</Button>
