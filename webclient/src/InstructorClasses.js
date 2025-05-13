@@ -69,6 +69,7 @@ function AttendanceRow(props) {
 	const [loading, setLoading] = useState(false);
 	const [refundLoading, setRefundLoading] = useState(false);
 	const [refundError, setRefundError] = useState(false);
+	const [yousure, setYousure] = useState(false);
 
 	const handleMark = (newStatus) => {
 		if (loading || refundLoading) return;
@@ -87,21 +88,25 @@ function AttendanceRow(props) {
 	};
 
 	const handleRefund = () => {
-		if (loading || refundLoading) return;
-		setRefundLoading(true);
-		setRefundError(false);
-		requester(`/training/${student.id}/refund/`, 'POST', token)
-		.then(res => {
-			refreshClass();
+		if (yousure) {
+			if (loading || refundLoading) return;
+			setRefundLoading(true);
 			setRefundError(false);
-		})
-		.catch(err => {
-			console.log(err);
-			setRefundError(err.data?.non_field_errors || 'Something went wrong.');
-		})
-		.finally(() => {
-			setRefundLoading(false);
-		});
+			requester(`/training/${student.id}/refund/`, 'POST', token)
+			.then(res => {
+				refreshClass();
+				setRefundError(false);
+			})
+			.catch(err => {
+				console.log(err);
+				setRefundError(err.data?.non_field_errors || 'Something went wrong.');
+			})
+			.finally(() => {
+				setRefundLoading(false);
+			});
+		} else {
+			setYousure(true);
+		}
 	};
 
 	const makeProps = (name) => ({
@@ -131,7 +136,7 @@ function AttendanceRow(props) {
 						compact
 						size='mini'
 					>
-						Refund
+						{yousure ? 'Confirm?' : 'Refund'}
 					</Button>
 					</>
 				}
