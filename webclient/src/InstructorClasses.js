@@ -67,9 +67,11 @@ function AttendanceRow(props) {
 	const { student, token, refreshClass } = props;
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [refundLoading, setRefundLoading] = useState(false);
+	const [refundError, setRefundError] = useState(false);
 
 	const handleMark = (newStatus) => {
-		if (loading) return;
+		if (loading || refundLoading) return;
 		if (student.attendance_status === newStatus) return;
 		setLoading(newStatus);
 		const data = { ...student, attendance_status: newStatus };
@@ -84,6 +86,24 @@ function AttendanceRow(props) {
 		});
 	};
 
+	const handleRefund = () => {
+		if (loading || refundLoading) return;
+		setRefundLoading(true);
+		setRefundError(false);
+		requester(`/training/${student.id}/refund/`, 'POST', token)
+		.then(res => {
+			refreshClass();
+			setRefundError(false);
+		})
+		.catch(err => {
+			console.log(err);
+			setRefundError(err.data?.non_field_errors || 'Something went wrong.');
+		})
+		.finally(() => {
+			setRefundLoading(false);
+		});
+	};
+
 	const makeProps = (name) => ({
 		onClick: () => handleMark(name),
 		toggle: true,
@@ -93,14 +113,30 @@ function AttendanceRow(props) {
 
 	useEffect(() => {
 		setLoading(false);
+		// We don't reset refundLoading here as it's managed by its own finally block
 	}, [student.attendance_status]);
 
 	return (
 		<div className='attendance-row'>
 			<p>
 				<Link to={'/members/'+student.student_id}>{student.student_name}</Link>
+				{student.paid_date &&
+					<Button
+						onClick={handleRefund}
+						loading={refundLoading}
+						disabled={loading}
+						negative
+						compact
+						size='mini'
+						style={{ marginLeft: '10px' }}
+					>
+						Refund
+					</Button>
+				}
 				{student.attendance_status === 'Waiting for payment' && ' (Waiting for payment)'}:
 			</p>
+
+			{refundError && <Message error content={refundError} />}
 
 			<Button {...makeProps('Withdrawn')}>
 				Withdrawn
