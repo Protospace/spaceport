@@ -580,6 +580,10 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
     @action(detail=True, methods=['post'], permission_classes=[IsSessionInstructorOrAdmin])
     def refund(self, request, pk=None):
         training = self.get_object()
+
+        if training.paid_date is None:
+            raise exceptions.ValidationError(dict(non_field_errors='This training has not been paid for yet, so it cannot be refunded.'))
+
         training.attendance_status = 'Withdrawn'
         training.paid_date = None
         training.save()
