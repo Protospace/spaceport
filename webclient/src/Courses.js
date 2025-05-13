@@ -190,6 +190,10 @@ export function CourseDetail(props) {
 		requester('/interest/', 'POST', token, data)
 		.then(res => {
 			setError(false);
+			setCourse(prevCourse => ({
+				...prevCourse,
+				num_interested: prevCourse.num_interested + 1,
+			}));
 			refreshUser();
 		})
 		.catch(err => {
