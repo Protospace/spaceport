@@ -131,13 +131,13 @@ function AttendanceRow(props) {
 						<Button
 							onClick={handleRefund}
 							loading={refundLoading}
-						disabled={loading}
-						negative
-						compact
-						size='mini'
-					>
-						{yousure ? 'Confirm?' : 'Refund'}
-					</Button>
+							disabled={loading}
+							negative
+							compact
+							size='mini'
+						>
+							{yousure ? 'Confirm?' : 'Refund'}
+						</Button>
 					</>
 				}
 				{student.attendance_status === 'Waiting for payment' && ' (Waiting for payment)'}:
