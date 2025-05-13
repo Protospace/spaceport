@@ -577,6 +577,15 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             logging.info('Updating cert...')
             self.update_cert(session, member, status)
 
+    @action(detail=True, methods=['post'], permission_classes=[IsSessionInstructorOrAdmin])
+    def refund(self, request, pk=None):
+        training = self.get_object()
+        training.attendance_status = 'Withdrawn'
+        training.paid_date = None
+        training.save()
+        # TODO: should we also revoke certs here if applicable? For now, following request scope.
+        return Response(200)
+
 
 class QuizViewSet(Base):
     permission_classes = [AllowMetadata | IsAuthenticated]
