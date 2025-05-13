@@ -590,7 +590,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
 
         cost = training.session.cost
         if cost > 0:
-            memo = 'Protocoin - Transaction refund ₱ {} for {}, session: {}, training: {}'.format(
+            memo = 'Protocoin - Refund ₱ {} for {}, session: {}, training: {}'.format(
                 cost,
                 training.session.course.name,
                 str(training.session.id),
