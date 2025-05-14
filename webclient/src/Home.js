@@ -257,6 +257,11 @@ export function Home(props) {
 	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').fromNow() : '';
 	const getTrackName = (x) => stats && stats.track && stats.track[x] && stats.track[x]['first_name'] ? stats.track[x]['first_name'] : 'Unknown';
 
+	const getScannerStat = (name) => stats?.scanner3d?.[name] ? moment().unix() - stats.scanner3d[name]['time'] > 60 ? 'Free' : 'In Use' : 'Unknown';
+	const getScannerLast = (name) => stats?.scanner3d?.[name] ? moment.unix(stats.scanner3d[name]['time']).tz('America/Edmonton').format('llll') : 'Unknown';
+	const getScannerAgo = (name) => stats?.scanner3d?.[name] ? moment.unix(stats.scanner3d[name]['time']).tz('America/Edmonton').fromNow() : '';
+	const getScannerName = (name) => stats?.scanner3d?.[name]?.['first_name'] ? stats.scanner3d[name]['first_name'] : 'Unknown';
+
 	const alarmStat = (x) => stats && stats.alarm && moment().unix() - stats.alarm.time < 60*60*24 ? stats.alarm.data : 'Unknown';
 	const alarmUpdateLast = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz('America/Edmonton').format('llll') : 'Unknown';
 	const alarmUpdateAgo = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz('America/Edmonton').fromNow() : 'Unknown';
@@ -452,6 +457,19 @@ export function Home(props) {
 								<p>P1S printer L: {p1sPrinter3dStat('p1s1')}</p>
 
 								<p>P1S printer R: {p1sPrinter3dStat('p1s2')}</p>
+
+								<p>
+									3D Scanner availability: {getScannerStat('raptorx1')} <Popup content={
+										<React.Fragment>
+											<p>
+												Last use:<br />
+												{getScannerLast('raptorx1')}<br />
+												{getScannerAgo('raptorx1')}<br />
+												by {getScannerName('raptorx1')}
+											</p>
+										</React.Fragment>
+									} trigger={<a>[more]</a>} />
+								</p>
 
 								{stats && stats?.solar?.hasOwnProperty('total') && <p>
 									Members' solar power: {stats.solar.total.toLocaleString()} W <Popup content={
