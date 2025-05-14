@@ -257,7 +257,7 @@ export function Home(props) {
 	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').fromNow() : '';
 	const getTrackName = (x) => stats && stats.track && stats.track[x] && stats.track[x]['first_name'] ? stats.track[x]['first_name'] : 'Unknown';
 
-	const getScannerStat = (name) => stats?.scanner3d?.[name] ? moment().unix() - stats.scanner3d[name]['time'] > 60 ? 'Free' : 'In Use' : 'Unknown';
+	const getScannerStat = (name) => stats?.scanner3d?.[name]?.status || 'Unknown';
 	const getScannerLast = (name) => stats?.scanner3d?.[name] ? moment.unix(stats.scanner3d[name]['time']).tz('America/Edmonton').format('llll') : 'Unknown';
 	const getScannerAgo = (name) => stats?.scanner3d?.[name] ? moment.unix(stats.scanner3d[name]['time']).tz('America/Edmonton').fromNow() : '';
 	const getScannerName = (name) => stats?.scanner3d?.[name]?.['first_name'] ? stats.scanner3d[name]['first_name'] : 'Unknown';
