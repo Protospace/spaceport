@@ -106,8 +106,14 @@ def get_discourse_usernames():
     for user in response['members']:
         usernames.append(user['username'])
 
-    if len(usernames) == 1000:
-        logger.error('Hit username limit, aborting!')
+    response = discourse_api_get('https://forum.protospace.ca/groups/trust_level_0/members.json?limit=1000&offset=1000')
+    response = response.json()
+
+    for user in response['members']:
+        usernames.append(user['username'])
+
+    if len(usernames) == 2000:
+        logger.error('Hit username limit, aborting! Tanner, fix this in the integration\'s get_discourse_usernames() function.')
         abort(400)
 
     return usernames
