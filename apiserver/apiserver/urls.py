@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.conf.urls import re_path
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
@@ -39,25 +39,25 @@ router.register(r'charts/spaceactivity', views.SpaceActivityViewSet, basename='s
 
 urlpatterns = [
     path('', include(router.urls)),
-    url(r'^rest-auth/login/$', views.MyLoginView.as_view(), name='rest_login'),
-    url(r'^spaceport-auth/login/$', views.SpaceportAuthView.as_view(), name='spaceport_auth'),
-    url(r'^rest-auth/logout/$', LogoutView.as_view(), name='rest_logout'),
-    url(r'^password/reset/$', views.PasswordResetView.as_view(), name='rest_password_reset'),
-    url(r'^password/reset/confirm/$', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-    url(r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,32})/$', views.null_view, name='password_reset_confirm'),
-    url(r'^password/change/', views.PasswordChangeView.as_view(), name='rest_password_change'),
-    url(r'^registration/', views.RegistrationView.as_view(), name='rest_name_register'),
-    url(r'^user/', views.UserView.as_view(), name='user'),
-    url(r'^ping/', views.PingView.as_view(), name='ping'),
-    url(r'^paste/', views.PasteView.as_view(), name='paste'),
-    url(r'^backup/', views.BackupView.as_view(), name='backup'),
-    url(r'^oidc/', views.OIDCAuthView.as_view(), name='oidc'),
+    re_path(r'^rest-auth/login/$', views.MyLoginView.as_view(), name='rest_login'),
+    re_path(r'^spaceport-auth/login/$', views.SpaceportAuthView.as_view(), name='spaceport_auth'),
+    re_path(r'^rest-auth/logout/$', LogoutView.as_view(), name='rest_logout'),
+    re_path(r'^password/reset/$', views.PasswordResetView.as_view(), name='rest_password_reset'),
+    re_path(r'^password/reset/confirm/$', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    re_path(r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,32})/$', views.null_view, name='password_reset_confirm'),
+    re_path(r'^password/change/', views.PasswordChangeView.as_view(), name='rest_password_change'),
+    re_path(r'^registration/', views.RegistrationView.as_view(), name='rest_name_register'),
+    re_path(r'^user/', views.UserView.as_view(), name='user'),
+    re_path(r'^ping/', views.PingView.as_view(), name='ping'),
+    re_path(r'^paste/', views.PasteView.as_view(), name='paste'),
+    re_path(r'^backup/', views.BackupView.as_view(), name='backup'),
+    re_path(r'^oidc/', views.OIDCAuthView.as_view(), name='oidc'),
     path('openid/', include('oidc_provider.urls', namespace='oidc_provider')),
 ]
 
 if secrets.IPN_RANDOM:
     IPN_ROUTE = r'^ipn/{}/'.format(secrets.IPN_RANDOM)
-    urlpatterns.append(url(IPN_ROUTE, views.IpnView.as_view(), name='ipn'))
+    urlpatterns.append(re_path(IPN_ROUTE, views.IpnView.as_view(), name='ipn'))
 
 if secrets.ADMIN_RANDOM:
     ADMIN_ROUTE = '{}/admin/'.format(secrets.ADMIN_RANDOM)
