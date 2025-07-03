@@ -10,6 +10,8 @@ from django.utils.timezone import now, pytz
 from apiserver.api import models, utils
 from apiserver import secrets
 
+from . import utils_todo
+
 DEFAULTS = {
     'last_card_change': time.time(),
     'next_meeting': None,
@@ -34,6 +36,7 @@ DEFAULTS = {
     'scanner3d': {},
     'solar': {},
     'drinks_6mo': [],
+    'shopping_list': [],
 }
 
 if secrets.MUMBLE:
@@ -180,6 +183,17 @@ def check_mumble_server():
             return users
         except BaseException as e:
             logger.error('Problem checking Mumble: {} - {}'.format(e.__class__.__name__, str(e)))
+
+    return []
+
+def check_shopping_list():
+    if utils_todo.is_configured():
+        try:
+            tasks = utils_todo.get_task_list('Consumables')
+            cache.set('shopping_list', tasks)
+            return tasks
+        except BaseException as e:
+            logger.error('Problem checking Shopping List: {} - {}'.format(e.__class__.__name__, str(e)))
 
     return []
 

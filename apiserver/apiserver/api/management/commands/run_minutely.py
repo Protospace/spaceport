@@ -16,6 +16,8 @@ class Command(BaseCommand):
         self.stdout.write('Found Minecraft players: ' + str(players))
         users = utils_stats.check_mumble_server()
         self.stdout.write('Found Mumble users: ' + str(users))
+        tasks = utils_stats.check_shopping_list()
+        self.stdout.write('Found shopping tasks: ' + str([x['title'] for x in tasks]))
 
         self.stdout.write('Completed tasks in {} s'.format(
             str(time.time() - start)[:4]

@@ -361,7 +361,7 @@ export function Home(props) {
 								<p>Next clean: {getDateStat('next_clean')}</p>
 								<p className='nowrap-stat'>Next class: {getNextStat('next_class')}</p>
 								<p className='nowrap-stat'>Last class: {getNextStat('prev_class')}</p>
-								<p>Shopping list: {stats?.shopping_list?.length ? stats.shopping_list.map(item => item.title).join(', ') : 'None'} <a href='https://todo.protospace.ca/projects/4' target='_blank' rel='noopener noreferrer'>[more]</a></p>
+								<p>Shopping list: {stats?.shopping_list?.length ? stats.shopping_list.map(item => item.title).join(', ') : 'None'} <a href='https://todo.protospace.ca/projects/4' target='_blank' rel='noopener noreferrer'>[list]</a></p>
 								<p>Member count: {getStat('member_count')} <Link to='/charts'>[charts]</Link></p>
 								<p>Card scans today: {getZeroStat('card_scans')}</p>
 
