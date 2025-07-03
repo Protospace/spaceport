@@ -365,37 +365,6 @@ export function Home(props) {
 								<p>Card scans today: {getZeroStat('card_scans')}</p>
 
 								<p>
-									Minecraft players: {mcPlayers.length} {mcPlayers.length > 5 && '🔥'} <Popup content={
-										<React.Fragment>
-											<p>
-												Server IP:<br />
-												games.protospace.ca
-											</p>
-											<p>
-												Players:<br />
-												{mcPlayers.length ? mcPlayers.map(x => <React.Fragment>{x}<br /></React.Fragment>) : 'None'}
-											</p>
-										</React.Fragment>
-									} trigger={<a>[more]</a>} />
-								{' '}<a href='http://games.protospace.ca:8123/?worldname=world&mapname=flat&zoom=3&x=74&y=64&z=354' target='_blank'>[map]</a>
-								</p>
-
-								{stats && stats.hasOwnProperty('mumble_users') && <p>
-									Mumble users: {mumbleUsers.length} <Popup content={
-										<React.Fragment>
-											<p>
-												Server IP:<br />
-												mumble.protospace.ca
-											</p>
-											<p>
-												Users:<br />
-												{mumbleUsers.length ? mumbleUsers.map(x => <React.Fragment>{x}<br /></React.Fragment>) : 'None'}
-											</p>
-										</React.Fragment>
-									} trigger={<a>[more]</a>} />
-								</p>}
-
-								<p>
 									Trotec availability: {getTrackStat('TROTECS300')} <Popup content={
 										<React.Fragment>
 											<p>
