@@ -357,11 +357,11 @@ export function Home(props) {
 
 							<div>
 								<Header size='medium'>Protospace Stats</Header>
+								<p>Shopping list: {stats?.shopping_list?.length ? <b>{stats.shopping_list.map(item => item.title).join(', ')}</b> : 'Empty'} <a href='https://todo.protospace.ca/projects/4' target='_blank' rel='noopener noreferrer'>[list]</a></p>
 								<p>Next meeting: {getDateStat('next_meeting')} {showMeetingLink() && <a href='https://protospace.ca/meet' target='_blank' rel='noopener noreferrer'>[remote link]</a>}</p>
 								<p>Next clean: {getDateStat('next_clean')}</p>
 								<p className='nowrap-stat'>Next class: {getNextStat('next_class')}</p>
 								<p className='nowrap-stat'>Last class: {getNextStat('prev_class')}</p>
-								<p>Shopping list: {stats?.shopping_list?.length ? stats.shopping_list.map(item => item.title).join(', ') : 'None'} <a href='https://todo.protospace.ca/projects/4' target='_blank' rel='noopener noreferrer'>[list]</a></p>
 								<p>Member count: {getStat('member_count')} <Link to='/charts'>[charts]</Link></p>
 								<p>Card scans today: {getZeroStat('card_scans')}</p>
 
