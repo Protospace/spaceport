@@ -190,7 +190,8 @@ def check_shopping_list():
     if utils_todo.is_configured():
         try:
             tasks = utils_todo.get_task_list('Consumables')
-            cache.set('shopping_list', tasks)
+            shopping_list = [dict(title=x['title'], created=x['created']) for x in tasks]
+            cache.set('shopping_list', shopping_list)
             return tasks
         except BaseException as e:
             logger.error('Problem checking Shopping List: {} - {}'.format(e.__class__.__name__, str(e)))
