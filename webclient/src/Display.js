@@ -389,7 +389,7 @@ export function DisplayClasses(props) {
 		<>
 			<Header size='large'>Upcoming Classes / Events</Header>
 
-			{classes ? classes.filter(isTodayOrFuture).sort((a, b) => a.datetime > b.datetime ? 1 : -1).slice(0, 5).map((x, i) =>
+			{classes ? classes.filter(isTodayOrFuture).filter(x => !x.is_cancelled).sort((a, b) => a.datetime > b.datetime ? 1 : -1).slice(0, 5).map((x, i) =>
 				<div key={i} className={isToday(x) ? 'today' : ''}>
 					<Header size='medium'>{x.course_data.name}</Header>
 					<p>
