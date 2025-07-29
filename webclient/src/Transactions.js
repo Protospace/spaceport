@@ -152,7 +152,7 @@ export function TransactionEditor(props) {
 			{input?.account_type !== prevInput?.account_type && input?.account_type === 'PayPal' &&
 				<Message visible warning>
 					<Message.Header>Are you sure?</Message.Header>
-					<p>PayPal transactions are automatic. Double check there's no duplicate. They may take 24h to appear.</p>
+					<p>PayPal transactions are automatic. Double check there's no duplicate. They may take 24h to appear. Also check Space > Transactions > Reported.</p>
 				</Message>
 			}
 
