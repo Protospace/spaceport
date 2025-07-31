@@ -2438,6 +2438,7 @@ class OIDCAuthView(views.APIView, AuthorizeView):
         try:
             r = super().get(request, args, kwargs)
             location = r._headers['location'][1]
+            time.sleep(1)
             return Response({'url': location})
         except Exception as e:
             msg = getattr(r, 'content', False) or str(e)

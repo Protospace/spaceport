@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Route, Link, useLocation } from 'react-router-dom';
+import * as THREE from 'three';
 import './light.css';
 import { Container, Form, Header, Image, Message, Segment } from 'semantic-ui-react';
 import { requester } from './utils.js';
@@ -149,6 +150,7 @@ export function AuthOIDC(props) {
 	const { token, user } = props;
 	const [error, setError] = useState(false);
 	const qs = decodeURIComponent(useLocation().search.replace('?next=/openid/authorize', ''));
+	const mountRef = useRef(null);
 
 	useEffect(() => {
 		requester('/oidc/' + qs, 'GET', token)
@@ -162,16 +164,137 @@ export function AuthOIDC(props) {
 		});
 	}, []);
 
+	useEffect(() => {
+		const mount = mountRef.current;
+		if (!mount) return;
+
+		const scene = new THREE.Scene();
+
+		const camera = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000);
+		camera.position.z = 50;
+
+		const vFOV = THREE.MathUtils.degToRad(camera.fov);
+		const height = 2 * Math.tan(vFOV / 2) * camera.position.z;
+		const width = height * camera.aspect;
+
+		const webglSupport = (() => {
+			try {
+				const canvas = document.createElement('canvas');
+				return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+			} catch (e) {
+				return false;
+			}
+		})();
+
+		if (!webglSupport) {
+			return;
+		}
+
+		const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+		renderer.setSize(mount.clientWidth, mount.clientHeight);
+		mount.appendChild(renderer.domElement);
+
+		const rockets = [];
+		const rocketMaterial = new THREE.MeshBasicMaterial({ color: 0x606060 });
+
+		const createRocket = () => {
+			const rocketGroup = new THREE.Group();
+
+			// Cone (engine)
+			const coneGeometry = new THREE.ConeGeometry(1, 2, 8);
+			const cone = new THREE.Mesh(coneGeometry, rocketMaterial);
+			cone.position.y = 1;
+			rocketGroup.add(cone);
+
+			// Cylinder (body)
+			const cylinderGeometry = new THREE.CylinderGeometry(1, 1, 4, 8);
+			const cylinder = new THREE.Mesh(cylinderGeometry, rocketMaterial);
+			cylinder.position.y = 4;
+			rocketGroup.add(cylinder);
+
+			// Hemisphere (tip)
+			const tipGeometry = new THREE.SphereGeometry(1, 8, 6, 0, Math.PI * 2, 0, Math.PI / 2);
+			const tip = new THREE.Mesh(tipGeometry, rocketMaterial);
+			tip.position.y = 6;
+			rocketGroup.add(tip);
+
+			// Flame
+			const flameMaterial = new THREE.MeshBasicMaterial({ color: 0xffa500 });
+			const flameGeometry = new THREE.ConeGeometry(0.8, 3, 8);
+			const flame = new THREE.Mesh(flameGeometry, flameMaterial);
+			flame.position.y = -1.5;
+			rocketGroup.add(flame);
+			rocketGroup.userData.flame = flame;
+
+			return rocketGroup;
+		};
+
+		const numRockets = 5;
+		const xRange = width * 0.9;
+		for (let i = 0; i < numRockets; i++) {
+			const rocket = createRocket();
+			const xPos = (i / (numRockets - 1) - 0.5) * xRange;
+			rocket.position.x = xPos;
+			rocket.position.y = -height / 2;
+			scene.add(rocket);
+			const velocity = 0;
+			const acceleration = 0.01 + (i / (numRockets - 1)) * 0.03;
+			rockets.push({mesh: rocket, velocity: velocity, acceleration: acceleration});
+		}
+
+		let t = 0;
+		let animationFrameId;
+		const animate = () => {
+			animationFrameId = requestAnimationFrame(animate);
+			t += 0.2;
+
+			rockets.forEach(r => {
+				r.velocity += r.acceleration;
+				r.mesh.position.y += r.velocity;
+
+				// Animate flame
+				const flame = r.mesh.userData.flame;
+				if (flame) {
+					flame.scale.y = 1 + Math.sin(t + r.mesh.id) * 0.4;
+					flame.scale.x = 1 + Math.cos(t + r.mesh.id) * 0.2;
+				}
+			});
+
+			renderer.render(scene, camera);
+		};
+		animate();
+
+		const handleResize = () => {
+			if (mount) {
+				camera.aspect = mount.clientWidth / mount.clientHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize(mount.clientWidth, mount.clientHeight);
+			}
+		};
+		window.addEventListener('resize', handleResize);
+
+		return () => {
+			window.removeEventListener('resize', handleResize);
+			cancelAnimationFrame(animationFrameId);
+			if (mount && renderer.domElement) {
+				mount.removeChild(renderer.domElement);
+			}
+		};
+	}, []);
+
 	return (
-		<Container>
-			<Header size='large'>Spaceport Auth</Header>
+		<>
+			<div ref={mountRef} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%' }} />
+			<Container style={{ position: 'relative' }}>
+				<Header size='large'>Spaceport Auth</Header>
 
-			<Segment compact padded>
-				<p>Authorizing OIDC...</p>
+				<Segment compact padded>
+					<p>Authorizing OIDC...</p>
 
-				{error && <p>Error, are you logged in?</p>}
-			</Segment>
-		</Container>
+					{error && <p>Error, are you logged in?</p>}
+				</Segment>
+			</Container>
+		</>
 	);
 }
 
