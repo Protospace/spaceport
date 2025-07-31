@@ -147,22 +147,31 @@ export function AuthDiscourse(props) {
 
 export function AuthOIDC(props) {
 	const { token, user } = props;
+	const [error, setError] = useState(false);
 	const qs = decodeURIComponent(useLocation().search.replace('?next=/openid/authorize', ''));
 
 	useEffect(() => {
 		requester('/oidc/' + qs, 'GET', token)
 		.then(res => {
+			setError(false);
 			window.location = res.url;
 		})
 		.catch(err => {
+			setError(true);
 			console.log(err);
 		});
 	}, []);
 
 	return (
-		<Segment compact padded>
-			<p>Authorizing OIDC...</p>
-		</Segment>
+		<Container>
+			<Header size='large'>Spaceport Auth</Header>
+
+			<Segment compact padded>
+				<p>Authorizing OIDC...</p>
+
+				{error && <p>Error, are you logged in?</p>}
+			</Segment>
+		</Container>
 	);
 }
 

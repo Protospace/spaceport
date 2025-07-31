@@ -259,14 +259,6 @@ function App() {
 						</Route>
 
 						<Switch>
-							<Route path='/storage/:id'>
-								<StorageDetail token={token} user={user} refreshUser={refreshUser} />
-							</Route>
-
-							<Route path='/storage'>
-								<Storage token={token} user={user} />
-							</Route>
-
 							<Route path='/debug'>
 								<Debug token={token} user={user} />
 							</Route>
@@ -314,10 +306,24 @@ function App() {
 								<Garden />
 							</Route>
 
+							{token ?
+								<Route path='/oidc'>
+									<AuthOIDC token={token} />
+								</Route>
+							:
+								<Route path='/:page'>
+									<PleaseLogin />
+								</Route>
+							}
+
 							{user && user.member.set_details ?
 								<Switch>
-									<Route path='/oidc'>
-										<AuthOIDC token={token} user={user} />
+									<Route path='/storage/:id'>
+										<StorageDetail token={token} user={user} refreshUser={refreshUser} />
+									</Route>
+
+									<Route path='/storage'>
+										<Storage token={token} user={user} />
 									</Route>
 
 									<Route path='/claimshelf/:id'>

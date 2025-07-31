@@ -2435,9 +2435,14 @@ class ToolsViewSet(Base, Create, Destroy):
 
 class OIDCAuthView(views.APIView, AuthorizeView):
     def get(self, request, *args, **kwargs):
-        r = super().get(request, args, kwargs)
-        location = r._headers['location'][1]
-        return Response({'url': location})
+        try:
+            r = super().get(request, args, kwargs)
+            location = r._headers['location'][1]
+            return Response({'url': location})
+        except Exception as e:
+            msg = getattr(r, 'content', False) or str(e)
+            logger.exception('OIDC auth view - {} - {}'.format(e.__class__.__name__, msg))
+            return Response({'error': msg}, status=drfstatus.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view()
 def null_view(request, *args, **kwargs):
