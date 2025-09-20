@@ -405,13 +405,13 @@ export function Home(props) {
 								</p>
 
 								<p>
-									Media computer: {getTrackStat('PROTOGRAPH1')} <Popup content={
+									Media computer: {getTrackStat('ARTEMUS')} <Popup content={
 										<React.Fragment>
 											<p>
 												Last use:<br />
-												{getTrackLast('PROTOGRAPH1')}<br />
-												{getTrackAgo('PROTOGRAPH1')}<br />
-												by {getTrackName('PROTOGRAPH1')}
+												{getTrackLast('ARTEMUS')}<br />
+												{getTrackAgo('ARTEMUS')}<br />
+												by {getTrackName('ARTEMUS')}
 											</p>
 
 											<p>

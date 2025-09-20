@@ -1742,7 +1742,7 @@ class ProtocoinViewSet(Base):
         #    raise exceptions.PermissionDenied()
 
         track = cache.get('track', {})
-        track_graphics_computer = track.get('PROTOGRAPH1', None)
+        track_graphics_computer = track.get('ARTEMUS', None)
 
         if not track_graphics_computer:
             return Response(200)
