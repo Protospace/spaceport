@@ -1953,6 +1953,17 @@ class ProtocoinViewSet(Base):
                 logging.info('Total cost: %s protocoin', str(total_cost))
 
                 if not username:
+                    logging.info('Username data missing, using track data...')
+
+                    track = cache.get('track', {})
+                    try:
+                        if time.time() - track['ARTEMUS']['time'] < 20*60:  # 20 minutes
+                            username = track['ARTEMUS']['username']
+                            logging.info('Found track username: %s', username)
+                    except:
+                        logging.info('Unable to derive username from track.')
+
+                if not username:
                     msg = 'Job {}: missing username, aborting. Cost: {}'.format(job_uuid, str(total_cost))
                     utils.alert_tanner(msg)
                     logger.error(msg)
