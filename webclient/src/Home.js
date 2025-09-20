@@ -428,7 +428,7 @@ export function Home(props) {
 
 								<p>P1S printer R: {p1sPrinter3dStat('p1s2')}</p>
 
-								<p>
+								{false && <p>
 									3D Scanner availability: {getScannerStat('raptorx1')} <Popup content={
 										<React.Fragment>
 											<p>
@@ -439,7 +439,7 @@ export function Home(props) {
 											</p>
 										</React.Fragment>
 									} trigger={<a>[more]</a>} />
-								</p>
+								</p>}
 
 								{stats && stats?.solar?.hasOwnProperty('total') && <p>
 									Members' solar power: {stats.solar.total.toLocaleString()} W <Popup content={
