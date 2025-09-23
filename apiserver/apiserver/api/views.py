@@ -945,7 +945,7 @@ class StatsViewSet(viewsets.ViewSet, List):
         if not user.is_authenticated:
             stats.pop('alarm', None)
             stats.pop('autoscan', None)
-        elif not user.is_admin_director:
+        elif not is_admin_director(user):
             stats.pop('autoscan', None)
 
         stats['at_protospace'] = utils.is_request_from_protospace(request)
