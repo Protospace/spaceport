@@ -286,7 +286,7 @@ export function AccountForm(props) {
 				label='Member Photo'
 				name='photo'
 				type='file'
-				accept='image/*'
+				accept='image/png, image/jpeg'
 				onChange={handleUpload}
 			/>}
 
