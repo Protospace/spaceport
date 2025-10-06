@@ -65,7 +65,7 @@ export function VestaboardForm(props) {
 		if (loading) return;
 		setLoading(true);
 		const data = {vestaboard: sign};
-		requester('/stats/vestboard/', 'POST', token, data)
+		requester('/stats/vestaboard/', 'POST', token, data)
 		.then(res => {
 			setLoading(false);
 			setSuccess(true);
