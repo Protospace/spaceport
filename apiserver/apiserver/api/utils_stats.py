@@ -28,6 +28,7 @@ DEFAULTS = {
     'track': {},
     'alarm': {},
     'sign': '',
+    'vestaboard': '',
     'link': '',
     'autoscan': '',
     'last_scan': {},

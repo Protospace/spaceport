@@ -7,7 +7,7 @@ import { Button, Container, Divider, Grid, Header, Icon, Image, Message, Popup, 
 import { statusColor, BasicTable, siteUrl, staticUrl, requester, isAdmin } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 import { AccountForm } from './Account.js';
-import { SignForm } from './Sign.js';
+import { VestaboardForm, SignForm } from './Sign.js';
 import { StorageButton } from './Storage.js';
 import { PayPalSubscribeDeal } from './PayPal.js';
 
@@ -477,11 +477,15 @@ export function Home(props) {
 
 							<SignForm token={token} />
 
-							<p>Protogarden:</p>
+							<VestaboardForm token={token} />
 
-							<Link to='/garden'>
-								<Image src={staticUrl + '/garden-medium.jpg?' + moment().unix()} />
-							</Link>
+							{false && <>
+								<p>Protogarden:</p>
+
+								<Link to='/garden'>
+									<Image src={staticUrl + '/garden-medium.jpg?' + moment().unix()} />
+								</Link>
+							</>}
 
 						</Segment>
 					}

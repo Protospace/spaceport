@@ -973,10 +973,26 @@ class StatsViewSet(viewsets.ViewSet, List):
                 cache.set('link', sign)
             else:
                 cache.set('sign', sign)
+                cache.set('vestaboard', sign)
 
             return Response(200)
         except KeyError:
             raise exceptions.ValidationError(dict(sign='This field is required.'))
+
+    @action(detail=False, methods=['post'])
+    def vestaboard(self, request):
+        try:
+            data = request.data['vestaboard'][:500]
+
+            data = data.replace('‘', '\'').replace('’', '\'')
+            data = data.replace('“', '"').replace('”', '"')
+            data = data.replace('…', '...')
+
+            cache.set('vestaboard', data)
+
+            return Response(200)
+        except KeyError:
+            raise exceptions.ValidationError(dict(vestaboard='This field is required.'))
 
     @action(detail=False, methods=['post'])
     def alarm(self, request):
