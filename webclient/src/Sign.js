@@ -96,7 +96,6 @@ export function VestaboardForm(props) {
 				</Form.Button>
 
 			</Form.Group>
-			{success && <div>Success!</div>}
 
 			<p style={{marginTop: '-0.5rem'}}>
 				Special:
@@ -109,6 +108,8 @@ export function VestaboardForm(props) {
 				\v = <span style={{color: 'violet'}}>█</span>,
 				\d = °
 			</p>
+
+			{success && <div>Success!</div>}
 		</Form>
 	);
 };
