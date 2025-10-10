@@ -8,6 +8,7 @@ export function SignForm(props) {
 	const [sign, setSign] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
+	const [isFocused, setIsFocused] = useState(false);
 
 	const handleValues = (e, v) => setSign(v.value);
 	const handleChange = (e) => handleValues(e, e.currentTarget);
@@ -89,6 +90,8 @@ export function VestaboardForm(props) {
 					onChange={handleChange}
 					value={sign}
 					error={error.sign}
+					onFocus={() => setIsFocused(true)}
+					onBlur={() => setIsFocused(false)}
 				/>
 
 				<Form.Button loading={loading} error={error.non_field_errors}>
@@ -97,7 +100,7 @@ export function VestaboardForm(props) {
 
 			</Form.Group>
 
-			<p style={{marginTop: '-0.5rem'}}>
+			{isFocused && <p style={{marginTop: '-0.5rem'}}>
 				Special:
 				\w = ▒,
 				\r = <span style={{color: 'red'}}>█</span>,
@@ -107,7 +110,7 @@ export function VestaboardForm(props) {
 				\b = <span style={{color: 'blue'}}>█</span>,
 				\v = <span style={{color: 'violet'}}>█</span>,
 				\d = °
-			</p>
+			</p>}
 
 			{success && <div>Success!</div>}
 		</Form>
