@@ -2,7 +2,7 @@
 
 Protospace uses [Vikunja](https://github.com/go-vikunja/vikunja) to track todo lists. This document describes setting up the portal auth integration.
 
-## Integration Setup
+## Setup
 
 Install and set up Vikunja according to their installation docs.
 

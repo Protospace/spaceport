@@ -1,6 +1,6 @@
 # Logon Tracker Integration
 
-The Logon Tracker periodically sends a logged on user's username to the portal.
+The Logon Tracker periodically sends a logged on user's username to the portal from various Windows computers around Protospace.
 
 ## Theory
 
