@@ -3,5 +3,6 @@
   "autoPairBrackets": false,
   "attachmentFolderPath": "./media",
   "newFileLocation": "current",
-  "useMarkdownLinks": true
+  "useMarkdownLinks": true,
+  "newLinkFormat": "relative"
 }

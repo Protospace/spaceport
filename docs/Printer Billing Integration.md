@@ -28,9 +28,9 @@ Go to Email server page:
 
 AutoSend can remain disabled.
 
-![](Pasted%20image%2020250115063417.png)
+![](media/Pasted%20image%2020250115063417.png)
 
-![](Pasted%20image%2020250115063429.png)
+![](media/Pasted%20image%2020250115063429.png)
 
 The SMTP server 172.17.17.181 needs to point to the server running the python script (probably Tanner's "dev server", hosted on Proxmox).
 
