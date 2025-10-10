@@ -4,9 +4,9 @@
 
 ### Theory
 
-[[Membership Accounting]]
+[Membership Accounting](Membership%20Accounting.md)
 
-[[FAQs]]
+[FAQs](FAQs.md)
 
 ### Development
 

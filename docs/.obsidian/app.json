@@ -2,5 +2,6 @@
   "autoPairMarkdown": false,
   "autoPairBrackets": false,
   "attachmentFolderPath": "./media",
-  "newFileLocation": "current"
+  "newFileLocation": "current",
+  "useMarkdownLinks": true
 }
