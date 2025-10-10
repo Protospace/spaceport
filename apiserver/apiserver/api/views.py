@@ -1254,6 +1254,8 @@ class StatsViewSet(viewsets.ViewSet, List):
             )
         elif devicename.startswith('p1s'):
             printer3d[devicename] = request.data
+        elif devicename == 'prusa_xl':
+            printer3d[devicename] = request.data
 
         cache.set('printer3d', printer3d)
 

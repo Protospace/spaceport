@@ -290,6 +290,26 @@ export function Home(props) {
 		}
 	};
 
+	const prusaPrinter3dStat = (x) => {
+		const data = stats?.printer3d?.[x];
+		const info = data?.info;
+		const online = data?.info?.online;
+
+		if (!data || !info || !online) {
+			return 'Unknown / Offline';
+		}
+
+		const printer_state = info?.state || 'Unknown';
+
+		if (printer_state === 'Printing' && info?.progress == '0.0') {
+			return 'Initializing';
+		} else if (printer_state === 'Printing') {
+			return 'Printing (' + info?.progress + '%)';
+		} else {
+			return printer_state;
+		}
+	};
+
 	const show_signup = stats?.at_protospace;
 
 	const setLightMode = () => {
@@ -427,6 +447,8 @@ export function Home(props) {
 								<p>P1S printer L: {p1sPrinter3dStat('p1s1')}</p>
 
 								<p>P1S printer R: {p1sPrinter3dStat('p1s2')}</p>
+
+								<p>Prusa XL: {prusaPrinter3dStat('prusa_xl')}</p>
 
 								{false && <p>
 									3D Scanner availability: {getScannerStat('raptorx1')} <Popup content={
