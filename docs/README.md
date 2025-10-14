@@ -19,6 +19,7 @@
 
 ### Integrations
 
+- [Supervisor](Supervisor.md)
 - [LDAP Integration](integration_ldap.md)
 - [Todo Integration](integration_todo.md)
 - [Printer Billing Integration](Printer%20Billing%20Integration.md)

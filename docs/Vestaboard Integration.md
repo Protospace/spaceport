@@ -20,6 +20,8 @@ https://github.com/Protospace/protoflap
 
 Follow instructions in the Protoflap README.
 
+The script is kept alive with [Supervisor](Supervisor.md).
+
 ## Examples
 
 Here are examples for sending your own custom message to the Vestaboard.

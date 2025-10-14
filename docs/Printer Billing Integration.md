@@ -42,6 +42,24 @@ https://github.com/Protospace/telemetry/tree/master/printer_report
 
 The script parses the printer's email and sends the data to the portal.
 
+The script is kept alive with [Supervisor](Supervisor.md):
+
+```
+[program:printer]
+user=tanner
+directory=/home/tanner/telemetry/printer_report
+environment=PYTHONUNBUFFERED=TRUE
+command=/home/tanner/telemetry/printer_report/env/bin/python main.py
+stopasgroup=true
+stopsignal=INT
+autostart=true
+autorestart=true
+stderr_logfile=/var/log/printer.log
+stderr_logfile_maxbytes=10MB
+stdout_logfile=/var/log/printer.log
+stdout_logfile_maxbytes=10MB
+```
+
 ### Portal
 
 Configure `PRINTER_API_TOKEN` in [secrets.py](https://github.com/Protospace/spaceport/blob/master/apiserver/apiserver/secrets.py.example) and copy it to the python script's secrets.py.
