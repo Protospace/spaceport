@@ -25,6 +25,7 @@
 - [Logon Tracker Integration](Logon%20Tracker%20Integration.md)
 - [Bambu 3D Printer Integration](Bambu%203D%20Printer%20Integration.md)
 - [Prusa 3D Printer Integration](Prusa%203D%20Printer%20Integration.md)
+- [Vestaboard Integration](Vestaboard%20Integration.md)
 
 ### Meta
 
