@@ -1942,7 +1942,7 @@ class ProtocoinViewSet(Base):
 
                 INK_PROTOCOIN_PER_ML = 0.75
                 DEFAULT_PAPER_PROTOCOIN_PER_M = 0.50
-                PROTOCOIN_PER_PRINT = 2.0
+                PROTOCOIN_PER_PRINT = 1.0
 
                 total_cost = PROTOCOIN_PER_PRINT
                 logging.info('    Fixed cost: %s', str(PROTOCOIN_PER_PRINT))
@@ -1955,7 +1955,7 @@ class ProtocoinViewSet(Base):
 
                 PAPER_COSTS = {
                     # Prices: https://forum.protospace.ca/t/issue-with-plotter-printer-protocoin/6928/20
-                    'Plain Paper': 2.16,
+                    'Plain Paper': 1.00,
                     'Photo Gloss Paper': 8.77,
                     # Canvas price: https://forum.protospace.ca/t/motion-canvas-roll-for-44-t1200-large-format-printer/8640/8
                     'Adhesive Polypropylene Matte': 20.54,
