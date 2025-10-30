@@ -84,18 +84,6 @@ export function VestaboardForm(props) {
 		<Form onSubmit={handleSubmit}>
 			<p>Send a message to the Vestaboard only:</p>
 
-			{isFocused && <p style={{marginTop: '-0.5rem'}}>
-				Special:
-				\w = ▒,
-				\r = <span style={{color: 'red'}}>█</span>,
-				\o = <span style={{color: 'orange'}}>█</span>,
-				\y = <span style={{color: 'yellow'}}>█</span>,
-				\g = <span style={{color: 'green'}}>█</span>,
-				\b = <span style={{color: 'blue'}}>█</span>,
-				\v = <span style={{color: 'violet'}}>█</span>,
-				\d = °
-			</p>}
-
 			<Form.Group widths='equal'>
 				<Form.Input
 					name='sign'
@@ -112,7 +100,19 @@ export function VestaboardForm(props) {
 
 			</Form.Group>
 
-			{success && <div>Success!</div>}
+			{success && <p>Success!</p>}
+
+			{isFocused && <p style={{marginTop: '-0.5rem'}}>
+				Special:
+				\w = ▒,
+				\r = <span style={{color: 'red'}}>█</span>,
+				\o = <span style={{color: 'orange'}}>█</span>,
+				\y = <span style={{color: 'yellow'}}>█</span>,
+				\g = <span style={{color: 'green'}}>█</span>,
+				\b = <span style={{color: 'blue'}}>█</span>,
+				\v = <span style={{color: 'violet'}}>█</span>,
+				\d = °
+			</p>}
 		</Form>
 	);
 };
