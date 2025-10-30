@@ -22,6 +22,8 @@ class LoggingThrottle(throttling.BaseThrottle):
             return True
         elif path == '/stats/sign/':
             pass  # log this one
+        elif path == '/stats/vestaboard/':
+            pass  # log this one
         elif path == '/stats/raptorx1/scanner3d/':
             pass  # log this one
         elif path.startswith('/stats/'):
