@@ -32,7 +32,7 @@ AutoSend can remain disabled.
 
 ![](media/Pasted%20image%2020250115063429.png)
 
-The SMTP server 172.17.17.181 needs to point to the server running the python script (probably Tanner's "dev server", hosted on Proxmox).
+The SMTP server 172.17.17.181 needs to point to the server running the python script, currently the [Integrations Server](Integrations%20Server.md).
 
 ### Python Script
 

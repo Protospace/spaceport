@@ -10,7 +10,7 @@ https://github.com/Protospace/telemetry/tree/master/prusa_tracker
 
 It's a stripped down version of the [Bambu 3D Printer Integration](Bambu%203D%20Printer%20Integration.md).
 
-This python script runs on a server (right now Tanner's "dev server", hosted on Proxmox). It's kept running with [Supervisor](Supervisor.md). One instance of the script runs per 3D printer (right now there's only one Prusa). Every 60 seconds it polls the Home Assistant API and gets the state of all entities. It filters those entities by the printer's name and then sends the data to the portal.
+This python script runs on the [Integrations Server](Integrations%20Server.md). It's kept running with [Supervisor](Supervisor.md). One instance of the script runs per 3D printer (right now there's only one Prusa). Every 60 seconds it polls the Home Assistant API and gets the state of all entities. It filters those entities by the printer's name and then sends the data to the portal.
 
 The data is handled by `printer3d(...)` in  [views.py](https://github.com/Protospace/spaceport/blob/master/apiserver/apiserver/api/views.py). The data gets written directly to a global `printer3d` dictionary that then gets read when the `/stats/` route is polled. This is used in the "Protospace Stats" section of the portal's Home page to display when the printers are in use.
 

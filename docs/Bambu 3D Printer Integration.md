@@ -12,7 +12,7 @@ Bambu is misspelled because the author didn't know any better.
 
 ### Portal Stats
 
-This python script runs on a server (right now Tanner's "dev server", hosted on Proxmox). It's kept running with [Supervisor](Supervisor.md). One instance of the script runs per 3D printer. Every 60 seconds it polls the Home Assistant API and gets the state of all entities. It filters those entities by the printer's serial number and then sends the data to the portal.
+This python script runs on the [Integrations Server](Integrations%20Server.md). It's kept running with [Supervisor](Supervisor.md). One instance of the script runs per 3D printer. Every 60 seconds it polls the Home Assistant API and gets the state of all entities. It filters those entities by the printer's serial number and then sends the data to the portal.
 
 The data is handled by `printer3d(...)` in  [views.py](https://github.com/Protospace/spaceport/blob/master/apiserver/apiserver/api/views.py). The data gets written directly to a global `printer3d` dictionary that then gets read when the `/stats/` route is polled. This is used in the "Protospace Stats" section of the portal's Home page to display when the printers are in use.
 
@@ -22,7 +22,7 @@ Every second the script also polls Home Assistant's camera feed for that printer
 
 ## Setup
 
-### Dev Server
+### Server
 
 Set the python script up to run automatically, one time for each printer. Generate API keys in Home Assistant and configure them in `secrets.py`. You'll need to run the script like this, for example:
 
@@ -65,7 +65,7 @@ stdout_logfile=/var/log/p1s2.log
 stdout_logfile_maxbytes=10MB
 ```
 
-### LCARS3 Display
+### LCARS3 TV Display
 
 Install nginx, configure `/etc/nginx/sites-available/default`:
 
