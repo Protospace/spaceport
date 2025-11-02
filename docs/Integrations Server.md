@@ -13,8 +13,9 @@ The "integrations" server runs multiple Spaceport integrations and scripts:
 	- `printer`
 - `garden` for capturing garden images using ffmpeg
 
-The [Supervisor](Supervisor.md) service names are in the code blocks above.
+The [Supervisor](Supervisor.md) service names are in the code blocks above. Configs are stored in `/etc/supervisor/conf.d/`. Reading these will tell you where all the code lives.
 
 ## Details
 
 The server is a Debian VPS running on the local Proxmox server.
+
