@@ -19,6 +19,7 @@
 
 ### Integrations
 
+- [Integrations Server](Integrations%20Server.md)
 - [Supervisor](Supervisor.md)
 - [LDAP Integration](integration_ldap.md)
 - [Todo Integration](integration_todo.md)
