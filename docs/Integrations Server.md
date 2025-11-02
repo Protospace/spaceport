@@ -19,3 +19,4 @@ The [Supervisor](Supervisor.md) service names are in the code blocks above. Conf
 
 The server is a Debian VPS running on the local Proxmox server.
 
+Private details, including how to recover access, are detailed [here](https://github.com/Protospace/infrastructure/blob/main/on-premises/integrations-server.md).
