@@ -1204,19 +1204,43 @@ export function Class(props) {
 			});
 			disposables.push(coinGeometry, coinMaterial);
 
+			const placedCoins = [];
 			for (let i = 0; i < 200; i++) {
 				const coin = new THREE.Mesh(coinGeometry, coinMaterial);
+				let intersects;
+				let attempts = 0;
+				let boundingBox;
 
-				const radius = random() * 20;
-				const angle = random() * Math.PI * 2;
-				const x = Math.cos(angle) * radius;
-				const z = Math.sin(angle) * radius;
-				const y = (20 - radius) * 0.5 + random() * 2;
+				do {
+					intersects = false;
+					const radius = random() * 20;
+					const angle = random() * Math.PI * 2;
+					const x = Math.cos(angle) * radius;
+					const z = Math.sin(angle) * radius;
+					const y = (20 - radius) * 0.2 + random() * 0.5;
 
-				coin.position.set(x, y, z);
-				coin.rotation.x = Math.PI / 2 + (random() - 0.5) * 0.5;
-				coin.rotation.z = random() * Math.PI * 2;
-				scene.add(coin);
+					coin.position.set(x, y, z);
+					coin.rotation.x = (random() - 0.5) * 0.2;
+					coin.rotation.y = random() * Math.PI * 2;
+					coin.rotation.z = (random() - 0.5) * 0.2;
+					
+					coin.updateMatrixWorld();
+					boundingBox = new THREE.Box3().setFromObject(coin);
+
+					for (const existingCoin of placedCoins) {
+						if (boundingBox.intersectsBox(existingCoin.userData.boundingBox)) {
+							intersects = true;
+							break;
+						}
+					}
+					attempts++;
+				} while (intersects && attempts < 100);
+
+				if (!intersects) {
+					coin.userData.boundingBox = boundingBox;
+					scene.add(coin);
+					placedCoins.push(coin);
+				}
 			}
 
 			let cameraX = 50;
