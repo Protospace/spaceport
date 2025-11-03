@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect, useReducer, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Label, Button, Container, Dropdown, Form, FormField, Header, Icon, Input, Segment, Table } from 'semantic-ui-react';
@@ -105,6 +105,80 @@ function NewClassTableCourse(props) {
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [interested, setInterested] = useState(course.num_interested || 0);
+	const mountRef = useRef(null);
+	const isSaturnalia = course.name === 'Saturnalia Party';
+
+	useEffect(() => {
+		if (!isSaturnalia) return;
+
+		const mount = mountRef.current;
+		if (!mount) return;
+		let animationFrameId;
+
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000);
+		camera.position.z = 5;
+
+		const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+		renderer.setSize(mount.clientWidth, mount.clientHeight);
+		mount.appendChild(renderer.domElement);
+
+		const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+		scene.add(ambientLight);
+		const pointLight = new THREE.PointLight(0xffffff, 1);
+		pointLight.position.set(5, 3, 5);
+		scene.add(pointLight);
+
+		const saturnGroup = new THREE.Group();
+		scene.add(saturnGroup);
+
+		const planetGeometry = new THREE.SphereGeometry(1.5, 32, 32);
+		const planetMaterial = new THREE.MeshStandardMaterial({ color: 0xDFC5A4 });
+		const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+		saturnGroup.add(planet);
+
+		const ringGeometry = new THREE.RingGeometry(2, 3, 64);
+		const ringMaterial = new THREE.MeshBasicMaterial({
+			color: 0x998A78,
+			side: THREE.DoubleSide,
+			transparent: true,
+			opacity: 0.7
+		});
+		const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+		ring.rotation.x = Math.PI / 2;
+		saturnGroup.add(ring);
+
+		saturnGroup.rotation.x = 0.3;
+		saturnGroup.rotation.z = -0.2;
+
+		const animate = () => {
+			animationFrameId = requestAnimationFrame(animate);
+			saturnGroup.rotation.y += 0.005;
+			renderer.render(scene, camera);
+		};
+		animate();
+
+		const handleResize = () => {
+			if (mount) {
+				camera.aspect = mount.clientWidth / mount.clientHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize(mount.clientWidth, mount.clientHeight);
+			}
+		};
+		window.addEventListener('resize', handleResize);
+
+		return () => {
+			window.removeEventListener('resize', handleResize);
+			cancelAnimationFrame(animationFrameId);
+			if (mount && renderer.domElement) {
+				mount.removeChild(renderer.domElement);
+			}
+			planetGeometry.dispose();
+			planetMaterial.dispose();
+			ringGeometry.dispose();
+			ringMaterial.dispose();
+		};
+	}, [isSaturnalia]);
 
 	const handleInterest = () => {
 		if (loading) return;
@@ -125,92 +199,98 @@ function NewClassTableCourse(props) {
 	const now = new Date().toISOString();
 
 	const segmentStyle = { margin: '1rem 1rem 0 0', width: '22rem' };
-	if (course.name === 'Saturnalia Party') {
-		segmentStyle.backgroundColor = 'lightgreen';
+	if (isSaturnalia) {
+		segmentStyle.position = 'relative';
+		segmentStyle.overflow = 'hidden';
+		segmentStyle.color = 'white';
+		segmentStyle.textShadow = '0 0 4px black';
 	}
 
 	return (
 		<Segment style={segmentStyle}>
-			<Header size='small'>
-				<Link to={'/courses/'+course.id}>
-					{course.name}
-				</Link>
-			</Header>
+			{isSaturnalia && <div ref={mountRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, backgroundColor: '#111' }} />}
+			<div style={{ position: 'relative', zIndex: 1 }}>
+				<Header size='small'>
+					<Link to={'/courses/'+course.id} style={isSaturnalia ? { color: 'white' } : {}}>
+						{course.name}
+					</Link>
+				</Header>
 
-			<div className='byline'>
-				<div className='tags'>
-					{!!course.tags && course.tags.split(',').map(name =>
-						<Label key={name} color={tags[name]} tag size='small'>
-							{name}
-						</Label>
-					)}
+				<div className='byline'>
+					<div className='tags'>
+						{!!course.tags && course.tags.split(',').map(name =>
+							<Label key={name} color={tags[name]} tag size='small'>
+								{name}
+							</Label>
+						)}
+					</div>
+
+					{user &&
+						<div className='interest'>
+							{user.interests.filter(x => !x.satisfied_by).map(x => x.course).includes(course.id) ?
+								<div
+									className='nonbutton'
+								>
+									{interested} interested <span className='dark-emoji'>✅</span>
+								</div>
+							:
+								<Button
+									size='tiny'
+									loading={loading}
+									onClick={handleInterest}
+								>
+									{interested} interested
+								</Button>
+							}
+						</div>
+					}
 				</div>
 
-				{user &&
-					<div className='interest'>
-						{user.interests.filter(x => !x.satisfied_by).map(x => x.course).includes(course.id) ?
-							<div
-								className='nonbutton'
-							>
-								{interested} interested <span className='dark-emoji'>✅</span>
-							</div>
-						:
-							<Button
-								size='tiny'
-								loading={loading}
-								onClick={handleInterest}
-							>
-								{interested} interested
-							</Button>
-						}
-					</div>
+				{error && <p>Error.</p>}
+
+				{classes ?
+					<Table compact unstackable singleLine basic='very'>
+						<Table.Header>
+							<Table.Row>
+								<Table.HeaderCell>Date</Table.HeaderCell>
+								<Table.HeaderCell>Cost</Table.HeaderCell>
+								<Table.HeaderCell>Students</Table.HeaderCell>
+							</Table.Row>
+						</Table.Header>
+
+						<Table.Body>
+							{classes.map(x =>
+								<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
+									<Table.Cell>
+										<Link to={'/classes/'+x.id} style={isSaturnalia ? { color: 'white' } : {}}>
+											{moment.utc(x.datetime).tz('America/Edmonton').format(' MMM Do')}
+										</Link>
+										{' - '}{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}
+									</Table.Cell>
+
+									<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost.slice(0,-3)}</Table.Cell>
+
+									<Table.Cell>
+										{!!x.max_students ?
+											x.max_students <= x.student_count ?
+												'Full'
+											:
+												x.student_count + ' / ' + x.max_students
+										:
+											x.student_count
+										}
+									</Table.Cell>
+								</Table.Row>
+							)}
+						</Table.Body>
+					</Table>
+				:
+					<>
+						<p/>
+						<p>No upcoming classes.</p>
+					</>
 				}
 			</div>
-
-			{error && <p>Error.</p>}
-
-			{classes ?
-				<Table compact unstackable singleLine basic='very'>
-					<Table.Header>
-						<Table.Row>
-							<Table.HeaderCell>Date</Table.HeaderCell>
-							<Table.HeaderCell>Cost</Table.HeaderCell>
-							<Table.HeaderCell>Students</Table.HeaderCell>
-						</Table.Row>
-					</Table.Header>
-
-					<Table.Body>
-						{classes.map(x =>
-							<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
-								<Table.Cell>
-									<Link to={'/classes/'+x.id}>
-										{moment.utc(x.datetime).tz('America/Edmonton').format(' MMM Do')}
-									</Link>
-									{' - '}{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}
-								</Table.Cell>
-
-								<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost.slice(0,-3)}</Table.Cell>
-
-								<Table.Cell>
-									{!!x.max_students ?
-										x.max_students <= x.student_count ?
-											'Full'
-										:
-											x.student_count + ' / ' + x.max_students
-									:
-										x.student_count
-									}
-								</Table.Cell>
-							</Table.Row>
-						)}
-					</Table.Body>
-				</Table>
-			:
-				<>
-					<p/>
-					<p>No upcoming classes.</p>
-				</>
-			}
 		</Segment>
 	);
 }
