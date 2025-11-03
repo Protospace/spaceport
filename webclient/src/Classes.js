@@ -1041,7 +1041,7 @@ export function Class(props) {
 					random() * 2 * Math.PI
 				);
 
-				gift.userData.velocity = random() * 0.1 + 0.05;
+				gift.userData.velocity = (random() * 0.1 + 0.05) / 2;
 				gift.userData.rotationSpeed = new THREE.Vector3(
 					(random() - 0.5) * 0.02,
 					(random() - 0.5) * 0.02,
