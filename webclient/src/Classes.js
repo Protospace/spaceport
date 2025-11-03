@@ -876,7 +876,7 @@ export function Class(props) {
 			animate();
 		} else if (currentEffect === 2) { // Beer glasses
 			pointLight.position.set(0, 40, 0);
-			camera.position.set(0, 30, 70);
+			camera.position.set(0, 30, 170);
 			camera.lookAt(0, 0, 0);
 
 			const mulberry32 = (a) => () => {
@@ -889,7 +889,7 @@ export function Class(props) {
 			const random = mulberry32(1758389168348180);
 
 			// Table
-			const tableGeometry = new THREE.BoxGeometry(60, 2, 120);
+			const tableGeometry = new THREE.BoxGeometry(60, 2, 360);
 			const tableMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 }); // SaddleBrown
 			const table = new THREE.Mesh(tableGeometry, tableMaterial);
 			table.position.y = -1;
@@ -914,15 +914,22 @@ export function Class(props) {
 			const glassGeometry = new THREE.CylinderGeometry(glassTopRadius, glassBottomRadius, glassHeight, 32);
 			disposables.push(glassGeometry);
 
-			const placedGlasses = [];
-			const isTippedFlags = Array.from({length: 30}, () => random() < 0.2);
+			const wineGlassPoints = [ new THREE.Vector2(0, 0), new THREE.Vector2(2, 0), new THREE.Vector2(2, 0.2), new THREE.Vector2(0.3, 1), new THREE.Vector2(0.3, 4), new THREE.Vector2(2.5, 5.5), new THREE.Vector2(2, 8) ];
+			const wineGlassGeometry = new THREE.LatheGeometry(wineGlassPoints, 16);
+			disposables.push(wineGlassGeometry);
+			const wineMaterial = new THREE.MeshStandardMaterial({ color: 0x5c001f });
+			disposables.push(wineMaterial);
+			const wineGlassWidestRadius = 2.5;
 
-			for (let i = 0; i < 30; i++) {
+			const placedGlasses = [];
+			const isBeerTippedFlags = Array.from({length: 15}, () => random() < 0.2);
+
+			for (let i = 0; i < 15; i++) {
 				const glassGroup = new THREE.Group();
 				const glass = new THREE.Mesh(glassGeometry, glassMaterial);
 				glassGroup.add(glass);
 
-				const isTipped = isTippedFlags[i];
+				const isTipped = isBeerTippedFlags[i];
 				let beerGeometry;
 				if (!isTipped) {
 					const beerHeight = glassHeight * (0.2 + random() * 0.7);
@@ -950,7 +957,7 @@ export function Class(props) {
 					}
 
 					glassGroup.position.x = (random() - 0.5) * 50;
-					glassGroup.position.z = (random() - 0.5) * 100;
+					glassGroup.position.z = (random() - 0.5) * 340;
 
 					glassGroup.updateMatrixWorld();
 					boundingBox = new THREE.Box3().setFromObject(glassGroup);
@@ -978,11 +985,87 @@ export function Class(props) {
 				}
 			}
 
-			let cameraZ = 70;
+			const isWineTippedFlags = Array.from({length: 15}, () => random() < 0.2);
+
+			for (let i = 0; i < 15; i++) {
+				const glassGroup = new THREE.Group();
+				const glass = new THREE.Mesh(wineGlassGeometry, glassMaterial);
+				glassGroup.add(glass);
+
+				const isTipped = isWineTippedFlags[i];
+				let liquidGeometry;
+				if (!isTipped) {
+					const wineFillHeight = 1 + random() * 2;
+					const wineBottomRadius = 0.3 * 0.95;
+					const y_at_max_radius = 5.5;
+					const max_radius = 2.5 * 0.95;
+					const top_radius = 2 * 0.95;
+					const y_of_wine_top = 4 + wineFillHeight;
+
+					let wineTopRadius;
+					if (y_of_wine_top <= y_at_max_radius) {
+						wineTopRadius = wineBottomRadius + (max_radius - wineBottomRadius) * (wineFillHeight / (y_at_max_radius - 4));
+					} else {
+						const height_past_max = y_of_wine_top - y_at_max_radius;
+						wineTopRadius = max_radius + (top_radius - max_radius) * (height_past_max / (8 - y_at_max_radius));
+					}
+
+					liquidGeometry = new THREE.CylinderGeometry(wineTopRadius, wineBottomRadius, wineFillHeight, 16);
+					const wine = new THREE.Mesh(liquidGeometry, wineMaterial);
+					wine.position.y = 4 + wineFillHeight / 2;
+					glassGroup.add(wine);
+				}
+
+				let intersects;
+				let attempts = 0;
+				let boundingBox;
+
+				do {
+					intersects = false;
+
+					if (isTipped) {
+						glassGroup.rotation.x = Math.PI / 2;
+						glassGroup.rotation.z = random() * Math.PI * 2;
+						glassGroup.position.y = wineGlassWidestRadius;
+					} else {
+						glassGroup.rotation.z = (random() - 0.5) * 0.4;
+						glassGroup.position.y = 0;
+					}
+
+					glassGroup.position.x = (random() - 0.5) * 50;
+					glassGroup.position.z = (random() - 0.5) * 340;
+
+					glassGroup.updateMatrixWorld();
+					boundingBox = new THREE.Box3().setFromObject(glassGroup);
+
+					for (const existingGlass of placedGlasses) {
+						if (boundingBox.intersectsBox(existingGlass.userData.boundingBox)) {
+							intersects = true;
+							break;
+						}
+					}
+					attempts++;
+				} while (intersects && attempts < 100);
+
+				if (!intersects) {
+					if (liquidGeometry) {
+						disposables.push(liquidGeometry);
+					}
+					glassGroup.userData.boundingBox = boundingBox;
+					scene.add(glassGroup);
+					placedGlasses.push(glassGroup);
+				} else {
+					if (liquidGeometry) {
+						liquidGeometry.dispose();
+					}
+				}
+			}
+
+			let cameraZ = 170;
 			const animate = () => {
 				animationFrameId = requestAnimationFrame(animate);
 				cameraZ -= 0.05;
-				if (cameraZ < -70) cameraZ = 70;
+				if (cameraZ < -170) cameraZ = 170;
 				camera.position.z = cameraZ;
 				renderer.render(scene, camera);
 			};
