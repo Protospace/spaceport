@@ -711,6 +711,7 @@ export function Class(props) {
 
 			const saturnGroup = new THREE.Group();
 			scene.add(saturnGroup);
+			saturnGroup.position.x = 20;
 
 			const planetGeometry = new THREE.SphereGeometry(15, 64, 64);
 			const planetMaterial = new THREE.MeshStandardMaterial({ color: 0xDFC5A4 });
