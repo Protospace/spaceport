@@ -1185,7 +1185,7 @@ export function Class(props) {
 		} else if (currentEffect === 5) { // Gold coins
 			pointLight.position.set(0, 30, 30);
 			pointLight.intensity = 2;
-			camera.position.set(50, 15, 30);
+			camera.position.set(40, 15, 25);
 			camera.lookAt(0, 0, 0);
 
 			const mulberry32 = (a) => () => {
@@ -1312,11 +1312,11 @@ export function Class(props) {
 				}
 			}
 
-			let cameraX = 50;
+			let cameraX = 40;
 			const animate = () => {
 				animationFrameId = requestAnimationFrame(animate);
 				cameraX -= 0.1;
-				if (cameraX < -50) cameraX = 50;
+				if (cameraX < -40) cameraX = 40;
 				camera.position.x = cameraX;
 				camera.lookAt(0, 0, 0);
 				renderer.render(scene, camera);
