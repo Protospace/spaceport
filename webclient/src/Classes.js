@@ -1136,11 +1136,11 @@ export function Class(props) {
 			
 			const pathPoints = [];
 			const pathLength = 400;
-			const numPoints = 10;
+			const numPoints = 15;
 			for (let i = 0; i < numPoints; i++) {
 				pathPoints.push(new THREE.Vector3(
-					(random() - 0.5) * 60,
-					(random() - 0.5) * 60,
+					(random() - 0.5) * 120,
+					(random() - 0.5) * 120,
 					(i / (numPoints - 1)) * pathLength - (pathLength / 2)
 				));
 			}
