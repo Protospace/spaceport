@@ -684,8 +684,7 @@ export function Class(props) {
 	useEffect(() => {
 		if (!isSaturnalia) return;
 
-		const currentEffect = effectIndex % 1; // Only 1 effect for now
-		if (currentEffect !== 0) return;
+		const currentEffect = effectIndex % 2;
 
 		const mount = mountRef.current;
 		const container = containerRef.current;
@@ -694,7 +693,6 @@ export function Class(props) {
 
 		const scene = new THREE.Scene();
 		const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-		camera.position.z = 50;
 
 		const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 		renderer.setSize(container.clientWidth, container.clientHeight);
@@ -703,37 +701,145 @@ export function Class(props) {
 		const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
 		scene.add(ambientLight);
 		const pointLight = new THREE.PointLight(0xffffff, 1);
-		pointLight.position.set(50, 30, 50);
 		scene.add(pointLight);
 
-		const saturnGroup = new THREE.Group();
-		scene.add(saturnGroup);
+		let disposables = [];
 
-		const planetGeometry = new THREE.SphereGeometry(15, 64, 64);
-		const planetMaterial = new THREE.MeshStandardMaterial({ color: 0xDFC5A4 });
-		const planet = new THREE.Mesh(planetGeometry, planetMaterial);
-		saturnGroup.add(planet);
+		if (currentEffect === 0) { // Saturn
+			camera.position.z = 50;
+			pointLight.position.set(50, 30, 50);
 
-		const ringGeometry = new THREE.RingGeometry(20, 30, 128);
-		const ringMaterial = new THREE.MeshBasicMaterial({
-			color: 0x998A78,
-			side: THREE.DoubleSide,
-			transparent: true,
-			opacity: 0.7
-		});
-		const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-		ring.rotation.x = Math.PI / 2;
-		saturnGroup.add(ring);
+			const saturnGroup = new THREE.Group();
+			scene.add(saturnGroup);
 
-		saturnGroup.rotation.x = 0.3;
-		saturnGroup.rotation.z = -0.2;
+			const planetGeometry = new THREE.SphereGeometry(15, 64, 64);
+			const planetMaterial = new THREE.MeshStandardMaterial({ color: 0xDFC5A4 });
+			const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+			saturnGroup.add(planet);
+			disposables.push(planetGeometry, planetMaterial);
 
-		const animate = () => {
-			animationFrameId = requestAnimationFrame(animate);
-			saturnGroup.rotation.y += 0.005;
-			renderer.render(scene, camera);
-		};
-		animate();
+			const ringGeometry = new THREE.RingGeometry(20, 30, 128);
+			const ringMaterial = new THREE.MeshBasicMaterial({
+				color: 0x998A78,
+				side: THREE.DoubleSide,
+				transparent: true,
+				opacity: 0.7
+			});
+			const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+			ring.rotation.x = Math.PI / 2;
+			saturnGroup.add(ring);
+			disposables.push(ringGeometry, ringMaterial);
+
+			saturnGroup.rotation.x = 0.3;
+			saturnGroup.rotation.z = -0.2;
+
+			const animate = () => {
+				animationFrameId = requestAnimationFrame(animate);
+				saturnGroup.rotation.y += 0.005;
+				renderer.render(scene, camera);
+			};
+			animate();
+		} else if (currentEffect === 1) { // Dice
+			pointLight.position.set(0, 20, 20);
+
+			const createDiceTexture = (number) => {
+				const canvas = document.createElement('canvas');
+				canvas.width = 128;
+				canvas.height = 128;
+				const context = canvas.getContext('2d');
+				context.fillStyle = 'white';
+				context.fillRect(0, 0, 128, 128);
+				context.fillStyle = 'black';
+
+				const drawDot = (x, y) => {
+					context.beginPath();
+					context.arc(x, y, 10, 0, 2 * Math.PI);
+					context.fill();
+				};
+
+				switch (number) {
+					case 1:
+						drawDot(64, 64);
+						break;
+					case 2:
+						drawDot(32, 32);
+						drawDot(96, 96);
+						break;
+					case 3:
+						drawDot(32, 32);
+						drawDot(64, 64);
+						drawDot(96, 96);
+						break;
+					case 4:
+						drawDot(32, 32);
+						drawDot(96, 32);
+						drawDot(32, 96);
+						drawDot(96, 96);
+						break;
+					case 5:
+						drawDot(32, 32);
+						drawDot(96, 32);
+						drawDot(64, 64);
+						drawDot(32, 96);
+						drawDot(96, 96);
+						break;
+					case 6:
+						drawDot(32, 32);
+						drawDot(32, 64);
+						drawDot(32, 96);
+						drawDot(96, 32);
+						drawDot(96, 64);
+						drawDot(96, 96);
+						break;
+					default:
+						break;
+				}
+				return new THREE.CanvasTexture(canvas);
+			};
+			
+			const diceMaterials = [
+				new THREE.MeshStandardMaterial({ map: createDiceTexture(2) }), // +X
+				new THREE.MeshStandardMaterial({ map: createDiceTexture(5) }), // -X
+				new THREE.MeshStandardMaterial({ map: createDiceTexture(3) }), // +Y
+				new THREE.MeshStandardMaterial({ map: createDiceTexture(4) }), // -Y
+				new THREE.MeshStandardMaterial({ map: createDiceTexture(1) }), // +Z
+				new THREE.MeshStandardMaterial({ map: createDiceTexture(6) })  // -Z
+			];
+			const dieGeometry = new THREE.BoxGeometry(10, 10, 10);
+			disposables.push(dieGeometry);
+			diceMaterials.forEach(m => {
+				disposables.push(m.map, m);
+			});
+
+			for (let i = 0; i < 50; i++) {
+				const die = new THREE.Mesh(dieGeometry, diceMaterials);
+				die.position.set(
+					(Math.random() - 0.5) * 100,
+					(Math.random() - 0.5) * 50,
+					(Math.random() - 0.5) * 50
+				);
+				die.rotation.set(
+					Math.random() * 2 * Math.PI,
+					Math.random() * 2 * Math.PI,
+					Math.random() * 2 * Math.PI
+				);
+				scene.add(die);
+			}
+
+			camera.position.z = 30;
+			let cameraX = 50;
+			camera.position.x = cameraX;
+
+			const animate = () => {
+				animationFrameId = requestAnimationFrame(animate);
+				cameraX -= 0.1;
+				if (cameraX < -50) cameraX = 50;
+				camera.position.x = cameraX;
+				camera.lookAt(0, 0, 0);
+				renderer.render(scene, camera);
+			};
+			animate();
+		}
 
 		const handleResize = () => {
 			const container = containerRef.current;
@@ -751,10 +857,7 @@ export function Class(props) {
 			if (mount && renderer.domElement) {
 				mount.removeChild(renderer.domElement);
 			}
-			planetGeometry.dispose();
-			planetMaterial.dispose();
-			ringGeometry.dispose();
-			ringMaterial.dispose();
+			disposables.forEach(d => d.dispose());
 		};
 	}, [isSaturnalia, effectIndex]);
 
