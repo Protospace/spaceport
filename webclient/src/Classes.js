@@ -687,7 +687,7 @@ export function Class(props) {
 		if (!animationsEnabled) return;
 
 		//const currentEffect = effectIndex % 5;
-		const currentEffect = 4; // just while testing
+		const currentEffect = 4; // just while testing, GEMINI DON'T TOUCH THIS
 
 		const mount = mountRef.current;
 		const container = containerRef.current;
@@ -1093,7 +1093,7 @@ export function Class(props) {
 				canvas.width = 250;
 				canvas.height = 350;
 				const ctx = canvas.getContext('2d');
-				ctx.fillStyle = '#dddddd';
+				ctx.fillStyle = '#aaaaaa';
 				ctx.fillRect(0, 0, 250, 350);
 				ctx.fillStyle = suit === '♥' || suit === '♦' ? 'red' : 'black';
 				ctx.font = 'bold 40px sans-serif';
@@ -1154,7 +1154,7 @@ export function Class(props) {
 				const card = new THREE.Mesh(cardGeometry, materials);
 
 				const angle = (i / numCards) * Math.PI * 10;
-				const z = (i / numCards) * 200 - 100;
+				const z = (i / numCards) * 400 - 200;
 				card.position.set(
 					Math.cos(angle) * radius,
 					Math.sin(angle) * radius,
