@@ -686,8 +686,7 @@ export function Class(props) {
 	useEffect(() => {
 		if (!animationsEnabled) return;
 
-		const currentEffect = effectIndex % 5;
-		//const currentEffect = 4; // just while testing, GEMINI DON'T TOUCH THIS
+		const currentEffect = effectIndex % 6;
 
 		const mount = mountRef.current;
 		const container = containerRef.current;
@@ -1179,6 +1178,53 @@ export function Class(props) {
 				cameraZ -= 0.1;
 				if (cameraZ < -100) cameraZ = 100;
 				camera.position.z = cameraZ;
+				renderer.render(scene, camera);
+			};
+			animate();
+		} else if (currentEffect === 5) { // Gold coins
+			pointLight.position.set(0, 30, 30);
+			camera.position.set(50, 20, 50);
+			camera.lookAt(0, 0, 0);
+
+			const mulberry32 = (a) => () => {
+				var t = a += 0x6D2B79F5;
+				t = Math.imul(t ^ t >>> 15, t | 1);
+				t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+				return ((t ^ t >>> 14) >>> 0) / 4294967296;
+			}
+
+			const random = mulberry32(2718281828);
+
+			const coinGeometry = new THREE.CylinderGeometry(2, 2, 0.2, 32);
+			const coinMaterial = new THREE.MeshStandardMaterial({
+				color: 0xFFD700,
+				metalness: 0.8,
+				roughness: 0.2
+			});
+			disposables.push(coinGeometry, coinMaterial);
+
+			for (let i = 0; i < 200; i++) {
+				const coin = new THREE.Mesh(coinGeometry, coinMaterial);
+
+				const radius = random() * 20;
+				const angle = random() * Math.PI * 2;
+				const x = Math.cos(angle) * radius;
+				const z = Math.sin(angle) * radius;
+				const y = (20 - radius) * 0.5 + random() * 2;
+
+				coin.position.set(x, y, z);
+				coin.rotation.x = Math.PI / 2 + (random() - 0.5) * 0.5;
+				coin.rotation.z = random() * Math.PI * 2;
+				scene.add(coin);
+			}
+
+			let cameraX = 50;
+			const animate = () => {
+				animationFrameId = requestAnimationFrame(animate);
+				cameraX -= 0.1;
+				if (cameraX < -50) cameraX = 50;
+				camera.position.x = cameraX;
+				camera.lookAt(0, 0, 0);
 				renderer.render(scene, camera);
 			};
 			animate();
