@@ -1151,6 +1151,15 @@ export function Class(props) {
 			</Segment>
 		}
 
+		{animationsEnabled &&
+			<Button
+				onClick={() => setUserDisabledAnimations(true)}
+				style={{ marginLeft: '1rem' }}
+			>
+				Stop animations
+			</Button>
+		}
+
 		<BasicTable>
 			<Table.Body>
 				<Table.Row>
@@ -1159,15 +1168,6 @@ export function Class(props) {
 						<Link to={'/courses/'+clazz.course}>
 							{clazz.course_data.name}
 						</Link>
-						{animationsEnabled &&
-							<Button
-								onClick={() => setUserDisabledAnimations(true)}
-								style={{ marginLeft: '1rem' }}
-								size='tiny'
-							>
-								Stop animations
-							</Button>
-						}
 					</Table.Cell>
 				</Table.Row>
 				<Table.Row>
