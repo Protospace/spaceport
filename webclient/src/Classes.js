@@ -874,7 +874,7 @@ export function Class(props) {
 			animate();
 		} else if (currentEffect === 2) { // Beer glasses
 			pointLight.position.set(0, 40, 0);
-			camera.position.set(0, 30, 40);
+			camera.position.set(0, 30, 70);
 			camera.lookAt(0, 0, 0);
 
 			const mulberry32 = (a) => () => {
@@ -890,7 +890,7 @@ export function Class(props) {
 			const random = mulberry32(beerSeed);
 
 			// Table
-			const tableGeometry = new THREE.BoxGeometry(120, 2, 60);
+			const tableGeometry = new THREE.BoxGeometry(60, 2, 120);
 			const tableMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 }); // SaddleBrown
 			const table = new THREE.Mesh(tableGeometry, tableMaterial);
 			table.position.y = -1;
@@ -915,33 +915,75 @@ export function Class(props) {
 			const glassGeometry = new THREE.CylinderGeometry(glassTopRadius, glassBottomRadius, glassHeight, 32);
 			disposables.push(glassGeometry);
 
+			const placedGlasses = [];
+			const isTippedFlags = Array.from({length: 30}, () => random() < 0.2);
+
 			for (let i = 0; i < 30; i++) {
 				const glassGroup = new THREE.Group();
 				const glass = new THREE.Mesh(glassGeometry, glassMaterial);
 				glassGroup.add(glass);
 
-				const beerHeight = glassHeight * (0.2 + random() * 0.7);
-				const beerRadius = glassBottomRadius + (glassTopRadius-glassBottomRadius) * (beerHeight/glassHeight) * 0.5;
-				const beerGeometry = new THREE.CylinderGeometry(beerRadius*0.95, glassBottomRadius*0.95, beerHeight, 32);
-				const beer = new THREE.Mesh(beerGeometry, beerMaterial);
-				beer.position.y = -(glassHeight - beerHeight) / 2;
-				glassGroup.add(beer);
-				disposables.push(beerGeometry);
+				const isTipped = isTippedFlags[i];
+				let beerGeometry;
+				if (!isTipped) {
+					const beerHeight = glassHeight * (0.2 + random() * 0.7);
+					const beerRadius = glassBottomRadius + (glassTopRadius - glassBottomRadius) * (beerHeight / glassHeight) * 0.5;
+					beerGeometry = new THREE.CylinderGeometry(beerRadius * 0.95, glassBottomRadius * 0.95, beerHeight, 32);
+					const beer = new THREE.Mesh(beerGeometry, beerMaterial);
+					beer.position.y = -(glassHeight - beerHeight) / 2;
+					glassGroup.add(beer);
+				}
 
-				glassGroup.position.set(
-					(random() - 0.5) * 100,
-					glassHeight / 2,
-					(random() - 0.5) * 50
-				);
-				glassGroup.rotation.z = (random() - 0.5) * 0.4; // Tilted a bit
-				scene.add(glassGroup);
+				let intersects;
+				let attempts = 0;
+				let boundingBox;
+
+				do {
+					intersects = false;
+
+					if (isTipped) {
+						glassGroup.rotation.x = Math.PI / 2;
+						glassGroup.rotation.z = random() * Math.PI * 2;
+						glassGroup.position.y = glassTopRadius;
+					} else {
+						glassGroup.rotation.z = (random() - 0.5) * 0.4;
+						glassGroup.position.y = glassHeight / 2;
+					}
+
+					glassGroup.position.x = (random() - 0.5) * 50;
+					glassGroup.position.z = (random() - 0.5) * 100;
+
+					glassGroup.updateMatrixWorld();
+					boundingBox = new THREE.Box3().setFromObject(glassGroup);
+
+					for (const existingGlass of placedGlasses) {
+						if (boundingBox.intersectsBox(existingGlass.userData.boundingBox)) {
+							intersects = true;
+							break;
+						}
+					}
+					attempts++;
+				} while (intersects && attempts < 100);
+
+				if (!intersects) {
+					if (beerGeometry) {
+						disposables.push(beerGeometry);
+					}
+					glassGroup.userData.boundingBox = boundingBox;
+					scene.add(glassGroup);
+					placedGlasses.push(glassGroup);
+				} else {
+					if (beerGeometry) {
+						beerGeometry.dispose();
+					}
+				}
 			}
 
-			let cameraZ = 40;
+			let cameraZ = 70;
 			const animate = () => {
 				animationFrameId = requestAnimationFrame(animate);
 				cameraZ -= 0.05;
-				if (cameraZ < -30) cameraZ = 40;
+				if (cameraZ < -70) cameraZ = 70;
 				camera.position.z = cameraZ;
 				renderer.render(scene, camera);
 			};
