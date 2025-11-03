@@ -1390,11 +1390,11 @@ export function Class(props) {
 
 			for (let i = 0; i < 5; i++) {
 				const columnLeft = createColumn();
-				columnLeft.position.set(-15, 0, i * -50);
+				columnLeft.position.set(-15, 0, i * -50 + 50);
 				scene.add(columnLeft);
 
 				const columnRight = createColumn();
-				columnRight.position.set(15, 0, i * -50);
+				columnRight.position.set(15, 0, i * -50 + 50);
 				scene.add(columnRight);
 			}
 
