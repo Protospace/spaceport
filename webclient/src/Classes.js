@@ -1480,8 +1480,8 @@ export function Class(props) {
 	const isOld = clazz && clazz.datetime < now;
 	const isFree = clazz && clazz.cost === '0.00';
 
-	return (<div ref={containerRef} style={animationsEnabled ? { position: 'relative', overflow: 'hidden' } : {}}>
-		{animationsEnabled && <div ref={mountRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '#1a1a1a' }} />}
+	return (<div ref={containerRef} style={animationsEnabled ? { position: 'relative' } : {}}>
+		{animationsEnabled && <div ref={mountRef} style={{ position: 'absolute', top: '-2rem', left: 0, width: '100%', height: 'calc(100% + 2rem)', backgroundColor: '#1a1a1a' }} />}
 		<div style={animationsEnabled ? { position: 'relative', zIndex: 1, color: 'white', textShadow: '0 0 4px black' } : {}}>
 		<Container>
 			<Header size='large'>Class Details</Header>
