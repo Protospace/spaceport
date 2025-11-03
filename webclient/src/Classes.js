@@ -1103,7 +1103,9 @@ export function Class(props) {
 			const height = 2 * Math.tan(vFOV / 2) * camera.position.z;
 			const width = height * camera.aspect;
 
-			for (let i = 0; i < 50; i++) {
+			const numGifts = Math.max(10, Math.round(width * height / 200));
+
+			for (let i = 0; i < numGifts; i++) {
 				const material = giftMaterials[Math.floor(random() * giftMaterials.length)];
 				
 				const gift = new THREE.Group();
