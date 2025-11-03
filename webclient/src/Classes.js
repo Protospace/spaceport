@@ -668,7 +668,7 @@ export function Class(props) {
 
 	const containerRef = useRef(null);
 	const mountRef = useRef(null);
-	const [effectIndex, setEffectIndex] = useState(0);
+	const [effectIndex, setEffectIndex] = useState(2);
 	const isSaturnalia = clazz && clazz.course_data.name === 'Saturnalia Party';
 	const [userDisabledAnimations, setUserDisabledAnimations] = useState(false);
 	const animationsEnabled = isSaturnalia && !userDisabledAnimations;
@@ -875,9 +875,9 @@ export function Class(props) {
 			};
 			animate();
 		} else if (currentEffect === 2) { // Beer glasses
-			pointLight.position.set(0, 40, 0);
+			pointLight.position.set(0, 60, 0);
 			camera.position.set(0, 30, 170);
-			camera.lookAt(0, 0, 0);
+			camera.lookAt(0, -30, 0);
 
 			const mulberry32 = (a) => () => {
 				var t = a += 0x6D2B79F5;
@@ -886,7 +886,7 @@ export function Class(props) {
 				return ((t ^ t >>> 14) >>> 0) / 4294967296;
 			}
 
-			const random = mulberry32(1758389168348180);
+			const random = mulberry32(1758389168348184);
 
 			// Table
 			const tableGeometry = new THREE.BoxGeometry(60, 2, 360);
@@ -924,7 +924,7 @@ export function Class(props) {
 			const placedGlasses = [];
 			const isBeerTippedFlags = Array.from({length: 15}, () => random() < 0.2);
 
-			for (let i = 0; i < 15; i++) {
+			for (let i = 0; i < 20; i++) {
 				const glassGroup = new THREE.Group();
 				const glass = new THREE.Mesh(glassGeometry, glassMaterial);
 				glassGroup.add(glass);
@@ -987,7 +987,7 @@ export function Class(props) {
 
 			const isWineTippedFlags = Array.from({length: 15}, () => random() < 0.2);
 
-			for (let i = 0; i < 15; i++) {
+			for (let i = 0; i < 20; i++) {
 				const glassGroup = new THREE.Group();
 				const glass = new THREE.Mesh(wineGlassGeometry, glassMaterial);
 				glassGroup.add(glass);
