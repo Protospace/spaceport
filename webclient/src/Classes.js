@@ -1168,11 +1168,8 @@ export function Class(props) {
 				const position = curve.getPointAt(t);
 				card.position.copy(position);
 
-				card.rotation.set(
-					random() * Math.PI * 2,
-					random() * Math.PI * 2,
-					random() * Math.PI * 2
-				);
+				const tangent = curve.getTangentAt(t);
+				card.lookAt(position.clone().add(tangent));
 				scene.add(card);
 			}
 
