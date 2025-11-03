@@ -1052,7 +1052,9 @@ export function Class(props) {
 	return (<div ref={containerRef} style={isSaturnalia ? { position: 'relative', overflow: 'hidden' } : {}}>
 		{isSaturnalia && <div ref={mountRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '#111' }} />}
 		<div style={isSaturnalia ? { position: 'relative', zIndex: 1, color: 'white', textShadow: '0 0 4px black' } : {}}>
-		{(isAdmin(user) || clazz.instructor === user.id) &&
+		<Container>
+			<Header size='large'>Class Details</Header>
+			{(isAdmin(user) || clazz.instructor === user.id) &&
 			<Segment padded>
 				<InstructorClassDetail clazz={clazz} setClass={setClass} {...props} />
 			</Segment>
@@ -1258,6 +1260,7 @@ export function Class(props) {
 				)
 			)
 		}
+		</Container>
 		</div>
 	</div>);
 };
@@ -1281,19 +1284,19 @@ export function ClassDetail(props) {
 	}, [refreshCount]);
 
 	return (
-		<Container>
+		<>
 			{!error ?
 				clazz ?
-					<div>
-						<Header size='large'>Class Details</Header>
-
-						<Class token={token} user={user} refreshUser={refreshUser} clazz={clazz} setClass={setClass} refreshClass={refreshClass} />
-					</div>
+					<Class token={token} user={user} refreshUser={refreshUser} clazz={clazz} setClass={setClass} refreshClass={refreshClass} />
 				:
-					<p>Loading...</p>
+					<Container>
+						<p>Loading...</p>
+					</Container>
 			:
-				<NotFound />
+				<Container>
+					<NotFound />
+				</Container>
 			}
-		</Container>
+		</>
 	);
 };
