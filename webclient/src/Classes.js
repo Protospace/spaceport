@@ -686,7 +686,8 @@ export function Class(props) {
 	useEffect(() => {
 		if (!animationsEnabled) return;
 
-		const currentEffect = effectIndex % 7;
+		//const currentEffect = effectIndex % 7;
+		const currentEffect = 6;
 
 		const mount = mountRef.current;
 		const container = containerRef.current;
