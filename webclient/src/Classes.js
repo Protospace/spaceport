@@ -1336,7 +1336,32 @@ export function Class(props) {
 			disposables.push(columnMaterial);
 
 			const baseGeometry = new THREE.BoxGeometry(10, 2, 10);
-			const shaftGeometry = new THREE.CylinderGeometry(4, 4.5, 40, 20);
+			const shaftGeometry = new THREE.CylinderGeometry(4, 4.5, 40, 40);
+
+			const positions = shaftGeometry.attributes.position;
+			const numVertices = positions.count;
+			const numFlutes = 20;
+			const fluteDepth = 0.3;
+
+			for (let i = 0; i < numVertices; i++) {
+				const x = positions.getX(i);
+				const z = positions.getZ(i);
+				const radius = Math.sqrt(x * x + z * z);
+
+				if (radius < 3.9) continue; // Don't modify vertices on the inside of the caps
+
+				const angle = Math.atan2(z, x);
+				const newRadius = radius - (fluteDepth / 2) * (1 - Math.cos(angle * numFlutes));
+
+				const scale = newRadius / radius;
+				if (radius > 0) {
+					positions.setX(i, x * scale);
+					positions.setZ(i, z * scale);
+				}
+			}
+			positions.needsUpdate = true;
+			shaftGeometry.computeVertexNormals();
+
 			const echinusGeometry = new THREE.CylinderGeometry(6, 6, 2, 20);
 			const abacusGeometry = new THREE.BoxGeometry(9, 2, 9);
 			disposables.push(baseGeometry, shaftGeometry, echinusGeometry, abacusGeometry);
