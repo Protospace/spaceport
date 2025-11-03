@@ -666,6 +666,95 @@ export function Class(props) {
 	const { id } = useParams();
 	const userTraining = clazz && clazz.students.find(x => x.user === user.id);
 
+	const mountRef = useRef(null);
+	const [effectIndex, setEffectIndex] = useState(0);
+	const isSaturnalia = clazz && clazz.course_data.name === 'Saturnalia Party';
+
+	useEffect(() => {
+		if (!isSaturnalia) return;
+
+		const timer = setTimeout(() => {
+			setEffectIndex(prev => prev + 1);
+		}, 5000);
+
+		return () => clearTimeout(timer);
+	}, [isSaturnalia, effectIndex]);
+
+	useEffect(() => {
+		if (!isSaturnalia) return;
+
+		const currentEffect = effectIndex % 1; // Only 1 effect for now
+		if (currentEffect !== 0) return;
+
+		const mount = mountRef.current;
+		if (!mount) return;
+		let animationFrameId;
+
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+		camera.position.z = 50;
+
+		const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		mount.appendChild(renderer.domElement);
+
+		const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+		scene.add(ambientLight);
+		const pointLight = new THREE.PointLight(0xffffff, 1);
+		pointLight.position.set(50, 30, 50);
+		scene.add(pointLight);
+
+		const saturnGroup = new THREE.Group();
+		scene.add(saturnGroup);
+
+		const planetGeometry = new THREE.SphereGeometry(15, 64, 64);
+		const planetMaterial = new THREE.MeshStandardMaterial({ color: 0xDFC5A4 });
+		const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+		saturnGroup.add(planet);
+
+		const ringGeometry = new THREE.RingGeometry(20, 30, 128);
+		const ringMaterial = new THREE.MeshBasicMaterial({
+			color: 0x998A78,
+			side: THREE.DoubleSide,
+			transparent: true,
+			opacity: 0.7
+		});
+		const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+		ring.rotation.x = Math.PI / 2;
+		saturnGroup.add(ring);
+
+		saturnGroup.rotation.x = 0.3;
+		saturnGroup.rotation.z = -0.2;
+
+		const animate = () => {
+			animationFrameId = requestAnimationFrame(animate);
+			saturnGroup.rotation.y += 0.005;
+			renderer.render(scene, camera);
+		};
+		animate();
+
+		const handleResize = () => {
+			if (mount) {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize(window.innerWidth, window.innerHeight);
+			}
+		};
+		window.addEventListener('resize', handleResize);
+
+		return () => {
+			window.removeEventListener('resize', handleResize);
+			cancelAnimationFrame(animationFrameId);
+			if (mount && renderer.domElement) {
+				mount.removeChild(renderer.domElement);
+			}
+			planetGeometry.dispose();
+			planetMaterial.dispose();
+			ringGeometry.dispose();
+			ringMaterial.dispose();
+		};
+	}, [isSaturnalia, effectIndex]);
+
 	const handleSignup = () => {
 		if (loading) return;
 		setLoading(true);
@@ -709,7 +798,8 @@ export function Class(props) {
 	const isOld = clazz && clazz.datetime < now;
 	const isFree = clazz && clazz.cost === '0.00';
 
-	return (<>
+	return (<div style={isSaturnalia ? { color: 'white', textShadow: '0 0 4px black' } : {}}>
+		{isSaturnalia && <div ref={mountRef} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: -1, backgroundColor: '#111' }} />}
 		{(isAdmin(user) || clazz.instructor === user.id) &&
 			<Segment padded>
 				<InstructorClassDetail clazz={clazz} setClass={setClass} {...props} />
@@ -916,7 +1006,7 @@ export function Class(props) {
 				)
 			)
 		}
-	</>);
+	</div>);
 };
 
 export function ClassDetail(props) {
