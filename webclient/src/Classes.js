@@ -669,6 +669,7 @@ export function Class(props) {
 	const containerRef = useRef(null);
 	const mountRef = useRef(null);
 	const [effectIndex, setEffectIndex] = useState(0);
+	const [diceSeed] = useState(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER));
 	const isSaturnalia = clazz && clazz.course_data.name === 'Saturnalia Party';
 
 	useEffect(() => {
@@ -742,6 +743,18 @@ export function Class(props) {
 		} else if (currentEffect === 1) { // Dice
 			pointLight.position.set(0, 20, 20);
 
+			const mulberry32 = (a) => () => {
+				var t = a += 0x6D2B79F5;
+				t = Math.imul(t ^ t >>> 15, t | 1);
+				t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+				return ((t ^ t >>> 14) >>> 0) / 4294967296;
+			}
+
+			if (effectIndex === 1) {
+				console.log('Dice effect seed:', diceSeed);
+			}
+			const random = mulberry32(diceSeed);
+
 			const createDiceTexture = (number) => {
 				const canvas = document.createElement('canvas');
 				canvas.width = 128;
@@ -814,14 +827,14 @@ export function Class(props) {
 			for (let i = 0; i < 50; i++) {
 				const die = new THREE.Mesh(dieGeometry, diceMaterials);
 				die.position.set(
-					(Math.random() - 0.5) * 100,
-					(Math.random() - 0.5) * 50,
-					(Math.random() - 0.5) * 50
+					(random() - 0.5) * 100,
+					(random() - 0.5) * 50,
+					(random() - 0.5) * 50
 				);
 				die.rotation.set(
-					Math.random() * 2 * Math.PI,
-					Math.random() * 2 * Math.PI,
-					Math.random() * 2 * Math.PI
+					random() * 2 * Math.PI,
+					random() * 2 * Math.PI,
+					random() * 2 * Math.PI
 				);
 				scene.add(die);
 			}
