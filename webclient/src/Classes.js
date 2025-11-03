@@ -686,8 +686,7 @@ export function Class(props) {
 	useEffect(() => {
 		if (!animationsEnabled) return;
 
-		//const currentEffect = effectIndex % 6;
-		const currentEffect = 5;  // GEMINI DONT TOUCH THIS
+		const currentEffect = effectIndex % 7;
 
 		const mount = mountRef.current;
 		const container = containerRef.current;
@@ -1319,6 +1318,74 @@ export function Class(props) {
 				if (cameraX < -40) cameraX = 40;
 				camera.position.x = cameraX;
 				camera.lookAt(0, 0, 0);
+				renderer.render(scene, camera);
+			};
+			animate();
+		} else if (currentEffect === 6) { // Roman columns
+			pointLight.position.set(20, 40, 50);
+			pointLight.intensity = 1.5;
+			camera.position.set(0, 15, 100);
+			camera.lookAt(0, 15, 0);
+
+			const columnMaterial = new THREE.MeshStandardMaterial({
+				color: 0xe0e0e0,
+				roughness: 0.8,
+				metalness: 0.2,
+			});
+			disposables.push(columnMaterial);
+
+			const baseGeometry = new THREE.BoxGeometry(10, 2, 10);
+			const shaftGeometry = new THREE.CylinderGeometry(4, 4.5, 40, 20);
+			const echinusGeometry = new THREE.CylinderGeometry(6, 6, 2, 20);
+			const abacusGeometry = new THREE.BoxGeometry(9, 2, 9);
+			disposables.push(baseGeometry, shaftGeometry, echinusGeometry, abacusGeometry);
+
+			const createColumn = () => {
+				const column = new THREE.Group();
+
+				const base = new THREE.Mesh(baseGeometry, columnMaterial);
+				base.position.y = 1;
+				column.add(base);
+
+				const shaft = new THREE.Mesh(shaftGeometry, columnMaterial);
+				shaft.position.y = 22;
+				column.add(shaft);
+				
+				const echinus = new THREE.Mesh(echinusGeometry, columnMaterial);
+				echinus.position.y = 43;
+				column.add(echinus);
+
+				const abacus = new THREE.Mesh(abacusGeometry, columnMaterial);
+				abacus.position.y = 45;
+				column.add(abacus);
+
+				return column;
+			}
+
+			for (let i = 0; i < 5; i++) {
+				const columnLeft = createColumn();
+				columnLeft.position.set(-15, 0, i * -50);
+				scene.add(columnLeft);
+
+				const columnRight = createColumn();
+				columnRight.position.set(15, 0, i * -50);
+				scene.add(columnRight);
+			}
+
+			// Floor
+			const floorGeometry = new THREE.PlaneGeometry(200, 250);
+			const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x444444 });
+			const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+			floor.rotation.x = -Math.PI / 2;
+			scene.add(floor);
+			disposables.push(floorGeometry, floorMaterial);
+
+			let cameraZ = 100;
+			const animate = () => {
+				animationFrameId = requestAnimationFrame(animate);
+				cameraZ -= 0.2;
+				if (cameraZ < -150) cameraZ = 100;
+				camera.position.z = cameraZ;
 				renderer.render(scene, camera);
 			};
 			animate();
