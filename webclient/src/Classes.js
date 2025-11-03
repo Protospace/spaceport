@@ -798,8 +798,9 @@ export function Class(props) {
 	const isOld = clazz && clazz.datetime < now;
 	const isFree = clazz && clazz.cost === '0.00';
 
-	return (<div style={isSaturnalia ? { color: 'white', textShadow: '0 0 4px black' } : {}}>
-		{isSaturnalia && <div ref={mountRef} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: -1, backgroundColor: '#111' }} />}
+	return (<>
+		{isSaturnalia && <div ref={mountRef} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: '#111' }} />}
+		<div style={isSaturnalia ? { position: 'relative', zIndex: 1, color: 'white', textShadow: '0 0 4px black' } : {}}>
 		{(isAdmin(user) || clazz.instructor === user.id) &&
 			<Segment padded>
 				<InstructorClassDetail clazz={clazz} setClass={setClass} {...props} />
@@ -1006,7 +1007,8 @@ export function Class(props) {
 				)
 			)
 		}
-	</div>);
+		</div>
+	</>);
 };
 
 export function ClassDetail(props) {
