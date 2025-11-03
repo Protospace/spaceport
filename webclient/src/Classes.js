@@ -686,7 +686,8 @@ export function Class(props) {
 	useEffect(() => {
 		if (!animationsEnabled) return;
 
-		const currentEffect = effectIndex % 6;
+		//const currentEffect = effectIndex % 6;
+		const currentEffect = 5;  // GEMINI DONT TOUCH THIS
 
 		const mount = mountRef.current;
 		const container = containerRef.current;
