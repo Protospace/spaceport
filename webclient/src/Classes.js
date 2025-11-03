@@ -686,7 +686,7 @@ export function Class(props) {
 	useEffect(() => {
 		if (!animationsEnabled) return;
 
-		const currentEffect = effectIndex % 4;
+		const currentEffect = effectIndex % 5;
 
 		const mount = mountRef.current;
 		const container = containerRef.current;
@@ -1072,6 +1072,103 @@ export function Class(props) {
 					}
 				}
 
+				renderer.render(scene, camera);
+			};
+			animate();
+		} else if (currentEffect === 4) { // Playing cards
+			camera.position.z = 100;
+			pointLight.position.set(0, 0, 100);
+
+			const mulberry32 = (a) => () => {
+				var t = a += 0x6D2B79F5;
+				t = Math.imul(t ^ t >>> 15, t | 1);
+				t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+				return ((t ^ t >>> 14) >>> 0) / 4294967296;
+			}
+			const random = mulberry32(987654321);
+
+			const createCardFrontTexture = (rank, suit) => {
+				const canvas = document.createElement('canvas');
+				canvas.width = 250;
+				canvas.height = 350;
+				const ctx = canvas.getContext('2d');
+				ctx.fillStyle = 'white';
+				ctx.fillRect(0, 0, 250, 350);
+				ctx.fillStyle = suit === '♥' || suit === '♦' ? 'red' : 'black';
+				ctx.font = 'bold 40px sans-serif';
+				ctx.fillText(rank, 15, 45);
+				ctx.fillText(suit, 15, 90);
+
+				ctx.save();
+				ctx.translate(250, 350);
+				ctx.rotate(Math.PI);
+				ctx.fillText(rank, 15, 45);
+				ctx.fillText(suit, 15, 90);
+				ctx.restore();
+
+				return new THREE.CanvasTexture(canvas);
+			};
+
+			const createCardBackTexture = () => {
+				const canvas = document.createElement('canvas');
+				canvas.width = 250;
+				canvas.height = 350;
+				const ctx = canvas.getContext('2d');
+				ctx.fillStyle = '#6A0DAD'; // Purple
+				ctx.fillRect(0, 0, 250, 350);
+				ctx.strokeStyle = '#FFD700'; // Gold
+				ctx.lineWidth = 10;
+				ctx.strokeRect(10, 10, 230, 330);
+				return new THREE.CanvasTexture(canvas);
+			};
+			
+			const cardBackMaterial = new THREE.MeshStandardMaterial({ map: createCardBackTexture() });
+			disposables.push(cardBackMaterial.map, cardBackMaterial);
+			
+			const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+			const suits = ['♠', '♥', '♦', '♣'];
+
+			const cardGeometry = new THREE.BoxGeometry(10, 14, 0.2);
+			disposables.push(cardGeometry);
+
+			const numCards = 100;
+			const radius = 20;
+
+			for (let i = 0; i < numCards; i++) {
+				const rank = ranks[Math.floor(random() * ranks.length)];
+				const suit = suits[Math.floor(random() * suits.length)];
+				const frontTexture = createCardFrontTexture(rank, suit);
+				const frontMaterial = new THREE.MeshStandardMaterial({ map: frontTexture });
+				disposables.push(frontTexture, frontMaterial);
+
+				const materials = [
+					cardBackMaterial, // right
+					cardBackMaterial, // left
+					cardBackMaterial, // top
+					cardBackMaterial, // bottom
+					frontMaterial,    // front
+					cardBackMaterial, // back
+				];
+
+				const card = new THREE.Mesh(cardGeometry, materials);
+
+				const angle = (i / numCards) * Math.PI * 10;
+				const z = (i / numCards) * 200 - 100;
+				card.position.set(
+					Math.cos(angle) * radius,
+					Math.sin(angle) * radius,
+					z
+				);
+				card.rotation.z = angle + Math.PI / 2;
+				scene.add(card);
+			}
+
+			let cameraZ = 100;
+			const animate = () => {
+				animationFrameId = requestAnimationFrame(animate);
+				cameraZ -= 0.1;
+				if (cameraZ < -100) cameraZ = 100;
+				camera.position.z = cameraZ;
 				renderer.render(scene, camera);
 			};
 			animate();
