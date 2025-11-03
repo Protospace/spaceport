@@ -666,6 +666,7 @@ export function Class(props) {
 	const { id } = useParams();
 	const userTraining = clazz && clazz.students.find(x => x.user === user.id);
 
+	const containerRef = useRef(null);
 	const mountRef = useRef(null);
 	const [effectIndex, setEffectIndex] = useState(0);
 	const isSaturnalia = clazz && clazz.course_data.name === 'Saturnalia Party';
@@ -687,15 +688,16 @@ export function Class(props) {
 		if (currentEffect !== 0) return;
 
 		const mount = mountRef.current;
-		if (!mount) return;
+		const container = containerRef.current;
+		if (!mount || !container) return;
 		let animationFrameId;
 
 		const scene = new THREE.Scene();
-		const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+		const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
 		camera.position.z = 50;
 
 		const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.setSize(container.clientWidth, container.clientHeight);
 		mount.appendChild(renderer.domElement);
 
 		const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
@@ -734,10 +736,11 @@ export function Class(props) {
 		animate();
 
 		const handleResize = () => {
-			if (mount) {
-				camera.aspect = window.innerWidth / window.innerHeight;
+			const container = containerRef.current;
+			if (mount && container) {
+				camera.aspect = container.clientWidth / container.clientHeight;
 				camera.updateProjectionMatrix();
-				renderer.setSize(window.innerWidth, window.innerHeight);
+				renderer.setSize(container.clientWidth, container.clientHeight);
 			}
 		};
 		window.addEventListener('resize', handleResize);
@@ -798,8 +801,8 @@ export function Class(props) {
 	const isOld = clazz && clazz.datetime < now;
 	const isFree = clazz && clazz.cost === '0.00';
 
-	return (<>
-		{isSaturnalia && <div ref={mountRef} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: '#111' }} />}
+	return (<div ref={containerRef} style={isSaturnalia ? { position: 'relative', overflow: 'hidden' } : {}}>
+		{isSaturnalia && <div ref={mountRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '#111' }} />}
 		<div style={isSaturnalia ? { position: 'relative', zIndex: 1, color: 'white', textShadow: '0 0 4px black' } : {}}>
 		{(isAdmin(user) || clazz.instructor === user.id) &&
 			<Segment padded>
@@ -1008,7 +1011,7 @@ export function Class(props) {
 			)
 		}
 		</div>
-	</>);
+	</div>);
 };
 
 export function ClassDetail(props) {
