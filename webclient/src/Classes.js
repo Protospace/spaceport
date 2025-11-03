@@ -1481,7 +1481,7 @@ export function Class(props) {
 	const isFree = clazz && clazz.cost === '0.00';
 
 	return (<div ref={containerRef} style={animationsEnabled ? { position: 'relative' } : {}}>
-		{animationsEnabled && <div ref={mountRef} style={{ position: 'absolute', top: '-1.8rem', bottom: '-4rem', left: 0, right: 0, backgroundColor: '#1a1a1a' }} />}
+		{animationsEnabled && <div ref={mountRef} style={{ position: 'absolute', top: '-1.7rem', bottom: '-4rem', left: 0, right: 0, backgroundColor: '#1a1a1a' }} />}
 		<div style={animationsEnabled ? { position: 'relative', zIndex: 1, color: 'white', textShadow: '0 0 4px black' } : {}}>
 		<Container>
 			<Header size='large'>Class Details</Header>
