@@ -999,14 +999,18 @@ export function Class(props) {
 			const random = mulberry32(8492068349104728);
 
 			const giftGeometry = new THREE.BoxGeometry(5, 5, 5);
-			disposables.push(giftGeometry);
+			const ribbonH_Geometry = new THREE.BoxGeometry(5.1, 1, 5.1);
+			const ribbonV_Geometry = new THREE.BoxGeometry(5.1, 5.1, 1);
+			disposables.push(giftGeometry, ribbonH_Geometry, ribbonV_Geometry);
 			
 			const giftMaterials = [
-				new THREE.MeshStandardMaterial({ color: 0xff0000 }), // Red
-				new THREE.MeshStandardMaterial({ color: 0x00ff00 }), // Green
-				new THREE.MeshStandardMaterial({ color: 0x0000ff }), // Blue
+				new THREE.MeshStandardMaterial({ color: 0xB94A48 }), // Dark Red
+				new THREE.MeshStandardMaterial({ color: 0x468847 }), // Dark Green
+				new THREE.MeshStandardMaterial({ color: 0x3A87AD }), // Dark Blue
 			];
 			giftMaterials.forEach(m => disposables.push(m));
+			const ribbonMaterial = new THREE.MeshStandardMaterial({ color: 0xF1C40F }); // Gold
+			disposables.push(ribbonMaterial);
 
 			const gifts = [];
 			const vFOV = THREE.MathUtils.degToRad(camera.fov);
@@ -1015,7 +1019,15 @@ export function Class(props) {
 
 			for (let i = 0; i < 50; i++) {
 				const material = giftMaterials[Math.floor(random() * giftMaterials.length)];
-				const gift = new THREE.Mesh(giftGeometry, material);
+				
+				const gift = new THREE.Group();
+				const box = new THREE.Mesh(giftGeometry, material);
+				gift.add(box);
+
+				const ribbonH = new THREE.Mesh(ribbonH_Geometry, ribbonMaterial);
+				gift.add(ribbonH);
+				const ribbonV = new THREE.Mesh(ribbonV_Geometry, ribbonMaterial);
+				gift.add(ribbonV);
 
 				gift.position.set(
 					(random() - 0.5) * width,
