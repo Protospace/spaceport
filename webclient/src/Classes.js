@@ -1324,7 +1324,7 @@ export function Class(props) {
 			animate();
 		} else if (currentEffect === 6) { // Roman columns
 			pointLight.position.set(20, 40, 50);
-			pointLight.intensity = 1.5;
+			pointLight.intensity = 1.0;
 			camera.position.set(0, 15, 100);
 			camera.lookAt(0, 15, 0);
 
