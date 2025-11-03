@@ -123,8 +123,13 @@ function NewClassTableCourse(props) {
 
 	const now = new Date().toISOString();
 
+	const segmentStyle = { margin: '1rem 1rem 0 0', width: '22rem' };
+	if (course.name === 'Saturnalia Party') {
+		segmentStyle.backgroundColor = 'lightgreen';
+	}
+
 	return (
-		<Segment style={{ margin: '1rem 1rem 0 0', width: '22rem' }}>
+		<Segment style={segmentStyle}>
 			<Header size='small'>
 				<Link to={'/courses/'+course.id}>
 					{course.name}
