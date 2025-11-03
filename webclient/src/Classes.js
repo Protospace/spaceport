@@ -203,7 +203,7 @@ function NewClassTableCourse(props) {
 		segmentStyle.position = 'relative';
 		segmentStyle.overflow = 'hidden';
 		segmentStyle.color = 'white';
-		segmentStyle.textShadow = '0 0 4px black';
+		segmentStyle.textShadow = '0 0 8px black';
 	}
 
 	return (
@@ -1482,7 +1482,7 @@ export function Class(props) {
 
 	return (<div ref={containerRef} style={animationsEnabled ? { position: 'relative' } : {}}>
 		{animationsEnabled && <div ref={mountRef} style={{ position: 'absolute', top: '-1.7rem', bottom: '-4rem', left: 0, right: 0, backgroundColor: '#1a1a1a' }} />}
-		<div style={animationsEnabled ? { position: 'relative', zIndex: 1, color: 'white', textShadow: '0 0 4px black' } : {}}>
+		<div style={animationsEnabled ? { position: 'relative', zIndex: 1, color: 'white', textShadow: '0 0 8px black' } : {}}>
 		<Container>
 			<Header size='large'>Class Details</Header>
 			{(isAdmin(user) || clazz.instructor === user.id) && !animationsEnabled &&
