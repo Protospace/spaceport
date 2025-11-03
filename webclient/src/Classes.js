@@ -670,19 +670,21 @@ export function Class(props) {
 	const mountRef = useRef(null);
 	const [effectIndex, setEffectIndex] = useState(0);
 	const isSaturnalia = clazz && clazz.course_data.name === 'Saturnalia Party';
+	const [userDisabledAnimations, setUserDisabledAnimations] = useState(false);
+	const animationsEnabled = isSaturnalia && !userDisabledAnimations;
 
 	useEffect(() => {
-		if (!isSaturnalia) return;
+		if (!animationsEnabled) return;
 
 		const timer = setTimeout(() => {
 			setEffectIndex(prev => prev + 1);
 		}, 5000);
 
 		return () => clearTimeout(timer);
-	}, [isSaturnalia, effectIndex]);
+	}, [animationsEnabled, effectIndex]);
 
 	useEffect(() => {
-		if (!isSaturnalia) return;
+		if (!animationsEnabled) return;
 
 		const currentEffect = effectIndex % 4;
 
@@ -1093,7 +1095,7 @@ export function Class(props) {
 			}
 			disposables.forEach(d => d.dispose());
 		};
-	}, [isSaturnalia, effectIndex]);
+	}, [animationsEnabled, effectIndex]);
 
 	const handleSignup = () => {
 		if (loading) return;
@@ -1138,12 +1140,12 @@ export function Class(props) {
 	const isOld = clazz && clazz.datetime < now;
 	const isFree = clazz && clazz.cost === '0.00';
 
-	return (<div ref={containerRef} style={isSaturnalia ? { position: 'relative', overflow: 'hidden' } : {}}>
-		{isSaturnalia && <div ref={mountRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '#111' }} />}
-		<div style={isSaturnalia ? { position: 'relative', zIndex: 1, color: 'white', textShadow: '0 0 4px black' } : {}}>
+	return (<div ref={containerRef} style={animationsEnabled ? { position: 'relative', overflow: 'hidden' } : {}}>
+		{animationsEnabled && <div ref={mountRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '#111' }} />}
+		<div style={animationsEnabled ? { position: 'relative', zIndex: 1, color: 'white', textShadow: '0 0 4px black' } : {}}>
 		<Container>
 			<Header size='large'>Class Details</Header>
-			{(isAdmin(user) || clazz.instructor === user.id) &&
+			{(isAdmin(user) || clazz.instructor === user.id) && !animationsEnabled &&
 			<Segment padded>
 				<InstructorClassDetail clazz={clazz} setClass={setClass} {...props} />
 			</Segment>
@@ -1157,6 +1159,15 @@ export function Class(props) {
 						<Link to={'/courses/'+clazz.course}>
 							{clazz.course_data.name}
 						</Link>
+						{animationsEnabled &&
+							<Button
+								onClick={() => setUserDisabledAnimations(true)}
+								style={{ marginLeft: '1rem' }}
+								size='tiny'
+							>
+								Stop animations
+							</Button>
+						}
 					</Table.Cell>
 				</Table.Row>
 				<Table.Row>
@@ -1204,7 +1215,7 @@ export function Class(props) {
 
 		<Header size='medium'>Attendance</Header>
 
-		{(isAdmin(user) || clazz.instructor === user.id) &&
+		{(isAdmin(user) || clazz.instructor === user.id) && !animationsEnabled &&
 			<Segment padded>
 				<InstructorClassAttendance clazz={clazz} refreshClass={refreshClass} {...props} />
 			</Segment>
