@@ -1133,7 +1133,18 @@ export function Class(props) {
 			disposables.push(cardGeometry);
 
 			const numCards = 100;
-			const radius = 30;
+			
+			const pathPoints = [];
+			const pathLength = 400;
+			const numPoints = 10;
+			for (let i = 0; i < numPoints; i++) {
+				pathPoints.push(new THREE.Vector3(
+					(random() - 0.5) * 60,
+					(random() - 0.5) * 60,
+					(i / (numPoints - 1)) * pathLength - (pathLength / 2)
+				));
+			}
+			const curve = new THREE.CatmullRomCurve3(pathPoints);
 
 			for (let i = 0; i < numCards; i++) {
 				const rank = ranks[Math.floor(random() * ranks.length)];
@@ -1153,14 +1164,15 @@ export function Class(props) {
 
 				const card = new THREE.Mesh(cardGeometry, materials);
 
-				const angle = (i / numCards) * Math.PI * 10;
-				const z = (i / numCards) * 400 - 200;
-				card.position.set(
-					Math.cos(angle) * radius,
-					Math.sin(angle) * radius,
-					z
+				const t = i / (numCards - 1);
+				const position = curve.getPointAt(t);
+				card.position.copy(position);
+
+				card.rotation.set(
+					random() * Math.PI * 2,
+					random() * Math.PI * 2,
+					random() * Math.PI * 2
 				);
-				card.rotation.z = angle + Math.PI / 2;
 				scene.add(card);
 			}
 
