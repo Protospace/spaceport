@@ -669,6 +669,7 @@ export function Class(props) {
 	const containerRef = useRef(null);
 	const mountRef = useRef(null);
 	const [effectIndex, setEffectIndex] = useState(0);
+	const [beerSeed] = useState(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER));
 	const isSaturnalia = clazz && clazz.course_data.name === 'Saturnalia Party';
 
 	useEffect(() => {
@@ -684,7 +685,7 @@ export function Class(props) {
 	useEffect(() => {
 		if (!isSaturnalia) return;
 
-		const currentEffect = 1;
+		const currentEffect = effectIndex % 3;
 
 		const mount = mountRef.current;
 		const container = containerRef.current;
@@ -868,6 +869,80 @@ export function Class(props) {
 				if (cameraX < -50) cameraX = 50;
 				camera.position.x = cameraX;
 				camera.lookAt(0, 0, 0);
+				renderer.render(scene, camera);
+			};
+			animate();
+		} else if (currentEffect === 2) { // Beer glasses
+			pointLight.position.set(0, 40, 0);
+			camera.position.set(0, 30, 40);
+			camera.lookAt(0, 0, 0);
+
+			const mulberry32 = (a) => () => {
+				var t = a += 0x6D2B79F5;
+				t = Math.imul(t ^ t >>> 15, t | 1);
+				t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+				return ((t ^ t >>> 14) >>> 0) / 4294967296;
+			}
+
+			if (effectIndex === 2) {
+				console.log('Beer effect seed:', beerSeed);
+			}
+			const random = mulberry32(beerSeed);
+
+			// Table
+			const tableGeometry = new THREE.BoxGeometry(120, 2, 60);
+			const tableMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 }); // SaddleBrown
+			const table = new THREE.Mesh(tableGeometry, tableMaterial);
+			table.position.y = -1;
+			scene.add(table);
+			disposables.push(tableGeometry, tableMaterial);
+
+			// Beer glass
+			const glassMaterial = new THREE.MeshPhysicalMaterial({
+				color: 0xffffff,
+				transparent: true,
+				opacity: 0.3,
+				roughness: 0.1,
+				metalness: 0.1,
+			});
+			disposables.push(glassMaterial);
+			const beerMaterial = new THREE.MeshStandardMaterial({ color: 0xFFA500 }); // Orange
+			disposables.push(beerMaterial);
+
+			const glassHeight = 10;
+			const glassTopRadius = 2.5;
+			const glassBottomRadius = 2;
+			const glassGeometry = new THREE.CylinderGeometry(glassTopRadius, glassBottomRadius, glassHeight, 32);
+			disposables.push(glassGeometry);
+
+			for (let i = 0; i < 30; i++) {
+				const glassGroup = new THREE.Group();
+				const glass = new THREE.Mesh(glassGeometry, glassMaterial);
+				glassGroup.add(glass);
+
+				const beerHeight = glassHeight * (0.2 + random() * 0.7);
+				const beerRadius = glassBottomRadius + (glassTopRadius-glassBottomRadius) * (beerHeight/glassHeight) * 0.5;
+				const beerGeometry = new THREE.CylinderGeometry(beerRadius*0.95, glassBottomRadius*0.95, beerHeight, 32);
+				const beer = new THREE.Mesh(beerGeometry, beerMaterial);
+				beer.position.y = -(glassHeight - beerHeight) / 2;
+				glassGroup.add(beer);
+				disposables.push(beerGeometry);
+
+				glassGroup.position.set(
+					(random() - 0.5) * 100,
+					glassHeight / 2,
+					(random() - 0.5) * 50
+				);
+				glassGroup.rotation.z = (random() - 0.5) * 0.4; // Tilted a bit
+				scene.add(glassGroup);
+			}
+
+			let cameraZ = 40;
+			const animate = () => {
+				animationFrameId = requestAnimationFrame(animate);
+				cameraZ -= 0.05;
+				if (cameraZ < -30) cameraZ = 40;
+				camera.position.z = cameraZ;
 				renderer.render(scene, camera);
 			};
 			animate();
