@@ -208,7 +208,7 @@ function NewClassTableCourse(props) {
 
 	return (
 		<Segment className={isSaturnalia ? 'dark' : ''} style={segmentStyle}>
-			{isSaturnalia && <div ref={mountRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, backgroundColor: '#111' }} />}
+			{isSaturnalia && <div ref={mountRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, backgroundColor: '#1a1a1a' }} />}
 			<div style={{ position: 'relative', zIndex: 1 }}>
 				<Header size='small'>
 					<Link to={'/courses/'+course.id}>
@@ -1141,7 +1141,7 @@ export function Class(props) {
 	const isFree = clazz && clazz.cost === '0.00';
 
 	return (<div ref={containerRef} style={animationsEnabled ? { position: 'relative', overflow: 'hidden' } : {}}>
-		{animationsEnabled && <div ref={mountRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '#111' }} />}
+		{animationsEnabled && <div ref={mountRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '#1a1a1a' }} />}
 		<div style={animationsEnabled ? { position: 'relative', zIndex: 1, color: 'white', textShadow: '0 0 4px black' } : {}}>
 		<Container>
 			<Header size='large'>Class Details</Header>
