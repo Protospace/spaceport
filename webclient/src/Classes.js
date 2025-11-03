@@ -1093,7 +1093,7 @@ export function Class(props) {
 				canvas.width = 250;
 				canvas.height = 350;
 				const ctx = canvas.getContext('2d');
-				ctx.fillStyle = 'white';
+				ctx.fillStyle = '#dddddd';
 				ctx.fillRect(0, 0, 250, 350);
 				ctx.fillStyle = suit === '♥' || suit === '♦' ? 'red' : 'black';
 				ctx.font = 'bold 40px sans-serif';
@@ -1101,10 +1101,9 @@ export function Class(props) {
 				ctx.fillText(suit, 15, 90);
 
 				ctx.save();
-				ctx.translate(250, 350);
-				ctx.rotate(Math.PI);
-				ctx.fillText(rank, 15, 45);
-				ctx.fillText(suit, 15, 90);
+				ctx.textAlign = 'right';
+				ctx.fillText(rank, 250 - 15, 45);
+				ctx.fillText(suit, 250 - 15, 90);
 				ctx.restore();
 
 				return new THREE.CanvasTexture(canvas);
@@ -1129,11 +1128,11 @@ export function Class(props) {
 			const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 			const suits = ['♠', '♥', '♦', '♣'];
 
-			const cardGeometry = new THREE.BoxGeometry(10, 14, 0.2);
+			const cardGeometry = new THREE.BoxGeometry(10, 14, 0.1);
 			disposables.push(cardGeometry);
 
 			const numCards = 100;
-			const radius = 20;
+			const radius = 30;
 
 			for (let i = 0; i < numCards; i++) {
 				const rank = ranks[Math.floor(random() * ranks.length)];
