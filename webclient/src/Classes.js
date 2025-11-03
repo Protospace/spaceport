@@ -207,11 +207,11 @@ function NewClassTableCourse(props) {
 	}
 
 	return (
-		<Segment style={segmentStyle}>
+		<Segment className={isSaturnalia ? 'dark' : ''} style={segmentStyle}>
 			{isSaturnalia && <div ref={mountRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, backgroundColor: '#111' }} />}
 			<div style={{ position: 'relative', zIndex: 1 }}>
 				<Header size='small'>
-					<Link to={'/courses/'+course.id} style={isSaturnalia ? { color: 'white' } : {}}>
+					<Link to={'/courses/'+course.id}>
 						{course.name}
 					</Link>
 				</Header>
@@ -262,7 +262,7 @@ function NewClassTableCourse(props) {
 							{classes.map(x =>
 								<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
 									<Table.Cell>
-										<Link to={'/classes/'+x.id} style={isSaturnalia ? { color: 'white' } : {}}>
+										<Link to={'/classes/'+x.id}>
 											{moment.utc(x.datetime).tz('America/Edmonton').format(' MMM Do')}
 										</Link>
 										{' - '}{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}
