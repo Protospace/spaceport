@@ -669,7 +669,6 @@ export function Class(props) {
 	const containerRef = useRef(null);
 	const mountRef = useRef(null);
 	const [effectIndex, setEffectIndex] = useState(0);
-	const [beerSeed] = useState(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER));
 	const isSaturnalia = clazz && clazz.course_data.name === 'Saturnalia Party';
 
 	useEffect(() => {
@@ -884,10 +883,7 @@ export function Class(props) {
 				return ((t ^ t >>> 14) >>> 0) / 4294967296;
 			}
 
-			if (effectIndex === 2) {
-				console.log('Beer effect seed:', beerSeed);
-			}
-			const random = mulberry32(beerSeed);
+			const random = mulberry32(1758389168348180);
 
 			// Table
 			const tableGeometry = new THREE.BoxGeometry(60, 2, 120);
