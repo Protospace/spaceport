@@ -1196,17 +1196,85 @@ export function Class(props) {
 
 			const random = mulberry32(2718281828);
 
+			const createCoinTexture = () => {
+				const canvas = document.createElement('canvas');
+				const size = 256;
+				canvas.width = size;
+				canvas.height = size;
+				const ctx = canvas.getContext('2d');
+				const centerX = size / 2;
+				const centerY = size / 2;
+
+				// Gold background for the coin face
+				ctx.beginPath();
+				ctx.arc(centerX, centerY, size / 2, 0, 2 * Math.PI, false);
+				ctx.fillStyle = '#FFD700'; // Gold
+				ctx.fill();
+
+				const detailColor = '#DAA520'; // A darker gold for details
+
+				// Saturn symbol in the center
+				ctx.font = '100px sans-serif';
+				ctx.fillStyle = detailColor;
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+				ctx.fillText('♄', centerX, centerY);
+
+				// Text along an arc
+				const text = "IO SATURNALIA";
+				ctx.font = '30px serif';
+				const radius = 95;
+				const angle = Math.PI; // Spread over 180 degrees
+				ctx.save();
+				ctx.translate(centerX, centerY);
+				ctx.rotate(-angle / 2 - Math.PI/2);
+				for (let i = 0; i < text.length; i++) {
+					ctx.rotate(angle / (text.length));
+					ctx.save();
+					ctx.translate(0, -radius);
+					ctx.fillText(text[i], 0, 0);
+					ctx.restore();
+				}
+				ctx.restore();
+				return new THREE.CanvasTexture(canvas);
+			};
+
+			const coinTexture = createCoinTexture();
+			const bumpMap = coinTexture.clone();
+			bumpMap.needsUpdate = true;
+			disposables.push(coinTexture, bumpMap);
+			
+			const coinMaterials = [
+				new THREE.MeshStandardMaterial({ // side
+					color: 0xFFD700,
+					metalness: 0.8,
+					roughness: 0.4
+				}),
+				new THREE.MeshStandardMaterial({ // top
+					map: coinTexture,
+					bumpMap: bumpMap,
+					bumpScale: 0.02,
+					color: 0xFFD700,
+					metalness: 0.8,
+					roughness: 0.2
+				}),
+				new THREE.MeshStandardMaterial({ // bottom
+					map: coinTexture,
+					bumpMap: bumpMap,
+					bumpScale: 0.02,
+					color: 0xFFD700,
+					metalness: 0.8,
+					roughness: 0.2
+				}),
+			];
+			coinMaterials.forEach(m => disposables.push(m));
+
 			const coinGeometry = new THREE.CylinderGeometry(2, 2, 0.2, 32);
-			const coinMaterial = new THREE.MeshStandardMaterial({
-				color: 0xFFD700,
-				metalness: 0.8,
-				roughness: 0.2
-			});
-			disposables.push(coinGeometry, coinMaterial);
+			disposables.push(coinGeometry);
 
 			const placedCoins = [];
 			for (let i = 0; i < 200; i++) {
-				const coin = new THREE.Mesh(coinGeometry, coinMaterial);
+				const coin = new THREE.Mesh(coinGeometry, coinMaterials);
 				let intersects;
 				let attempts = 0;
 				let boundingBox;
