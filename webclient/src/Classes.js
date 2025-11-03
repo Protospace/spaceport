@@ -669,7 +669,6 @@ export function Class(props) {
 	const containerRef = useRef(null);
 	const mountRef = useRef(null);
 	const [effectIndex, setEffectIndex] = useState(0);
-	const [diceSeed] = useState(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER));
 	const isSaturnalia = clazz && clazz.course_data.name === 'Saturnalia Party';
 
 	useEffect(() => {
@@ -685,7 +684,7 @@ export function Class(props) {
 	useEffect(() => {
 		if (!isSaturnalia) return;
 
-		const currentEffect = effectIndex % 2;
+		const currentEffect = 1;
 
 		const mount = mountRef.current;
 		const container = containerRef.current;
@@ -750,10 +749,7 @@ export function Class(props) {
 				return ((t ^ t >>> 14) >>> 0) / 4294967296;
 			}
 
-			if (effectIndex === 1) {
-				console.log('Dice effect seed:', diceSeed);
-			}
-			const random = mulberry32(diceSeed);
+			const random = mulberry32(6565293686400744);
 
 			const createDiceTexture = (number) => {
 				const canvas = document.createElement('canvas');
