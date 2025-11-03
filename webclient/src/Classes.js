@@ -1101,9 +1101,10 @@ export function Class(props) {
 				ctx.fillText(suit, 15, 90);
 
 				ctx.save();
-				ctx.textAlign = 'right';
-				ctx.fillText(rank, 250 - 15, 45);
-				ctx.fillText(suit, 250 - 15, 90);
+				ctx.translate(250, 350);
+				ctx.rotate(Math.PI);
+				ctx.fillText(rank, 15, 45);
+				ctx.fillText(suit, 15, 90);
 				ctx.restore();
 
 				return new THREE.CanvasTexture(canvas);
