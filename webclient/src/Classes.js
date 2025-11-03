@@ -695,10 +695,10 @@ export function Class(props) {
 		let animationFrameId;
 
 		const scene = new THREE.Scene();
-		const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+		const camera = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000);
 
 		const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-		renderer.setSize(container.clientWidth, container.clientHeight);
+		renderer.setSize(mount.clientWidth, mount.clientHeight);
 		mount.appendChild(renderer.domElement);
 
 		const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
@@ -1420,9 +1420,9 @@ export function Class(props) {
 		const handleResize = () => {
 			const container = containerRef.current;
 			if (mount && container) {
-				camera.aspect = container.clientWidth / container.clientHeight;
+				camera.aspect = mount.clientWidth / mount.clientHeight;
 				camera.updateProjectionMatrix();
-				renderer.setSize(container.clientWidth, container.clientHeight);
+				renderer.setSize(mount.clientWidth, mount.clientHeight);
 			}
 		};
 		window.addEventListener('resize', handleResize);
