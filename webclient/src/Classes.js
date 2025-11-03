@@ -686,8 +686,8 @@ export function Class(props) {
 	useEffect(() => {
 		if (!animationsEnabled) return;
 
-		//const currentEffect = effectIndex % 5;
-		const currentEffect = 4; // just while testing, GEMINI DON'T TOUCH THIS
+		const currentEffect = effectIndex % 5;
+		//const currentEffect = 4; // just while testing, GEMINI DON'T TOUCH THIS
 
 		const mount = mountRef.current;
 		const container = containerRef.current;
@@ -1086,7 +1086,7 @@ export function Class(props) {
 				t ^= t + Math.imul(t ^ t >>> 7, t | 61);
 				return ((t ^ t >>> 14) >>> 0) / 4294967296;
 			}
-			const random = mulberry32(987654329);
+			const random = mulberry32(8788559208175106);
 
 			const createCardFrontTexture = (rank, suit) => {
 				const canvas = document.createElement('canvas');
@@ -1135,7 +1135,7 @@ export function Class(props) {
 			const numCards = 100;
 			
 			const pathPoints = [];
-			const pathLength = 400;
+			const pathLength = 300;
 			const numPoints = 15;
 			for (let i = 0; i < numPoints; i++) {
 				pathPoints.push(new THREE.Vector3(
