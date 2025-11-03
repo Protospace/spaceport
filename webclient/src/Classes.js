@@ -1086,14 +1086,14 @@ export function Class(props) {
 				t ^= t + Math.imul(t ^ t >>> 7, t | 61);
 				return ((t ^ t >>> 14) >>> 0) / 4294967296;
 			}
-			const random = mulberry32(987654321);
+			const random = mulberry32(987654329);
 
 			const createCardFrontTexture = (rank, suit) => {
 				const canvas = document.createElement('canvas');
 				canvas.width = 250;
 				canvas.height = 350;
 				const ctx = canvas.getContext('2d');
-				ctx.fillStyle = '#aaaaaa';
+				ctx.fillStyle = '#ffffff';
 				ctx.fillRect(0, 0, 250, 350);
 				ctx.fillStyle = suit === '♥' || suit === '♦' ? 'red' : 'black';
 				ctx.font = 'bold 40px sans-serif';
@@ -1139,8 +1139,8 @@ export function Class(props) {
 			const numPoints = 15;
 			for (let i = 0; i < numPoints; i++) {
 				pathPoints.push(new THREE.Vector3(
-					(random() - 0.5) * 120,
-					(random() - 0.5) * 120,
+					(random() - 0.5) * 90,
+					(random() - 0.5) * 90,
 					(i / (numPoints - 1)) * pathLength - (pathLength / 2)
 				));
 			}
