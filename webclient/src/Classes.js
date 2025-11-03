@@ -824,19 +824,42 @@ export function Class(props) {
 				disposables.push(m.map, m);
 			});
 
+			const placedDice = [];
 			for (let i = 0; i < 50; i++) {
 				const die = new THREE.Mesh(dieGeometry, diceMaterials);
-				die.position.set(
-					(random() - 0.5) * 100,
-					(random() - 0.5) * 50,
-					(random() - 0.5) * 50
-				);
-				die.rotation.set(
-					random() * 2 * Math.PI,
-					random() * 2 * Math.PI,
-					random() * 2 * Math.PI
-				);
-				scene.add(die);
+				let intersects;
+				let attempts = 0;
+				let boundingBox;
+
+				do {
+					intersects = false;
+					die.position.set(
+						(random() - 0.5) * 100,
+						(random() - 0.5) * 50,
+						(random() - 0.5) * 50
+					);
+					die.rotation.set(
+						random() * 2 * Math.PI,
+						random() * 2 * Math.PI,
+						random() * 2 * Math.PI
+					);
+					die.updateMatrixWorld();
+					boundingBox = new THREE.Box3().setFromObject(die);
+
+					for (const existingDie of placedDice) {
+						if (boundingBox.intersectsBox(existingDie.userData.boundingBox)) {
+							intersects = true;
+							break;
+						}
+					}
+					attempts++;
+				} while (intersects && attempts < 100);
+
+				if (!intersects) {
+					die.userData.boundingBox = boundingBox;
+					scene.add(die);
+					placedDice.push(die);
+				}
 			}
 
 			camera.position.z = 30;
