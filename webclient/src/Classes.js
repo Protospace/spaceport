@@ -684,7 +684,7 @@ export function Class(props) {
 	useEffect(() => {
 		if (!isSaturnalia) return;
 
-		const currentEffect = effectIndex % 3;
+		const currentEffect = effectIndex % 4;
 
 		const mount = mountRef.current;
 		const container = containerRef.current;
@@ -981,6 +981,82 @@ export function Class(props) {
 				cameraZ -= 0.05;
 				if (cameraZ < -70) cameraZ = 70;
 				camera.position.z = cameraZ;
+				renderer.render(scene, camera);
+			};
+			animate();
+		} else if (currentEffect === 3) { // Falling gifts
+			camera.position.z = 50;
+			camera.lookAt(0, 0, 0);
+			pointLight.position.set(0, 20, 50);
+
+			const mulberry32 = (a) => () => {
+				var t = a += 0x6D2B79F5;
+				t = Math.imul(t ^ t >>> 15, t | 1);
+				t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+				return ((t ^ t >>> 14) >>> 0) / 4294967296;
+			}
+
+			const random = mulberry32(8492068349104728);
+
+			const giftGeometry = new THREE.BoxGeometry(5, 5, 5);
+			disposables.push(giftGeometry);
+			
+			const giftMaterials = [
+				new THREE.MeshStandardMaterial({ color: 0xff0000 }), // Red
+				new THREE.MeshStandardMaterial({ color: 0x00ff00 }), // Green
+				new THREE.MeshStandardMaterial({ color: 0x0000ff }), // Blue
+			];
+			giftMaterials.forEach(m => disposables.push(m));
+
+			const gifts = [];
+			const vFOV = THREE.MathUtils.degToRad(camera.fov);
+			const height = 2 * Math.tan(vFOV / 2) * camera.position.z;
+			const width = height * camera.aspect;
+
+			for (let i = 0; i < 50; i++) {
+				const material = giftMaterials[Math.floor(random() * giftMaterials.length)];
+				const gift = new THREE.Mesh(giftGeometry, material);
+
+				gift.position.set(
+					(random() - 0.5) * width,
+					(random() * 1.5 - 0.5) * height,
+					(random() - 0.5) * 30
+				);
+				gift.rotation.set(
+					random() * 2 * Math.PI,
+					random() * 2 * Math.PI,
+					random() * 2 * Math.PI
+				);
+
+				gift.userData.velocity = random() * 0.1 + 0.05;
+				gift.userData.rotationSpeed = new THREE.Vector3(
+					(random() - 0.5) * 0.02,
+					(random() - 0.5) * 0.02,
+					(random() - 0.5) * 0.02
+				);
+
+				scene.add(gift);
+				gifts.push(gift);
+			}
+
+			const animate = () => {
+				animationFrameId = requestAnimationFrame(animate);
+				
+				const bottomBoundary = -height / 2 - 5;
+				const topBoundary = height / 2 + 5;
+
+				for (const gift of gifts) {
+					gift.position.y -= gift.userData.velocity;
+					gift.rotation.x += gift.userData.rotationSpeed.x;
+					gift.rotation.y += gift.userData.rotationSpeed.y;
+					gift.rotation.z += gift.userData.rotationSpeed.z;
+
+					if (gift.position.y < bottomBoundary) {
+						gift.position.y = topBoundary;
+						gift.position.x = (random() - 0.5) * width;
+					}
+				}
+
 				renderer.render(scene, camera);
 			};
 			animate();
