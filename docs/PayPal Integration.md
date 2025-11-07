@@ -2,6 +2,10 @@
 
 The PayPal integration is an essential part of Spaceport because the overwhelming majority of membership dues are sent through PayPal.
 
+Spaceport is unable to request or prevent a payment from PayPal or manage subscriptions. It only gets notified that a payment to our PayPal account has taken place.
+
+If a member asks to go on vacation, they need to cancel their own subscription. If a member asks to change their dues amount, they’ll need to cancel the existing subscription and then set up a new one. The “monthly dues” field on each members’ profile only changes what the subscription buttons do, and helps calculate the number of months to credit.
+
 ## Theory
 
 PayPal uses [Instant Payment Notifications](https://developer.paypal.com/api/nvp-soap/ipn/IPNIntro/) (IPNs) to inform Spaceport of payments, subscriptions, cancellations, refunds, etc. IPNs are essentially webhooks.
