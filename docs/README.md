@@ -21,6 +21,7 @@
 
 - [Integrations Server](Integrations%20Server.md)
 - [Supervisor](Supervisor.md)
+- [PayPal Integration](PayPal%20Integration.md)
 - [LDAP Integration](integration_ldap.md)
 - [Todo Integration](integration_todo.md)
 - [Printer Billing Integration](Printer%20Billing%20Integration.md)
