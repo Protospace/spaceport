@@ -8,7 +8,7 @@ If a member asks to go on vacation, they need to cancel their own subscription. 
 
 ## Theory
 
-PayPal uses [Instant Payment Notifications](https://developer.paypal.com/api/nvp-soap/ipn/IPNIntro/) (IPNs) to inform Spaceport of payments, subscriptions, cancellations, refunds, etc. IPNs are essentially webhooks.
+PayPal uses [Instant Payment Notifications](https://developer.paypal.com/api/nvp-soap/ipn/IPNIntro/) (IPNs) to inform businesses of payments, subscriptions, cancellations, refunds, etc. IPNs are essentially webhooks.
 
 PayPal POSTs URL-encoded form data to an obfuscated Spaceport URL defined in [urls.py](https://github.com/Protospace/spaceport/blob/master/apiserver/apiserver/urls.py). The URL is in the format `https://api.my.protospace.ca/ipn/[secrets.IPN_RANDOM]/`. Form data is received by the `IpnView(...)` class in [views.py](https://github.com/Protospace/spaceport/blob/master/apiserver/apiserver/api/views.py).
 
