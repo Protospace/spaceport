@@ -119,7 +119,13 @@ function NewClassTableCourse(props) {
 		const camera = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000);
 		camera.position.z = 5;
 
-		const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+		let renderer;
+		try {
+			renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+		} catch (error) {
+			console.log('Problem creating WebGLRenderer:', error);
+			return;
+		}
 		renderer.setSize(mount.clientWidth, mount.clientHeight);
 		mount.appendChild(renderer.domElement);
 
@@ -696,7 +702,13 @@ export function Class(props) {
 		const scene = new THREE.Scene();
 		const camera = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000);
 
-		const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+		let renderer;
+		try {
+			renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+		} catch (error) {
+			console.log('Problem creating WebGLRenderer:', error);
+			return;
+		}
 		renderer.setSize(mount.clientWidth, mount.clientHeight);
 		mount.appendChild(renderer.domElement);
 
