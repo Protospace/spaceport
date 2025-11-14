@@ -31,6 +31,9 @@ function InstructorCourseEditor(props) {
 			['link'],
 			['clean']
 		],
+		clipboard: {
+			matchVisual: false,
+		},
 	};
 
 	return (
