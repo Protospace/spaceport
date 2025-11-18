@@ -40,15 +40,15 @@ export function LCARS1Display(props) {
 				</div>
 
 				<div className='display-scores'>
+					<DisplayScores />
+				</div>
+
+				<div className='display-scores'>
 					<DisplayHosting />
 				</div>
 
 				<div className='display-scores'>
 					<DisplayMonthlyHosting />
-				</div>
-
-				<div className='display-usage'>
-					<DisplayUsage token={token} name={'trotec'} />
 				</div>
 			</div>
 		</Container>
@@ -80,8 +80,12 @@ export function LCARS2Display(props) {
 					</p>
 				}
 
+				<div className='display-tasks'>
+					<DisplayShoppingList />
+				</div>
+
 				<div className='display-scores'>
-					<DisplayScores />
+					<DisplayMonthlyHosting />
 				</div>
 
 				<div className='display-scores'>
