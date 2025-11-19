@@ -488,6 +488,7 @@ def register_user(data, user):
     gen_search_strings()
 
     cache.set('sign', 'Welcome to Protospace, {}!'.format(data['preferred_name']))
+    cache.set('vestaboard', 'Welcome to Protospace, {}!'.format(data['preferred_name']))
 
 
 BLANK_FORM = 'misc/blank_member_form.pdf'
