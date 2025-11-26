@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect, useReducer, useRef } from 'react';
 import { Link, useParams, useHistory } from 'react-router-dom';
 import moment from 'moment-timezone';
 import QRCode from 'react-qr-code';
@@ -203,6 +203,140 @@ function MemberInfo(props) {
 		</div>
 	);
 };
+
+function DrawingCanvas(props) {
+	const { token } = props;
+	const canvasRef = useRef(null);
+	const contextRef = useRef(null);
+	const [isDrawing, setIsDrawing] = useState(false);
+	const [color, setColor] = useState('#000000');
+	const lastColor = useRef('#000000');
+	const [lineWidth, setLineWidth] = useState(5);
+	const [error, setError] = useState(false);
+	const [success, setSuccess] = useState(false);
+	const eraserColor = '#FFFFFF';
+
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		const context = canvas.getContext('2d');
+		context.lineCap = 'round';
+		context.lineJoin = 'round';
+		contextRef.current = context;
+
+		const setCanvasSize = () => {
+			const parent = canvas.parentElement;
+			if (parent) {
+				const newWidth = parent.offsetWidth;
+				if (newWidth > 0) {
+					const newHeight = Math.min(newWidth * 0.75, window.innerHeight * 0.5);
+					if (canvas.width !== newWidth || canvas.height !== newHeight) {
+						canvas.width = newWidth;
+						canvas.height = newHeight;
+						const ctx = canvas.getContext('2d');
+						ctx.fillStyle = 'white';
+						ctx.fillRect(0, 0, canvas.width, canvas.height);
+					}
+				}
+			}
+		};
+
+		setTimeout(setCanvasSize, 100);
+		window.addEventListener('resize', setCanvasSize);
+		
+		return () => window.removeEventListener('resize', setCanvasSize);
+	}, []);
+
+	const startDrawing = ({ nativeEvent }) => {
+		const { offsetX, offsetY } = nativeEvent;
+		contextRef.current.strokeStyle = color;
+		contextRef.current.lineWidth = lineWidth;
+		contextRef.current.beginPath();
+		contextRef.current.moveTo(offsetX, offsetY);
+		setIsDrawing(true);
+	};
+
+	const finishDrawing = () => {
+		if (!isDrawing) return;
+		contextRef.current.closePath();
+		setIsDrawing(false);
+	};
+
+	const draw = ({ nativeEvent }) => {
+		if (!isDrawing) {
+			return;
+		}
+		const { offsetX, offsetY } = nativeEvent;
+		contextRef.current.lineTo(offsetX, offsetY);
+		contextRef.current.stroke();
+	};
+
+	const clearCanvas = () => {
+		const canvas = canvasRef.current;
+		const context = canvas.getContext('2d');
+		context.fillStyle = 'white';
+		context.fillRect(0, 0, canvas.width, canvas.height);
+	};
+
+	const handleSubmit = () => {
+		setSuccess(false);
+		setError(false);
+		const canvas = canvasRef.current;
+		const image = canvas.toDataURL('image/png');
+		requester('/stats/drawing/', 'POST', token, { image: image })
+			.then(res => {
+				setSuccess(true);
+				setTimeout(() => setSuccess(false), 3000);
+			})
+			.catch(err => {
+				setError('Failed to submit drawing.');
+				console.error(err);
+			});
+	};
+	
+	const handleColorChange = (e) => {
+		const newColor = e.target.value;
+		setColor(newColor);
+		if (newColor !== eraserColor) {
+			lastColor.current = newColor;
+		}
+	}
+
+	return (
+		<div style={{marginTop: '1.5rem'}}>
+			<Divider />
+			<Header size='medium'>Public Drawing Canvas</Header>
+			<canvas
+				ref={canvasRef}
+				onMouseDown={startDrawing}
+				onMouseUp={finishDrawing}
+				onMouseMove={draw}
+				onMouseLeave={finishDrawing}
+				style={{ border: '1px solid #ccc', background: 'white', touchAction: 'none', cursor: 'crosshair' }}
+			/>
+			<div style={{marginTop: '0.5rem', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem'}}>
+				<input type='color' value={color} onChange={handleColorChange} />
+				
+				<Button icon='paint brush' size='tiny' active={color !== eraserColor} onClick={() => setColor(lastColor.current)} />
+				<Button icon='eraser' size='tiny' active={color === eraserColor} onClick={() => setColor(eraserColor)} />
+
+				<input
+					type='range'
+					min='1'
+					max='50'
+					value={lineWidth}
+					onChange={(e) => setLineWidth(e.target.value)}
+					style={{flexGrow: '1', minWidth: '100px'}}
+				/>
+				<span style={{width: '2.5rem'}}>{lineWidth}px</span>
+				
+				<Button size='tiny' onClick={clearCanvas} style={{marginLeft: 'auto'}}>Clear</Button>
+			</div>
+			<Button primary onClick={handleSubmit} style={{marginTop: '1rem', width: '100%'}}>Submit Drawing</Button>
+			{error && <Message error header={error} />}
+			{success && <Message success header='Drawing submitted!' />}
+		</div>
+	);
+}
 
 export function Home(props) {
 	const { user, token } = props;
@@ -500,6 +634,8 @@ export function Home(props) {
 							<SignForm token={token} />
 
 							<VestaboardForm token={token} />
+
+							<DrawingCanvas token={token} />
 
 							{false && <>
 								<p>Protogarden:</p>
