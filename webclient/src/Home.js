@@ -246,8 +246,19 @@ function DrawingCanvas(props) {
 		return () => window.removeEventListener('resize', setCanvasSize);
 	}, []);
 
-	const startDrawing = ({ nativeEvent }) => {
-		const { offsetX, offsetY } = nativeEvent;
+	const getEventCoords = (e) => {
+		if (e.touches && e.touches[0]) {
+			const canvas = canvasRef.current;
+			const rect = canvas.getBoundingClientRect();
+			const touch = e.touches[0];
+			return { offsetX: touch.clientX - rect.left, offsetY: touch.clientY - rect.top };
+		}
+		return { offsetX: e.nativeEvent.offsetX, offsetY: e.nativeEvent.offsetY };
+	};
+
+	const startDrawing = (e) => {
+		if (e.cancelable) e.preventDefault();
+		const { offsetX, offsetY } = getEventCoords(e);
 		contextRef.current.strokeStyle = color;
 		contextRef.current.lineWidth = lineWidth;
 		contextRef.current.beginPath();
@@ -255,17 +266,19 @@ function DrawingCanvas(props) {
 		setIsDrawing(true);
 	};
 
-	const finishDrawing = () => {
+	const finishDrawing = (e) => {
+		if (e && e.cancelable) e.preventDefault();
 		if (!isDrawing) return;
 		contextRef.current.closePath();
 		setIsDrawing(false);
 	};
 
-	const draw = ({ nativeEvent }) => {
+	const draw = (e) => {
 		if (!isDrawing) {
 			return;
 		}
-		const { offsetX, offsetY } = nativeEvent;
+		if (e.cancelable) e.preventDefault();
+		const { offsetX, offsetY } = getEventCoords(e);
 		contextRef.current.lineTo(offsetX, offsetY);
 		contextRef.current.stroke();
 	};
@@ -311,6 +324,10 @@ function DrawingCanvas(props) {
 				onMouseUp={finishDrawing}
 				onMouseMove={draw}
 				onMouseLeave={finishDrawing}
+				onTouchStart={startDrawing}
+				onTouchEnd={finishDrawing}
+				onTouchMove={draw}
+				onTouchCancel={finishDrawing}
 				style={{ border: '1px solid #ccc', background: 'white', touchAction: 'none', cursor: 'crosshair' }}
 			/>
 			<div style={{marginTop: '0.5rem', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem'}}>
