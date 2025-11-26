@@ -20,6 +20,7 @@ from oidc_provider.views import AuthorizeView
 from fuzzywuzzy import fuzz, process
 from collections import OrderedDict
 from dateutil import relativedelta
+from PIL import Image, ImageDraw, ImageFont, ImageOps, JpegImagePlugin
 import icalendar
 import datetime, time
 import io
@@ -993,6 +994,36 @@ class StatsViewSet(viewsets.ViewSet, List):
             return Response(200)
         except KeyError:
             raise exceptions.ValidationError(dict(vestaboard='This field is required.'))
+
+    @action(detail=False, methods=['post'])
+    def drawing(self, request):
+        if 'image' not in request.data:
+            raise exceptions.ValidationError(dict(image='This field is required.'))
+
+        image = request.data['image']
+
+        try:
+            pic = Image.open(image)
+        except OSError:
+            raise serializers.ValidationError(dict(non_field_errors='Invalid image file.'))
+
+        logging.debug('Detected format: %s', pic.format)
+
+        if pic.format == 'PNG':
+            ext = '.png'
+        elif pic.format == 'JPEG':
+            ext = '.jpg'
+        else:
+            raise serializers.ValidationError(dict(non_field_errors='Image must be a jpg or png.'))
+
+        pic = ImageOps.exif_transpose(pic)
+        draw = ImageDraw.Draw(pic)
+
+        filename = 'drawing' + ext
+        pic.save(STATIC_FOLDER + filename)
+
+        return Response(200)
+
 
     @action(detail=False, methods=['post'])
     def alarm(self, request):
