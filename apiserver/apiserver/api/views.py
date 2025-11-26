@@ -27,6 +27,8 @@ import io
 import csv
 import xmltodict
 import json
+import base64
+import binascii
 
 from . import models, serializers, utils, utils_paypal, utils_stats, utils_ldap, utils_email, utils_mediawiki, utils_todo
 from .permissions import (
@@ -1000,11 +1002,15 @@ class StatsViewSet(viewsets.ViewSet, List):
         if 'image' not in request.data:
             raise exceptions.ValidationError(dict(image='This field is required.'))
 
-        image = request.data['image']
+        image_data_url = request.data['image']
 
         try:
-            pic = Image.open(image)
-        except OSError:
+            # remove data url prefix and decode
+            _header, encoded = image_data_url.split(';base64,', 1)
+            decoded_image = base64.b64decode(encoded)
+            image_stream = io.BytesIO(decoded_image)
+            pic = Image.open(image_stream)
+        except (ValueError, binascii.Error, OSError):
             raise serializers.ValidationError(dict(non_field_errors='Invalid image file.'))
 
         logging.debug('Detected format: %s', pic.format)
