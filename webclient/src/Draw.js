@@ -89,9 +89,24 @@ export function DrawingCanvas(props) {
 		context.fillRect(0, 0, canvas.width, canvas.height);
 	};
 
+	const isCanvasBlank = () => {
+		const canvas = canvasRef.current;
+		const context = canvas.getContext('2d');
+		const pixelBuffer = new Uint32Array(
+			context.getImageData(0, 0, canvas.width, canvas.height).data.buffer
+		);
+		return !pixelBuffer.some(color => color !== 0xFFFFFFFF);
+	};
+
 	const handleSubmit = () => {
 		setSuccess(false);
 		setError(false);
+
+		if (isCanvasBlank()) {
+			setError('Cannot submit an empty drawing.');
+			return;
+		}
+
 		const canvas = canvasRef.current;
 		const image = canvas.toDataURL('image/png');
 		requester('/stats/drawing/', 'POST', token, { image: image })
