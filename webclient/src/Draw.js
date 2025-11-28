@@ -298,7 +298,7 @@ export function DrawingCanvas(props) {
 						fontSize: '1rem',
 						fontWeight: 'bold',
 					}}>
-						<p>Confirm reset?</p>
+						<p style={{padding: '0.5rem', backgroundColor: 'white'}}>Confirm reset?</p>
 						<div>
 							<Button color='red' onClick={() => { resetCanvasAndSettings(); setShowResetConfirm(false); }}>Reset</Button>
 							<Button onClick={() => setShowResetConfirm(false)} style={{marginLeft: '2rem'}}>Cancel</Button>
