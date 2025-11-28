@@ -71,6 +71,7 @@ export function DrawingCanvas(props) {
 	const [lineWidth, setLineWidth] = useState(5);
 	const [error, setError] = useState(false);
 	const [success, setSuccess] = useState(false);
+	const [showResetConfirm, setShowResetConfirm] = useState(false);
 	const eraserColor = '#FFFFFF';
 
 	useEffect(() => {
@@ -281,6 +282,29 @@ export function DrawingCanvas(props) {
 						Unauthorized
 					</div>
 				)}
+				{showResetConfirm && (
+					<div style={{
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						width: '100%',
+						height: '100%',
+						backgroundColor: 'rgba(200, 200, 200, 0.7)',
+						display: 'flex',
+						flexDirection: 'column',
+						justifyContent: 'center',
+						alignItems: 'center',
+						color: 'black',
+						fontSize: '1rem',
+						fontWeight: 'bold',
+					}}>
+						<p>Confirm reset?</p>
+						<div>
+							<Button color='red' onClick={() => { resetCanvasAndSettings(); setShowResetConfirm(false); }}>Reset</Button>
+							<Button onClick={() => setShowResetConfirm(false)}>Cancel</Button>
+						</div>
+					</div>
+				)}
 			</div>
 			<div style={{marginTop: '0.5rem', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem'}}>
 				<input type='color' value={color} onChange={handleColorChange} disabled={!user} style={{width: '37px', height: '35px', padding: 0, marginRight: '0.2em'}} />
@@ -314,7 +338,7 @@ export function DrawingCanvas(props) {
 					/>
 				</div>
 				
-				<Button size='tiny' onClick={resetCanvasAndSettings} style={{marginLeft: 'auto'}} disabled={!user}>Reset</Button>
+				<Button size='tiny' onClick={() => setShowResetConfirm(true)} style={{marginLeft: 'auto'}} disabled={!user}>Reset</Button>
 			</div>
 			<div style={{marginTop: '1rem', display: 'flex', alignItems: 'center'}}>
 				<Button primary onClick={handleSubmit} disabled={!user}>Submit Drawing</Button>
