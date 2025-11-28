@@ -72,6 +72,7 @@ export function DrawingCanvas(props) {
 	const [error, setError] = useState(false);
 	const [success, setSuccess] = useState(false);
 	const [showResetConfirm, setShowResetConfirm] = useState(false);
+	const [history, setHistory] = useState([]);
 	const eraserColor = '#FFFFFF';
 
 	useEffect(() => {
@@ -93,6 +94,7 @@ export function DrawingCanvas(props) {
 						const ctx = canvas.getContext('2d');
 						ctx.fillStyle = 'white';
 						ctx.fillRect(0, 0, canvas.width, canvas.height);
+						setHistory([ctx.getImageData(0, 0, canvas.width, canvas.height)]);
 					}
 				}
 			}
@@ -149,6 +151,9 @@ export function DrawingCanvas(props) {
 		if (!isDrawing) return;
 		contextRef.current.closePath();
 		setIsDrawing(false);
+
+		const context = canvasRef.current.getContext('2d');
+		setHistory([...history, context.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height)]);
 	};
 
 	const draw = (e) => {
@@ -166,6 +171,7 @@ export function DrawingCanvas(props) {
 		const context = canvas.getContext('2d');
 		context.fillStyle = 'white';
 		context.fillRect(0, 0, canvas.width, canvas.height);
+		setHistory([context.getImageData(0, 0, canvas.width, canvas.height)]);
 	};
 
 	const resetCanvasAndSettings = () => {
@@ -173,6 +179,16 @@ export function DrawingCanvas(props) {
 		setColor('#000000');
 		setLineWidth(5);
 		lastColor.current = '#000000';
+	};
+
+	const handleUndo = () => {
+		if (history.length <= 1) return;
+
+		const newHistory = history.slice(0, -1);
+		const lastState = newHistory[newHistory.length - 1];
+		const context = canvasRef.current.getContext('2d');
+		context.putImageData(lastState, 0, 0);
+		setHistory(newHistory);
 	};
 
 	const isDrawingInsufficient = () => {
@@ -338,7 +354,10 @@ export function DrawingCanvas(props) {
 					/>
 				</div>
 				
-				<Button size='tiny' onClick={() => setShowResetConfirm(true)} style={{marginLeft: 'auto'}} disabled={!user}>Reset</Button>
+				<div style={{marginLeft: 'auto', display: 'flex', gap: '0.5rem'}}>
+					<Button icon='undo' size='tiny' onClick={handleUndo} disabled={!user || history.length <= 1} />
+					<Button size='tiny' onClick={() => setShowResetConfirm(true)} disabled={!user}>Reset</Button>
+				</div>
 			</div>
 			<div style={{marginTop: '1rem', display: 'flex', alignItems: 'center'}}>
 				<Button primary onClick={handleSubmit} disabled={!user}>Submit Drawing</Button>
