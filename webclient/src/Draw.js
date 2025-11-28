@@ -104,16 +104,12 @@ export function DrawingCanvas(props) {
 			setCanvasSize();
 			const savedDrawing = localStorage.getItem('savedDrawing');
 			if (savedDrawing) {
-				if (window.confirm('Restore your previous drawing?')) {
-					const img = new Image();
-					img.src = savedDrawing;
-					img.onload = () => {
-						context.drawImage(img, 0, 0, canvas.width, canvas.height);
-						setHistory([context.getImageData(0, 0, canvas.width, canvas.height)]);
-					};
-				} else {
-					localStorage.removeItem('savedDrawing');
-				}
+				const img = new Image();
+				img.src = savedDrawing;
+				img.onload = () => {
+					context.drawImage(img, 0, 0, canvas.width, canvas.height);
+					setHistory([context.getImageData(0, 0, canvas.width, canvas.height)]);
+				};
 			}
 		};
 
