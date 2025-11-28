@@ -369,19 +369,17 @@ export function DrawingCanvas(props) {
 	);
 }
 
-let galleryCache = false;
 
 export function Gallery(props) {
 	const { token, user } = props;
-	const [drawings, setDrawings] = useState(galleryCache);
+	const [drawings, setDrawings] = useState(false);
 	const [error, setError] = useState(false);
 
 	useEffect(() => {
-		requester('/drawings/', 'GET', token)
+		requester('/drawing/', 'GET', token)
 		.then(res => {
 			const drawingsWithAngles = res.results.map(d => ({...d, angle: Math.random() * 8 - 4}));
 			setDrawings(drawingsWithAngles);
-			galleryCache = drawingsWithAngles;
 			setError(false);
 		})
 		.catch(err => {
@@ -393,7 +391,6 @@ export function Gallery(props) {
 	const handleHide = (drawingId) => {
 		const newDrawings = drawings.filter(d => d.id !== drawingId);
 		setDrawings(newDrawings);
-		galleryCache = newDrawings;
 	};
 
 	const HideButton = ({ drawing }) => {
