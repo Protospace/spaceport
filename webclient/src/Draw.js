@@ -254,12 +254,12 @@ export function DrawingCanvas(props) {
 				)}
 			</div>
 			<div style={{marginTop: '0.5rem', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem'}}>
-				<input type='color' value={color} onChange={handleColorChange} disabled={!user} />
+				<input type='color' value={color} onChange={handleColorChange} disabled={!user} style={{width: '28px', height: '28px', padding: 0}} />
 				
 				<Button icon='paint brush' size='tiny' active={!isEraser} onClick={() => setColor(lastColor.current)} disabled={!user} />
 				<Button icon='eraser' size='tiny' active={isEraser} onClick={() => setColor(eraserColor)} disabled={!user} />
 
-				<div style={{display: 'flex', flexDirection: 'column'}}>
+				<div style={{display: 'flex', flexDirection: 'column', flexGrow: '1'}}>
 					<svg width="100%" height="12" viewBox="0 0 100 12" preserveAspectRatio="none" style={{marginBottom: '2px'}}>
 						<path d="M0,5.5 Q50,0 100,0 L100,12 Q50,12 0,6.5 Z" fill="#bbb" />
 					</svg>
