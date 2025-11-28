@@ -57,6 +57,8 @@ export function DrawingCanvas(props) {
 
 	const startDrawing = (e) => {
 		if (e.cancelable) e.preventDefault();
+		setError(false);
+		setSuccess(false);
 		const { offsetX, offsetY } = getEventCoords(e);
 		contextRef.current.strokeStyle = color;
 		contextRef.current.lineWidth = lineWidth;
@@ -118,6 +120,7 @@ export function DrawingCanvas(props) {
 		requester('/drawing/', 'POST', token, { image: image })
 			.then(res => {
 				setSuccess(true);
+				clearCanvas();
 				setTimeout(() => setSuccess(false), 3000);
 			})
 			.catch(err => {
