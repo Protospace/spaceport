@@ -509,8 +509,8 @@ a {
 	padding: 1rem;
 	padding-bottom: 0.5rem;
 	box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-	min-width: 250px;
-	max-width: 250px;
+	min-width: 300px;
+	max-width: 300px;
 	position: relative;
 }
 

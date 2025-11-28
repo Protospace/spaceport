@@ -185,3 +185,10 @@
 	background-color: #5d0000 !important;
 }
 
+.dark .drawing-canvas {
+	filter: brightness(70%);
+}
+
+.dark .polaroid {
+	background-color: #000 !important;
+}

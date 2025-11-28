@@ -502,7 +502,7 @@ export function Home(props) {
 
 							<VestaboardForm token={token} />
 
-							<DrawingCanvas token={token} />
+							<DrawingCanvas user={user} token={token} />
 
 							{false && <>
 								<p>Protogarden:</p>

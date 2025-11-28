@@ -1330,7 +1330,7 @@ class StatsViewSet(viewsets.ViewSet, List):
 
 
 class DrawingViewSet(Base, List, Create, Update):
-    permission_classes = [AllowMetadata | IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = models.Drawing.objects.all().order_by('-id')
     serializer_class = serializers.DrawingSerializer
 
@@ -1380,7 +1380,7 @@ class DrawingViewSet(Base, List, Create, Update):
 
         pic = ImageOps.exif_transpose(pic)
 
-        filename = str(drawing.id) + ext
+        filename = 'drawing' + str(drawing.id).zfill(6) + ext
         pic.save(STATIC_FOLDER + filename)
 
         drawing.filename = filename

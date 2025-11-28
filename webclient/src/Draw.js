@@ -217,8 +217,8 @@ export function DrawingCanvas(props) {
 
 		const originalCanvas = canvasRef.current;
 		const outputCanvas = document.createElement('canvas');
-		outputCanvas.width = 576;
-		outputCanvas.height = 432;
+		outputCanvas.width = 384;
+		outputCanvas.height = 288;
 		const context = outputCanvas.getContext('2d');
 
 		context.fillStyle = 'white';
@@ -419,7 +419,7 @@ export function Gallery(props) {
 							}}>
 								<img src={`${staticUrl}/${drawing.filename}`} className='polaroid-img' alt={`Drawing by ${drawing.member_name}`} />
 								<div className='polaroid-caption'>
-									<span style={{color: 'black'}}>{drawing.member_name}</span>
+									<Link to={'/members/'+drawing.member_id}>{drawing.member_name}</Link>
 									<DeleteButton drawing={drawing} />
 								</div>
 								{confirmDeleteId === drawing.id && (

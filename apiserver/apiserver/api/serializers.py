@@ -1154,23 +1154,24 @@ class SpaceActivitySerializer(serializers.ModelSerializer):
 
 
 class DrawingSerializer(serializers.ModelSerializer):
-    owner_name = serializers.SerializerMethodField()
-    owner_id = serializers.SerializerMethodField()
+    member_id = serializers.SerializerMethodField()
+    member_name = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Drawing
-        fields = ['id', 'owner_id', 'owner_name', 'filename', 'is_hidden']
-        read_only_fields = ['id', 'owner_id', 'owner_name', 'filename']
+        fields = ['id', 'member_id', 'member_name', 'filename', 'is_hidden']
+        read_only_fields = ['id', 'member_id', 'member_name', 'filename']
 
-    def get_owner_name(self, obj):
-        if obj.owner and hasattr(obj.owner, 'member'):
-            return obj.owner.member.preferred_name
-        return 'Anonymous'
-
-    def get_owner_id(self, obj):
+    def get_member_id(self, obj):
         if obj.owner:
-            return obj.owner.id
+            return obj.owner.member.id
         return None
+
+    def get_member_name(self, obj):
+        if obj.owner and hasattr(obj.owner, 'member'):
+            member = obj.owner.member
+            return member.preferred_name + ' ' + member.last_name[0] + '.'
+        return 'Anonymous'
 
 
 class HistoryChangeSerializer(serializers.ModelSerializer):
