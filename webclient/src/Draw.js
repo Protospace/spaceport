@@ -246,7 +246,7 @@ export function DrawingCanvas(props) {
 						justifyContent: 'center',
 						alignItems: 'center',
 						color: 'black',
-						fontSize: '1.5rem',
+						fontSize: '1rem',
 						fontWeight: 'bold',
 					}}>
 						Unauthorized
