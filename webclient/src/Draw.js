@@ -430,7 +430,7 @@ export function Gallery(props) {
 					<div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '2rem', paddingTop: '1rem' }}>
 						{drawings.filter(d => showDeleted || !d.is_hidden).map(drawing => (
 							<div key={drawing.id} style={{
-								background: 'white',
+								background: drawing.is_hidden ? '#f0f0f0' : 'white',
 								padding: '1rem',
 								paddingBottom: '0.5rem',
 								boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
@@ -438,7 +438,6 @@ export function Gallery(props) {
 								minWidth: '250px',
 								maxWidth: '250px',
 								position: 'relative',
-								...(drawing.is_hidden && { filter: 'grayscale(100%)' }),
 							}}>
 								<img src={`${staticUrl}/${drawing.filename}`} style={{ width: '100%', display: 'block', border: '1px solid #eee' }} alt={`Drawing by ${drawing.owner_name}`} />
 								<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
