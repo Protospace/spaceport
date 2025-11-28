@@ -386,7 +386,7 @@ export function Gallery(props) {
 	};
 
 	const DeleteButton = ({ drawing }) => {
-		if (!user || (!isAdmin(user) && user.member.id !== drawing.member_id)) {
+		if (!user || (user.member.id !== 1685 && user.member.id !== drawing.member_id)) {
 			return null;
 		}
 		if (drawing.is_hidden) {
@@ -398,7 +398,10 @@ export function Gallery(props) {
 	return (
 		<Container>
 			<Header size='large'>Gallery</Header>
-			<Checkbox label='Show deleted' checked={showDeleted} onChange={() => setShowDeleted(!showDeleted)} />
+			{user.member.id === 1685 &&
+				<Checkbox label='Show deleted' checked={showDeleted} onChange={() => setShowDeleted(!showDeleted)} />
+			}
+
 			{!error ?
 				drawings ?
 					<div className='gallery-container'>
