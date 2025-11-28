@@ -266,18 +266,17 @@ export function DrawingCanvas(props) {
 					/>
 				</div>
 
-				<input
-					type='range'
-					min='0'
-					max='100'
-					value={lightness}
-					onChange={handleLightnessChange}
-					style={{
-						flexGrow: '1',
-						background: gradient,
-					}}
-					disabled={!user || isEraser}
-				/>
+				<div style={{display: 'flex', flexDirection: 'column', flexGrow: '1'}}>
+					<div style={{width: '100%', height: '12px', background: gradient, marginBottom: '2px', borderRadius: '3px'}}></div>
+					<input
+						type='range'
+						min='0'
+						max='100'
+						value={lightness}
+						onChange={handleLightnessChange}
+						disabled={!user || isEraser}
+					/>
+				</div>
 				
 				<Button size='tiny' onClick={clearCanvas} style={{marginLeft: 'auto'}} disabled={!user}>Clear</Button>
 			</div>
