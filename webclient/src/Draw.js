@@ -4,7 +4,7 @@ import { Button, Divider, Header } from 'semantic-ui-react';
 import { requester } from './utils.js';
 
 export function DrawingCanvas(props) {
-	const { token } = props;
+	const { user, token } = props;
 	const canvasRef = useRef(null);
 	const contextRef = useRef(null);
 	const [isDrawing, setIsDrawing] = useState(false);
