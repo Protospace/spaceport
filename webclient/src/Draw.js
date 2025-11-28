@@ -101,7 +101,7 @@ export function DrawingCanvas(props) {
 		if (totalPixels === 0) return true;
 
 		const percentage = (nonWhitePixels / totalPixels) * 100;
-		return percentage < 5;
+		return percentage < 3;
 	};
 
 	const handleSubmit = () => {
@@ -109,13 +109,13 @@ export function DrawingCanvas(props) {
 		setError(false);
 
 		if (isDrawingInsufficient()) {
-			setError('Drawing must be at least 5% non-white to submit.');
+			setError('Draw more.');
 			return;
 		}
 
 		const canvas = canvasRef.current;
 		const image = canvas.toDataURL('image/png');
-		requester('/stats/drawing/', 'POST', token, { image: image })
+		requester('/drawing/', 'POST', token, { image: image })
 			.then(res => {
 				setSuccess(true);
 				setTimeout(() => setSuccess(false), 3000);
