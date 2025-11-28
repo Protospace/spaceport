@@ -150,6 +150,13 @@ export function DrawingCanvas(props) {
 		context.fillRect(0, 0, canvas.width, canvas.height);
 	};
 
+	const resetCanvasAndSettings = () => {
+		clearCanvas();
+		setColor('#000000');
+		setLineWidth(5);
+		lastColor.current = '#000000';
+	};
+
 	const isDrawingInsufficient = () => {
 		const canvas = canvasRef.current;
 		const context = canvas.getContext('2d');
@@ -278,7 +285,7 @@ export function DrawingCanvas(props) {
 					/>
 				</div>
 				
-				<Button size='tiny' onClick={clearCanvas} style={{marginLeft: 'auto'}} disabled={!user}>Clear</Button>
+				<Button size='tiny' onClick={resetCanvasAndSettings} style={{marginLeft: 'auto'}} disabled={!user}>Reset</Button>
 			</div>
 			<div style={{marginTop: '1rem', display: 'flex', alignItems: 'center'}}>
 				<Button primary onClick={handleSubmit} disabled={!user}>Submit Drawing</Button>
