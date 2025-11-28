@@ -100,7 +100,24 @@ export function DrawingCanvas(props) {
 			}
 		};
 
-		setTimeout(setCanvasSize, 100);
+		const initialSetup = () => {
+			setCanvasSize();
+			const savedDrawing = localStorage.getItem('savedDrawing');
+			if (savedDrawing) {
+				if (window.confirm('Restore your previous drawing?')) {
+					const img = new Image();
+					img.src = savedDrawing;
+					img.onload = () => {
+						context.drawImage(img, 0, 0, canvas.width, canvas.height);
+						setHistory([context.getImageData(0, 0, canvas.width, canvas.height)]);
+					};
+				} else {
+					localStorage.removeItem('savedDrawing');
+				}
+			}
+		};
+
+		setTimeout(initialSetup, 100);
 		window.addEventListener('resize', setCanvasSize);
 		
 		return () => window.removeEventListener('resize', setCanvasSize);
@@ -152,8 +169,10 @@ export function DrawingCanvas(props) {
 		contextRef.current.closePath();
 		setIsDrawing(false);
 
-		const context = canvasRef.current.getContext('2d');
-		setHistory([...history, context.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height)]);
+		const canvas = canvasRef.current;
+		const context = canvas.getContext('2d');
+		setHistory([...history, context.getImageData(0, 0, canvas.width, canvas.height)]);
+		localStorage.setItem('savedDrawing', canvas.toDataURL());
 	};
 
 	const draw = (e) => {
@@ -179,6 +198,7 @@ export function DrawingCanvas(props) {
 		setColor('#000000');
 		setLineWidth(5);
 		lastColor.current = '#000000';
+		localStorage.removeItem('savedDrawing');
 	};
 
 	const handleUndo = () => {
@@ -241,6 +261,7 @@ export function DrawingCanvas(props) {
 			.then(res => {
 				setSuccess(true);
 				clearCanvas();
+				localStorage.removeItem('savedDrawing');
 				setTimeout(() => setSuccess(false), 5000);
 			})
 			.catch(err => {
