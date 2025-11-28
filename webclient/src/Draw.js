@@ -103,6 +103,23 @@ export function DrawingCanvas(props) {
 		return () => window.removeEventListener('resize', setCanvasSize);
 	}, []);
 
+	useEffect(() => {
+		const handleGlobalUp = () => {
+			contextRef.current.closePath();
+			setIsDrawing(false);
+		};
+
+		if (isDrawing) {
+			window.addEventListener('mouseup', handleGlobalUp);
+			window.addEventListener('touchend', handleGlobalUp);
+		}
+
+		return () => {
+			window.removeEventListener('mouseup', handleGlobalUp);
+			window.removeEventListener('touchend', handleGlobalUp);
+		};
+	}, [isDrawing]);
+
 	const getEventCoords = (e) => {
 		if (e.touches && e.touches[0]) {
 			const canvas = canvasRef.current;
@@ -240,7 +257,6 @@ export function DrawingCanvas(props) {
 					onMouseDown={startDrawing}
 					onMouseUp={finishDrawing}
 					onMouseMove={draw}
-					onMouseLeave={finishDrawing}
 					onTouchStart={startDrawing}
 					onTouchEnd={finishDrawing}
 					onTouchMove={draw}
