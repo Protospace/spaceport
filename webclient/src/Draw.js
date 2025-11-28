@@ -401,9 +401,22 @@ export function Gallery(props) {
 			});
 	};
 
+	const handleUndelete = (drawingId) => {
+		requester(`/drawing/${drawingId}/`, 'PUT', token, { is_hidden: false })
+			.then(res => {
+				setDrawings(drawings.map(d => d.id === drawingId ? { ...d, is_hidden: false } : d));
+			})
+			.catch(err => {
+				console.log(err);
+			});
+	};
+
 	const DeleteButton = ({ drawing }) => {
 		if (!user || (!isAdmin(user) && user.id !== drawing.owner_id)) {
 			return null;
+		}
+		if (drawing.is_hidden) {
+			return <Button size='tiny' onClick={() => handleUndelete(drawing.id)}>Undelete</Button>;
 		}
 		return <Button size='tiny' onClick={() => setConfirmDeleteId(drawing.id)}>Delete</Button>;
 	};
@@ -425,6 +438,7 @@ export function Gallery(props) {
 								minWidth: '250px',
 								maxWidth: '250px',
 								position: 'relative',
+								...(drawing.is_hidden && { filter: 'grayscale(100%)' }),
 							}}>
 								<img src={`${staticUrl}/${drawing.filename}`} style={{ width: '100%', display: 'block', border: '1px solid #eee' }} alt={`Drawing by ${drawing.owner_name}`} />
 								<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
