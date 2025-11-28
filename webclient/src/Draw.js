@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Divider, Header, Message } from 'semantic-ui-react';
+import { Button, Divider, Header } from 'semantic-ui-react';
 import { requester } from './utils.js';
 
 export function DrawingCanvas(props) {
@@ -178,7 +178,7 @@ export function DrawingCanvas(props) {
 				<Button primary onClick={handleSubmit}>Submit Drawing</Button>
 				<Link to='/gallery' style={{marginLeft: '1rem'}}>[gallery]</Link>
 			</div>
-			{error && <Message error header={error} />}
+			{error && <p>Error: {error}</p>}
 			{success && <p>Success!</p>}
 		</div>
 	);
