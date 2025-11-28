@@ -997,40 +997,6 @@ class StatsViewSet(viewsets.ViewSet, List):
         except KeyError:
             raise exceptions.ValidationError(dict(vestaboard='This field is required.'))
 
-    @action(detail=False, methods=['post'])
-    def drawing(self, request):
-        if 'image' not in request.data:
-            raise exceptions.ValidationError(dict(image='This field is required.'))
-
-        image_data_url = request.data['image']
-        STATIC_FOLDER = 'data/static/'
-
-        try:
-            # remove data url prefix and decode
-            _header, encoded = image_data_url.split(';base64,', 1)
-            decoded_image = base64.b64decode(encoded)
-            image_stream = io.BytesIO(decoded_image)
-            pic = Image.open(image_stream)
-        except (ValueError, binascii.Error, OSError):
-            raise serializers.ValidationError(dict(non_field_errors='Invalid image file.'))
-
-        logging.debug('Detected format: %s', pic.format)
-
-        if pic.format == 'PNG':
-            ext = '.png'
-        elif pic.format == 'JPEG':
-            ext = '.jpg'
-        else:
-            raise serializers.ValidationError(dict(non_field_errors='Image must be a jpg or png.'))
-
-        pic = ImageOps.exif_transpose(pic)
-        draw = ImageDraw.Draw(pic)
-
-        filename = 'drawing' + ext
-        pic.save(STATIC_FOLDER + filename)
-
-        return Response(200)
-
 
     @action(detail=False, methods=['post'])
     def alarm(self, request):
@@ -1362,6 +1328,59 @@ class StatsViewSet(viewsets.ViewSet, List):
 
         return Response(200)
 
+
+class DrawingViewSet(Base, List, Create, Update):
+    permission_classes = [AllowMetadata | IsAuthenticatedOrReadOnly]
+    queryset = models.Drawing.objects.all().order_by('-id')
+    serializer_class = serializers.DrawingSerializer
+
+    def perform_create(self, serializer):
+        if 'image' not in self.request.data:
+            raise exceptions.ValidationError(dict(image='This field is required.'))
+
+        image_data_url = self.request.data['image']
+        STATIC_FOLDER = 'data/static/'
+
+        try:
+            # remove data url prefix and decode
+            _header, encoded = image_data_url.split(';base64,', 1)
+            decoded_image = base64.b64decode(encoded)
+            image_stream = io.BytesIO(decoded_image)
+            pic = Image.open(image_stream)
+        except (ValueError, binascii.Error, OSError):
+            raise serializers.ValidationError(dict(non_field_errors='Invalid image file.'))
+
+        logging.debug('Detected format: %s', pic.format)
+
+        if pic.format == 'PNG':
+            ext = '.png'
+        elif pic.format == 'JPEG':
+            ext = '.jpg'
+        else:
+            raise serializers.ValidationError(dict(non_field_errors='Image must be a jpg or png.'))
+
+        owner = self.request.user if self.request.user.is_authenticated else None
+        drawing = serializer.save(owner=owner)
+
+        pic = ImageOps.exif_transpose(pic)
+
+        filename = str(drawing.id) + ext
+        pic.save(STATIC_FOLDER + filename)
+
+        drawing.filename = filename
+        drawing.save()
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = request.user
+
+        if not user.is_authenticated:
+            raise exceptions.NotAuthenticated()
+
+        if not (is_admin_director(user) or instance.owner == user):
+            raise exceptions.PermissionDenied()
+
+        return super().update(request, *args, **kwargs)
 
 
 class MemberCountViewSet(Base, List):
