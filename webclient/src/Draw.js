@@ -130,17 +130,13 @@ export function DrawingCanvas(props) {
 			});
 	};
 	
-	const handleGreyChange = (e) => {
-		const value = parseInt(e.target.value, 10);
-		const hex = value.toString(16).padStart(2, '0');
-		const newColor = `#${hex}${hex}${hex}`;
+	const handleColorChange = (e) => {
+		const newColor = e.target.value;
 		setColor(newColor);
 		if (newColor !== eraserColor) {
 			lastColor.current = newColor;
 		}
 	};
-
-	const greyValue = color.startsWith('#') && color.length === 7 ? parseInt(color.substring(1, 3), 16) : 0;
 
 	return (
 		<div style={{marginTop: '1.5rem', maxWidth: '24rem'}}>
@@ -179,16 +175,7 @@ export function DrawingCanvas(props) {
 				)}
 			</div>
 			<div style={{marginTop: '0.5rem', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem'}}>
-				<input
-					type='range'
-					min='0'
-					max='255'
-					value={greyValue}
-					onChange={handleGreyChange}
-					style={{flexGrow: '1', minWidth: '100px'}}
-					disabled={!user}
-				/>
-				<div style={{width: '2rem', height: '2rem', backgroundColor: color, border: '1px solid #ccc'}} />
+				<input type='color' value={color} onChange={handleColorChange} disabled={!user} />
 				
 				<Button icon='paint brush' size='tiny' active={color !== eraserColor} onClick={() => setColor(lastColor.current)} disabled={!user} />
 				<Button icon='eraser' size='tiny' active={color === eraserColor} onClick={() => setColor(eraserColor)} disabled={!user} />
