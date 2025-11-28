@@ -8,6 +8,7 @@ import { statusColor, BasicTable, siteUrl, staticUrl, requester, isAdmin } from 
 import { LoginForm, SignupForm } from './LoginSignup.js';
 import { AccountForm } from './Account.js';
 import { VestaboardForm, SignForm } from './Sign.js';
+import { DrawingCanvas } from './Draw.js';
 import { StorageButton } from './Storage.js';
 import { PayPalSubscribeDeal } from './PayPal.js';
 
