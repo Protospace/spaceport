@@ -187,7 +187,7 @@ export function DrawingCanvas(props) {
 		if (totalPixels === 0) return true;
 
 		const percentage = (nonWhitePixels / totalPixels) * 100;
-		return percentage < 3;
+		return percentage < 5;
 	};
 
 	const handleSubmit = () => {
@@ -301,7 +301,7 @@ export function DrawingCanvas(props) {
 						<p>Confirm reset?</p>
 						<div>
 							<Button color='red' onClick={() => { resetCanvasAndSettings(); setShowResetConfirm(false); }}>Reset</Button>
-							<Button onClick={() => setShowResetConfirm(false)}>Cancel</Button>
+							<Button onClick={() => setShowResetConfirm(false)} style={{marginLeft: '2rem'}}>Cancel</Button>
 						</div>
 					</div>
 				)}
