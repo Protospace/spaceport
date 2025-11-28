@@ -378,7 +378,7 @@ export function Gallery(props) {
 	const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
 	useEffect(() => {
-		requester('/drawings/', 'GET', token)
+		requester('/drawing/', 'GET', token)
 		.then(res => {
 			const drawingsWithAngles = res.results.map(d => ({...d, angle: Math.random() * 8 - 4}));
 			setDrawings(drawingsWithAngles);
