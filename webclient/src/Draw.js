@@ -117,9 +117,9 @@ export function DrawingCanvas(props) {
 	const greyValue = color.startsWith('#') && color.length === 7 ? parseInt(color.substring(1, 3), 16) : 0;
 
 	return (
-		<div style={{marginTop: '1.5rem'}}>
+		<div style={{marginTop: '1.5rem', maxWidth: '24rem'}}>
 			<Divider />
-			<Header size='medium'>Public Drawing Canvas</Header>
+			<p>Send a drawing to the Bash Register:</p>
 			<canvas
 				ref={canvasRef}
 				onMouseDown={startDrawing}
