@@ -306,6 +306,19 @@ class StorageSpace(models.Model):
         return self.shelf_id
 
 
+class Drawing(models.Model):
+    owner = models.ForeignKey(User, related_name='drawings', blank=True, null=True, on_delete=models.SET_NULL)
+    filename = models.CharField(max_length=64, blank=True, null=True)
+    is_hidden = models.BooleanField(default=False)
+
+    history = HistoricalRecords()
+
+    list_display = ['id', 'owner', 'filename', 'is_hidden']
+    search_fields = ['id', 'owner__username', 'filename']
+    def __str__(self):
+        return self.filename or str(self.id)
+
+
 class HistoryIndex(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField()
