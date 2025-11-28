@@ -252,14 +252,19 @@ export function DrawingCanvas(props) {
 				<Button icon='paint brush' size='tiny' active={!isEraser} onClick={() => setColor(lastColor.current)} disabled={!user} />
 				<Button icon='eraser' size='tiny' active={isEraser} onClick={() => setColor(eraserColor)} disabled={!user} />
 
-				<input
-					type='range'
-					min='1'
-					max='50'
-					value={lineWidth}
-					onChange={(e) => setLineWidth(e.target.value)}
-					disabled={!user}
-				/>
+				<div style={{display: 'flex', flexDirection: 'column'}}>
+					<svg width="100%" height="12" viewBox="0 0 100 12" preserveAspectRatio="none" style={{marginBottom: '2px'}}>
+						<path d="M0,5.5 Q50,0 100,0 L100,12 Q50,12 0,6.5 Z" fill="#bbb" />
+					</svg>
+					<input
+						type='range'
+						min='1'
+						max='50'
+						value={lineWidth}
+						onChange={(e) => setLineWidth(e.target.value)}
+						disabled={!user}
+					/>
+				</div>
 
 				<input
 					type='range'
