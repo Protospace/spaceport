@@ -254,7 +254,7 @@ export function DrawingCanvas(props) {
 				)}
 			</div>
 			<div style={{marginTop: '0.5rem', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem'}}>
-				<input type='color' value={color} onChange={handleColorChange} disabled={!user} style={{width: '28px', height: '28px', padding: 0}} />
+				<input type='color' value={color} onChange={handleColorChange} disabled={!user} style={{width: '37px', height: '35px', padding: 0, marginRight: '0.2em'}} />
 				
 				<Button icon='paint brush' size='tiny' active={!isEraser} onClick={() => setColor(lastColor.current)} disabled={!user} />
 				<Button icon='eraser' size='tiny' active={isEraser} onClick={() => setColor(eraserColor)} disabled={!user} />
