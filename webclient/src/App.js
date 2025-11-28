@@ -28,6 +28,7 @@ import { Subscribe } from './PayPal.js';
 import { PasswordReset, ConfirmReset } from './PasswordReset.js';
 import { NotFound, PleaseLogin } from './Misc.js';
 import { Debug } from './Debug.js';
+import { Gallery } from './Draw.js';
 import { Storage, StorageDetail, ClaimShelf } from './Storage.js';
 import { Garden } from './Garden.js';
 import { Footer } from './Footer.js';
@@ -292,6 +293,10 @@ function App() {
 
 							<Route path='/charts'>
 								<Charts />
+							</Route>
+
+							<Route path='/gallery'>
+								<Gallery token={token} user={user} />
 							</Route>
 
 							<Route path='/auth'>

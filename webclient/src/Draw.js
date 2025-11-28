@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Divider, Header } from 'semantic-ui-react';
-import { requester } from './utils.js';
+import { Button, Divider, Header, Container } from 'semantic-ui-react';
+import { requester, staticUrl, isAdmin } from './utils.js';
 
 function hexToHsl(hex) {
 	let r = 0, g = 0, b = 0;
@@ -366,5 +366,72 @@ export function DrawingCanvas(props) {
 			{error && <p>Error: {error}</p>}
 			{success && <p>Success!</p>}
 		</div>
+	);
+}
+
+let galleryCache = false;
+
+export function Gallery(props) {
+	const { token, user } = props;
+	const [drawings, setDrawings] = useState(galleryCache);
+	const [error, setError] = useState(false);
+
+	useEffect(() => {
+		requester('/drawings/', 'GET', token)
+		.then(res => {
+			const drawingsWithAngles = res.results.map(d => ({...d, angle: Math.random() * 8 - 4}));
+			setDrawings(drawingsWithAngles);
+			galleryCache = drawingsWithAngles;
+			setError(false);
+		})
+		.catch(err => {
+			console.log(err);
+			setError(true);
+		});
+	}, [token]);
+
+	const handleHide = (drawingId) => {
+		const newDrawings = drawings.filter(d => d.id !== drawingId);
+		setDrawings(newDrawings);
+		galleryCache = newDrawings;
+	};
+
+	const HideButton = ({ drawing }) => {
+		if (!user || (!isAdmin(user) && user.id !== drawing.owner_id)) {
+			return null;
+		}
+		return <Button size='tiny' onClick={() => handleHide(drawing.id)}>Hide</Button>;
+	};
+
+	return (
+		<Container>
+			<Header size='large'>Gallery</Header>
+			{!error ?
+				drawings ?
+					<div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '2rem', paddingTop: '1rem' }}>
+						{drawings.filter(d => !d.is_hidden).map(drawing => (
+							<div key={drawing.id} style={{
+								background: 'white',
+								padding: '1rem',
+								paddingBottom: '0.5rem',
+								boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+								transform: `rotate(${drawing.angle}deg)`,
+								minWidth: '250px',
+								maxWidth: '250px',
+							}}>
+								<img src={`${staticUrl}/${drawing.filename}`} style={{ width: '100%', display: 'block', border: '1px solid #eee' }} alt={`Drawing by ${drawing.owner_name}`} />
+								<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
+									<span style={{color: 'black'}}>{drawing.owner_name}</span>
+									<HideButton drawing={drawing} />
+								</div>
+							</div>
+						))}
+					</div>
+				:
+					<p>Loading...</p>
+			:
+				<p>Error loading.</p>
+			}
+		</Container>
 	);
 }
