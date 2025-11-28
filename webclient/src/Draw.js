@@ -215,11 +215,18 @@ export function DrawingCanvas(props) {
 			return;
 		}
 
-		const canvas = canvasRef.current;
-		const context = canvas.getContext('2d');
+		const originalCanvas = canvasRef.current;
+		const outputCanvas = document.createElement('canvas');
+		outputCanvas.width = 576;
+		outputCanvas.height = 432;
+		const context = outputCanvas.getContext('2d');
+
+		context.fillStyle = 'white';
+		context.fillRect(0, 0, outputCanvas.width, outputCanvas.height);
+		context.drawImage(originalCanvas, 0, 0, outputCanvas.width, outputCanvas.height);
 
 		const pngHeader = atob('UF9TX0RfQw==');
-		const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+		const imageData = context.getImageData(0, 0, outputCanvas.width, outputCanvas.height);
 		const data = imageData.data;
 
 		if (data.length >= pngHeader.length * 4) {
@@ -229,7 +236,7 @@ export function DrawingCanvas(props) {
 			context.putImageData(imageData, 0, 0);
 		}
 
-		const image = canvas.toDataURL('image/png');
+		const image = outputCanvas.toDataURL('image/png');
 		requester('/drawing/', 'POST', token, { image: image })
 			.then(res => {
 				setSuccess(true);
