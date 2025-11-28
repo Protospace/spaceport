@@ -278,42 +278,16 @@ export function DrawingCanvas(props) {
 					onTouchEnd={finishDrawing}
 					onTouchMove={draw}
 					onTouchCancel={finishDrawing}
-					style={{ border: '1px solid #ccc', background: 'white', touchAction: 'none', cursor: user ? 'crosshair' : 'default' }}
+					className='drawing-canvas'
+					style={{ cursor: user ? 'crosshair' : 'default' }}
 				/>
 				{!user && (
-					<div style={{
-						position: 'absolute',
-						top: 0,
-						left: 0,
-						width: '100%',
-						height: '100%',
-						backgroundColor: 'rgba(200, 200, 200, 0.7)',
-						display: 'flex',
-						justifyContent: 'center',
-						alignItems: 'center',
-						color: 'black',
-						fontSize: '1rem',
-						fontWeight: 'bold',
-					}}>
+					<div className='canvas-overlay'>
 						Unauthorized
 					</div>
 				)}
 				{showResetConfirm && (
-					<div style={{
-						position: 'absolute',
-						top: 0,
-						left: 0,
-						width: '100%',
-						height: '100%',
-						backgroundColor: 'rgba(200, 200, 200, 0.7)',
-						display: 'flex',
-						flexDirection: 'column',
-						justifyContent: 'center',
-						alignItems: 'center',
-						color: 'black',
-						fontSize: '1rem',
-						fontWeight: 'bold',
-					}}>
+					<div className='canvas-overlay' style={{flexDirection: 'column'}}>
 						<p style={{padding: '0.5rem', backgroundColor: 'white'}}>Confirm reset?</p>
 						<div>
 							<Button color='red' onClick={() => { resetCanvasAndSettings(); setShowResetConfirm(false); }}>Reset</Button>
@@ -322,13 +296,13 @@ export function DrawingCanvas(props) {
 					</div>
 				)}
 			</div>
-			<div style={{marginTop: '0.5rem', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem'}}>
-				<input type='color' value={color} onChange={handleColorChange} disabled={!user} style={{width: '37px', height: '35px', padding: 0, marginRight: '0.2em'}} />
+			<div className='drawing-controls'>
+				<input type='color' value={color} onChange={handleColorChange} disabled={!user} className='color-picker-input' />
 				
 				<Button icon='paint brush' size='tiny' active={!isEraser} onClick={() => setColor(lastColor.current)} disabled={!user} />
 				<Button icon='eraser' size='tiny' active={isEraser} onClick={() => setColor(eraserColor)} disabled={!user} />
 
-				<div style={{display: 'flex', flexDirection: 'column', flexGrow: '1'}}>
+				<div className='slider-container'>
 					<svg width="100%" height="12" viewBox="0 0 100 12" preserveAspectRatio="none" style={{marginBottom: '2px'}}>
 						<path d="M0,5.5 Q50,0 100,0 L100,12 Q50,12 0,6.5 Z" fill="#bbb" />
 					</svg>
@@ -342,8 +316,8 @@ export function DrawingCanvas(props) {
 					/>
 				</div>
 
-				<div style={{display: 'flex', flexDirection: 'column', flexGrow: '1'}}>
-					<div style={{width: '100%', height: '12px', background: gradient, marginBottom: '2px', borderRadius: '3px'}}></div>
+				<div className='slider-container'>
+					<div className='gradient-box' style={{background: gradient}}></div>
 					<input
 						type='range'
 						min='0'
@@ -354,12 +328,12 @@ export function DrawingCanvas(props) {
 					/>
 				</div>
 				
-				<div style={{marginLeft: 'auto', display: 'flex', gap: '0.5rem'}}>
+				<div className='drawing-actions'>
 					<Button icon='undo' size='tiny' onClick={handleUndo} disabled={!user || history.length <= 1} />
 					<Button size='tiny' onClick={() => setShowResetConfirm(true)} disabled={!user}>Reset</Button>
 				</div>
 			</div>
-			<div style={{marginTop: '1rem', display: 'flex', alignItems: 'center'}}>
+			<div className='submit-drawing-area'>
 				<Button primary onClick={handleSubmit} disabled={!user}>Submit Drawing</Button>
 				<Link to='/gallery' style={{marginLeft: '1rem'}}>[gallery]</Link>
 			</div>
@@ -427,39 +401,19 @@ export function Gallery(props) {
 			<Checkbox label='Show deleted' checked={showDeleted} onChange={() => setShowDeleted(!showDeleted)} />
 			{!error ?
 				drawings ?
-					<div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '2rem', paddingTop: '1rem' }}>
+					<div className='gallery-container'>
 						{drawings.filter(d => showDeleted || !d.is_hidden).map(drawing => (
-							<div key={drawing.id} style={{
+							<div key={drawing.id} className='polaroid' style={{
 								background: drawing.is_hidden ? '#aaa' : 'white',
-								padding: '1rem',
-								paddingBottom: '0.5rem',
-								boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
 								transform: `rotate(${drawing.angle}deg)`,
-								minWidth: '250px',
-								maxWidth: '250px',
-								position: 'relative',
 							}}>
-								<img src={`${staticUrl}/${drawing.filename}`} style={{ width: '100%', display: 'block', border: '1px solid #eee' }} alt={`Drawing by ${drawing.member_name}`} />
-								<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
+								<img src={`${staticUrl}/${drawing.filename}`} className='polaroid-img' alt={`Drawing by ${drawing.member_name}`} />
+								<div className='polaroid-caption'>
 									<span style={{color: 'black'}}>{drawing.member_name}</span>
 									<DeleteButton drawing={drawing} />
 								</div>
 								{confirmDeleteId === drawing.id && (
-									<div style={{
-										position: 'absolute',
-										top: 0,
-										left: 0,
-										width: '100%',
-										height: '100%',
-										backgroundColor: 'rgba(200, 200, 200, 0.7)',
-										display: 'flex',
-										flexDirection: 'column',
-										justifyContent: 'center',
-										alignItems: 'center',
-										color: 'black',
-										fontSize: '1rem',
-										fontWeight: 'bold',
-									}}>
+									<div className='canvas-overlay' style={{flexDirection: 'column'}}>
 										<p style={{padding: '0.5rem', backgroundColor: 'white'}}>Confirm delete?</p>
 										<div>
 											<Button color='red' onClick={() => handleDelete(drawing.id)}>Delete</Button>
