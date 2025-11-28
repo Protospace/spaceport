@@ -89,21 +89,27 @@ export function DrawingCanvas(props) {
 		context.fillRect(0, 0, canvas.width, canvas.height);
 	};
 
-	const isCanvasBlank = () => {
+	const isDrawingInsufficient = () => {
 		const canvas = canvasRef.current;
 		const context = canvas.getContext('2d');
 		const pixelBuffer = new Uint32Array(
 			context.getImageData(0, 0, canvas.width, canvas.height).data.buffer
 		);
-		return !pixelBuffer.some(color => color !== 0xFFFFFFFF);
+		const nonWhitePixels = pixelBuffer.reduce((count, color) => color !== 0xFFFFFFFF ? count + 1 : count, 0);
+		const totalPixels = canvas.width * canvas.height;
+
+		if (totalPixels === 0) return true;
+
+		const percentage = (nonWhitePixels / totalPixels) * 100;
+		return percentage < 5;
 	};
 
 	const handleSubmit = () => {
 		setSuccess(false);
 		setError(false);
 
-		if (isCanvasBlank()) {
-			setError('Cannot submit an empty drawing.');
+		if (isDrawingInsufficient()) {
+			setError('Drawing must be at least 5% non-white to submit.');
 			return;
 		}
 
