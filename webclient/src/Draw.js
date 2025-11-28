@@ -412,7 +412,7 @@ export function Gallery(props) {
 	};
 
 	const DeleteButton = ({ drawing }) => {
-		if (!user || (!isAdmin(user) && user.id !== drawing.owner_id)) {
+		if (!user || (!isAdmin(user) && user.member.id !== drawing.member_id)) {
 			return null;
 		}
 		if (drawing.is_hidden) {
@@ -430,7 +430,7 @@ export function Gallery(props) {
 					<div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '2rem', paddingTop: '1rem' }}>
 						{drawings.filter(d => showDeleted || !d.is_hidden).map(drawing => (
 							<div key={drawing.id} style={{
-								background: drawing.is_hidden ? '#f0f0f0' : 'white',
+								background: drawing.is_hidden ? '#aaa' : 'white',
 								padding: '1rem',
 								paddingBottom: '0.5rem',
 								boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
@@ -439,9 +439,9 @@ export function Gallery(props) {
 								maxWidth: '250px',
 								position: 'relative',
 							}}>
-								<img src={`${staticUrl}/${drawing.filename}`} style={{ width: '100%', display: 'block', border: '1px solid #eee' }} alt={`Drawing by ${drawing.owner_name}`} />
+								<img src={`${staticUrl}/${drawing.filename}`} style={{ width: '100%', display: 'block', border: '1px solid #eee' }} alt={`Drawing by ${drawing.member_name}`} />
 								<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
-									<span style={{color: 'black'}}>{drawing.owner_name}</span>
+									<span style={{color: 'black'}}>{drawing.member_name}</span>
 									<DeleteButton drawing={drawing} />
 								</div>
 								{confirmDeleteId === drawing.id && (
