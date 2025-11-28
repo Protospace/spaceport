@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Divider, Header, Container } from 'semantic-ui-react';
+import { Button, Divider, Header, Container, Checkbox } from 'semantic-ui-react';
 import { requester, staticUrl, isAdmin } from './utils.js';
 
 function hexToHsl(hex) {
@@ -374,9 +374,11 @@ export function Gallery(props) {
 	const { token, user } = props;
 	const [drawings, setDrawings] = useState(false);
 	const [error, setError] = useState(false);
+	const [showDeleted, setShowDeleted] = useState(false);
+	const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
 	useEffect(() => {
-		requester('/drawing/', 'GET', token)
+		requester('/drawings/', 'GET', token)
 		.then(res => {
 			const drawingsWithAngles = res.results.map(d => ({...d, angle: Math.random() * 8 - 4}));
 			setDrawings(drawingsWithAngles);
@@ -388,25 +390,32 @@ export function Gallery(props) {
 		});
 	}, [token]);
 
-	const handleHide = (drawingId) => {
-		const newDrawings = drawings.filter(d => d.id !== drawingId);
-		setDrawings(newDrawings);
+	const handleDelete = (drawingId) => {
+		requester(`/drawing/${drawingId}/`, 'PUT', token, { is_hidden: true })
+			.then(res => {
+				setDrawings(drawings.map(d => d.id === drawingId ? { ...d, is_hidden: true } : d));
+				setConfirmDeleteId(null);
+			})
+			.catch(err => {
+				console.log(err);
+			});
 	};
 
-	const HideButton = ({ drawing }) => {
+	const DeleteButton = ({ drawing }) => {
 		if (!user || (!isAdmin(user) && user.id !== drawing.owner_id)) {
 			return null;
 		}
-		return <Button size='tiny' onClick={() => handleHide(drawing.id)}>Hide</Button>;
+		return <Button size='tiny' onClick={() => setConfirmDeleteId(drawing.id)}>Delete</Button>;
 	};
 
 	return (
 		<Container>
 			<Header size='large'>Gallery</Header>
+			<Checkbox label='Show deleted' checked={showDeleted} onChange={() => setShowDeleted(!showDeleted)} />
 			{!error ?
 				drawings ?
 					<div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '2rem', paddingTop: '1rem' }}>
-						{drawings.filter(d => !d.is_hidden).map(drawing => (
+						{drawings.filter(d => showDeleted || !d.is_hidden).map(drawing => (
 							<div key={drawing.id} style={{
 								background: 'white',
 								padding: '1rem',
@@ -415,12 +424,36 @@ export function Gallery(props) {
 								transform: `rotate(${drawing.angle}deg)`,
 								minWidth: '250px',
 								maxWidth: '250px',
+								position: 'relative',
 							}}>
 								<img src={`${staticUrl}/${drawing.filename}`} style={{ width: '100%', display: 'block', border: '1px solid #eee' }} alt={`Drawing by ${drawing.owner_name}`} />
 								<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
 									<span style={{color: 'black'}}>{drawing.owner_name}</span>
-									<HideButton drawing={drawing} />
+									<DeleteButton drawing={drawing} />
 								</div>
+								{confirmDeleteId === drawing.id && (
+									<div style={{
+										position: 'absolute',
+										top: 0,
+										left: 0,
+										width: '100%',
+										height: '100%',
+										backgroundColor: 'rgba(200, 200, 200, 0.7)',
+										display: 'flex',
+										flexDirection: 'column',
+										justifyContent: 'center',
+										alignItems: 'center',
+										color: 'black',
+										fontSize: '1rem',
+										fontWeight: 'bold',
+									}}>
+										<p style={{padding: '0.5rem', backgroundColor: 'white'}}>Confirm delete?</p>
+										<div>
+											<Button color='red' onClick={() => handleDelete(drawing.id)}>Delete</Button>
+											<Button onClick={() => setConfirmDeleteId(null)} style={{marginLeft: '2rem'}}>Cancel</Button>
+										</div>
+									</div>
+								)}
 							</div>
 						))}
 					</div>
