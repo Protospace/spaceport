@@ -56,6 +56,7 @@ export function DrawingCanvas(props) {
 	};
 
 	const startDrawing = (e) => {
+		if (!user) return;
 		if (e.cancelable) e.preventDefault();
 		setError(false);
 		setSuccess(false);
@@ -145,18 +146,38 @@ export function DrawingCanvas(props) {
 		<div style={{marginTop: '1.5rem', maxWidth: '24rem'}}>
 			<Divider />
 			<p>Send a drawing to the Bash Register:</p>
-			<canvas
-				ref={canvasRef}
-				onMouseDown={startDrawing}
-				onMouseUp={finishDrawing}
-				onMouseMove={draw}
-				onMouseLeave={finishDrawing}
-				onTouchStart={startDrawing}
-				onTouchEnd={finishDrawing}
-				onTouchMove={draw}
-				onTouchCancel={finishDrawing}
-				style={{ border: '1px solid #ccc', background: 'white', touchAction: 'none', cursor: 'crosshair' }}
-			/>
+			<div style={{ position: 'relative' }}>
+				<canvas
+					ref={canvasRef}
+					onMouseDown={startDrawing}
+					onMouseUp={finishDrawing}
+					onMouseMove={draw}
+					onMouseLeave={finishDrawing}
+					onTouchStart={startDrawing}
+					onTouchEnd={finishDrawing}
+					onTouchMove={draw}
+					onTouchCancel={finishDrawing}
+					style={{ border: '1px solid #ccc', background: 'white', touchAction: 'none', cursor: user ? 'crosshair' : 'default' }}
+				/>
+				{!user && (
+					<div style={{
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						width: '100%',
+						height: '100%',
+						backgroundColor: 'rgba(200, 200, 200, 0.7)',
+						display: 'flex',
+						justifyContent: 'center',
+						alignItems: 'center',
+						color: 'black',
+						fontSize: '1.5rem',
+						fontWeight: 'bold',
+					}}>
+						Unauthorized
+					</div>
+				)}
+			</div>
 			<div style={{marginTop: '0.5rem', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem'}}>
 				<input
 					type='range'
@@ -165,11 +186,12 @@ export function DrawingCanvas(props) {
 					value={greyValue}
 					onChange={handleGreyChange}
 					style={{flexGrow: '1', minWidth: '100px'}}
+					disabled={!user}
 				/>
 				<div style={{width: '2rem', height: '2rem', backgroundColor: color, border: '1px solid #ccc'}} />
 				
-				<Button icon='paint brush' size='tiny' active={color !== eraserColor} onClick={() => setColor(lastColor.current)} />
-				<Button icon='eraser' size='tiny' active={color === eraserColor} onClick={() => setColor(eraserColor)} />
+				<Button icon='paint brush' size='tiny' active={color !== eraserColor} onClick={() => setColor(lastColor.current)} disabled={!user} />
+				<Button icon='eraser' size='tiny' active={color === eraserColor} onClick={() => setColor(eraserColor)} disabled={!user} />
 
 				<input
 					type='range'
@@ -178,13 +200,14 @@ export function DrawingCanvas(props) {
 					value={lineWidth}
 					onChange={(e) => setLineWidth(e.target.value)}
 					style={{flexGrow: '1', minWidth: '100px'}}
+					disabled={!user}
 				/>
 				<span style={{width: '2.5rem'}}>{lineWidth}px</span>
 				
-				<Button size='tiny' onClick={clearCanvas} style={{marginLeft: 'auto'}}>Clear</Button>
+				<Button size='tiny' onClick={clearCanvas} style={{marginLeft: 'auto'}} disabled={!user}>Clear</Button>
 			</div>
 			<div style={{marginTop: '1rem', display: 'flex', alignItems: 'center'}}>
-				<Button primary onClick={handleSubmit}>Submit Drawing</Button>
+				<Button primary onClick={handleSubmit} disabled={!user}>Submit Drawing</Button>
 				<Link to='/gallery' style={{marginLeft: '1rem'}}>[gallery]</Link>
 			</div>
 			{error && <p>Error: {error}</p>}
