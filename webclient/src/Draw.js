@@ -241,7 +241,7 @@ export function DrawingCanvas(props) {
 			.then(res => {
 				setSuccess(true);
 				clearCanvas();
-				setTimeout(() => setSuccess(false), 3000);
+				setTimeout(() => setSuccess(false), 5000);
 			})
 			.catch(err => {
 				setError('Failed to submit drawing.');
@@ -345,7 +345,7 @@ export function DrawingCanvas(props) {
 				<Link to='/gallery' style={{marginLeft: '1rem'}}>[gallery]</Link>
 			</div>
 			{error && <p>Error: {error}</p>}
-			{success && <p>Success!</p>}
+			{success && <p>Success! View it in the gallery ^</p>}
 		</div>
 	);
 }
@@ -405,7 +405,7 @@ export function Gallery(props) {
 	return (
 		<Container>
 			<Header size='large'>Gallery</Header>
-			{user.member.id === 1685 &&
+			{user?.member?.id === 1685 &&
 				<Checkbox label='Show deleted' checked={showDeleted} onChange={() => setShowDeleted(!showDeleted)} />
 			}
 
