@@ -1354,10 +1354,26 @@ class DrawingViewSet(Base, List, Create, Update):
 
         if pic.format == 'PNG':
             ext = '.png'
-        elif pic.format == 'JPEG':
-            ext = '.jpg'
         else:
-            raise serializers.ValidationError(dict(non_field_errors='Image must be a jpg or png.'))
+            raise serializers.ValidationError(dict(non_field_errors='Image must be a png.'))
+
+        png_header = base64.b64decode('UF9TX0RfQw==').decode('utf-8')
+
+        try:
+            pic = pic.convert('RGBA')
+            extracted_header = ''
+            for i in range(len(png_header)):
+                _r, _g, _b, a = pic.getpixel((i, 0))
+                extracted_header += chr(a)
+
+            if extracted_header != png_header:
+                raise ValueError()
+
+            for i in range(len(png_header)):
+                r, g, b, _a = pic.getpixel((i, 0))
+                pic.putpixel((i, 0), (r, g, b, 255))
+        except (IndexError, TypeError, ValueError):
+            raise serializers.ValidationError(dict(non_field_errors='Invalid png file.'))
 
         owner = self.request.user if self.request.user.is_authenticated else None
         drawing = serializer.save(owner=owner)
