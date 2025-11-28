@@ -1003,6 +1003,7 @@ class StatsViewSet(viewsets.ViewSet, List):
             raise exceptions.ValidationError(dict(image='This field is required.'))
 
         image_data_url = request.data['image']
+        STATIC_FOLDER = 'data/static/'
 
         try:
             # remove data url prefix and decode
