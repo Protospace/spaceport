@@ -2044,7 +2044,10 @@ class ProtocoinViewSet(Base):
                 job_id = request.data.get('job_id', '')
                 username = request.data.get('user', '')
                 printer = request.data.get('printer', 'unknown-printer')
-                copies = int(request.data.get('copies', '1'))
+                try:
+                    copies = int(request.data.get('copies', '1'))
+                except ValueError:
+                    copies = 1
 
                 logging.info('New %s printer job UUID: %s, username: %s', str(printer), str(job_id), str(username))
 
@@ -2087,7 +2090,7 @@ class ProtocoinViewSet(Base):
                 memo = 'Protocoin - Purchase spent ₱ {} {} printing {}'.format(
                     total_cost,
                     printer,
-                    request.data['title'][:100],
+                    request.data.get('title', '')[:100],
                 )
 
                 tx = models.Transaction.objects.create(
