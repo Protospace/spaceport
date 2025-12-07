@@ -2031,6 +2031,11 @@ class ProtocoinViewSet(Base):
         except OperationalError:
             self.printer_report(request, pk)
 
+    @action(detail=False, methods=['post'])
+    def cups_printer_report(self, request, pk=None):
+        logging.info('cups_printer_report data: %s', request.data)
+        return Response(200)
+
 
 class PinballViewSet(Base):
     @action(detail=False, methods=['post'])
