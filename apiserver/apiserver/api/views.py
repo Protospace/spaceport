@@ -1386,6 +1386,8 @@ class DrawingViewSet(Base, List, Create, Update):
         drawing.filename = filename
         drawing.save()
 
+        utils.mqtt_publish('spaceport/drawing/new', filename)
+
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         user = request.user
