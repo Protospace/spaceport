@@ -90,7 +90,7 @@ export function DrawingCanvas(props) {
 			if (parent) {
 				const newWidth = parent.offsetWidth;
 				if (newWidth > 0) {
-					const newHeight = Math.min(newWidth * DRAWING_HEIGHT / DRAWING_WIDTH, window.innerHeight * 0.5);
+					const newHeight = newWidth * DRAWING_HEIGHT / DRAWING_WIDTH;
 					if (canvas.width !== newWidth || canvas.height !== newHeight) {
 						canvas.width = newWidth;
 						canvas.height = newHeight;

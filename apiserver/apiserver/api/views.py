@@ -1382,6 +1382,7 @@ class DrawingViewSet(Base, List, Create, Update):
 
         filename = 'drawing' + str(drawing.id).zfill(6) + ext
         pic.save(STATIC_FOLDER + filename)
+        pic.save(STATIC_FOLDER + 'drawing.png')
 
         drawing.filename = filename
         drawing.save()
