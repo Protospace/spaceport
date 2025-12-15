@@ -87,7 +87,7 @@ export function DrawingCanvas(props) {
 			if (parent) {
 				const newWidth = parent.offsetWidth;
 				if (newWidth > 0) {
-					const newHeight = Math.min(newWidth * 0.75, window.innerHeight * 0.5);
+					const newHeight = Math.min(newWidth * 320.0 / 384.0, window.innerHeight * 0.5);
 					if (canvas.width !== newWidth || canvas.height !== newHeight) {
 						canvas.width = newWidth;
 						canvas.height = newHeight;
@@ -234,7 +234,7 @@ export function DrawingCanvas(props) {
 		const originalCanvas = canvasRef.current;
 		const outputCanvas = document.createElement('canvas');
 		outputCanvas.width = 384;
-		outputCanvas.height = 288;
+		outputCanvas.height = 320;
 		const context = outputCanvas.getContext('2d');
 
 		context.fillStyle = 'white';
@@ -289,7 +289,7 @@ export function DrawingCanvas(props) {
 	const gradient = `linear-gradient(to right, ${hslToHex(h, s, 0)}, ${hslToHex(h, s, 50)}, ${hslToHex(h, s, 100)})`;
 
 	return (
-		<div style={{marginTop: '1.5rem', maxWidth: '24rem'}}>
+		<div style={{marginTop: '1.5rem', maxWidth: '384px'}}>
 			<Divider />
 			<p>Send a drawing to the Bash Register:</p>
 			<div style={{ position: 'relative' }}>
