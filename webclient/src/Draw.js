@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import { Button, Divider, Header, Container, Checkbox } from 'semantic-ui-react';
 import { requester, staticUrl, isAdmin } from './utils.js';
 
+const DRAWING_WIDTH = 384;
+const DRAWING_HEIGHT = 320;
+
 function hexToHsl(hex) {
 	let r = 0, g = 0, b = 0;
 	if (hex.length === 4) {
@@ -87,7 +90,7 @@ export function DrawingCanvas(props) {
 			if (parent) {
 				const newWidth = parent.offsetWidth;
 				if (newWidth > 0) {
-					const newHeight = Math.min(newWidth * 320.0 / 384.0, window.innerHeight * 0.5);
+					const newHeight = Math.min(newWidth * DRAWING_HEIGHT / DRAWING_WIDTH, window.innerHeight * 0.5);
 					if (canvas.width !== newWidth || canvas.height !== newHeight) {
 						canvas.width = newWidth;
 						canvas.height = newHeight;
@@ -233,8 +236,8 @@ export function DrawingCanvas(props) {
 
 		const originalCanvas = canvasRef.current;
 		const outputCanvas = document.createElement('canvas');
-		outputCanvas.width = 384;
-		outputCanvas.height = 320;
+		outputCanvas.width = DRAWING_WIDTH;
+		outputCanvas.height = DRAWING_HEIGHT;
 		const context = outputCanvas.getContext('2d');
 
 		context.fillStyle = 'white';
@@ -289,7 +292,7 @@ export function DrawingCanvas(props) {
 	const gradient = `linear-gradient(to right, ${hslToHex(h, s, 0)}, ${hslToHex(h, s, 50)}, ${hslToHex(h, s, 100)})`;
 
 	return (
-		<div style={{marginTop: '1.5rem', maxWidth: '384px'}}>
+		<div style={{marginTop: '1.5rem', maxWidth: `${DRAWING_WIDTH}px`}}>
 			<Divider />
 			<p>Send a drawing to the Bash Register:</p>
 			<div style={{ position: 'relative' }}>
