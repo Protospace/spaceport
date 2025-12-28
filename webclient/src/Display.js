@@ -467,7 +467,8 @@ export function DisplayShoppingList(props) {
 			<Header size='medium'>Shopping list:</Header>
 
 			{tasks && tasks.slice(0, 10).map((x, i) => {
-				const text = x.labels?.includes('Ordered') ? <s style={{ textDecorationThickness: '0.15em' }}>{x.title}</s> : x.title;
+				const isOrdered = x.labels?.some(label => label.title === 'Ordered');
+				const text = isOrdered ? <s style={{ textDecorationThickness: '0.15em' }}>{x.title}</s> : x.title;
 				return (
 					<div key={i}>
 						<Header size='medium'>#{i+1} — {text}</Header>
