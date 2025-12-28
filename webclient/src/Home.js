@@ -402,7 +402,7 @@ export function Home(props) {
 							<div>
 								<Header size='medium'>Protospace Stats</Header>
 								<p>Shopping list: {stats?.shopping_list?.length ? <b>{renderShoppingListItems(stats.shopping_list)}</b> : 'Empty'} <a href='https://todo.protospace.ca/projects/4' target='_blank' rel='noopener noreferrer'>[list]</a></p>
-								<p>Maintenance list: {stats?.maintenance_list?.length ? <b>{renderMaintenanceListItems(stats.maintenance_list)}</b> : 'Empty'} <a href='https://todo.protospace.ca/projects/1' target='_blank' rel='noopener noreferrer'>[list]</a></p>
+								<p>Maintenance list: {stats?.maintenance_list?.length ? <b>{renderMaintenanceListItems(stats.maintenance_list)}</b> : 'Empty'} <a href='https://todo.protospace.ca/projects/76' target='_blank' rel='noopener noreferrer'>[list]</a></p>
 								<p>Next meeting: {getDateStat('next_meeting')} {showMeetingLink() && <a href='https://protospace.ca/meet' target='_blank' rel='noopener noreferrer'>[remote link]</a>}</p>
 								<p>Next clean: {getDateStat('next_clean')}</p>
 								<p className='nowrap-stat'>Next class: {getNextStat('next_class')}</p>

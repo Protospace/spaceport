@@ -458,7 +458,7 @@ export function DisplayShoppingList(props) {
 	}, []);
 
 	return (
-		<>
+		<div className='task-list'>
 			<Header size='large'>Consumables</Header>
 
 			<div className='qr'>
@@ -477,7 +477,7 @@ export function DisplayShoppingList(props) {
 				);
 			})}
 
-		</>
+		</div>
 	);
 };
 
@@ -502,11 +502,11 @@ export function DisplayMaintenanceList(props) {
 	}, []);
 
 	return (
-		<>
-			<Header size='large'>Maintenance</Header>
+		<div className='task-list'>
+			<Header size='large'>Tasks</Header>
 
 			<div className='qr'>
-				<QRCode size={128} value={'https://todo.protospace.ca/projects/1'} />
+				<QRCode size={128} value={'https://todo.protospace.ca/projects/76'} />
 			</div>
 
 			<Header size='medium'>Maintenance list:</Header>
@@ -521,6 +521,6 @@ export function DisplayMaintenanceList(props) {
 				);
 			})}
 
-		</>
+		</div>
 	);
 };
