@@ -466,11 +466,14 @@ export function DisplayShoppingList(props) {
 
 			<Header size='medium'>Shopping list:</Header>
 
-			{tasks && tasks.slice(0, 10).map((x, i) =>
-				<div key={i}>
-					<Header size='medium'>#{i+1} — {x.title}</Header>
-				</div>
-			)}
+			{tasks && tasks.slice(0, 10).map((x, i) => {
+				const text = x.labels?.includes('Ordered') ? <s style={{ textDecorationThickness: '0.15em' }}>{x.title}</s> : x.title;
+				return (
+					<div key={i}>
+						<Header size='medium'>#{i+1} — {text}</Header>
+					</div>
+				);
+			})}
 
 		</>
 	);
