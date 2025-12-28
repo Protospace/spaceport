@@ -192,7 +192,14 @@ def check_shopping_list():
     if utils_todo.is_configured():
         try:
             tasks = utils_todo.get_task_list('Consumables')
-            shopping_list = [dict(title=x['title'], created=x['created'], labels=[y['title'] for y in x['labels'] if x['labels'] else []]) for x in tasks]
+            shopping_list = []
+            for task in tasks:
+                labels = [label['title'] for label in task.get('labels') or []]
+                shopping_list.append(dict(
+                    title=task['title'],
+                    created=task['created'],
+                    labels=labels,
+                ))
             cache.set('shopping_list', shopping_list)
             return tasks
         except BaseException as e:
@@ -204,7 +211,14 @@ def check_maintenance_list():
     if utils_todo.is_configured():
         try:
             tasks = utils_todo.get_task_list('Maintenance')
-            maintenance_list = [dict(title=x['title'], created=x['created'], labels=[y['title'] for y in x['labels'] if x['labels'] else []]) for x in tasks]
+            maintenance_list = []
+            for task in tasks:
+                labels = [label['title'] for label in task.get('labels') or []]
+                maintenance_list.append(dict(
+                    title=task['title'],
+                    created=task['created'],
+                    labels=labels,
+                ))
             cache.set('maintenance_list', maintenance_list)
             return tasks
         except BaseException as e:
