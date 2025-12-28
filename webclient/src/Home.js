@@ -328,7 +328,7 @@ export function Home(props) {
 		}
 
 		return shoppingList.map((item, index) => {
-			const text = item.labels?.includes('Ordered') ? <s>{item.title}</s> : item.title;
+			const text = item.labels?.includes('Ordered') ? <s style={{ textDecorationThickness: '0.1em' }}>{item.title}</s> : item.title;
 			const separator = index < shoppingList.length - 1 ? ', ' : '';
 			return <React.Fragment key={index}>{text}{separator}</React.Fragment>;
 		});
