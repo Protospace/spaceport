@@ -38,6 +38,7 @@ DEFAULTS = {
     'solar': {},
     'drinks_6mo': [],
     'shopping_list': [],
+    'maintenance_list': [],
 }
 
 if secrets.MUMBLE:
@@ -196,6 +197,18 @@ def check_shopping_list():
             return tasks
         except BaseException as e:
             logger.error('Problem checking Shopping List: {} - {}'.format(e.__class__.__name__, str(e)))
+
+    return []
+
+def check_maintenance_list():
+    if utils_todo.is_configured():
+        try:
+            tasks = utils_todo.get_task_list('Maintenance')
+            maintenance_list = [dict(title=x['title'], created=x['created'], labels=[y['title'] for y in x['labels']]) for x in tasks]
+            cache.set('maintenance_list', maintenance_list)
+            return tasks
+        except BaseException as e:
+            logger.error('Problem checking Maintenance List: {} - {}'.format(e.__class__.__name__, str(e)))
 
     return []
 

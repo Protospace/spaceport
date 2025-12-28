@@ -37,6 +37,7 @@ export function LCARS1Display(props) {
 
 				<div className='display-tasks'>
 					<DisplayShoppingList />
+					<DisplayMaintenanceList />
 				</div>
 
 				<div className='display-scores'>
@@ -469,6 +470,50 @@ export function DisplayShoppingList(props) {
 			{tasks && tasks.slice(0, 10).map((x, i) => {
 				const isOrdered = x.labels?.some(label => label.title === 'Ordered');
 				const text = isOrdered ? <s style={{ textDecorationThickness: '0.15em' }}>{x.title}</s> : x.title;
+				return (
+					<div key={i}>
+						<Header size='medium'>#{i+1} — {text}</Header>
+					</div>
+				);
+			})}
+
+		</>
+	);
+};
+
+export function DisplayMaintenanceList(props) {
+	const [tasks, setTasks] = useState(false);
+
+	const getTasks = () => {
+		requester('/todo/tasks/?project=Maintenance', 'GET')
+		.then(res => {
+			setTasks(res);
+		})
+		.catch(err => {
+			console.log(err);
+			setTasks(false);
+		});
+	};
+
+	useEffect(() => {
+		getTasks();
+		const interval = setInterval(getTasks, 10000);
+		return () => clearInterval(interval);
+	}, []);
+
+	return (
+		<>
+			<Header size='large'>Maintenance</Header>
+
+			<div className='qr'>
+				<QRCode size={128} value={'https://todo.protospace.ca/projects/1'} />
+			</div>
+
+			<Header size='medium'>Maintenance list:</Header>
+
+			{tasks && tasks.slice(0, 10).map((x, i) => {
+				const isCompleted = x.labels?.some(label => label.title === 'Completed');
+				const text = isCompleted ? <s style={{ textDecorationThickness: '0.15em' }}>{x.title}</s> : x.title;
 				return (
 					<div key={i}>
 						<Header size='medium'>#{i+1} — {text}</Header>
