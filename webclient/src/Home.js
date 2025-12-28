@@ -322,6 +322,18 @@ export function Home(props) {
 		localStorage.setItem('darkmode', true);
 	};
 
+	const renderShoppingListItems = (shoppingList) => {
+		if (!shoppingList?.length) {
+			return null;
+		}
+
+		return shoppingList.map((item, index) => {
+			const text = item.labels?.includes('Ordered') ? <s>{item.title}</s> : item.title;
+			const separator = index < shoppingList.length - 1 ? ', ' : '';
+			return <React.Fragment key={index}>{text}{separator}</React.Fragment>;
+		});
+	};
+
 
 	return (
 		<Container>
@@ -377,7 +389,7 @@ export function Home(props) {
 
 							<div>
 								<Header size='medium'>Protospace Stats</Header>
-								<p>Shopping list: {stats?.shopping_list?.length ? <b>{stats.shopping_list.map(item => item.title).join(', ')}</b> : 'Empty'} <a href='https://todo.protospace.ca/projects/4' target='_blank' rel='noopener noreferrer'>[list]</a></p>
+								<p>Shopping list: {stats?.shopping_list?.length ? <b>{renderShoppingListItems(stats.shopping_list)}</b> : 'Empty'} <a href='https://todo.protospace.ca/projects/4' target='_blank' rel='noopener noreferrer'>[list]</a></p>
 								<p>Next meeting: {getDateStat('next_meeting')} {showMeetingLink() && <a href='https://protospace.ca/meet' target='_blank' rel='noopener noreferrer'>[remote link]</a>}</p>
 								<p>Next clean: {getDateStat('next_clean')}</p>
 								<p className='nowrap-stat'>Next class: {getNextStat('next_class')}</p>
