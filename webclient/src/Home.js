@@ -502,9 +502,7 @@ export function Home(props) {
 
 							<VestaboardForm token={token} />
 
-							{(user?.member?.id === 1685 || user?.member?.id === 5967) &&
-								<DrawingCanvas user={user} token={token} />
-							}
+							<DrawingCanvas user={user} token={token} />
 
 							{false && <>
 								<p>Protogarden:</p>

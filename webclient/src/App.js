@@ -284,7 +284,7 @@ function App() {
 							</Route>
 
 							<Route path='/sign'>
-								<Sign token={token} />
+								<Sign token={token} user={user} />
 							</Route>
 
 							<Route path='/out-of-stock'>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Form, Header } from 'semantic-ui-react';
+import { DrawingCanvas } from './Draw.js';
 import { requester } from './utils.js';
 
 export function SignForm(props) {
@@ -119,15 +120,17 @@ export function VestaboardForm(props) {
 
 
 export function Sign(props) {
-	const { token } = props;
+	const { token, user } = props;
 
 	return (
 		<Container>
-			<Header size='large'>Protospace Sign</Header>
+			<Header size='large'>Protospace Sign / Drawing</Header>
 
 			<SignForm token={token} />
 
 			<VestaboardForm token={token} />
+
+			<DrawingCanvas user={user} token={token} />
 		</Container>
 	);
 };
