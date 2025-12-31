@@ -310,7 +310,7 @@ export function DrawingCanvas(props) {
 				/>
 				{!user && (
 					<div className='canvas-overlay'>
-						Unauthorized
+						<p>Please <Link to={'/?next=/sign'}>login</Link> first</p>
 					</div>
 				)}
 				{showResetConfirm && (
