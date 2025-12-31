@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect, useReducer, useRef } from 'react';
 import { Link, useParams, useHistory } from 'react-router-dom';
 import moment from 'moment-timezone';
 import QRCode from 'react-qr-code';
@@ -8,6 +8,7 @@ import { statusColor, BasicTable, siteUrl, staticUrl, requester, isAdmin } from 
 import { LoginForm, SignupForm } from './LoginSignup.js';
 import { AccountForm } from './Account.js';
 import { VestaboardForm, SignForm } from './Sign.js';
+import { DrawingCanvas } from './Draw.js';
 import { StorageButton } from './Storage.js';
 import { PayPalSubscribeDeal } from './PayPal.js';
 
@@ -525,6 +526,8 @@ export function Home(props) {
 							<SignForm token={token} />
 
 							<VestaboardForm token={token} />
+
+							<DrawingCanvas user={user} token={token} />
 
 							{false && <>
 								<p>Protogarden:</p>

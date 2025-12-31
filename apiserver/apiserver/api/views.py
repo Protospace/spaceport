@@ -20,12 +20,15 @@ from oidc_provider.views import AuthorizeView
 from fuzzywuzzy import fuzz, process
 from collections import OrderedDict
 from dateutil import relativedelta
+from PIL import Image, ImageDraw, ImageFont, ImageOps, JpegImagePlugin
 import icalendar
 import datetime, time
 import io
 import csv
 import xmltodict
 import json
+import base64
+import binascii
 
 from . import models, serializers, utils, utils_paypal, utils_stats, utils_ldap, utils_email, utils_mediawiki, utils_todo
 from .permissions import (
@@ -994,6 +997,7 @@ class StatsViewSet(viewsets.ViewSet, List):
         except KeyError:
             raise exceptions.ValidationError(dict(vestaboard='This field is required.'))
 
+
     @action(detail=False, methods=['post'])
     def alarm(self, request):
         # Sample messages:
@@ -1324,6 +1328,78 @@ class StatsViewSet(viewsets.ViewSet, List):
 
         return Response(200)
 
+
+class DrawingViewSet(Base, List, Create, Update):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = models.Drawing.objects.all().order_by('-id')
+    serializer_class = serializers.DrawingSerializer
+
+    def perform_create(self, serializer):
+        if 'image' not in self.request.data:
+            raise exceptions.ValidationError(dict(image='This field is required.'))
+
+        image_data_url = self.request.data['image']
+        STATIC_FOLDER = 'data/static/'
+
+        try:
+            # remove data url prefix and decode
+            _header, encoded = image_data_url.split(';base64,', 1)
+            decoded_image = base64.b64decode(encoded)
+            image_stream = io.BytesIO(decoded_image)
+            pic = Image.open(image_stream)
+        except (ValueError, binascii.Error, OSError):
+            raise serializers.ValidationError(dict(non_field_errors='Invalid image file.'))
+
+        logging.debug('Detected format: %s', pic.format)
+
+        if pic.format == 'PNG':
+            ext = '.png'
+        else:
+            raise serializers.ValidationError(dict(non_field_errors='Image must be a png.'))
+
+        png_header = base64.b64decode('UF9TX0RfQw==').decode('utf-8')
+
+        try:
+            pic = pic.convert('RGBA')
+            extracted_header = ''
+            for i in range(len(png_header)):
+                _r, _g, _b, a = pic.getpixel((i, 0))
+                extracted_header += chr(a)
+
+            if extracted_header != png_header:
+                raise ValueError()
+
+            for i in range(len(png_header)):
+                r, g, b, _a = pic.getpixel((i, 0))
+                pic.putpixel((i, 0), (r, g, b, 255))
+        except (IndexError, TypeError, ValueError):
+            raise serializers.ValidationError(dict(non_field_errors='Invalid png file.'))
+
+        owner = self.request.user if self.request.user.is_authenticated else None
+        drawing = serializer.save(owner=owner)
+
+        pic = ImageOps.exif_transpose(pic)
+
+        filename = 'drawing' + str(drawing.id).zfill(6) + ext
+        pic.save(STATIC_FOLDER + filename)
+        pic.save(STATIC_FOLDER + 'drawing.png')
+
+        drawing.filename = filename
+        drawing.save()
+
+        utils.mqtt_publish('spaceport/drawing/new', filename)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = request.user
+
+        if not user.is_authenticated:
+            raise exceptions.NotAuthenticated()
+
+        if not (is_admin_director(user) or instance.owner == user):
+            raise exceptions.PermissionDenied()
+
+        return super().update(request, *args, **kwargs)
 
 
 class MemberCountViewSet(Base, List):

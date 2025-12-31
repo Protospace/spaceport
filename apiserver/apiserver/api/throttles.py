@@ -56,6 +56,9 @@ class LoggingThrottle(throttling.BaseThrottle):
             for key in ['password', 'password1', 'password2', 'old_password', 'new_password1', 'new_password2']:
                 if key in data:
                     data[key] = '[CENSORED]'
+            for key in ['image']:
+                if key in data:
+                    data[key] = '[TRUNCATED]'
         else:
             data = None
 
