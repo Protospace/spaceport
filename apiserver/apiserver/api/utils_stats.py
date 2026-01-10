@@ -251,7 +251,7 @@ def calc_drink_sales():
         '4': 'Iced Tea',
         '5': 'Crush Pop',
         '6': 'Dr Pepper',
-        '7': 'Arizona Tea',
+        '7': 'Diet Coke',
         '8': 'Cherry Coke',
     }
     results = []
