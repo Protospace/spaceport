@@ -270,12 +270,26 @@ def calc_drink_sales():
             '2': 'Coke Zero',
             '3': 'Root Beer',
             '4': 'Iced Tea',
-            '5': 'Crush Pop',
+            '5': 'Fanta',
             '6': 'Dr Pepper',
             '7': 'Diet Coke',
             '8': 'Cherry Coke',
         },
     }
+
+    colors = {
+        'Coke': '#e7223a',
+        'Coke Zero': 'black',
+        'Root Beer': '#9a4423',
+        'Iced Tea': '#1582ae',
+        'Crush Pop': '#d77a2d',
+        'Fanta': '#ffd700',
+        'Dr Pepper': '#6f0e21',
+        'Arizona Tea': '#3fad96',
+        'Cherry Coke': '#ab316e',
+        'Diet Coke': '#c8b560',
+    }
+
     txs = models.Transaction.objects
     drink_counts = {}
     sorted_dates = sorted(drinks_since.keys())
@@ -311,7 +325,7 @@ def calc_drink_sales():
             ).count()
             drink_counts[name] += count
 
-    results = [{'name': name, 'count': count} for name, count in sorted(drink_counts.items())]
+    results = [{'name': name, 'count': count, 'fill': colors[name]} for name, count in drink_counts.items()]
     cache.set('drinks_6mo', results)
 
 

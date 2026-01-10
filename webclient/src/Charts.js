@@ -378,16 +378,14 @@ export function Charts(props) {
 
 			<Header size='medium'>Drink Sales</Header>
 
-			<p>Drinks sold over the last six months.</p>
+			<p>Drinks sold over the last six months via Protocoin. Excludes instructor comped vends.</p>
 
 			<p>
 				{!!stats?.drinks_6mo?.length &&
 					<ResponsiveContainer width='100%' height={300}>
 						<BarChart
 							margin={isMobile? {bottom: 50} : {}}
-							data={stats.drinks_6mo.map((x, i) => (
-								{...x, fill: ['#e7223a', 'black', '#9a4423', '#1582ae', '#d77a2d', '#6f0e21', '#3fad96', '#ab316e'][i]}
-							))}
+							data={stats.drinks_6mo}
 						>
 							<XAxis dataKey='name' interval={0} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
 							<YAxis />
