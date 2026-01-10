@@ -510,9 +510,6 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
 
         member.save()
 
-    # TODO: turn these into @actions
-    # TODO: check if full, but not for instructors
-    # TODO: if already paid, skip to confirmed
     def perform_create(self, serializer):
         user = self.request.user
         data = self.request.data
@@ -548,6 +545,9 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             if user == session.instructor:
                 raise exceptions.ValidationError(dict(non_field_errors='You are teaching this session'))
 
+            if session.max_students and session.students.count() >= session.max_students:
+                raise exceptions.ValidationError(dict(non_field_errors='Class is full.'))
+
             if status == 'Waiting for payment' and session.cost == 0:
                 status = 'Confirmed'
 
@@ -572,6 +572,14 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             and not ((is_admin_director(user) or session.instructor == user) and 'student_id' in data)
         ):
             raise exceptions.ValidationError(dict(non_field_errors='Can\'t withdraw 24h before class or after. Contact instructor.'))
+
+        if (
+            status == 'Waiting for payment'
+            and session.max_students
+            and session.students.count() >= session.max_students
+            and not ((is_admin_director(user) or session.instructor == user) and 'student_id' in data)
+        ):
+            raise exceptions.ValidationError(dict(non_field_errors='Class is full.'))
 
         training = serializer.save(attendance_status=status)
         member = training.user.member
