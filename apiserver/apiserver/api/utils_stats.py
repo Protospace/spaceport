@@ -276,19 +276,42 @@ def calc_drink_sales():
             '8': 'Cherry Coke',
         },
     }
-    results = []
-
     txs = models.Transaction.objects
+    drink_counts = {}
+    sorted_dates = sorted(drinks_since.keys())
 
-    for number, name in drinks.items():
-        count = txs.filter(
-            category='Snacks',
-            memo__contains='pop vending machine item #' + number,
-            date__gte=six_months_ago,
-        ).count()
+    for i, start_date_str in enumerate(sorted_dates):
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
 
-        results.append(dict(name=name, count=count))
+        end_date = None
+        if i + 1 < len(sorted_dates):
+            end_date_str = sorted_dates[i + 1]
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
 
+        # If the period is entirely before the 6-month window, skip it.
+        if end_date and end_date <= six_months_ago:
+            continue
+
+        drinks_mapping = drinks_since[start_date_str]
+        for name in drinks_mapping.values():
+            drink_counts.setdefault(name, 0)
+
+        query_start_date = max(start_date, six_months_ago)
+
+        date_filter = Q(date__gte=query_start_date)
+        if end_date:
+            # The range is up to, but not including, the next start date.
+            date_filter &= Q(date__lt=end_date)
+
+        for number, name in drinks_mapping.items():
+            count = txs.filter(
+                date_filter,
+                category='Snacks',
+                memo__contains='pop vending machine item #' + number,
+            ).count()
+            drink_counts[name] += count
+
+    results = [{'name': name, 'count': count} for name, count in sorted(drink_counts.items())]
     cache.set('drinks_6mo', results)
 
 
