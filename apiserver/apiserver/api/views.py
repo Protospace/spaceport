@@ -2115,6 +2115,98 @@ class ProtocoinViewSet(Base):
         except OperationalError:
             self.printer_report(request, pk)
 
+    @action(detail=False, methods=['post'])
+    def cups_printer_report(self, request, pk=None):
+        try:
+            with transaction.atomic():
+                #auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+                #if secrets.PRINTER_API_TOKEN and auth_token != 'Bearer ' + secrets.PRINTER_API_TOKEN:
+                #    raise exceptions.PermissionDenied()
+
+                # {'job_id': '17', 'user': 'Tanner.Collin', 'title': 'test', 'printer': 'EpsonRAW', 'copies': '1'}
+
+                job_id = request.data.get('job_id', '')
+                username = request.data.get('user', '')
+                printer = request.data.get('printer', 'unknown-printer')
+                try:
+                    copies = int(request.data.get('copies', '1'))
+                except ValueError:
+                    copies = 1
+
+                logging.info('New %s printer job UUID: %s, username: %s', str(printer), str(job_id), str(username))
+
+                if not job_id:
+                    msg = 'Missing job ID, aborting.'
+                    utils.alert_tanner(msg)
+                    raise exceptions.ValidationError(dict(job_id='This field is required.'))
+
+                if not username:
+                    msg = 'Job {}: missing username, aborting.'.format(job_id)
+                    utils.alert_tanner(msg)
+                    raise exceptions.ValidationError(dict(username='This field is required.'))
+
+                reference = 'cups-' + printer + '-' + job_id
+
+                tx = models.Transaction.objects.filter(reference_number=reference)
+                if tx.exists():
+                    msg = 'Job {}: already billed for in transaction {}, aborting.'.format(job_id, tx[0].id)
+                    utils.alert_tanner(msg)
+                    raise exceptions.ValidationError(dict(non_field_errors=msg))
+
+
+                PROTOCOIN_PER_PRINT = 3.0
+
+                total_cost = PROTOCOIN_PER_PRINT * copies
+                logging.info('    Fixed cost: %s * %s', str(PROTOCOIN_PER_PRINT), str(copies))
+
+                total_cost = round(total_cost, 2)
+
+                logging.info('Total cost: %s protocoin', str(total_cost))
+
+
+                try:
+                    user = User.objects.get(username__istartswith=username)
+                except User.DoesNotExist:
+                    msg = 'Job {}: unable to find username {}, aborting. Cost: {}'.format(job_id, username, str(total_cost))
+                    utils.alert_tanner(msg)
+                    raise exceptions.ValidationError(dict(non_field_errors=msg))
+
+                memo = 'Protocoin - Purchase spent ₱ {} {} printing {}'.format(
+                    total_cost,
+                    printer,
+                    request.data.get('title', '')[:100],
+                )
+
+                tx = models.Transaction.objects.create(
+                    user=user,
+                    protocoin=-total_cost,
+                    amount=0,
+                    number_of_membership_months=0,
+                    account_type='Protocoin',
+                    category='Consumables',
+                    info_source='System',
+                    reference_number=reference,
+                    memo=memo,
+                )
+                utils.log_transaction(tx)
+
+                track = cache.get('track', {})
+
+                devicename = 'LAST' + printer + 'PRINT'
+                devicename = devicename.upper()
+                first_name = username.split('.')[0].title()
+
+                track[devicename] = dict(
+                    time=time.time(),
+                    username=username,
+                    first_name=first_name,
+                )
+                cache.set('track', track)
+
+                return Response(200)
+        except OperationalError:
+            self.cups_printer_report(request, pk)
+
 
 class PinballViewSet(Base):
     @action(detail=False, methods=['post'])
