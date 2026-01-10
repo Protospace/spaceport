@@ -244,15 +244,37 @@ def calc_card_scans():
 def calc_drink_sales():
     six_months_ago = utils.today_alberta_tz() - timedelta(days=183)
 
-    drinks = {
-        '1': 'Coke',
-        '2': 'Coke Zero',
-        '3': 'Root Beer',
-        '4': 'Iced Tea',
-        '5': 'Crush Pop',
-        '6': 'Dr Pepper',
-        '7': 'Diet Coke',
-        '8': 'Cherry Coke',
+    drinks_since = {
+        '1970-01-01': {
+            '1': 'Coke',
+            '2': 'Coke Zero',
+            '3': 'Root Beer',
+            '4': 'Iced Tea',
+            '5': 'Crush Pop',
+            '6': 'Dr Pepper',
+            '7': 'Arizona Tea',
+            '8': 'Cherry Coke',
+        },
+        '2025-04-01': {
+            '1': 'Coke',
+            '2': 'Coke Zero',
+            '3': 'Root Beer',
+            '4': 'Iced Tea',
+            '5': 'Fanta',
+            '6': 'Dr Pepper',
+            '7': 'Arizona Tea',
+            '8': 'Cherry Coke',
+        },
+        '2026-01-08': {
+            '1': 'Coke',
+            '2': 'Coke Zero',
+            '3': 'Root Beer',
+            '4': 'Iced Tea',
+            '5': 'Crush Pop',
+            '6': 'Dr Pepper',
+            '7': 'Diet Coke',
+            '8': 'Cherry Coke',
+        },
     }
     results = []
 
