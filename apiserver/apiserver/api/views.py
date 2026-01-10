@@ -2070,7 +2070,7 @@ class ProtocoinViewSet(Base):
                     raise exceptions.ValidationError(dict(non_field_errors=msg))
 
 
-                PROTOCOIN_PER_PRINT = 2.0
+                PROTOCOIN_PER_PRINT = 3.0
 
                 total_cost = PROTOCOIN_PER_PRINT * copies
                 logging.info('    Fixed cost: %s * %s', str(PROTOCOIN_PER_PRINT), str(copies))
