@@ -7,6 +7,7 @@ import { NotFound } from './Misc.js';
 import { AdminMemberInfo, AdminAccounting, AdminMemberPause, AdminMemberForm, AdminMemberCards, AdminMemberTraining, AdminMemberCertifications } from './AdminMembers.js';
 import { AdminMemberTransactions } from './AdminTransactions.js';
 import { AdminHistory } from './Admin.js';
+import { StorageLinks } from './Storage.js';
 import AbortController from 'abort-controller';
 
 const memberSorts = {
@@ -261,12 +262,7 @@ export function Members(props) {
 													:
 														<Item.Description>
 															Shelf: {x.member.storage.length ?
-																x.member.storage.sort((a, b) => a.location === 'member_shelves' ? -1 : 1).map((x, i, arr) =>
-																	<span className='storage-span' key={x.id}>
-																		<Link className='storage-link' to={'/storage/'+x.id}>{x.shelf_id}</Link>
-																		{i < arr.length - 1 && '·'}
-																	</span>
-																)
+																<StorageLinks storage={x.member.storage} />
 															:
 																'None'
 															}
@@ -406,12 +402,7 @@ export function MemberDetail(props) {
 														<Table.Cell>Shelf:</Table.Cell>
 														<Table.Cell>
 															{member.storage.length ?
-																member.storage.sort((a, b) => a.location === 'member_shelves' ? -1 : 1).map((x, i, arr) =>
-																	<span className='storage-span' key={x.id}>
-																		<Link className='storage-link' to={'/storage/'+x.id}>{x.shelf_id}</Link>
-																		{i < arr.length - 1 && '·'}
-																	</span>
-																)
+																<StorageLinks storage={member.storage} />
 															:
 																'None'
 															}

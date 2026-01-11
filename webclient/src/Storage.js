@@ -6,6 +6,19 @@ import { MembersDropdown } from './Members.js';
 import { statusColor, isAdmin, BasicTable, requester, useIsMobile } from './utils.js';
 import { Button, Checkbox, Container, Form, Grid, Header, Icon, Input, Message, Segment, Table } from 'semantic-ui-react';
 
+export function StorageLinks(props) {
+	const { storage } = props;
+
+	return (
+		storage.map((x, i, arr) =>
+			<span className='storage-span' key={x.id}>
+				<Link className='storage-link' to={'/storage/'+x.id}>{x.shelf_id}</Link>
+				{i < arr.length - 1 && '·'}
+			</span>
+		)
+	);
+}
+
 export function StorageEditor(props) {
 	const { token, input, setInput, error } = props;
 
