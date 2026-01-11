@@ -46,7 +46,6 @@ function App() {
 	const history = useHistory();
 
 	useEffect(() => {
-		// note: theme also gets set below in the history.location useEffect
 		document.body.className = isDark ? 'dark' : '';
 		console.log('theme to:', document.body.className || 'light');
 	}, []);
@@ -85,13 +84,6 @@ function App() {
 	}
 
 	useEffect(() => {
-		if (history.location.pathname === '/classes/14640') {
-			// force Saturnalia class page to dark
-			document.body.className = 'dark';
-		} else {
-			document.body.className = isDark ? 'dark' : '';
-		}
-
 		if (user) {
 			const data = {
 				id: user.member.id,
