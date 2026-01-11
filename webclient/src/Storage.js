@@ -265,34 +265,6 @@ export function StorageDetail(props) {
 	);
 };
 
-export function StorageButton(props) {
-	const { storage } = props;
-	const history = useHistory();
-
-	const buttonColors = {
-		member_shelves: 'grey',
-		lockers: 'red',
-		large_project_storage: 'brown',
-		accessible_project_storage: 'blue',
-	};
-
-	const handleStorageButton = (e, id) => {
-		e.preventDefault();
-		history.push('/storage/' + id);
-	};
-
-	return (
-		<Button
-			className='storage-button'
-			onClick={(e) => handleStorageButton(e, storage.id)}
-			size='tiny'
-			color={buttonColors[storage.location]}
-		>
-			{storage.shelf_id}
-		</Button>
-	);
-};
-
 let storageSearchCache = '';
 
 export function StorageSearch(props) {
@@ -347,6 +319,13 @@ export function StorageList(props) {
 	const [showExpired, setShowExpired] = useState(showExpiredCache);
 	const [error, setError] = useState(false);
 	const isMobile = useIsMobile();
+
+	const storageTypes = {
+		member_shelves: 'Shelf',
+		lockers: 'Locker',
+		large_project_storage: 'Large',
+		accessible_project_storage: 'Accessible',
+	};
 
 	useEffect(() => {
 		requester('/storage/', 'GET', token)
@@ -410,13 +389,6 @@ export function StorageList(props) {
 	return (
 		<div>
 			<p>
-				<Icon name='circle' color='grey' /> Member shelf <br/>
-				<Icon name='circle' color='red' /> Locker <br/>
-				<Icon name='circle' color='brown' /> Large Project Storage <br/>
-				<Icon name='circle' color='blue' /> Accessible Project Storage
-			</p>
-
-			<p>
 				<StorageSearch setSearch={setSearch} />
 			</p>
 
@@ -468,7 +440,7 @@ export function StorageList(props) {
 							<Table.Body>
 								{storageList.filter(filterStorage).sort(sortStorage).map(x =>
 									<Table.Row key={x.id}>
-										<Table.Cell><StorageButton storage={x} /></Table.Cell>
+										<Table.Cell><Link to={'/storage/'+x.id}>{x.shelf_id}</Link> ({storageTypes[x.location]})</Table.Cell>
 										<Table.Cell>
 											{isMobile && 'Owner: '}
 											{x.member_name && <Icon name='circle' color={statusColor[x.member_status]} />}

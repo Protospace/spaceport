@@ -186,10 +186,12 @@ a {
 	padding-bottom: 0.785714em;
 }
 
-.ui.button.storage-button {
-	padding-left: 0.5rem;
-	padding-right: 0.5rem;
-	margin-top: 0.25rem;
+.storage-link {
+	padding: 1rem 0.5rem;
+}
+
+.storage-span {
+	display: inline-block;
 }
 
 .ui.tag.label {

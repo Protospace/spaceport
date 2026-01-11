@@ -395,6 +395,7 @@ class MemberSerializer(serializers.ModelSerializer):
 # admin viewing member details
 class AdminMemberSerializer(MemberSerializer):
     phone = serializers.CharField(required=False)
+    storage = serializers.SerializerMethodField()
     monthly_fees = serializers.ChoiceField([10, 30, 35, 50, 55])
 
     class Meta:
@@ -415,7 +416,13 @@ class AdminMemberSerializer(MemberSerializer):
             'is_director',
             'is_staff',
             'mediawiki_username',
+            'storage',
         ]
+
+    def get_storage(self, obj):
+        serializer = StorageSpaceSerializer(data=obj.user.storage, many=True)
+        serializer.is_valid()
+        return serializer.data
 
     def update(self, instance, validated_data):
         if 'is_allowed_entry' in validated_data:

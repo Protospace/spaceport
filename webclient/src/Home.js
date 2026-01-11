@@ -9,7 +9,6 @@ import { LoginForm, SignupForm } from './LoginSignup.js';
 import { AccountForm } from './Account.js';
 import { VestaboardForm, SignForm } from './Sign.js';
 import { DrawingCanvas } from './Draw.js';
-import { StorageButton } from './Storage.js';
 import { PayPalSubscribeDeal } from './PayPal.js';
 
 function MemberInfo(props) {
@@ -69,8 +68,11 @@ function MemberInfo(props) {
 								<Table.Cell>Shelf:</Table.Cell>
 								<Table.Cell>
 									{user.storage.length ?
-										user.storage.sort((a, b) => a.location === 'member_shelves' ? -1 : 1).map((x, i) =>
-											<StorageButton storage={x} />
+										user.storage.sort((a, b) => a.location === 'member_shelves' ? -1 : 1).map((x, i, arr) =>
+											<span className='storage-span' key={x.id}>
+												<Link className='storage-link' to={'/storage/'+x.id}>{x.shelf_id}</Link>
+												{i < arr.length - 1 && '·'}
+											</span>
 										)
 									:
 										<>None <Link to='/claimshelf'>[claim]</Link></>
