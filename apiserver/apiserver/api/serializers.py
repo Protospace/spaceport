@@ -208,6 +208,9 @@ class OtherMemberSerializer(serializers.ModelSerializer):
         ]
 
     def get_last_name(self, obj):
+        if obj.preferred_name == 'Contractor' and obj.last_name == 'Access':
+            return 'Access'
+
         if len(obj.last_name):
             return obj.last_name[0] + '.'
         else:
