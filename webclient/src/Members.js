@@ -269,7 +269,7 @@ export function Members(props) {
 														</Item.Description>
 												}
 
-												<Item.Description>
+												<Item.Description style={{overflowWrap: 'break-word'}}>
 													{x.member.public_bio.substring(0, 100)}
 													{x.member.public_bio.length > 100 && '...'}
 												</Item.Description>
