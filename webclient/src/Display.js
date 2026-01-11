@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import moment from 'moment-timezone';
 import { Button, Container, Header, Icon } from 'semantic-ui-react';
 import { requester } from './utils.js';
-import { TrotecUsage } from './Usage.js';
 import QRCode from 'react-qr-code';
 
 const deviceNames = {
@@ -132,47 +131,6 @@ export function LCARS3Display(props) {
 				</div>
 			</div>
 		</Container>
-	);
-};
-
-export function DisplayUsage(props) {
-	const { token, name } = props;
-	const title = deviceNames[name].title;
-	const device = deviceNames[name].device;
-	const [usage, setUsage] = useState(false);
-
-	const getUsage = () => {
-		requester('/stats/usage_data/?device='+device, 'GET', token)
-		.then(res => {
-			setUsage(res);
-		})
-		.catch(err => {
-			console.log(err);
-			setUsage(false);
-		});
-	};
-
-	useEffect(() => {
-		getUsage();
-		const interval = setInterval(getUsage, 60000);
-		return () => clearInterval(interval);
-	}, []);
-
-	const inUse = usage && moment().unix() - usage.track.time <= 60;
-	const showUsage = usage && inUse && usage.username.startsWith(usage.track.username);
-
-	return (
-		<>
-			<Header size='large'>Trotec Usage</Header>
-
-			{showUsage ?
-				<TrotecUsage usage={usage} />
-			:
-				<p className='stat'>
-					Waiting for job
-				</p>
-			}
-		</>
 	);
 };
 

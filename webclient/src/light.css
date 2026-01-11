@@ -220,14 +220,6 @@ a {
 	font-size: 1.75em;
 }
 
-.display-usage {
-	border: 1px solid white;
-	padding: 0.5em;
-	align-self: flex-end;
-	width: 25vw;
-	height: 75vh;
-}
-
 .display-graphs {
 	border: 1px solid white;
 	padding: 0em;
@@ -298,23 +290,13 @@ a {
 	margin-bottom: 15px;
 }
 
-.usage {
-	height: 100vh;
-	background-color: black;
-	color: white;
-	padding: 0.5em;
-	font-size: 2.5em;
-}
-
-.display .ui.header,
-.usage .ui.header {
+.display .ui.header {
 	color: white;
 	margin-top: 0.5em;
 	margin-bottom: 0em;
 }
 
-.display .stat,
-.usage .stat {
+.display .stat {
 	font-size: 2em;
 	margin-bottom: 0;
 }

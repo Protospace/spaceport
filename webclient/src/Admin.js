@@ -281,69 +281,6 @@ export function AdminBackups(props) {
 	);
 };
 
-export function AdminUsage(props) {
-	const { token } = props;
-	const [input, setInput] = useState({ month: moment() });
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(false);
-
-	const handleDatetime = (v) => setInput({ ...input, month: v });
-
-	const handleDownload = (month) => {
-		if (loading) return;
-		setLoading(true);
-		const query = month ? '?month=' + month : '';
-		requester('/usage/csv/' + query, 'GET', token)
-		.then(res => {
-			setLoading(false);
-			setError(false);
-			return res.blob();
-		})
-		.then(blob => {
-			download(blob, 'usage-'+(month || 'all')+'.csv');
-		})
-		.catch(err => {
-			setLoading(false);
-			console.log(err);
-			setError(true);
-		});
-	};
-
-
-	const handleSubmit = (e) => {
-		const month = input.month.format('YYYY-MM');
-		handleDownload(month)
-	};
-
-	return (
-		<div>
-			<Form onSubmit={handleSubmit}>
-				<label>Month</label>
-				<Form.Group>
-					<Form.Field>
-						<Datetime
-							dateFormat='YYYY-MM'
-							timeFormat={false}
-							value={input.month}
-							onChange={handleDatetime}
-						/>
-					</Form.Field>
-
-					<Form.Button loading={loading}>
-						Download
-					</Form.Button>
-				</Form.Group>
-			</Form>
-
-			<Form.Button loading={loading} onClick={() => handleDownload(null)}>
-				Download All
-			</Form.Button>
-
-			{error && <p>Error.</p>}
-		</div>
-	);
-};
-
 export function Admin(props) {
 	return (
 		<Container>
@@ -360,11 +297,6 @@ export function Admin(props) {
 
 			<Header size='small'>Backup Downloads</Header>
 			<AdminBackups />
-
-
-			<Header size='medium'>Trotec Device Usage</Header>
-			<p>All times are in Mountain time.</p>
-			<AdminUsage {...props} />
 
 			<p/>
 

@@ -233,28 +233,6 @@ class StatsSpaceActivity(models.Model):
     list_display = ['date', 'card_scans']
     search_fields = ['date', 'card_scans']
 
-class Usage(models.Model):
-    user = models.ForeignKey(User, related_name='usages', blank=True, null=True, on_delete=models.SET_NULL)
-
-    username = models.CharField(max_length=64, blank=True)  # incase of LDAP-Spaceport mismatch
-
-    device = models.CharField(max_length=64)
-    started_at = models.DateTimeField(auto_now_add=True)
-    finished_at = models.DateTimeField(null=True)
-    deleted_at = models.DateTimeField(null=True, blank=True)
-
-    num_seconds = models.IntegerField()
-    num_reports = models.IntegerField()
-    memo = models.TextField(blank=True)
-    should_bill = models.BooleanField(default=True)
-
-    history = HistoricalRecords(excluded_fields=['num_reports'])
-
-    list_display = ['started_at', 'finished_at', 'user', 'num_seconds', 'should_bill']
-    search_fields = ['started_at', 'finished_at', 'user__username']
-    def __str__(self):
-        return str(self.started_at)
-
 class PinballScore(models.Model):
     user = models.ForeignKey(User, related_name='scores', blank=True, null=True, on_delete=models.SET_NULL)
 

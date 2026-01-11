@@ -18,15 +18,6 @@ from . import models, fields, utils, utils_ldap, utils_auth, utils_stats
 from .. import settings, secrets
 from .permissions import is_admin_director
 
-class UsageSerializer(serializers.ModelSerializer):
-    first_name = serializers.SerializerMethodField()
-
-    class Meta:
-        model = models.Usage
-        fields = '__all__'
-
-    def get_first_name(self, obj):
-        return obj.user.member.preferred_name
 
 class ProtocoinTransactionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -555,7 +546,6 @@ class AdminSearchSerializer(serializers.Serializer):
     member = serializers.SerializerMethodField()
     training = serializers.SerializerMethodField()
     transactions = serializers.SerializerMethodField()
-    #usages = serializers.SerializerMethodField()
 
     def get_member(self, obj):
         serializer = AdminMemberSerializer(obj)
@@ -580,12 +570,6 @@ class AdminSearchSerializer(serializers.Serializer):
         serializer = TransactionSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
-
-    #def get_usages(self, obj):
-    #    queryset = obj.user.usages.order_by('-start_time')
-    #    serializer = UsageSerializer(data=queryset, many=True)
-    #    serializer.is_valid()
-    #    return serializer.data
 
 
 class CardSerializer(serializers.ModelSerializer):
@@ -942,7 +926,6 @@ class UserSerializer(serializers.ModelSerializer):
             'wifi_pass',
             'gate_code',
             'app_version',
-            #'usages',
             'interests',
             'storage',
         ]

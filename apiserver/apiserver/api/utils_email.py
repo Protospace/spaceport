@@ -98,37 +98,6 @@ def send_interest_email(interest):
 
     logger.info('Sent interest email:\n' + email_text)
 
-def send_usage_bill_email(user, device, month, minutes, overage, bill):
-    def replace_fields(text):
-        return text.replace(
-            '[name]', user.member.preferred_name,
-        ).replace(
-            '[device]', device,
-        ).replace(
-            '[month]', month,
-        ).replace(
-            '[minutes]', str(minutes),
-        ).replace(
-            '[overage]', str(overage),
-        ).replace(
-            '[bill]', bill,
-        )
-
-    with open(EMAIL_DIR + 'usage_bill.txt', 'r') as f:
-        email_text = replace_fields(f.read())
-
-    send_mail(
-        subject='{} {} Usage Bill'.format(month, device),
-        message=email_text,
-        from_email=None,  # defaults to DEFAULT_FROM_EMAIL
-        recipient_list=[user.email, 'directors@protospace.ca', 'spaceport@tannercollin.com'],
-    )
-
-    if not settings.EMAIL_HOST:
-        time.sleep(0.5)  # simulate slowly sending emails when logging to console
-
-    logger.info('Sent usage bill email:\n' + email_text)
-
 def send_overdue_email(member):
     def replace_fields(text):
         return text.replace(
