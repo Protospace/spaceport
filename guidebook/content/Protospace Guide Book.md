@@ -30,10 +30,11 @@ This guide book is meant to be read serially in the order listed below, but each
 
 <p class="recommended-list" />
 
-1. [[Sheet Material Storage Policy]]
-2. [[Proxy Voting]]
-3. [[Bikeshedding]]
-4. [[Monthly Clean]]
-5. [[Restocking Supplies]]
-6. [[Protocoin]]
-7. [[Proto Places]]
+1. [[Member Shelves]]
+2. [[Sheet Material Storage Policy]]
+3. [[Proxy Voting]]
+4. [[Bikeshedding]]
+5. [[Monthly Clean]]
+6. [[Restocking Supplies]]
+7. [[Protocoin]]
+8. [[Proto Places]]
