@@ -1,0 +1,8 @@
+{
+  "autoPairMarkdown": false,
+  "autoPairBrackets": false,
+  "attachmentFolderPath": "./media",
+  "newFileLocation": "current",
+  "useMarkdownLinks": false,
+  "newLinkFormat": "shortest"
+}
