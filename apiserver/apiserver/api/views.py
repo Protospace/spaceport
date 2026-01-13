@@ -2337,7 +2337,7 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
             raise exceptions.ValidationError(dict(shelf_id='Shelf ID not found.'))
 
         if storage.location != 'member_shelves':
-            raise exceptions.ValidationError(dict(shelf_id='Not a member shelf. Please see a Director.'))
+            raise exceptions.ValidationError(dict(shelf_id='Not a regular member shelf. Please see a Director.'))
 
         if storage.user:
             owner_name = storage.user.member.preferred_name
@@ -2350,6 +2350,12 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
 
         if user.member.paused_date:
             raise exceptions.ValidationError(dict(shelf_id='Only active members can claim shelves.'))
+
+        if not user.member.vetted_date:
+            raise exceptions.ValidationError(dict(shelf_id='Only vetted members can claim shelves.'))
+
+        if user.member.status == 'Overdue':
+            raise exceptions.ValidationError(dict(shelf_id='Must be current on dues to claim a shelf.'))
 
         storage.user = user
         storage.save()
