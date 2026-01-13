@@ -2317,7 +2317,12 @@ class TodoViewSet(viewsets.ViewSet):
 class StorageSpaceViewSet(Base, List, Retrieve, Update):
     permission_classes = [AllowMetadata | IsAuthenticated, IsAdminOrReadOnly]
     queryset = models.StorageSpace.objects.all().select_related('user__member').order_by('id')
-    serializer_class = serializers.StorageSpaceSerializer
+
+    def get_serializer_class(self):
+        if self.request.user.member.vetted_date:
+            return serializers.StorageSpaceSerializer
+        else:
+            return serializers.UnvettedStorageSpaceSerializer
 
     @action(detail=False, methods=['post'], permission_classes=[AllowMetadata | IsAuthenticated])
     def claim(self, request):

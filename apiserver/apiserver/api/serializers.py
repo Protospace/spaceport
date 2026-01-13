@@ -622,7 +622,6 @@ class SimpleStorageSpaceSerializer(serializers.ModelSerializer):
         model = models.StorageSpace
         fields = '__all__'
 
-
 class StorageSpaceSerializer(serializers.ModelSerializer):
     member_id = serializers.SerializerMethodField()
     member_name = serializers.SerializerMethodField()
@@ -666,6 +665,15 @@ class StorageSpaceSerializer(serializers.ModelSerializer):
     def get_member_paused(self, obj):
         if not obj.user: return None
         return obj.user.member.paused_date
+
+class UnvettedStorageSpaceSerializer(StorageSpaceSerializer):
+    member_name = serializers.SerializerMethodField()
+
+    def get_member_name(self, obj):
+        if not obj.user: return None
+
+        member = obj.user.member
+        return member.preferred_name + ' ' + member.last_name[0] + '.'
 
 
 class TrainingSerializer(serializers.ModelSerializer):
