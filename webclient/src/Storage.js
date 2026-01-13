@@ -171,7 +171,7 @@ function StorageTable(props) {
 							}
 						</Table.Cell>
 					:
-						<Table.Cell>None</Table.Cell>
+						<Table.Cell>None <Link to={'/claimshelf/'+storage.shelf_id}>[claim]</Link></Table.Cell>
 					}
 				</Table.Row>
 				<Table.Row>
@@ -482,6 +482,8 @@ export function Storage(props) {
 		<Container>
 			<Header size='large'>Storage Locations</Header>
 
+			<p>Documentation: <a href='https://my.protospace.ca/guide/member-shelves/' target='_blank' rel='noopener noreferrer'>Member Shelves | Protospace Guide Book</a></p>
+
 			<StorageList {...props} />
 		</Container>
 	);
@@ -554,6 +556,8 @@ export function ClaimShelf(props) {
 					<Header size='large'>Claim Member Shelf</Header>
 
 					<p>Use this form to claim a member shelf.</p>
+
+					<p>Documentation: <a href='https://my.protospace.ca/guide/member-shelves/' target='_blank' rel='noopener noreferrer'>Member Shelves | Protospace Guide Book</a></p>
 
 					<p>Please make sure your name and contact info are visible on the shelf.</p>
 
