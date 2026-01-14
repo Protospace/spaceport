@@ -34,7 +34,7 @@ def gen_course_name_embedding(name):
         return False
 
 def gen_all_course_embeddings():
-    courses = list(models.Course.objects.filter(is_old=False).exclude(name__isnull=True).exclude(name=''))
+    courses = list(models.Course.objects.all())
     if not courses:
         logger.info("No courses to generate embeddings for.")
         return
@@ -54,3 +54,11 @@ def gen_all_course_embeddings():
         logger.info('Generated %d course embeddings. Prompt tokens: %d, Total tokens: %d', len(courses), prompt_tokens, total_tokens)
     else:
         logger.error("Failed to generate course embeddings from OpenAI API.")
+
+
+def find_similar_courses(name):
+    pass
+
+
+
+
