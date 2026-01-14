@@ -3,6 +3,9 @@ logger = logging.getLogger(__name__)
 
 import requests
 import json
+import base64
+import struct
+import math
 
 from apiserver import secrets
 from apiserver.api import models
@@ -59,7 +62,45 @@ def gen_all_course_embeddings():
 
 
 def find_similar_courses(name):
-    pass
+    query_embedding_b64 = gen_course_name_embedding(name)
+    if not query_embedding_b64:
+        logger.error("Could not generate embedding for query name: %s", name)
+        return []
+
+    try:
+        decoded_query = base64.b64decode(query_embedding_b64)
+        query_vector = struct.unpack('<1536f', decoded_query)
+    except (struct.error, TypeError, base64.binascii.Error) as e:
+        logger.error("Failed to decode or unpack query embedding for '%s': %s", name, e)
+        return []
+
+    def cosine_similarity(v1, v2):
+        dot_product = sum(x*y for x, y in zip(v1, v2))
+        magnitude1 = math.sqrt(sum(x*x for x in v1))
+        magnitude2 = math.sqrt(sum(x*x for x in v2))
+        if not magnitude1 or not magnitude2:
+            return 0.0
+        return dot_product / (magnitude1 * magnitude2)
+
+    courses_with_embeddings = models.Course.objects.exclude(name_embedding__exact='').exclude(is_old=True)
+    if not courses_with_embeddings:
+        logger.info("No courses with embeddings found to compare against.")
+        return []
+
+    similarities = []
+    for course in courses_with_embeddings:
+        try:
+            decoded_course = base64.b64decode(course.name_embedding)
+            course_vector = struct.unpack('<1536f', decoded_course)
+            similarity = cosine_similarity(query_vector, course_vector)
+            similarities.append((course.name, similarity))
+        except (struct.error, TypeError, base64.binascii.Error) as e:
+            logger.warning("Could not process course '%s' (id: %d): %s", course.name, course.id, e)
+            continue
+
+    similarities.sort(key=lambda x: x[1], reverse=True)
+
+    return similarities[:10]
 
 
 
