@@ -7,6 +7,8 @@ import json
 from apiserver import secrets
 from apiserver.api import models
 
+format_course_name = lambda name: 'A course at a makerspace titled "{}"'.format(name)
+
 def api_openai_create_embeddings(text_list):
     headers = {'Authorization': 'Bearer ' + secrets.OPENAI_API_KEY}
     data = {'input': text_list, 'model': 'text-embedding-3-small', 'encoding_format': 'base64'}
@@ -24,7 +26,7 @@ def api_openai_create_embeddings(text_list):
 
 
 def gen_course_name_embedding(name):
-    text = 'A course at a makerspace titled "{}"'.format(name)
+    text = format_course_name(name)
 
     res = api_openai_create_embeddings([text])
 
@@ -39,7 +41,7 @@ def gen_all_course_embeddings():
         logger.info("No courses to generate embeddings for.")
         return
 
-    texts_to_embed = ['A course at a makerspace titled "{}"'.format(course.name) for course in courses]
+    texts_to_embed = [format_course_name(course.name) for course in courses]
 
     res = api_openai_create_embeddings(texts_to_embed)
 
