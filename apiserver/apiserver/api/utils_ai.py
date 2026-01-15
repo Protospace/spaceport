@@ -12,7 +12,10 @@ import statistics
 from apiserver import secrets
 from apiserver.api import models
 
-format_course_name = lambda name: 'A course at a makerspace titled "{}"'.format(name)
+#format_course_name = lambda name: 'A course at a makerspace titled "{}"'.format(name)  # 0.003131
+#format_course_name = lambda name: 'A course titled "{}"'.format(name)  # 0.005670
+#format_course_name = lambda name: '"{}"'.format(name)  # 0.009028
+format_course_name = lambda name: 'A course titled "{}" at a non-profit club, taught by volunteers. It\'s a makerspace which is a two-bay shop filled with all kinds of different tools.'.format(name)  # 0.002736
 
 def cosine_similarity(v1, v2):
     dot_product = sum(x*y for x, y in zip(v1, v2))
