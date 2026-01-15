@@ -135,5 +135,64 @@ def calc_variance_of_similarity_scores():
     return variance
 
 
+def calc_cluster_separation_score():
+    courses_with_data = models.Course.objects.exclude(name_embedding__exact='').exclude(tags__exact='')
+    if not courses_with_data:
+        logger.info("No courses with embeddings and tags found to calculate cluster separation.")
+        return 0.0
+
+    processed_courses = []
+    for course in courses_with_data:
+        try:
+            decoded_course = base64.b64decode(course.name_embedding)
+            vector = struct.unpack('<1536f', decoded_course)
+            tags = set(course.tags.split(','))
+            processed_courses.append({'vector': vector, 'tags': tags, 'name': course.name, 'id': course.id})
+        except (struct.error, TypeError, base64.binascii.Error) as e:
+            logger.warning("Could not process course '%s' (id: %d): %s", course.name, course.id, e)
+            continue
+
+    if len(processed_courses) < 2:
+        logger.info("Not enough processed courses to compare for cluster separation.")
+        return 0.0
+
+    intra_cluster_scores = []
+    inter_cluster_scores = []
+
+    for course_a, course_b in itertools.combinations(processed_courses, 2):
+        similarity = cosine_similarity(course_a['vector'], course_b['vector'])
+
+        if not course_a['tags'].isdisjoint(course_b['tags']):
+            intra_cluster_scores.append(similarity)
+        else:
+            inter_cluster_scores.append(similarity)
+
+    if not intra_cluster_scores:
+        avg_intra_similarity = 0.0
+        logger.warning("No pairs with shared tags found. Cannot calculate intra-cluster similarity.")
+    else:
+        avg_intra_similarity = statistics.mean(intra_cluster_scores)
+
+    if not inter_cluster_scores:
+        avg_inter_similarity = 0.0
+        logger.warning("No pairs with different tags found. Cannot calculate inter-cluster similarity.")
+    else:
+        avg_inter_similarity = statistics.mean(inter_cluster_scores)
+
+    logger.info(
+        'Intra-cluster: avg similarity %f from %d pairs. Inter-cluster: avg similarity %f from %d pairs.',
+        avg_intra_similarity, len(intra_cluster_scores),
+        avg_inter_similarity, len(inter_cluster_scores)
+    )
+
+    if avg_inter_similarity == 0:
+        logger.warning("Average inter-cluster similarity is zero, cannot compute ratio.")
+        return 0.0
+
+    score = avg_intra_similarity / avg_inter_similarity
+    logger.info('Calculated cluster separation score: %f', score)
+    return score
+
+
 
 
