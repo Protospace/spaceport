@@ -82,7 +82,7 @@ def find_similar_courses(name):
             return 0.0
         return dot_product / (magnitude1 * magnitude2)
 
-    courses_with_embeddings = models.Course.objects.exclude(name_embedding__exact='').exclude(is_old=True)
+    courses_with_embeddings = models.Course.objects.exclude(name_embedding__exact='')
     if not courses_with_embeddings:
         logger.info("No courses with embeddings found to compare against.")
         return []
