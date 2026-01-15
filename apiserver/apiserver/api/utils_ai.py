@@ -12,10 +12,6 @@ import statistics
 from apiserver import secrets
 from apiserver.api import models
 
-#format_course_name = lambda name: 'A course at a makerspace titled "{}"'.format(name)  # 1.067038
-format_course_name = lambda name: 'A course titled "{}"'.format(name)  # 1.151285
-#format_course_name = lambda name: '"{}"'.format(name)  # 
-#format_course_name = lambda name: 'A course titled "{}" at a non-profit club, taught by volunteers. It\'s a makerspace which is a two-bay shop filled with all kinds of different tools.'.format(name)  # 1.044301
 
 def cosine_similarity(v1, v2):
     dot_product = sum(x*y for x, y in zip(v1, v2))
@@ -42,7 +38,8 @@ def api_openai_create_embeddings(text_list):
 
 
 def gen_course_name_embedding(name):
-    text = format_course_name(name)
+    # This format must match the "no tags" case in gen_all_course_embeddings
+    text = 'A course titled "{}"'.format(name)
 
     res = api_openai_create_embeddings([text])
 
