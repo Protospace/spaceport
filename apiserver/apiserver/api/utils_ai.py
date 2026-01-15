@@ -13,8 +13,8 @@ from apiserver import secrets
 from apiserver.api import models
 
 #format_course_name = lambda name: 'A course at a makerspace titled "{}"'.format(name)  # 1.067038
-#format_course_name = lambda name: 'A course titled "{}"'.format(name)  # 1.151285
-format_course_name = lambda name: '"{}"'.format(name)  # 
+format_course_name = lambda name: 'A course titled "{}"'.format(name)  # 1.151285
+#format_course_name = lambda name: '"{}"'.format(name)  # 
 #format_course_name = lambda name: 'A course titled "{}" at a non-profit club, taught by volunteers. It\'s a makerspace which is a two-bay shop filled with all kinds of different tools.'.format(name)  # 1.044301
 
 def cosine_similarity(v1, v2):
@@ -61,9 +61,9 @@ def gen_all_course_embeddings():
     for course in courses:
         if course.tags:
             # Add context from tags to differentiate similar concepts in different domains
-            text = '"{}" with tags: {}'.format(course.name, course.tags.replace(',', ', '))
+            text = 'A course titled "{}" with tags: {}'.format(course.name, course.tags.replace(',', ', '))
         else:
-            text = '"{}"'.format(course.name)
+            text = 'A course titled "{}"'.format(course.name)
         texts_to_embed.append(text)
 
     res = api_openai_create_embeddings(texts_to_embed)
