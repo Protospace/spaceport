@@ -6,11 +6,21 @@ import json
 import base64
 import struct
 import math
+import itertools
+import statistics
 
 from apiserver import secrets
 from apiserver.api import models
 
 format_course_name = lambda name: 'A course at a makerspace titled "{}"'.format(name)
+
+def cosine_similarity(v1, v2):
+    dot_product = sum(x*y for x, y in zip(v1, v2))
+    magnitude1 = math.sqrt(sum(x*x for x in v1))
+    magnitude2 = math.sqrt(sum(x*x for x in v2))
+    if not magnitude1 or not magnitude2:
+        return 0.0
+    return dot_product / (magnitude1 * magnitude2)
 
 def api_openai_create_embeddings(text_list):
     headers = {'Authorization': 'Bearer ' + secrets.OPENAI_API_KEY}
@@ -74,14 +84,6 @@ def find_similar_courses(name):
         logger.error("Failed to decode or unpack query embedding for '%s': %s", name, e)
         return []
 
-    def cosine_similarity(v1, v2):
-        dot_product = sum(x*y for x, y in zip(v1, v2))
-        magnitude1 = math.sqrt(sum(x*x for x in v1))
-        magnitude2 = math.sqrt(sum(x*x for x in v2))
-        if not magnitude1 or not magnitude2:
-            return 0.0
-        return dot_product / (magnitude1 * magnitude2)
-
     courses_with_embeddings = models.Course.objects.exclude(name_embedding__exact='')
     if not courses_with_embeddings:
         logger.info("No courses with embeddings found to compare against.")
@@ -101,6 +103,33 @@ def find_similar_courses(name):
     similarities.sort(key=lambda x: x[1], reverse=True)
 
     return similarities[:10]
+
+
+def calc_variance_of_similarity_scores():
+    courses_with_embeddings = models.Course.objects.exclude(name_embedding__exact='')
+    if not courses_with_embeddings:
+        logger.info("No courses with embeddings found to calculate variance.")
+        return 0.0
+
+    vectors = []
+    for course in courses_with_embeddings:
+        try:
+            decoded_course = base64.b64decode(course.name_embedding)
+            vectors.append(struct.unpack('<1536f', decoded_course))
+        except (struct.error, TypeError, base64.binascii.Error) as e:
+            logger.warning("Could not process course '%s' (id: %d): %s", course.name, course.id, e)
+            continue
+    
+    # Variance requires at least two similarity scores, which requires at least 3 vectors.
+    if len(vectors) < 3:
+        logger.info("Not enough vectors to calculate variance (need at least 3).")
+        return 0.0
+
+    similarity_scores = [cosine_similarity(v1, v2) for v1, v2 in itertools.combinations(vectors, 2)]
+
+    variance = statistics.variance(similarity_scores)
+    logger.info('Calculated variance of similarity scores: %f from %d pairs', variance, len(similarity_scores))
+    return variance
 
 
 
