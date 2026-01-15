@@ -57,7 +57,14 @@ def gen_all_course_embeddings():
         logger.info("No courses to generate embeddings for.")
         return
 
-    texts_to_embed = [format_course_name(course.name) for course in courses]
+    texts_to_embed = []
+    for course in courses:
+        if course.tags:
+            # Add context from tags to differentiate similar concepts in different domains
+            text = '"{}" with tags: {}'.format(course.name, course.tags.replace(',', ', '))
+        else:
+            text = '"{}"'.format(course.name)
+        texts_to_embed.append(text)
 
     res = api_openai_create_embeddings(texts_to_embed)
 
