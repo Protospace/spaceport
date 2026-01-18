@@ -77,8 +77,10 @@ def gen_all_course_embeddings():
     else:
         logger.error("Failed to generate course embeddings from OpenAI API.")
 
+def find_similar_courses_simple(name):
+    return similarities[:10]
 
-def find_similar_courses(name):
+def find_similar_courses_ai(name):
     query_embedding_b64 = gen_course_name_embedding(name)
     if not query_embedding_b64:
         logger.error("Could not generate embedding for query name: %s", name)
