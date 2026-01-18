@@ -78,6 +78,29 @@ def gen_all_course_embeddings():
         logger.error("Failed to generate course embeddings from OpenAI API.")
 
 def find_similar_courses_simple(name):
+    query_tokens = set(name.lower().split())
+    if not query_tokens:
+        return []
+
+    courses = models.Course.objects.filter(is_old=False).exclude(name__isnull=True).exclude(name='')
+
+    similarities = []
+    for course in courses:
+        course_tokens = set(course.name.lower().split())
+        if not course_tokens:
+            continue
+
+        intersection = query_tokens.intersection(course_tokens)
+        union = query_tokens.union(course_tokens)
+
+        # Jaccard similarity
+        similarity = len(intersection) / len(union)
+
+        if similarity > 0:
+            similarities.append((course.name, similarity))
+
+    similarities.sort(key=lambda x: x[1], reverse=True)
+
     return similarities[:10]
 
 def find_similar_courses_ai(name):
