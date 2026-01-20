@@ -360,7 +360,7 @@ export function StorageList(props) {
 			return false;
 		} else if (showMemod && !x.memo) {
 			return false;
-		} else if (showServed && !x.memo.toLowerCase().includes('served')) {
+		} else if (showServed && !(x.memo.toLowerCase().includes('served') || x.memo.toLowerCase().includes('evict'))) {
 			return false;
 		} else if (showExpired && !x.member_paused) {
 			return false;
