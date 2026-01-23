@@ -545,7 +545,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             if user == session.instructor:
                 raise exceptions.ValidationError(dict(non_field_errors='You are teaching this session'))
 
-            if session.max_students and session.students.count() >= session.max_students:
+            if session.max_students and session.students.exclude(attendance_status='Withdrawn').count() >= session.max_students:
                 raise exceptions.ValidationError(dict(non_field_errors='Class is full.'))
 
             if status == 'Waiting for payment' and session.cost == 0:
@@ -576,7 +576,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
         if (
             status == 'Waiting for payment'
             and session.max_students
-            and session.students.count() >= session.max_students
+            and session.students.exclude(attendance_status='Withdrawn').count() >= session.max_students
             and not ((is_admin_director(user) or session.instructor == user) and 'student_id' in data)
         ):
             raise exceptions.ValidationError(dict(non_field_errors='Class is full.'))
