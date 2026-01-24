@@ -91,7 +91,7 @@ export function DrawingCanvas(props) {
 				const newWidth = parent.offsetWidth;
 				if (newWidth > 0) {
 					const newHeight = newWidth * DRAWING_HEIGHT / DRAWING_WIDTH;
-					if (canvas.width !== newWidth || canvas.height !== newHeight) {
+					if (canvas.width !== newWidth) {
 						canvas.width = newWidth;
 						canvas.height = newHeight;
 						const context = canvas.getContext('2d');
