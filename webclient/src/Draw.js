@@ -94,10 +94,25 @@ export function DrawingCanvas(props) {
 					if (canvas.width !== newWidth || canvas.height !== newHeight) {
 						canvas.width = newWidth;
 						canvas.height = newHeight;
-						const ctx = canvas.getContext('2d');
-						ctx.fillStyle = 'white';
-						ctx.fillRect(0, 0, canvas.width, canvas.height);
-						setHistory([ctx.getImageData(0, 0, canvas.width, canvas.height)]);
+						const context = canvas.getContext('2d');
+
+						// Because the context is reset on resize, we have to set these again.
+						context.lineCap = 'round';
+						context.lineJoin = 'round';
+
+						const savedDrawing = localStorage.getItem('savedDrawing');
+						if (savedDrawing) {
+							const img = new Image();
+							img.src = savedDrawing;
+							img.onload = () => {
+								context.drawImage(img, 0, 0, canvas.width, canvas.height);
+								setHistory([context.getImageData(0, 0, canvas.width, canvas.height)]);
+							};
+						} else {
+							context.fillStyle = 'white';
+							context.fillRect(0, 0, canvas.width, canvas.height);
+							setHistory([context.getImageData(0, 0, canvas.width, canvas.height)]);
+						}
 					}
 				}
 			}
