@@ -67,6 +67,11 @@ a {
 	margin-top: -1rem;
 }
 
+.bash-register {
+	width: 40rem;
+	max-width: 80vw;
+}
+
 .content-wrap {
 	min-height: 100%;
 	background: #fafafa;

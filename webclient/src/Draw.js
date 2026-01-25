@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Divider, Header, Container, Checkbox } from 'semantic-ui-react';
+import { Button, Divider, Header, Container, Checkbox, Popup } from 'semantic-ui-react';
 import { requester, staticUrl, isAdmin } from './utils.js';
 
 const DRAWING_WIDTH = 384;
@@ -309,7 +309,21 @@ export function DrawingCanvas(props) {
 	return (
 		<div style={{marginTop: '1.5rem', maxWidth: `${DRAWING_WIDTH}px`}}>
 			<Divider />
-			<p>Send a drawing to the Bash Register:</p>
+			<p>
+				Send a drawing to the{' '}
+				<Popup
+					content={
+						<React.Fragment>
+							<p>
+								<img className='bash-register' src='/bash-register.jpg'/>
+							</p>
+						</React.Fragment>
+					}
+					trigger={<a>Bash Register</a>}
+				/>
+				:
+			</p>
+
 			<div style={{ position: 'relative' }}>
 				<canvas
 					ref={canvasRef}
