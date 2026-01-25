@@ -205,11 +205,11 @@ export function StorageTakeover(props) {
 	return (
 		<>
 			<p>Shelf owner expired / paused on {storage.member_paused}.</p>
-			{daysRemaining >= 1 ?
+			{storage.location === 'member_shelves' && (daysRemaining >= 1 ?
 				<p>Shelf can be taken over in {daysRemaining} more day{daysRemaining == 1 ? '' : 's'}.</p>
 			:
 				<p>Shelf can be <Link to={'/claimshelf/'+storage.shelf_id}>taken over</Link> now.</p>
-			}
+			)}
 		</>
 	);
 }
