@@ -971,6 +971,33 @@ class StatsViewSet(viewsets.ViewSet, List):
         except KeyError:
             raise exceptions.ValidationError(dict(request_id='This field is required.'))
 
+    @action(detail=False, methods=['get'])
+    def ad_search_username(self, request):
+        if not is_admin_director(request.user):
+            raise exceptions.PermissionDenied()
+
+        try:
+            search = request.query_params['search']
+        except KeyError:
+            raise exceptions.ValidationError(dict(search='This field is required.'))
+
+        if len(search) < 5:
+            raise exceptions.ValidationError(dict(search='Must be at least 5 characters.'))
+
+        users = User.objects.select_related('member').filter(username__icontains=search)
+
+        results = []
+        for user in users:
+            results.append(dict(
+                username=user.username,
+                email=user.member.email,
+                first_name=user.first_name,
+                preferred_name=user.member.preferred_name,
+                last_name=user.last_name,
+            ))
+
+        return Response(results)
+
     @action(detail=False, methods=['post'])
     def sign(self, request):
         try:
