@@ -315,7 +315,7 @@ export function DrawingCanvas(props) {
 					content={
 						<React.Fragment>
 							<p>
-								<img className='bash-register' src='/bash-register.jpg'/>
+								<img className='bash-register' src='/bash-register.jpg' width='1280' height='960' />
 							</p>
 						</React.Fragment>
 					}

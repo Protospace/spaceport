@@ -68,6 +68,7 @@ a {
 }
 
 .bash-register {
+	height: auto;
 	width: 40rem;
 	max-width: 80vw;
 }
