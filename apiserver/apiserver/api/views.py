@@ -973,7 +973,8 @@ class StatsViewSet(viewsets.ViewSet, List):
 
     @action(detail=False, methods=['get'])
     def ad_search_username(self, request):
-        if not is_admin_director(request.user):
+        auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+        if secrets.AD_SEARCH_TOKEN and auth_token != 'Bearer ' + secrets.AD_SEARCH_TOKEN:
             raise exceptions.PermissionDenied()
 
         try:
@@ -990,10 +991,10 @@ class StatsViewSet(viewsets.ViewSet, List):
         for user in users:
             results.append(dict(
                 username=user.username,
-                email=user.member.email,
-                first_name=user.first_name,
+                email=user.email,
+                first_name=user.member.first_name,
                 preferred_name=user.member.preferred_name,
-                last_name=user.last_name,
+                last_name=user.member.last_name,
             ))
 
         return Response(results)
