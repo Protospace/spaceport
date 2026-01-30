@@ -45,6 +45,7 @@ if secrets.MUMBLE:
 
 EXTRAS = {
     'drinks_6mo': [],
+    'dues_dist': [],
 }
 
 
@@ -372,6 +373,11 @@ def calc_dues_distribution():
         'monthly_fees'
     ))
     cache.set('dues_dist', results)
+
+def calc_year_distribution():
+    cache.set('year_dist', results)
+
+calc_dues_distribution()
 
 
 def get_progress(request_id):
