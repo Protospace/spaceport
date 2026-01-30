@@ -362,6 +362,15 @@ def calc_num_interested():
     models.Course.objects.bulk_update(course_list, ['num_interested'])
 
 def calc_dues_distribution():
+    results = list(models.Member.objects.filter(
+        paused_date__isnull=True,
+    ).values(
+        'monthly_fees'
+    ).annotate(
+        count=Count('id')
+    ).order_by(
+        'monthly_fees'
+    ))
     cache.set('dues_dist', results)
 
 
