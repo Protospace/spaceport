@@ -501,27 +501,22 @@ export function Charts(props) {
 			<p>
 				{!!extras?.forums_visit_1mo?.length &&
 					(() => {
-						const counts = extras.forums_visit_1mo.reduce((acc, val) => {
-							acc[val] = (acc[val] || 0) + 1;
-							return acc;
-						}, {});
-						const data = Object.keys(counts).map(key => ({
-							days: parseInt(key),
-							members: counts[key]
-						})).sort((a, b) => a.days - b.days);
+						const data = extras.forums_visit_1mo.map((value, index) => ({
+							member: index + 1,
+							days_visited: value,
+						}));
 
 						return (
 							<ResponsiveContainer width='100%' height={300}>
 								<BarChart data={data}>
-									<XAxis dataKey='days' name='Days Visited' />
+									<XAxis dataKey='member' tick={false} />
 									<YAxis />
 									<CartesianGrid strokeDasharray='3 3'/>
 									<Tooltip />
 									<Bar
-										dataKey='members'
-										name='Members'
+										dataKey='days_visited'
+										name='Days Visited'
 										fill='#2185d0'
-										maxBarSize={40}
 										animationDuration={250}
 									/>
 								</BarChart>
@@ -531,7 +526,7 @@ export function Charts(props) {
 				}
 			</p>
 
-			<p>Count: number of members who visited the forum a certain number of days in the last month.</p>
+			<p>Each bar represents an active member's visit count to the forum in the last month, sorted by activity.</p>
 
 		</Container>
 	);
