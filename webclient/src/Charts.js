@@ -494,29 +494,20 @@ export function Charts(props) {
 
 			<p>
 				{!!extras?.forums_visit_1mo?.length &&
-					(() => {
-						const data = extras.forums_visit_1mo.map((value, index) => ({
-							member: index + 1,
-							days_visited: value,
-						}));
-
-						return (
-							<ResponsiveContainer width='100%' height={300}>
-								<BarChart data={data}>
-									<XAxis dataKey='member' tick={false} />
-									<YAxis />
-									<CartesianGrid strokeDasharray='3 3'/>
-									<Tooltip labelFormatter={label => `Member ${label} (${(label / data.length * 100).toFixed(0)}%)`} />
-									<Bar
-										dataKey='days_visited'
-										name='Days Visited'
-										fill='#2185d0'
-										animationDuration={250}
-									/>
-								</BarChart>
-							</ResponsiveContainer>
-						);
-					})()
+					<ResponsiveContainer width='100%' height={300}>
+						<BarChart data={extras.forums_visit_1mo}>
+							<XAxis dataKey='member' tick={false} />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip labelFormatter={label => `Member ${label} (${(label / extras.forums_visit_1mo.length * 100).toFixed(0)}%)`} />
+							<Bar
+								dataKey='days_visited'
+								name='Days Visited'
+								fill='#2185d0'
+								animationDuration={250}
+							/>
+						</BarChart>
+					</ResponsiveContainer>
 				}
 			</p>
 

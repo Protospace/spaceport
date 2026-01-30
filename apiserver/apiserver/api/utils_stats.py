@@ -445,8 +445,12 @@ def calc_forum_activity():
             total_rows = data.get('meta', {}).get('total_rows_directory_items', 0)
             page += 1
 
-        results = [item['days_visited'] for item in all_items]
-        results.sort(reverse=True)
+        days_visited_list = [item['days_visited'] for item in all_items]
+        days_visited_list.sort(reverse=True)
+        results = [
+            {'member': index + 1, 'days_visited': value}
+            for index, value in enumerate(days_visited_list)
+        ]
         cache.set('forums_visit_1mo', results)
     except BaseException as e:
         logger.error('Problem checking Forum Activity: {} - {}'.format(e.__class__.__name__, str(e)))
