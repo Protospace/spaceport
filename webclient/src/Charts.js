@@ -496,7 +496,7 @@ export function Charts(props) {
 
 			<Header size='medium'>Forum Activity</Header>
 
-			<p>Distribution of forum visit days by active members in the last month.</p>
+			<p>Distribution of forum visit days by active members in the last month. Taken from <a href="https://forum.protospace.ca/u?group=protospace_members&order=days_visited&period=monthly">here</a>.</p>
 
 			<p>
 				{!!extras?.forums_visit_1mo?.length &&
@@ -512,7 +512,7 @@ export function Charts(props) {
 									<XAxis dataKey='member' tick={false} />
 									<YAxis />
 									<CartesianGrid strokeDasharray='3 3'/>
-									<Tooltip />
+									<Tooltip labelFormatter={label => `Member ${label}`} />
 									<Bar
 										dataKey='days_visited'
 										name='Days Visited'
