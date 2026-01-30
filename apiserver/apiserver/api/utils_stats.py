@@ -45,7 +45,7 @@ if secrets.MUMBLE:
 
 EXTRAS = {
     'drinks_6mo': [],
-    'forums_1mo': [],
+    'forums_visit_1mo': [],
     'dues_dist': [],
     'year_dist': [],
     'cert_dist': [],
@@ -415,14 +415,14 @@ def calc_cert_distribution():
 
 def calc_forum_activity():
     if not secrets.FORUM_READ_API_KEY:
-        cache.set('forums_1mo', [])
+        cache.set('forums_visit_1mo', [])
         return
 
     page = 0
     all_items = []
     total_rows = 1
 
-    headers = {'Api-Key': secrets.FORUM_READ_API_KEY}
+    headers = {'Api-Key': secrets.FORUM_READ_API_KEY, 'Api-Username': 'System'}
     base_url = "https://forum.protospace.ca/directory_items.json"
     params = {
         'group': 'protospace_members',
@@ -447,15 +447,10 @@ def calc_forum_activity():
 
         results = [item['days_visited'] for item in all_items]
         results.sort(reverse=True)
-        cache.set('forums_1mo', results)
+        cache.set('forums_visit_1mo', results)
     except BaseException as e:
         logger.error('Problem checking Forum Activity: {} - {}'.format(e.__class__.__name__, str(e)))
-        cache.set('forums_1mo', [])
-
-calc_dues_distribution()
-calc_year_distribution()
-calc_cert_distribution()
-calc_forum_activity()
+        cache.set('forums_visit_1mo', [])
 
 
 def get_progress(request_id):
