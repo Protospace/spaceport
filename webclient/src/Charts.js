@@ -7,6 +7,7 @@ import moment from 'moment-timezone';
 let memberCountCache = false;
 let signupCountCache = false;
 let spaceActivityCache = false;
+let extrasCache = false;
 
 export function Charts(props) {
 	const [memberCount, setMemberCount] = useState(memberCountCache);
@@ -14,7 +15,7 @@ export function Charts(props) {
 	const [spaceActivity, setSpaceActivity] = useState(spaceActivityCache);
 	const [fullActivity, setFullActivity] = useState(false);
 	const [fullSignups, setFullSignups] = useState(false);
-	const [stats, setStats] = useState(false);
+	const [extras, setExtras] = useState(extrasCache);
 	const isMobile = useIsMobile();
 
 	useEffect(() => {
@@ -45,14 +46,13 @@ export function Charts(props) {
 			console.log(err);
 		});
 
-		requester('/stats/', 'GET')
+		requester('/stats/extras/', 'GET')
 		.then(res => {
-			setStats(res);
-			localStorage.setItem('stats', JSON.stringify(res));
+			setExtras(res);
+			extrasCache = res;
 		})
 		.catch(err => {
 			console.log(err);
-			setStats(false);
 		});
 	}, []);
 
@@ -381,11 +381,11 @@ export function Charts(props) {
 			<p>Drinks sold over the last six months via Protocoin. Excludes instructor comped vends.</p>
 
 			<p>
-				{!!stats?.drinks_6mo?.length &&
+				{!!extras?.drinks_6mo?.length &&
 					<ResponsiveContainer width='100%' height={300}>
 						<BarChart
 							margin={isMobile? {bottom: 50} : {}}
-							data={stats.drinks_6mo}
+							data={extras.drinks_6mo}
 						>
 							<XAxis dataKey='name' interval={0} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
 							<YAxis />
