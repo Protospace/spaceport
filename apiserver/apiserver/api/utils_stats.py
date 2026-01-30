@@ -47,6 +47,7 @@ EXTRAS = {
     'drinks_6mo': [],
     'dues_dist': [],
     'year_dist': [],
+    'cert_dist': [],
 }
 
 
@@ -387,8 +388,35 @@ def calc_year_distribution():
     ))
     cache.set('year_dist', results)
 
+def calc_cert_distribution():
+    cert_fields = [
+        ('Lathe', 'lathe_cert_date'),
+        ('Mill', 'mill_cert_date'),
+        ('Woodshop', 'wood_cert_date'),
+        ('Woodshop 2', 'wood2_cert_date'),
+        ('Tormach CNC', 'tormach_cnc_cert_date'),
+        ('Precix CNC', 'precix_cnc_cert_date'),
+        ('Embroidery', 'embroidery_cert_date'),
+        ('Rabbit Laser', 'rabbit_cert_date'),
+        ('Trotec Laser', 'trotec_cert_date'),
+        ('3D Scanner', 'scanner_cert_date'),
+    ]
+
+    not_paused = models.Member.objects.filter(paused_date__isnull=True)
+
+    aggregates = {}
+    for _, field in cert_fields:
+        aggregates[field] = Count('pk', filter=Q(**{f'{field}__isnull': False}))
+
+    counts = not_paused.aggregate(**aggregates)
+
+    results = [{'name': name, 'count': counts[field]} for name, field in cert_fields]
+
+    cache.set('cert_dist', results)
+
 calc_dues_distribution()
 calc_year_distribution()
+calc_cert_distribution()
 
 
 def get_progress(request_id):
