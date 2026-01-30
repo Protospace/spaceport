@@ -407,6 +407,93 @@ export function Charts(props) {
 
 			<p>Count: number of cans of pop sold over the last six months.</p>
 
+			<Header size='medium'>Dues Distribution</Header>
+
+			<p>Distribution of monthly dues for active members.</p>
+
+			<p>
+				{!!extras?.dues_dist?.length &&
+					<ResponsiveContainer width='100%' height={300}>
+						<BarChart data={extras.dues_dist}>
+							<XAxis dataKey='monthly_fees' tickFormatter={val => `$${val}`} />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip labelFormatter={label => `$${label}`} />
+
+							<Bar
+								type='monotone'
+								dataKey='count'
+								name='Members'
+								fill='#2185d0'
+								maxBarSize={40}
+								animationDuration={250}
+							/>
+						</BarChart>
+					</ResponsiveContainer>
+				}
+			</p>
+
+			<p>Count: number of members paying a certain amount monthly.</p>
+
+			<Header size='medium'>Signup Year Distribution</Header>
+
+			<p>Distribution of active members by their signup year.</p>
+
+			<p>
+				{!!extras?.year_dist?.length &&
+					<ResponsiveContainer width='100%' height={300}>
+						<BarChart data={extras.year_dist}>
+							<XAxis dataKey='application_date__year' />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip />
+
+							<Bar
+								type='monotone'
+								dataKey='count'
+								name='Members'
+								fill='#2185d0'
+								maxBarSize={40}
+								animationDuration={250}
+							/>
+						</BarChart>
+					</ResponsiveContainer>
+				}
+			</p>
+
+			<p>Count: number of members who signed up in a given year who are still active.</p>
+
+			<Header size='medium'>Certification Distribution</Header>
+
+			<p>Number of active members with each certification.</p>
+
+			<p>
+				{!!extras?.cert_dist?.length &&
+					<ResponsiveContainer width='100%' height={300}>
+						<BarChart
+							margin={isMobile? {bottom: 80} : {}}
+							data={extras.cert_dist}
+						>
+							<XAxis dataKey='name' interval={0} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip />
+
+							<Bar
+								type='monotone'
+								dataKey='count'
+								name='Members'
+								fill='#2185d0'
+								maxBarSize={40}
+								animationDuration={250}
+							/>
+						</BarChart>
+					</ResponsiveContainer>
+				}
+			</p>
+
+			<p>Count: number of active members with the given certification.</p>
+
 		</Container>
 	);
 };
