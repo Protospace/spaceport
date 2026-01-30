@@ -494,6 +494,45 @@ export function Charts(props) {
 
 			<p>Count: number of active members with the given certification.</p>
 
+			<Header size='medium'>Forum Activity</Header>
+
+			<p>Distribution of forum visit days by active members in the last month.</p>
+
+			<p>
+				{!!extras?.forums_visit_1mo?.length &&
+					(() => {
+						const counts = extras.forums_visit_1mo.reduce((acc, val) => {
+							acc[val] = (acc[val] || 0) + 1;
+							return acc;
+						}, {});
+						const data = Object.keys(counts).map(key => ({
+							days: parseInt(key),
+							members: counts[key]
+						})).sort((a, b) => a.days - b.days);
+
+						return (
+							<ResponsiveContainer width='100%' height={300}>
+								<BarChart data={data}>
+									<XAxis dataKey='days' name='Days Visited' />
+									<YAxis />
+									<CartesianGrid strokeDasharray='3 3'/>
+									<Tooltip />
+									<Bar
+										dataKey='members'
+										name='Members'
+										fill='#2185d0'
+										maxBarSize={40}
+										animationDuration={250}
+									/>
+								</BarChart>
+							</ResponsiveContainer>
+						);
+					})()
+				}
+			</p>
+
+			<p>Count: number of members who visited the forum a certain number of days in the last month.</p>
+
 		</Container>
 	);
 };
