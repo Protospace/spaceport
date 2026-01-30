@@ -407,23 +407,32 @@ export function Charts(props) {
 
 			<p>
 				{!!extras?.dues_dist?.length &&
-					<ResponsiveContainer width='100%' height={300}>
-						<BarChart data={extras.dues_dist}>
-							<XAxis dataKey='monthly_fees' tickFormatter={val => `$${val}`} />
-							<YAxis />
-							<CartesianGrid strokeDasharray='3 3'/>
-							<Tooltip labelFormatter={label => `$${label}`} />
+					(() => {
+						const total = extras.dues_dist.reduce((acc, item) => acc + item.count, 0);
+						return (
+							<ResponsiveContainer width='100%' height={300}>
+								<BarChart data={extras.dues_dist}>
+									<XAxis dataKey='monthly_fees' tickFormatter={val => `$${val}`} />
+									<YAxis />
+									<CartesianGrid strokeDasharray='3 3'/>
+									<Tooltip labelFormatter={label => {
+										const item = extras.dues_dist.find(d => d.monthly_fees === label);
+										const percentage = item ? (item.count / total * 100).toFixed(1) : 0;
+										return `$${label} (${percentage}%)`;
+									}} />
 
-							<Bar
-								type='monotone'
-								dataKey='count'
-								name='Members'
-								fill='#2185d0'
-								maxBarSize={40}
-								animationDuration={250}
-							/>
-						</BarChart>
-					</ResponsiveContainer>
+									<Bar
+										type='monotone'
+										dataKey='count'
+										name='Members'
+										fill='#2185d0'
+										maxBarSize={40}
+										animationDuration={250}
+									/>
+								</BarChart>
+							</ResponsiveContainer>
+						);
+					})()
 				}
 			</p>
 
@@ -435,23 +444,32 @@ export function Charts(props) {
 
 			<p>
 				{!!extras?.year_dist?.length &&
-					<ResponsiveContainer width='100%' height={300}>
-						<BarChart data={extras.year_dist}>
-							<XAxis dataKey='application_date__year' />
-							<YAxis />
-							<CartesianGrid strokeDasharray='3 3'/>
-							<Tooltip />
+					(() => {
+						const total = extras.year_dist.reduce((acc, item) => acc + item.count, 0);
+						return (
+							<ResponsiveContainer width='100%' height={300}>
+								<BarChart data={extras.year_dist}>
+									<XAxis dataKey='application_date__year' />
+									<YAxis />
+									<CartesianGrid strokeDasharray='3 3'/>
+									<Tooltip labelFormatter={label => {
+										const item = extras.year_dist.find(d => d.application_date__year === label);
+										const percentage = item ? (item.count / total * 100).toFixed(1) : 0;
+										return `${label} (${percentage}%)`;
+									}} />
 
-							<Bar
-								type='monotone'
-								dataKey='count'
-								name='Members'
-								fill='#2185d0'
-								maxBarSize={40}
-								animationDuration={250}
-							/>
-						</BarChart>
-					</ResponsiveContainer>
+									<Bar
+										type='monotone'
+										dataKey='count'
+										name='Members'
+										fill='#2185d0'
+										maxBarSize={40}
+										animationDuration={250}
+									/>
+								</BarChart>
+							</ResponsiveContainer>
+						);
+					})()
 				}
 			</p>
 
@@ -463,26 +481,35 @@ export function Charts(props) {
 
 			<p>
 				{!!extras?.cert_dist?.length &&
-					<ResponsiveContainer width='100%' height={300}>
-						<BarChart
-							margin={isMobile? {bottom: 80} : {}}
-							data={extras.cert_dist}
-						>
-							<XAxis dataKey='name' interval={0} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
-							<YAxis />
-							<CartesianGrid strokeDasharray='3 3'/>
-							<Tooltip />
+					(() => {
+						const total = extras.dues_dist.reduce((acc, item) => acc + item.count, 0);
+						return (
+							<ResponsiveContainer width='100%' height={300}>
+								<BarChart
+									margin={isMobile? {bottom: 80} : {}}
+									data={extras.cert_dist}
+								>
+									<XAxis dataKey='name' interval={0} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
+									<YAxis />
+									<CartesianGrid strokeDasharray='3 3'/>
+									<Tooltip labelFormatter={label => {
+										const item = extras.cert_dist.find(d => d.name === label);
+										const percentage = item && total > 0 ? (item.count / total * 100).toFixed(1) : 0;
+										return `${label} (${percentage}%)`;
+									}} />
 
-							<Bar
-								type='monotone'
-								dataKey='count'
-								name='Members'
-								fill='#2185d0'
-								maxBarSize={40}
-								animationDuration={250}
-							/>
-						</BarChart>
-					</ResponsiveContainer>
+									<Bar
+										type='monotone'
+										dataKey='count'
+										name='Members'
+										fill='#2185d0'
+										maxBarSize={40}
+										animationDuration={250}
+									/>
+								</BarChart>
+							</ResponsiveContainer>
+						);
+					})()
 				}
 			</p>
 
