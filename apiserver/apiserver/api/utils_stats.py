@@ -36,13 +36,17 @@ DEFAULTS = {
     'printer3d': {},
     'scanner3d': {},
     'solar': {},
-    'drinks_6mo': [],
     'shopping_list': [],
     'maintenance_list': [],
 }
 
 if secrets.MUMBLE:
     DEFAULTS['mumble_users'] = []
+
+EXTRAS = {
+    'drinks_6mo': [],
+}
+
 
 def changed_card():
     '''
@@ -79,7 +83,6 @@ def calc_next_events():
         cache.set('prev_class', dict(datetime=prev_class.datetime, id=prev_class.id, name=prev_class.course.name))
     else:
         cache.set('prev_class', None)
-
 
 def calc_member_counts():
     members = models.Member.objects
@@ -339,7 +342,6 @@ def calc_drink_sales():
     results = [{'name': name, 'count': count, 'fill': colors[name]} for name, count in drink_counts.items()]
     cache.set('drinks_6mo', results)
 
-
 def calc_num_interested():
     courses = models.Course.objects.annotate(
         num_interested_calc=Count(
@@ -359,6 +361,8 @@ def calc_num_interested():
 
     models.Course.objects.bulk_update(course_list, ['num_interested'])
 
+def calc_dues_distribution():
+    cache.set('dues_dist', results)
 
 
 def get_progress(request_id):
