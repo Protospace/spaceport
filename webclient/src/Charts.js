@@ -415,11 +415,10 @@ export function Charts(props) {
 									<XAxis dataKey='monthly_fees' tickFormatter={val => `$${val}`} />
 									<YAxis />
 									<CartesianGrid strokeDasharray='3 3'/>
-									<Tooltip labelFormatter={label => {
-										const item = extras.dues_dist.find(d => d.monthly_fees === label);
-										const percentage = item ? (item.count / total * 100).toFixed(1) : 0;
-										return `$${label} (${percentage}%)`;
-									}} />
+									<Tooltip
+										formatter={(value) => `${value} (${(value / total * 100).toFixed(1)}%)`}
+										labelFormatter={label => `$${label}`}
+									/>
 
 									<Bar
 										type='monotone'
@@ -452,11 +451,7 @@ export function Charts(props) {
 									<XAxis dataKey='application_date__year' />
 									<YAxis />
 									<CartesianGrid strokeDasharray='3 3'/>
-									<Tooltip labelFormatter={label => {
-										const item = extras.year_dist.find(d => d.application_date__year === label);
-										const percentage = item ? (item.count / total * 100).toFixed(1) : 0;
-										return `${label} (${percentage}%)`;
-									}} />
+									<Tooltip formatter={(value) => `${value} (${(value / total * 100).toFixed(1)}%)`} />
 
 									<Bar
 										type='monotone'
@@ -492,10 +487,9 @@ export function Charts(props) {
 									<XAxis dataKey='name' interval={0} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
 									<YAxis />
 									<CartesianGrid strokeDasharray='3 3'/>
-									<Tooltip labelFormatter={label => {
-										const item = extras.cert_dist.find(d => d.name === label);
-										const percentage = item && total > 0 ? (item.count / total * 100).toFixed(1) : 0;
-										return `${label} (${percentage}%)`;
+									<Tooltip formatter={(value) => {
+										const percentage = total > 0 ? (value / total * 100).toFixed(1) : 0;
+										return `${value} (${percentage}%)`;
 									}} />
 
 									<Bar
