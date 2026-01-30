@@ -45,6 +45,7 @@ if secrets.MUMBLE:
 
 EXTRAS = {
     'drinks_6mo': [],
+    'forums_1mo': [],
     'dues_dist': [],
     'year_dist': [],
     'cert_dist': [],
@@ -411,6 +412,9 @@ def calc_cert_distribution():
     results = [{'name': name, 'count': counts[field]} for name, field in cert_fields]
 
     cache.set('cert_dist', results)
+
+def calc_forum_activity():
+    cache.set('forums_1mo', results)
 
 calc_dues_distribution()
 calc_year_distribution()
