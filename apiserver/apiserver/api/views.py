@@ -964,6 +964,14 @@ class StatsViewSet(viewsets.ViewSet, List):
         return Response(stats)
 
     @action(detail=False, methods=['get'])
+    def extras(self, request):
+        extras_keys = utils_stats.EXTRAS.keys()
+        cached_stats = cache.get_many(extras_keys)
+        extras = utils_stats.EXTRAS.copy()
+        extras.update(cached_stats)
+        return Response(extras)
+
+    @action(detail=False, methods=['get'])
     def progress(self, request):
         try:
             request_id = request.query_params['request_id']
