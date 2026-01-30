@@ -414,11 +414,48 @@ def calc_cert_distribution():
     cache.set('cert_dist', results)
 
 def calc_forum_activity():
-    cache.set('forums_1mo', results)
+    if not secrets.FORUM_READ_API_KEY:
+        cache.set('forums_1mo', [])
+        return
+
+    page = 0
+    all_items = []
+    total_rows = 1
+
+    headers = {'Api-Key': secrets.FORUM_READ_API_KEY}
+    base_url = "https://forum.protospace.ca/directory_items.json"
+    params = {
+        'group': 'protospace_members',
+        'order': 'days_visited',
+        'period': 'monthly',
+    }
+
+    try:
+        while len(all_items) < total_rows:
+            params['page'] = page
+            r = requests.get(base_url, params=params, headers=headers, timeout=10)
+            r.raise_for_status()
+            data = r.json()
+
+            items = data.get('directory_items', [])
+            if not items:
+                break
+
+            all_items.extend(items)
+            total_rows = data.get('meta', {}).get('total_rows_directory_items', 0)
+            page += 1
+
+        results = [item['days_visited'] for item in all_items]
+        results.sort(reverse=True)
+        cache.set('forums_1mo', results)
+    except BaseException as e:
+        logger.error('Problem checking Forum Activity: {} - {}'.format(e.__class__.__name__, str(e)))
+        cache.set('forums_1mo', [])
 
 calc_dues_distribution()
 calc_year_distribution()
 calc_cert_distribution()
+calc_forum_activity()
 
 
 def get_progress(request_id):
