@@ -512,7 +512,7 @@ export function Charts(props) {
 									<XAxis dataKey='member' tick={false} />
 									<YAxis />
 									<CartesianGrid strokeDasharray='3 3'/>
-									<Tooltip labelFormatter={label => `Member ${label}`} />
+									<Tooltip labelFormatter={label => `Member ${label} (${(label / data.length * 100).toFixed(0)}%)`} />
 									<Bar
 										dataKey='days_visited'
 										name='Days Visited'
