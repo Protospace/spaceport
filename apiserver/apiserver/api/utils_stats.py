@@ -46,6 +46,7 @@ if secrets.MUMBLE:
 EXTRAS = {
     'drinks_6mo': [],
     'dues_dist': [],
+    'year_dist': [],
 }
 
 
@@ -375,9 +376,19 @@ def calc_dues_distribution():
     cache.set('dues_dist', results)
 
 def calc_year_distribution():
+    results = list(models.Member.objects.filter(
+        paused_date__isnull=True,
+    ).values(
+        'application_date__year'
+    ).annotate(
+        count=Count('id')
+    ).order_by(
+        'application_date__year'
+    ))
     cache.set('year_dist', results)
 
 calc_dues_distribution()
+calc_year_distribution()
 
 
 def get_progress(request_id):
