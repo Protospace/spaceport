@@ -1288,7 +1288,7 @@ class DrawingViewSet(Base, List, Create, Update):
 
 class MemberCountViewSet(Base, List):
     pagination_class = None
-    queryset = models.StatsMemberCount.objects.all()
+    queryset = models.StatsMemberCount.objects.all()[::3]
     serializer_class = serializers.MemberCountSerializer
 
 class SignupCountViewSet(Base, List):

@@ -139,12 +139,6 @@ export function Charts(props) {
 							<Tooltip />
 							<Legend />
 
-							<ReferenceLine x='2020-03-25' stroke='red' label='Locked' strokeDasharray='3 3' />
-							<ReferenceLine x='2020-06-01' stroke='red' label='Opened' strokeDasharray='3 3' />
-
-							<ReferenceLine x='2020-11-27' stroke='red' label='Locked' strokeDasharray='3 3' />
-							<ReferenceLine x='2021-03-20' stroke='red' label='Opened' strokeDasharray='3 3' />
-
 							<Line
 								type='monotone'
 								dataKey='member_count'
