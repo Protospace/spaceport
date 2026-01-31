@@ -297,6 +297,20 @@ class Drawing(models.Model):
         return self.filename or str(self.id)
 
 
+class Achievement(models.Model):
+    user = models.ForeignKey(User, related_name='achievements', on_delete=models.CASCADE)
+    name = models.CharField(max_length=64)
+    date_awarded = models.DateField(default=today_alberta_tz)
+
+    class Meta:
+        unique_together = ('user', 'name')
+
+    list_display = ['user', 'name', 'date_awarded']
+    search_fields = ['user__username', 'name']
+    def __str__(self):
+        return '%s earned %s' % (self.user, self.name)
+
+
 class HistoryIndex(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField()

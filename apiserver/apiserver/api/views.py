@@ -2316,6 +2316,14 @@ class SignupHelperViewSet(Base):
         return Response(helpers)
 
 
+class AchievementViewSet(Base, List):
+    permission_classes = [AllowMetadata | IsAuthenticated]
+    serializer_class = serializers.AchievementSerializer
+
+    def get_queryset(self):
+        return self.request.user.achievements.all().order_by('-date_awarded', 'name')
+
+
 class TodoViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['get'])
     def tasks(self, request):

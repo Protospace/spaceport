@@ -470,3 +470,66 @@ def set_progress(request_id, data, replace=False):
         progress.append(data)
 
     cache.set('request-progress-' + request_id, progress)
+
+
+ACHIEVEMENTS = {
+    'signup': 'Signed up to Protospace',
+    'nmo': 'Completed New Member Orientation',
+    'first_class': 'Attended first Class',
+    'teach_first_class': 'Taught first Class',
+    'guide_book': 'Read the entire Guide Book',
+    'forum_post': 'Made first Forum Post',
+    'thunder_laser': 'Passed Thunder Laser Training',
+}
+
+def grant_achievements():
+    members = models.Member.objects.filter(paused_date__isnull=True).select_related('user').prefetch_related('user__achievements')
+
+    for member in members:
+        user = member.user
+        if not user:
+            continue
+
+        existing_achievements = {a.name for a in user.achievements.all()}
+        new_achievements = []
+
+        # Sign up to Protospace
+        if ACHIEVEMENTS['signup'] not in existing_achievements and member.application_date:
+            new_achievements.append(models.Achievement(user=user, name=ACHIEVEMENTS['signup'], date_awarded=member.application_date))
+
+        # Complete New Member Orientation
+        if ACHIEVEMENTS['nmo'] not in existing_achievements and member.orientation_date:
+            new_achievements.append(models.Achievement(user=user, name=ACHIEVEMENTS['nmo'], date_awarded=member.orientation_date))
+
+        # Attend your First Class
+        if ACHIEVEMENTS['first_class'] not in existing_achievements:
+            first_class = models.Training.objects.filter(
+                user=user,
+                attendance_status='Attended'
+            ).exclude(
+                session__course_id=249 # NMO
+            ).order_by('session__datetime').first()
+            if first_class:
+                new_achievements.append(models.Achievement(user=user, name=ACHIEVEMENTS['first_class'], date_awarded=first_class.session.datetime.date()))
+
+        # Teach your First Class
+        if ACHIEVEMENTS['teach_first_class'] not in existing_achievements:
+            first_taught = models.Session.objects.filter(instructor=user).order_by('datetime').first()
+            if first_taught:
+                new_achievements.append(models.Achievement(user=user, name=ACHIEVEMENTS['teach_first_class'], date_awarded=first_taught.datetime.date()))
+
+        # Read the Entire Guide Book
+        # Placeholder
+        pass
+
+        # Make your First Forum Post
+        # Placeholder
+        pass
+
+        # Pass Thunder Laser Training
+        if ACHIEVEMENTS['thunder_laser'] not in existing_achievements and member.rabbit_cert_date:
+            new_achievements.append(models.Achievement(user=user, name=ACHIEVEMENTS['thunder_laser'], date_awarded=member.rabbit_cert_date))
+
+        if new_achievements:
+            models.Achievement.objects.bulk_create(new_achievements)
+            logger.info("Granted %s achievements to %s", len(new_achievements), user.username)

@@ -936,6 +936,7 @@ class UserSerializer(serializers.ModelSerializer):
             'app_version',
             'interests',
             'storage',
+            'achievements',
         ]
         depth = 1
 
@@ -1173,6 +1174,12 @@ class DrawingSerializer(serializers.ModelSerializer):
             member = obj.owner.member
             return member.preferred_name + ' ' + member.last_name[0] + '.'
         return 'Anonymous'
+
+
+class AchievementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Achievement
+        fields = ['name', 'date_awarded']
 
 
 class HistoryChangeSerializer(serializers.ModelSerializer):
