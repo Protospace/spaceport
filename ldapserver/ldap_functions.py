@@ -2,6 +2,7 @@ from log import logger
 import time
 import ldap
 import ldap.modlist as modlist
+from ldap.controls import SimplePagedResultsControl
 import secrets
 import base64
 
@@ -293,8 +294,38 @@ def dump_users():
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
         criteria = '(&(objectClass=user)(objectGUID=*))'
         attributes = ['cn', 'sAMAccountName', 'userPrincipalName', 'mail', 'displayName', 'givenName', 'name', 'sn', 'logonCount', 'objectGUID']
-        results = ldap_conn.search_s(secrets.BASE_MEMBERS, ldap.SCOPE_SUBTREE, criteria, attributes)
-        results = convert(results)
+
+        page_control = SimplePagedResultsControl(True, size=1000, cookie=b'')
+
+        results_list = []
+        while True:
+            msgid = ldap_conn.search_ext(
+                secrets.BASE_MEMBERS,
+                ldap.SCOPE_SUBTREE,
+                criteria,
+                attributes,
+                serverctrls=[page_control]
+            )
+
+            rtype, rdata, rmsgid, serverctrls_out = ldap_conn.result3(msgid)
+
+            # Filter out referrals
+            results_list.extend([r for r in rdata if r[0] is not None])
+
+            pctrls = [
+                c for c in serverctrls_out if c.controlType == SimplePagedResultsControl.controlType
+            ]
+            if not pctrls:
+                logger.warning("Server ignored paged results control")
+                break
+
+            cookie = pctrls[0].cookie
+            if not cookie:
+                break # No more pages
+
+            page_control.cookie = cookie
+
+        results = convert(results_list)
 
         output = {}
         for r in results:
