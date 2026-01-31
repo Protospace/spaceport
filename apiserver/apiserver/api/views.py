@@ -990,9 +990,6 @@ class StatsViewSet(viewsets.ViewSet, List):
         except KeyError:
             raise exceptions.ValidationError(dict(search='This field is required.'))
 
-        if len(search) < 5:
-            raise exceptions.ValidationError(dict(search='Must be at least 5 characters.'))
-
         users = User.objects.select_related('member').filter(username__icontains=search)
 
         results = []
