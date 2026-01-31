@@ -2379,9 +2379,9 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
 
         if storage.user:
             owner_name = storage.user.member.preferred_name
-            six_months_ago = utils.today_alberta_tz() - datetime.timedelta(days=178)  # 2 days slack from the UI
+            three_months_ago = utils.today_alberta_tz() - datetime.timedelta(days=89)  # 1 day slack from the UI
             owner_paused_date = storage.user.member.paused_date
-            owner_long_expired = owner_paused_date and owner_paused_date <= six_months_ago
+            owner_long_expired = owner_paused_date and owner_paused_date <= three_months_ago
 
             if not owner_long_expired:
                 raise exceptions.ValidationError(dict(shelf_id='Shelf already belongs to {}.'.format(owner_name)))

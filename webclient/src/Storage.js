@@ -200,7 +200,7 @@ function StorageTable(props) {
 export function StorageTakeover(props) {
 	const { storage } = props;
 
-	const daysRemaining = 180 - moment().diff(moment(storage.member_paused), 'days');
+	const daysRemaining = 90 - moment().diff(moment(storage.member_paused), 'days');
 
 	return (
 		<>
