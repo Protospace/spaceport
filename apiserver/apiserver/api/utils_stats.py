@@ -292,6 +292,16 @@ def calc_drink_sales():
             '7': 'Diet Coke',
             '8': 'Brisk Iced Tea',
         },
+        '2026-02-01': {
+            '1': 'Coke',
+            '2': 'Coke Zero',
+            '3': 'Root Beer',
+            '4': 'Iced Tea',
+            '5': 'Fanta',
+            '6': 'Dr Pepper',
+            '7': 'Brisk Iced Tea',
+            '8': 'Diet Coke',
+        },
     }
 
     colors = {
