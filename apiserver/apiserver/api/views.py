@@ -524,11 +524,13 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             member = get_object_or_404(models.Member, id=data['member_id'])
             user = member.user
             course_id = session.course.id
+            tags = session.course.tags
 
-            if course_id not in [317, 273, 413] and user == session.instructor:
-                msg = 'Self-register trickery detected:\n' + str(data.dict())
+            if 'Protospace' not in tags and 'Event' not in tags and 'Outing' not in tags and user == session.instructor:
+                info = 'User: {}, Course: {}, date: {}, tags: {}'.format(user.username, session.course.name, session.datetime, tags)
+                msg = 'Self-register trickery detected:\n' + info + '\n' + str(data.dict())
                 utils.alert_tanner(msg)
-                raise exceptions.ValidationError(dict(non_field_errors='Can\'t register the instructor. Don\'t try to trick the portal.'))
+                raise exceptions.ValidationError(dict(non_field_errors='Can\'t register the instructor.'))
 
             training1 = models.Training.objects.filter(user=user, session=session)
             if training1.exists():
