@@ -30,3 +30,7 @@ If the shelf isn't empty, you must contact the [[Directors]] so they can return 
 7. If the shelf isn't empty, leave the items there and contact the [[Directors]]. They will help you coordinate returning the previous owner's property to them.
 
 Tip: You can filter for expired shelves on the Portal > Space > [Storage](https://my.protospace.ca/storage) page. The list will be sorted by longest expired first.
+
+## References
+
+- <https://www.youtube.com/watch?v=cCVIgT71BMQ>
