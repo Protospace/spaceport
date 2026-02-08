@@ -2367,8 +2367,16 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
         ).filter(
             Q(user__isnull=True) | Q(user__member__paused_date__isnull=False, user__member__paused_date__lte=three_months_ago)
         ).select_related('user__member').order_by('id')
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+
+        data = []
+        for storage in queryset:
+            data.append({
+                'id': storage.id,
+                'shelf_id': storage.shelf_id,
+                'member_paused': storage.user.member.paused_date.isoformat() if storage.user else None,
+            })
+
+        return Response(data)
 
     @action(detail=False, methods=['post'], permission_classes=[AllowMetadata | IsAuthenticated])
     def claim(self, request):
