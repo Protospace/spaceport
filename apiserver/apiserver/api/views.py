@@ -2359,6 +2359,17 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
         else:
             return serializers.UnvettedStorageSpaceSerializer
 
+    @action(detail=False, methods=['get'])
+    def available(self, request):
+        three_months_ago = utils.today_alberta_tz() - datetime.timedelta(days=89)
+        queryset = models.StorageSpace.objects.filter(
+            location='member_shelves'
+        ).filter(
+            Q(user__isnull=True) | Q(user__member__paused_date__isnull=False, user__member__paused_date__lte=three_months_ago)
+        ).select_related('user__member').order_by('id')
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     @action(detail=False, methods=['post'], permission_classes=[AllowMetadata | IsAuthenticated])
     def claim(self, request):
         user = self.request.user
