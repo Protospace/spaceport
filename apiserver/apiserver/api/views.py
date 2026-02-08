@@ -2376,6 +2376,8 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
                 'member_paused': storage.user.member.paused_date.isoformat() if storage.user else None,
             })
 
+        data.sort(key=lambda x: (x['member_paused'] is not None, x['member_paused'] or '', x['shelf_id']))
+
         return Response(data)
 
     @action(detail=False, methods=['post'], permission_classes=[AllowMetadata | IsAuthenticated])
