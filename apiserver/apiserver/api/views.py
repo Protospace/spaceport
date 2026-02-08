@@ -2359,7 +2359,7 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
         else:
             return serializers.UnvettedStorageSpaceSerializer
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], permission_classes=[])
     def available(self, request):
         three_months_ago = utils.today_alberta_tz() - datetime.timedelta(days=89)
         queryset = models.StorageSpace.objects.filter(
