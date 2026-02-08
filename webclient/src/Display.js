@@ -344,7 +344,7 @@ export function DisplayAvailableShelves(props) {
 			<Header size='large'>Available Shelves</Header>
 
 			{shelves && shelves.slice(0, 10).map((x, i) =>
-				<div key={i} className={x.member_paused ? 'expired' : ''}>
+				<div key={i} className={x.member_paused ? 'shelf expired' : 'shelf'}>
 					<Header size='large'>{x.shelf_id}</Header>
 				</div>
 			)}

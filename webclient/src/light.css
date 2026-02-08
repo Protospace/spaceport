@@ -260,6 +260,10 @@ a {
 	height: 75vh;
 }
 
+.display .display-shelves .shelf .ui.header{
+	margin-left: 2rem;
+}
+
 .display .display-shelves .expired,
 .display .display-shelves .expired .ui.header{
 	color: #f26060 !important;
