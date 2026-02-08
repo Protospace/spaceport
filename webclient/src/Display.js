@@ -88,7 +88,7 @@ export function LCARS2Display(props) {
 					<DisplayMonthlyHosting />
 				</div>
 
-				<div className='display-scores'>
+				<div className='display-shelves'>
 					<DisplayAvailableShelves />
 				</div>
 
@@ -344,8 +344,8 @@ export function DisplayAvailableShelves(props) {
 			<Header size='large'>Available Shelves</Header>
 
 			{shelves && shelves.slice(0, 10).map((x, i) =>
-				<div key={i}>
-					<Header size='medium'>{x.shelf_id}</Header>
+				<div key={i} className={x.member_paused ? 'expired' : ''}>
+					<Header size='large'>{x.shelf_id}</Header>
 				</div>
 			)}
 		</>

@@ -252,6 +252,19 @@ a {
 	color: #4baafe !important;
 }
 
+.display-shelves {
+	border: 1px solid white;
+	padding: 0.5em;
+	align-self: flex-end;
+	width: 25vw;
+	height: 75vh;
+}
+
+.display .display-shelves .expired,
+.display .display-shelves .expired .ui.header{
+	color: #f26060 !important;
+}
+
 .display-tasks {
 	border: 1px solid white;
 	padding: 0.5em;

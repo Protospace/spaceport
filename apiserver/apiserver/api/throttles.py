@@ -44,7 +44,8 @@ class LoggingThrottle(throttling.BaseThrottle):
             '/stats/ord3/printer3d/',
             '/stats/p1s1/printer3d/',
             '/stats/solar_data/',
-            '/user/6005/'
+            '/user/6005/',
+            '/storage/available/',
         ]:
             return True
 
