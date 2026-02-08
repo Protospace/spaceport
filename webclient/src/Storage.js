@@ -500,6 +500,7 @@ export function ClaimShelfForm(props) {
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);
+	const handleCheck = (e, v) => setInput({ ...input, [v.name]: v.checked });
 
 	const handleSubmit = (e) => {
 		if (loading) return;
@@ -539,7 +540,47 @@ export function ClaimShelfForm(props) {
 				maxLength={3}
 			/>
 
-			<Form.Button loading={loading} error={error.non_field_errors || error.detail}>
+			<Form.Group grouped>
+				<label>Are there items on the shelf?</label>
+				<Form.Radio
+					label='Yes'
+					name='has_items'
+					value={true}
+					checked={input.has_items === true}
+					onChange={handleValues}
+					error={!!error.has_items}
+				/>
+				<Form.Radio
+					label='No'
+					name='has_items'
+					value={false}
+					checked={input.has_items === false}
+					onChange={handleValues}
+					error={!!error.has_items}
+				/>
+			</Form.Group>
+
+			{input.has_items && <>
+				<p>You must contact the Directors so they can coordinate returning the previous owner's property.</p>
+
+				<Form.Checkbox
+					label='I will contact directors@protospace.ca about the items'
+					required
+					{...makeProps('will_contact')}
+					onChange={handleCheck}
+					checked={input.will_contact}
+				/>
+
+				<Form.Checkbox
+					label="I won't throw the items away"
+					required
+					{...makeProps('wont_toss')}
+					onChange={handleCheck}
+					checked={input.wont_toss}
+				/>
+			</>}
+
+			<Form.Button disabled={input.has_items !== false && (!input.will_contact || !input.wont_toss)} loading={loading} error={error.non_field_errors || error.detail}>
 				Submit
 			</Form.Button>
 		</Form>
