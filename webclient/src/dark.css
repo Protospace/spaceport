@@ -57,6 +57,7 @@
 .dark .ui.menu .ui.dropdown .menu > .item,
 .dark .ui.dropdown .menu > .item,
 .dark .ui.form .field > label,
+.dark .ui.form .grouped.fields > label,
 .dark .ui.items > .item > .content > .description,
 .dark .ui.items > .item > .content > .header,
 .dark .ui.checkbox label,
