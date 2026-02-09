@@ -981,31 +981,6 @@ class StatsViewSet(viewsets.ViewSet, List):
         except KeyError:
             raise exceptions.ValidationError(dict(request_id='This field is required.'))
 
-    @action(detail=False, methods=['get'])
-    def ad_search_username(self, request):
-        auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-        if secrets.AD_SEARCH_TOKEN and auth_token != 'Bearer ' + secrets.AD_SEARCH_TOKEN:
-            raise exceptions.PermissionDenied()
-
-        try:
-            search = request.query_params['search']
-        except KeyError:
-            raise exceptions.ValidationError(dict(search='This field is required.'))
-
-        users = User.objects.select_related('member').filter(username__icontains=search)
-
-        results = []
-        for user in users:
-            results.append(dict(
-                username=user.username,
-                email=user.email,
-                first_name=user.member.first_name,
-                preferred_name=user.member.preferred_name,
-                last_name=user.member.last_name,
-            ))
-
-        return Response(results)
-
     @action(detail=False, methods=['post'])
     def sign(self, request):
         try:
