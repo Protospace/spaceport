@@ -302,6 +302,16 @@ def calc_drink_sales():
             '7': 'Brisk Iced Tea',
             '8': 'Diet Coke',
         },
+        '2026-02-11': {
+            '1': 'Coke',
+            '2': 'Coke Zero',
+            '3': 'Root Beer',
+            '4': 'Lime Fizzy Water',
+            '5': 'Fanta',
+            '6': 'Dr Pepper',
+            '7': 'Brisk Iced Tea',
+            '8': 'Diet Coke',
+        },
     }
 
     colors = {
@@ -316,6 +326,7 @@ def calc_drink_sales():
         'Cherry Coke': '#ab316e',
         'Diet Coke': '#c8b560',
         'Brisk Iced Tea': '#f07e05',
+        'Lime Fizzy Water': '#00ff00',
     }
 
     txs = models.Transaction.objects
