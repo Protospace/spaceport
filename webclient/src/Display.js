@@ -37,6 +37,7 @@ export function LCARS1Display(props) {
 				<div className='display-tasks'>
 					<DisplayShoppingList />
 					<DisplayMaintenanceList />
+					<div/>
 				</div>
 
 				<div className='display-scores'>
@@ -82,6 +83,8 @@ export function LCARS2Display(props) {
 
 				<div className='display-tasks'>
 					<DisplayShoppingList />
+					<DisplayMaintenanceList />
+					<div/>
 				</div>
 
 				<div className='display-scores'>

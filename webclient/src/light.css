@@ -275,6 +275,10 @@ a {
 	align-self: flex-end;
 	width: 25vw;
 	height: 75vh;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 }
 
 .display-tasks p {
@@ -288,7 +292,7 @@ a {
 
 .display-tasks .qr {
 	position: absolute;
-	top: 0;
+	top: -1rem;
 	right: -0.5em;
 	background: white;
 	padding: 16px;
