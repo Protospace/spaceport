@@ -42,6 +42,7 @@ class Member(models.Model):
     is_director = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_instructor = models.BooleanField(default=False)
+    is_vetter = models.BooleanField(default=False)
     status = models.CharField(max_length=32, blank=True, null=True)
     expire_date = models.DateField(default=today_alberta_tz, null=True)
     current_start_date = models.DateField(default=today_alberta_tz, null=True)

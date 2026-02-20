@@ -241,6 +241,7 @@ class VettedOtherMemberSerializer(serializers.ModelSerializer):
             'storage',
             'signup_helper',
             'discourse_username',
+            'is_allowed_entry',
         ]
 
     def get_storage(self, obj):
@@ -275,6 +276,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'is_director',
             'is_staff',
             'is_instructor',
+            'is_vetter',
             'first_name',
             'last_name',
             'status',
@@ -448,60 +450,6 @@ class AdminMemberSerializer(MemberSerializer):
                 else:
                     utils_ldap.remove_from_group(instance, 'Trotec Users')
 
-        if 'vetted_date' in validated_data:
-            changed = validated_data['vetted_date'] != instance.vetted_date
-            if changed:
-                if validated_data['vetted_date']:
-
-                    # TODO: fix bug where admin editing vetted date doesn't cause
-                    #       the changes to apply. this is because the PATCH request
-                    #       includes empty cert values which overrides this.
-
-                    PRECIX_COURSE = 428
-                    attended_precix = models.Training.objects.filter(
-                        user=instance.user,
-                        session__course__id=PRECIX_COURSE,
-                        session__datetime__gte=instance.current_start_date,
-                        attendance_status='Attended',
-                    ).exists()
-
-                    if attended_precix:
-                        logging.info('Auto-certifying precix...')
-                        if utils_ldap.is_configured():
-                            utils_ldap.add_to_group(instance, 'CNC-Precix-Users')
-                        instance.precix_cnc_cert_date = utils.today_alberta_tz()
-
-                    RABBIT_COURSE = 247
-                    attended_rabbit = models.Training.objects.filter(
-                        user=instance.user,
-                        session__course__id=RABBIT_COURSE,
-                        session__datetime__gte=instance.current_start_date,
-                        attendance_status='Attended',
-                    ).exists()
-
-                    if attended_rabbit:
-                        logging.info('Auto-certifying rabbit...')
-                        if utils_ldap.is_configured():
-                            utils_ldap.add_to_group(instance, 'Laser Users')
-                        instance.rabbit_cert_date = utils.today_alberta_tz()
-
-                    TROTEC_COURSE = 321
-                    attended_trotec = models.Training.objects.filter(
-                        user=instance.user,
-                        session__course__id=TROTEC_COURSE,
-                        session__datetime__gte=instance.current_start_date,
-                        attendance_status='Attended',
-                    ).exists()
-
-                    if attended_trotec:
-                        logging.info('Auto-certifying trotec...')
-                        if utils_ldap.is_configured():
-                            utils_ldap.add_to_group(instance, 'Trotec Users')
-                        instance.trotec_cert_date = utils.today_alberta_tz()
-
-                else:
-                    pass
-
         return super().update(instance, validated_data)
 
 
@@ -537,6 +485,17 @@ class InstructorSearchSerializer(serializers.Serializer):
     def get_training(self, obj):
         queryset = obj.user.training
         serializer = UserTrainingSerializer(data=queryset, many=True)
+        serializer.is_valid()
+        return serializer.data
+
+# vetter viewing search result, add cards
+class VetterSearchSerializer(InstructorSearchSerializer):
+    cards = serializers.SerializerMethodField()
+
+    def get_cards(self, obj):
+        queryset = obj.user.cards
+        queryset = queryset.order_by('-last_seen')
+        serializer = CardSerializer(data=queryset, many=True)
         serializer.is_valid()
         return serializer.data
 

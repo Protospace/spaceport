@@ -48,6 +48,14 @@ class IsAdmin(BasePermission):
             and is_admin_director(request.user)
         )
 
+class IsVetter(BasePermission):
+    def has_permission(self, request, view):
+        return bool(
+            request.user
+            and hasattr(request.user, 'member')
+            and request.user.member.is_vetter
+        )
+
 class IsAdminOrReadOnly(BasePermission):
     def has_permission(self, request, view):
         return bool(

@@ -23,8 +23,7 @@ export function AdminVet(props) {
 
 		if (yousure) {
 			setLoading(true);
-			const data = {vetted_date: moment.utc().tz('America/Edmonton').format('YYYY-MM-DD')}
-			requester('/members/' + member.id + '/', 'PATCH', token, data)
+			requester('/members/' + member.id + '/vet/', 'POST', token, {})
 			.then(res => {
 				refreshVetting();
 			})
@@ -48,11 +47,11 @@ export function AdminVet(props) {
 }
 
 export function AdminVetting(props) {
-	const { token } = props;
+	const { token, all } = props;
 	const [vetting, setVetting] = useState(vettingCache);
 	const [refreshCount, refreshVetting] = useReducer(x => x + 1, 0);
 	const [error, setError] = useState(false);
-	const [showAll, setShowAll] = useState(false);
+	const [showAll, setShowAll] = useState(all);
 
 	useEffect(() => {
 		requester('/vetting/', 'GET', token)
@@ -278,6 +277,19 @@ export function AdminBackups(props) {
 				<p>Error loading.</p>
 			}
 		</div>
+	);
+};
+
+export function Vetting(props) {
+	return (
+		<Container>
+			<Header size='large'>Vetting</Header>
+
+			<Header size='medium'>Ready to Vet</Header>
+			<p>Members who are Current or Due, and past their probationary period.</p>
+			<p>Sorted by last name.</p>
+			<AdminVetting {...props} all={true} />
+		</Container>
 	);
 };
 

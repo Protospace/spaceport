@@ -38,6 +38,7 @@ from .permissions import (
     IsSessionInstructorOrAdmin,
     ReadOnly,
     IsAdmin,
+    IsVetter,
     IsAdminOrReadOnly,
     IsInstructorOrReadOnly
 )
@@ -60,6 +61,8 @@ class SearchViewSet(Base, Retrieve):
     def get_serializer_class(self):
         if is_admin_director(self.request.user) and self.action == 'retrieve':
             return serializers.AdminSearchSerializer
+        elif self.request.user.member.is_vetter and self.action == 'retrieve':
+            return serializers.VetterSearchSerializer
         elif self.request.user.member.is_instructor and self.action == 'retrieve':
             return serializers.InstructorSearchSerializer
         elif self.request.user.member.vetted_date:
@@ -124,6 +127,9 @@ class SearchViewSet(Base, Retrieve):
                 queryset = queryset.order_by('application_date', 'id')
             elif sort == 'is_instructor':
                 queryset = queryset.filter(paused_date__isnull=True, is_instructor=True)
+                queryset = queryset.order_by('application_date', 'id')
+            elif sort == 'is_vetter':
+                queryset = queryset.filter(paused_date__isnull=True, is_vetter=True)
                 queryset = queryset.order_by('application_date', 'id')
             elif sort == 'due':
                 queryset = queryset.filter(status='Due')
@@ -262,10 +268,58 @@ class MemberViewSet(Base, Retrieve, Update):
         utils_stats.changed_card()
         return Response(200)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['post'], permission_classes=[AllowMetadata | IsAdmin | IsVetter])
+    def vet(self, request, pk=None):
+        member = self.get_object()
+
+        PRECIX_COURSE = 428
+        attended_precix = models.Training.objects.filter(
+            user=member.user,
+            session__course__id=PRECIX_COURSE,
+            session__datetime__gte=member.current_start_date,
+            attendance_status='Attended',
+        ).exists()
+
+        if attended_precix:
+            logging.info('Auto-certifying precix...')
+            if utils_ldap.is_configured():
+                utils_ldap.add_to_group(member, 'CNC-Precix-Users')
+            member.precix_cnc_cert_date = utils.today_alberta_tz()
+
+        RABBIT_COURSE = 247
+        attended_rabbit = models.Training.objects.filter(
+            user=member.user,
+            session__course__id=RABBIT_COURSE,
+            session__datetime__gte=member.current_start_date,
+            attendance_status='Attended',
+        ).exists()
+
+        if attended_rabbit:
+            logging.info('Auto-certifying rabbit...')
+            if utils_ldap.is_configured():
+                utils_ldap.add_to_group(member, 'Laser Users')
+            member.rabbit_cert_date = utils.today_alberta_tz()
+
+        TROTEC_COURSE = 321
+        attended_trotec = models.Training.objects.filter(
+            user=member.user,
+            session__course__id=TROTEC_COURSE,
+            session__datetime__gte=member.current_start_date,
+            attendance_status='Attended',
+        ).exists()
+
+        if attended_trotec:
+            logging.info('Auto-certifying trotec...')
+            if utils_ldap.is_configured():
+                utils_ldap.add_to_group(member, 'Trotec Users')
+            member.trotec_cert_date = utils.today_alberta_tz()
+
+        member.vetted_date = utils.today_alberta_tz()
+        member.save()
+        return Response(200)
+
+    @action(detail=True, methods=['get'], permission_classes=[AllowMetadata | IsAdmin | IsVetter])
     def card_photo(self, request, pk=None):
-        if not is_admin_director(self.request.user):
-            raise exceptions.PermissionDenied()
         member = self.get_object()
         if not member.photo_large:
             raise Http404
@@ -274,7 +328,7 @@ class MemberViewSet(Base, Retrieve, Update):
 
 
 class CardViewSet(Base, Create, Retrieve, Update):
-    permission_classes = [AllowMetadata | IsAdmin]
+    permission_classes = [AllowMetadata | IsAdmin | IsVetter]
     queryset = models.Card.objects.all()
     serializer_class = serializers.CardSerializer
 
@@ -1368,7 +1422,7 @@ class HistoryViewSet(Base, List, Retrieve):
 
 
 class VettingViewSet(Base, List):
-    permission_classes = [AllowMetadata | IsAdmin]
+    permission_classes = [AllowMetadata | IsAdmin | IsVetter]
     serializer_class = serializers.AdminMemberSerializer
 
     def get_queryset(self):

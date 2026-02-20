@@ -13,7 +13,7 @@ import { Paymaster } from './Paymaster.js';
 import { Cards } from './Cards.js';
 import { Training } from './Training.js';
 import { AdminTransactions } from './AdminTransactions.js';
-import { Admin } from './Admin.js';
+import { Admin, Vetting } from './Admin.js';
 import { Paste } from './Paste.js';
 import { Sign } from './Sign.js';
 import { OutOfStock } from './Todo.js';
@@ -215,6 +215,12 @@ function App() {
 										to='/charts'
 									/>
 
+									{user && user.member.is_vetter && <Dropdown.Item
+										content='Vetting'
+										as={Link}
+										to='/vetting'
+									/>}
+
 									{user && isAdmin(user) && <Dropdown.Item
 										content='Admin'
 										as={Link}
@@ -382,6 +388,12 @@ function App() {
 									<Route path='/members'>
 										<Members token={token} user={user} />
 									</Route>
+
+									{user && user.member.is_vetter &&
+										<Route path='/vetting'>
+											<Vetting token={token} user={user} />
+										</Route>
+									}
 
 									{user && isAdmin(user) &&
 										<Route path='/admin'>

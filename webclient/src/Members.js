@@ -338,6 +338,13 @@ export function MemberDetail(props) {
 							</p>
 						}
 
+						{user.member.is_vetter &&
+							<p className='links-menu'>Vetting: {' '}
+								<Link to={'/members/'+member.id}>Profile</Link>{' - '}
+								<Link to={'/members/'+member.id+'/cards'}>Cards</Link>
+							</p>
+						}
+
 						<Switch>
 							{isAdmin(user) && <Route path='/members/:id/details'>
 								<Grid stackable columns={2}>
@@ -357,7 +364,7 @@ export function MemberDetail(props) {
 								</Grid>
 							</Route>}
 
-							{isAdmin(user) && <Route path='/members/:id/cards'>
+							{(isAdmin(user) || user.member.is_vetter) && <Route path='/members/:id/cards'>
 								<AdminMemberCards result={result} refreshResult={refreshResult} {...props} />
 							</Route>}
 
