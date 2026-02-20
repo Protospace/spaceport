@@ -1433,10 +1433,16 @@ class VettingViewSet(Base, List):
         queryset = queryset.filter(paused_date__isnull=True)
         queryset = queryset.filter(vetted_date__isnull=True)
         queryset = queryset.filter(current_start_date__lte=four_weeks_ago)
+
+        nmo_attendees = models.Training.objects.filter(
+            session__course__id=249,
+            attendance_status='Attended',
+        ).values_list('user_id', flat=True).distinct()
+
         queryset = queryset.filter(
-            Q(user__training__session__course__id=249, user__training__attendance_status='Attended') |
+            Q(user__in=nmo_attendees) |
             Q(orientation_date__isnull=False)
-        ).distinct()
+        )
 
         return queryset.order_by('-current_start_date', '-id')
 
