@@ -171,6 +171,20 @@ class TransactionSerializer(serializers.ModelSerializer):
             return None
 
 
+# vetter viewing list of members eligible for vetting
+# just needs to be barebones
+class VettingListMemberSerializer(serializers.ModelSerializer):
+    email = fields.UserEmailField(serializers.EmailField)
+
+    class Meta:
+        model = models.Member
+        fields = [
+            'id',
+            'preferred_name',
+            'last_name',
+            'email',
+        ]
+
 # member viewing other members
 # hide info for non-vetted members so someone sitting
 # in our parking lot can't scrape all our info

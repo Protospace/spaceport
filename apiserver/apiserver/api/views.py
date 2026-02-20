@@ -1423,7 +1423,7 @@ class HistoryViewSet(Base, List, Retrieve):
 
 class VettingViewSet(Base, List):
     permission_classes = [AllowMetadata | IsAdmin | IsVetter]
-    serializer_class = serializers.AdminMemberSerializer
+    serializer_class = serializers.VettingListMemberSerializer
 
     def get_queryset(self):
         queryset = models.Member.objects
@@ -1433,18 +1433,9 @@ class VettingViewSet(Base, List):
         queryset = queryset.filter(paused_date__isnull=True)
         queryset = queryset.filter(vetted_date__isnull=True)
         queryset = queryset.filter(current_start_date__lte=four_weeks_ago)
+        queryset = queryset.filter(orientation_date__isnull=False)
 
-        nmo_attendees = models.Training.objects.filter(
-            session__course__id=249,
-            attendance_status='Attended',
-        ).values_list('user_id', flat=True).distinct()
-
-        queryset = queryset.filter(
-            Q(user__in=nmo_attendees) |
-            Q(orientation_date__isnull=False)
-        )
-
-        return queryset.order_by('-current_start_date', '-id')
+        return queryset.order_by('-id')  # sorted by newest for email links
 
 
 class InterestViewSet(Base, Retrieve, Create):

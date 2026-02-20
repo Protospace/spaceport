@@ -97,7 +97,6 @@ export function AdminVetting(props) {
 							<Table.Header>
 								<Table.Row>
 									<Table.HeaderCell>Name</Table.HeaderCell>
-									<Table.HeaderCell>Status / NMO</Table.HeaderCell>
 									<Table.HeaderCell></Table.HeaderCell>
 								</Table.Row>
 							</Table.Header>
@@ -106,10 +105,6 @@ export function AdminVetting(props) {
 								{filterAndSort(vetting).map(x =>
 									<Table.Row key={x.id}>
 										<Table.Cell><Link to={'/members/'+x.id}>{x.preferred_name} {x.last_name}</Link></Table.Cell>
-										<Table.Cell>
-											<Icon name='circle' color={statusColor[x.status]} />
-											{x.orientation_date ? '✅' : '❌'}
-										</Table.Cell>
 										<Table.Cell><AdminVet {...props} member={x} refreshVetting={refreshVetting} /></Table.Cell>
 									</Table.Row>
 								)}
@@ -121,7 +116,8 @@ export function AdminVetting(props) {
 						<p>
 							{displayAll ?
 								<>
-									&#8627; <a href={'mailto:'+vetting.filter(x => x.orientation_date).map(x => x.email).join(',')}>Email All</a>
+									<p>&#8627; <a href={'mailto:'+vetting.slice(0, 10).map(x => x.email).join(',')}>Email 10 Newest</a></p>
+									<p>&#8627; <a href={'mailto:'+vetting.map(x => x.email).join(',')}>Email All</a></p>
 								</>
 							:
 								<Button onClick={() => setShowAll(true)}>Show All</Button>
