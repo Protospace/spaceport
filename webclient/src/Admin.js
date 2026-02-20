@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { Link } from 'react-router-dom';
 import './light.css';
-import { Button, Container, Checkbox, Form, Header, Icon, Table } from 'semantic-ui-react';
+import { Button, Container, Checkbox, Form, Header, Icon, Input, Table } from 'semantic-ui-react';
 import * as Datetime from 'react-datetime';
 import moment from 'moment-timezone';
 import download from 'downloadjs';
@@ -50,6 +50,7 @@ export function AdminVetting(props) {
 	const { token, all } = props;
 	const [vetting, setVetting] = useState(vettingCache);
 	const [refreshCount, refreshVetting] = useReducer(x => x + 1, 0);
+	const [search, setSearch] = useState('');
 	const [error, setError] = useState(false);
 	const [showAll, setShowAll] = useState(all);
 
@@ -66,12 +67,32 @@ export function AdminVetting(props) {
 	}, [refreshCount]);
 
 	const displayAll = (vetting && vetting.length <= 5) || showAll;
+	const bySearch = (x) => search ? (x.preferred_name + ' ' + x.last_name).toLowerCase().includes(search.toLowerCase()) : true;
+	const byName = (a, b) => a.last_name > b.last_name ? 1 : -1;
+	const filterAndSort = (x) => (displayAll ? x.filter(bySearch) : x.filter(bySearch).slice(0,5)).sort(byName);
 
 	return (
 		<div className='adminvetting'>
 			{!error ?
 				vetting ?
 					<>
+						<div>
+							<Input focus icon='search'
+								placeholder='Filter...'
+								value={search}
+								onChange={(event) => setSearch(event.target.value)}
+								aria-label='search products'
+								style={{ margin: '0.5rem 0.5rem 0.5rem 0' }}
+							/>
+
+							{!!search.length &&
+								<Button
+									content='Clear'
+									onClick={() => setSearch('')}
+								/>
+							}
+						</div>
+
 						<Table compact collapsing unstackable basic='very'>
 							<Table.Header>
 								<Table.Row>
@@ -82,7 +103,7 @@ export function AdminVetting(props) {
 							</Table.Header>
 
 							<Table.Body>
-								{(displayAll ? vetting : vetting.slice(0,5)).sort((a, b) => a.last_name > b.last_name ? 1 : -1).map(x =>
+								{filterAndSort(vetting).map(x =>
 									<Table.Row key={x.id}>
 										<Table.Cell><Link to={'/members/'+x.id}>{x.preferred_name} {x.last_name}</Link></Table.Cell>
 										<Table.Cell>
@@ -95,7 +116,7 @@ export function AdminVetting(props) {
 							</Table.Body>
 						</Table>
 
-						<p>{displayAll ? '' : '5 / '}{vetting.length} members</p>
+						<p>{displayAll ? '' : filterAndSort(vetting).length + ' / '}{vetting.filter(bySearch).length} member{vetting.filter(bySearch).length !== 1 ? 's' : ''}</p>
 
 						<p>
 							{displayAll ?
@@ -286,7 +307,7 @@ export function Vetting(props) {
 			<Header size='large'>Vetting</Header>
 
 			<Header size='medium'>Ready to Vet</Header>
-			<p>Members who are Current or Due, and past their probationary period.</p>
+			<p>Members who are Current or Due, past their probationary period, and have attended the NMO.</p>
 			<p>Sorted by last name.</p>
 			<AdminVetting {...props} all={true} />
 		</Container>
@@ -299,7 +320,7 @@ export function Admin(props) {
 			<Header size='large'>Portal Admin</Header>
 
 			<Header size='medium'>Ready to Vet</Header>
-			<p>Members who are Current or Due, and past their probationary period.</p>
+			<p>Members who are Current or Due, past their probationary period, and have attended the NMO.</p>
 			<p>Sorted by last name.</p>
 			<AdminVetting {...props} />
 
