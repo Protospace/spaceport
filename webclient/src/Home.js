@@ -366,7 +366,8 @@ export function Home(props) {
 									<p>
 										Hosting status: <b>{closedStat()}</b><br/>
 										This indicates when a volunteer has offered to host new members (you) at the space. You can show up and ring the doorbell when it's "open".<br/>
-										<a href='https://forum.protospace.ca/t/view-hosting-alerts-or-configure-notifications/8427' target='_blank' rel='noopener noreferrer'>View hosting alerts and configure notifications</a> (login first).<br/><br/>
+										<a href='https://forum.protospace.ca/t/view-hosting-alerts-or-configure-notifications/8427' target='_blank' rel='noopener noreferrer'>View hosting alerts and configure notifications</a> (login first).<br/>
+										<a href='https://forum.protospace.ca/c/administrivia/occupancy/15' target='_blank' rel='noopener noreferrer'>"Find a Host"</a> on the forums (login first).<br/><br/>
 									</p>
 								}
 
