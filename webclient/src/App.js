@@ -34,7 +34,7 @@ import { Footer } from './Footer.js';
 import { ScannerQuiz, SawstopQuiz } from './Quiz.js';
 import { LCARS1Display, LCARS2Display, LCARS3Display } from './Display.js';
 
-const APP_VERSION = 11;  // TODO: automate this
+const APP_VERSION = 12;  // TODO: automate this
 
 function App() {
 	const [token, setToken] = useState(localStorage.getItem('token', ''));
