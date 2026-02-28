@@ -257,13 +257,16 @@ export function CourseDetail(props) {
 						</Segment>}
 
 						<Header size='medium'>Course Description</Header>
-						{course.is_old ?
-							course.description.split('\n').map((x, i) =>
-								<p key={i}>{x}</p>
-							)
-						:
-							<div dangerouslySetInnerHTML={{__html: course.description}} />
-						}
+
+						<div className='word-break'>
+							{course.is_old ?
+								course.description.split('\n').map((x, i) =>
+									<p key={i}>{x}</p>
+								)
+							:
+								<div dangerouslySetInnerHTML={{__html: course.description}} />
+							}
+						</div>
 
 						<Header size='medium'>Classes</Header>
 

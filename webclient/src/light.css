@@ -21,6 +21,10 @@ a {
 	cursor: pointer;
 }
 
+.word-break {
+	overflow-wrap: anywhere;
+}
+
 .hero {
 	padding-top: 1.5rem;
 	margin-bottom: 1.5rem;
@@ -80,6 +84,11 @@ a {
 
 .content-wrap-inside {
 	padding-bottom: 24rem;
+}
+
+.ui.stackable.column.grid .no-padding {
+	padding-right: 0 !important;
+	padding-left: 0 !important;
 }
 
 .course-editor,

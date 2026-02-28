@@ -525,12 +525,12 @@ export function InstructorClassList(props) {
 			{!open && success && <p>Added! <Link to={'/classes/'+success}>View the class.</Link></p>}
 
 			{open ?
-				<Grid stackable columns={2}>
-					<Grid.Column>
+				<Grid stackable padded columns={2}>
+					<Grid.Column className='no-padding'>
 						<Form onSubmit={handleSubmit}>
 							<Header size='small'>Add a Class</Header>
 
-							<p>Documentation: <a href='https://wiki.protospace.ca/Be_a_Course_Instructor' target='_blank' rel='noopener noreferrer'>https://wiki.protospace.ca/Be_a_Course_Instructor</a></p>
+							<p className='word-break'>Documentation: <a href='https://wiki.protospace.ca/Be_a_Course_Instructor' target='_blank' rel='noopener noreferrer'>https://wiki.protospace.ca/Be_a_Course_Instructor</a></p>
 
 							{course.suggestion &&
 								<p><Button onClick={fillSuggestion}>Suggest</Button> based off previous classes.</p>
@@ -547,7 +547,7 @@ export function InstructorClassList(props) {
 							</Form.Button>
 						</Form>
 					</Grid.Column>
-					<Grid.Column>
+					<Grid.Column className='no-padding'>
 						{!!input.datetime &&
 							<div className='upcoming-classes'>
 								<div>

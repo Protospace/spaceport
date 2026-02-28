@@ -770,13 +770,16 @@ export function Class(props) {
 		</BasicTable>
 
 		<Header size='medium'>Course Description</Header>
-		{clazz.course_data.is_old ?
-			clazz.course_data.description.split('\n').map((x, i) =>
-				<p key={i}>{x}</p>
-			)
-		:
-			<div dangerouslySetInnerHTML={{__html: clazz.course_data.description}} />
-		}
+
+		<div className='word-break'>
+			{clazz.course_data.is_old ?
+				clazz.course_data.description.split('\n').map((x, i) =>
+					<p key={i}>{x}</p>
+				)
+			:
+				<div dangerouslySetInnerHTML={{__html: clazz.course_data.description}} />
+			}
+		</div>
 
 		<Header size='medium'>Attendance</Header>
 
