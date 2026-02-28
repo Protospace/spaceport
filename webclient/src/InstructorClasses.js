@@ -298,6 +298,12 @@ function InstructorClassEditor(props) {
 		error: error[name],
 	});
 
+	const classDate = moment.utc(input.datetime).tz('America/Edmonton');
+
+	useEffect(() => {
+		setInput({ ...input, date_confirmed: null, no_conflicts: null });
+	}, [input.datetime]);
+
 	return (
 		<div className='class-editor'>
 			{editing &&
@@ -370,6 +376,22 @@ function InstructorClassEditor(props) {
 					checked={input.is_cancelled}
 				/>
 			</Form.Field>}
+
+			{!editing && input.datetime && <Form.Checkbox
+				label={'Confirmed for ' + classDate.format('llll') + ' (' + classDate.fromNow() + ')'}
+				required
+				{...makeProps('date_confirmed')}
+				onChange={handleCheck}
+				checked={input.date_confirmed}
+			/>}
+
+			{!editing && input.datetime && <Form.Checkbox
+				label='Confirmed no scheduling conflicts (space and noise)'
+				required
+				{...makeProps('no_conflicts')}
+				onChange={handleCheck}
+				checked={input.no_conflicts}
+			/>}
 
 		</div>
 	);
@@ -503,7 +525,7 @@ export function InstructorClassList(props) {
 			{!open && success && <p>Added! <Link to={'/classes/'+success}>View the class.</Link></p>}
 
 			{open ?
-				<Grid stackable padded columns={2}>
+				<Grid stackable columns={2}>
 					<Grid.Column>
 						<Form onSubmit={handleSubmit}>
 							<Header size='small'>Add a Class</Header>
@@ -520,25 +542,27 @@ export function InstructorClassList(props) {
 								{progress.map(x => <>{x}<br /></>)}
 							</p>
 
-							<Form.Button loading={loading} error={error.non_field_errors}>
+							<Form.Button disabled={!input.date_confirmed || !input.no_conflicts} loading={loading} error={error.non_field_errors}>
 								Submit
 							</Form.Button>
 						</Form>
 					</Grid.Column>
 					<Grid.Column>
 						{!!input.datetime &&
-							<div>
-								<Header size='small'>Upcoming Classes That Day</Header>
+							<div className='upcoming-classes'>
+								<div>
+									<Header size='small'>Upcoming Classes That Day</Header>
 
-								{sameClasses.length ?
-									sameClasses.map(x =>
-										<p>
-											{moment.utc(x.datetime).tz('America/Edmonton').format('LT')} — {x.course_data.name}
-										</p>
-									)
-								:
-									<p>None</p>
-								}
+									{sameClasses.length ?
+										sameClasses.map(x =>
+											<p>
+												{moment.utc(x.datetime).tz('America/Edmonton').format('LT')} — {x.course_data.name}
+											</p>
+										)
+									:
+										<p>None</p>
+									}
+								</div>
 							</div>
 						}
 					</Grid.Column>

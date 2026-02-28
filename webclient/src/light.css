@@ -88,6 +88,13 @@ a {
 	margin-bottom: 1rem;
 }
 
+.upcoming-classes {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	height: 100%;
+}
+
 .ql-container {
 	height: 30rem !important;
 	font-size: inherit !important;
