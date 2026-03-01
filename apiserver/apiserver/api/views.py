@@ -255,6 +255,7 @@ class MemberViewSet(Base, Retrieve, Update):
             member.embroidery_cert_date = None
             member.rabbit_cert_date = None
             member.trotec_cert_date = None
+            member.mopa_cert_date = None
             member.scanner_cert_date = None
 
         member.current_start_date = today
@@ -313,6 +314,20 @@ class MemberViewSet(Base, Retrieve, Update):
             if utils_ldap.is_configured():
                 utils_ldap.add_to_group(member, 'Trotec Users')
             member.trotec_cert_date = utils.today_alberta_tz()
+
+        MOPA_COURSE = 519
+        attended_mopa = models.Training.objects.filter(
+            user=member.user,
+            session__course__id=MOPA_COURSE,
+            session__datetime__gte=member.current_start_date,
+            attendance_status='Attended',
+        ).exists()
+
+        if attended_mopa:
+            logging.info('Auto-certifying MOPA...')
+            if utils_ldap.is_configured():
+                utils_ldap.add_to_group(member, 'MOPA Users')
+            member.mopa_cert_date = utils.today_alberta_tz()
 
         member.vetted_date = utils.today_alberta_tz()
         member.save()
@@ -559,6 +574,14 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
                     utils_ldap.add_to_group(member, 'Trotec Users')
                 else:
                     utils_ldap.remove_from_group(member, 'Trotec Users')
+        elif session.course.id == 519:
+            member.mopa_cert_date = check_attendance(requires_vetted=True)
+
+            if utils_ldap.is_configured():
+                if member.mopa_cert_date:
+                    utils_ldap.add_to_group(member, 'MOPA Users')
+                else:
+                    utils_ldap.remove_from_group(member, 'MOPA Users')
         elif session.course.id == 447:
             member.embroidery_cert_date = check_attendance()
 

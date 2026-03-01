@@ -793,6 +793,12 @@ export function AdminMemberCertifications(props) {
 						<Table.Cell><AdminCert name='Trotec' field='trotec_cert_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
 					</Table.Row>
 					<Table.Row>
+						<Table.Cell>MOPA Laser</Table.Cell>
+						<Table.Cell>{member.mopa_cert_date ? 'Yes, ' + member.mopa_cert_date : 'No'}</Table.Cell>
+						<Table.Cell><Link to='/courses/519'>Laser: MOPA Course</Link></Table.Cell>
+						<Table.Cell><AdminCert name='MOPA' field='mopa_cert_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
+					</Table.Row>
+					<Table.Row>
 						<Table.Cell>Embroidery Machine</Table.Cell>
 						<Table.Cell>{member.embroidery_cert_date ? 'Yes, ' + member.embroidery_cert_date : 'No'}</Table.Cell>
 						<Table.Cell><Link to='/courses/447'>Embroidery Machine Overview</Link></Table.Cell>

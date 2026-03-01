@@ -76,6 +76,11 @@ export function CertList(props) {
 					<Table.Cell><Link to='/courses/321'>Laser: Trotec Course</Link></Table.Cell>
 				</Table.Row>
 				<Table.Row>
+					<Table.Cell>MOPA Laser</Table.Cell>
+					<Table.Cell>{isMobile && 'Enabled: '}{member.mopa_cert_date ? 'Yes, ' + member.mopa_cert_date : 'No'}</Table.Cell>
+					<Table.Cell><Link to='/courses/519'>Laser: MOPA Fibre</Link></Table.Cell>
+				</Table.Row>
+				<Table.Row>
 					<Table.Cell>Embroidery Machine</Table.Cell>
 					<Table.Cell>{isMobile && 'Enabled: '}{member.embroidery_cert_date ? 'Yes, ' + member.embroidery_cert_date : 'No'}</Table.Cell>
 					<Table.Cell><Link to='/courses/447'>Embroidery Machine Overview</Link></Table.Cell>
