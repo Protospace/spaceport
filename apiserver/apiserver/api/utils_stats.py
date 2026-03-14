@@ -306,7 +306,7 @@ def calc_drink_sales():
             '1': 'Coke',
             '2': 'Coke Zero',
             '3': 'Root Beer',
-            '4': 'Lime Fizzy Water',
+            '4': 'Lime Bubly',
             '5': 'Fanta',
             '6': 'Dr Pepper',
             '7': 'Brisk Iced Tea',
@@ -326,7 +326,7 @@ def calc_drink_sales():
         'Cherry Coke': '#ab316e',
         'Diet Coke': '#c8b560',
         'Brisk Iced Tea': '#f07e05',
-        'Lime Fizzy Water': '#00ff00',
+        'Lime Bubly': '#00ff00',
     }
 
     txs = models.Transaction.objects
@@ -419,7 +419,7 @@ def calc_cert_distribution():
         ('Thunder Laser', 'rabbit_cert_date'),
         ('Trotec Laser', 'trotec_cert_date'),
         ('MOPA Laser', 'mopa_cert_date'),
-        ('Eufymake UV Printer', 'eufymakeuv_cert_date'),
+        ('Eufymake UV', 'eufymakeuv_cert_date'),
         ('Embroidery', 'embroidery_cert_date'),
         ('3D Scanner', 'scanner_cert_date'),
     ]
