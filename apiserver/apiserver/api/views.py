@@ -256,6 +256,7 @@ class MemberViewSet(Base, Retrieve, Update):
             member.rabbit_cert_date = None
             member.trotec_cert_date = None
             member.mopa_cert_date = None
+            member.eufymakeuv_cert_date = None
             member.scanner_cert_date = None
 
         member.current_start_date = today
@@ -328,6 +329,20 @@ class MemberViewSet(Base, Retrieve, Update):
             if utils_ldap.is_configured():
                 utils_ldap.add_to_group(member, 'MOPA Users')
             member.mopa_cert_date = utils.today_alberta_tz()
+
+        EUFYMAKEUV_COURSE = 520
+        attended_eufymakeuv = models.Training.objects.filter(
+            user=member.user,
+            session__course__id=EUFYMAKEUV_COURSE,
+            session__datetime__gte=member.current_start_date,
+            attendance_status='Attended',
+        ).exists()
+            
+        if attended_eufymakeuv:
+            logging.info('Auto-certifying EUFYMAKEUV...')
+            if utils_ldap.is_configured():   
+                utils_ldap.add_to_group(member, 'Eufymake Users')
+            member.eufymakeuv_cert_date = utils.today_alberta_tz()
 
         member.vetted_date = utils.today_alberta_tz()
         member.save()
@@ -582,6 +597,14 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
                     utils_ldap.add_to_group(member, 'MOPA Users')
                 else:
                     utils_ldap.remove_from_group(member, 'MOPA Users')
+        elif session.course.id == 520:
+            member.eufymakeuv_cert_date = check_attendance(requires_vetted=False)
+            
+            if utils_ldap.is_configured():  
+                if member.eufymakeuv_cert_date:
+                    utils_ldap.add_to_group(member, 'Eufymake Users')
+                else:
+                    utils_ldap.remove_from_group(member, 'Eufymake Users')
         elif session.course.id == 447:
             member.embroidery_cert_date = check_attendance()
 

@@ -81,6 +81,11 @@ export function CertList(props) {
 					<Table.Cell><Link to='/courses/519'>Laser: MOPA Fibre</Link></Table.Cell>
 				</Table.Row>
 				<Table.Row>
+					<Table.Cell>Eufymake UV Printer</Table.Cell>
+					<Table.Cell>{isMobile && 'Enabled: '}{member.eufymakeuv_cert_date ? 'Yes, ' + member.eufymakeuv_cert_date : 'No'}</Table.Cell>
+					<Table.Cell><Link to='/courses/520'>Eufymake UV Printer</Link></Table.Cell>
+				</Table.Row>
+				<Table.Row>
 					<Table.Cell>Embroidery Machine</Table.Cell>
 					<Table.Cell>{isMobile && 'Enabled: '}{member.embroidery_cert_date ? 'Yes, ' + member.embroidery_cert_date : 'No'}</Table.Cell>
 					<Table.Cell><Link to='/courses/447'>Embroidery Machine Overview</Link></Table.Cell>

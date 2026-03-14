@@ -799,6 +799,12 @@ export function AdminMemberCertifications(props) {
 						<Table.Cell><AdminCert name='MOPA' field='mopa_cert_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
 					</Table.Row>
 					<Table.Row>
+						<Table.Cell>Eufymake UV Printer</Table.Cell>
+						<Table.Cell>{member.eufymakeuv_cert_date ? 'Yes, ' + member.eufymakeuv_cert_date : 'No'}</Table.Cell>
+						<Table.Cell><Link to='/courses/520'>Eufymake UV Printer Course</Link></Table.Cell>
+						<Table.Cell><AdminCert name='Eufymake UV' field='eufymakeuv_cert_date' {...props} loading={loading} setLoading={setLoading} /></Table.Cell>
+					</Table.Row>
+					<Table.Row>
 						<Table.Cell>Embroidery Machine</Table.Cell>
 						<Table.Cell>{member.embroidery_cert_date ? 'Yes, ' + member.embroidery_cert_date : 'No'}</Table.Cell>
 						<Table.Cell><Link to='/courses/447'>Embroidery Machine Overview</Link></Table.Cell>
