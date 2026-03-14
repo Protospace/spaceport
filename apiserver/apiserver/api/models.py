@@ -59,6 +59,7 @@ class Member(models.Model):
     rabbit_cert_date = models.DateField(blank=True, null=True, default=None)
     trotec_cert_date = models.DateField(blank=True, null=True, default=None)
     mopa_cert_date = models.DateField(blank=True, null=True, default=None)
+    eufymakeuv_cert_date = models.DateField(blank=True, null=True, default=None)
     scanner_cert_date = models.DateField(blank=True, null=True, default=None)
     paused_date = models.DateField(blank=True, null=True)
     monthly_fees = models.IntegerField(default=55, blank=True, null=True)

@@ -318,6 +318,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'rabbit_cert_date',
             'trotec_cert_date',
             'mopa_cert_date',
+            'eufymakeuv_cert_date',
             'scanner_cert_date',
             'is_allowed_entry',
             'mediawiki_username',
@@ -472,6 +473,15 @@ class AdminMemberSerializer(MemberSerializer):
                     utils_ldap.add_to_group(instance, 'MOPA Users')
                 else:
                     utils_ldap.remove_from_group(instance, 'MOPA Users')
+
+        if 'eufymakeuv_cert_date' in validated_data:
+            changed = validated_data['eufymakeuv_cert_date'] != instance.eufymakeuv_cert_date
+            if changed:
+                if validated_data['eufymakeuv_cert_date']:
+                    utils_ldap.add_to_group(instance, 'Eufymake Users')
+                else:
+                    utils_ldap.remove_from_group(instance, 'Eufymake Users')
+
 
         return super().update(instance, validated_data)
 

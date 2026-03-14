@@ -419,6 +419,7 @@ def calc_cert_distribution():
         ('Thunder Laser', 'rabbit_cert_date'),
         ('Trotec Laser', 'trotec_cert_date'),
         ('MOPA Laser', 'mopa_cert_date'),
+        ('Eufymake UV Printer', 'eufymakeuv_cert_date'),
         ('Embroidery', 'embroidery_cert_date'),
         ('3D Scanner', 'scanner_cert_date'),
     ]
