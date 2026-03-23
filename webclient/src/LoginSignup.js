@@ -7,6 +7,7 @@ import { requester, randomString, siteUrl } from './utils.js';
 export function LoginForm(props) {
 	const [input, setInput] = useState({ username: '' });
 	const [error, setError] = useState({});
+	const [errorCounts, setErrorCounts] = useState({});
 	const [loading, setLoading] = useState(false);
 	const qs = useLocation().search;
 	const params = new URLSearchParams(qs);
@@ -18,7 +19,9 @@ export function LoginForm(props) {
 
 	const handleSubmit = (e) => {
 		if (input.username.includes('@')) {
-			setError({ username: 'Username, not email.' });
+			const msg = 'Username, not email.';
+			setError({ username: msg });
+			setErrorCounts(prev => ({...prev, [msg]: (prev[msg] || 0.357) + 0.5}));
 		} else {
 			if (loading) return;
 			setLoading(true);
@@ -37,9 +40,23 @@ export function LoginForm(props) {
 				setLoading(false);
 				console.log(err);
 				setError(err.data);
+				if (err.data && err.data.username) {
+					const msg = Array.isArray(err.data.username) ? err.data.username[0] : err.data.username;
+					if (msg) {
+						setErrorCounts(prev => ({...prev, [msg]: (prev[msg] || 0.357) + 0.5}));
+					}
+				}
 			});
 		}
 	};
+
+	const usernameErrorMsg = error.username && (Array.isArray(error.username) ? error.username[0] : error.username);
+	const usernameError = usernameErrorMsg
+		? {
+				content: error.username,
+				style: { fontSize: `${errorCounts[usernameErrorMsg] || 0.857}em` },
+		  }
+		: null;
 
 	return (
 		<Form
@@ -53,7 +70,7 @@ export function LoginForm(props) {
 				name='username'
 				placeholder='first.last'
 				onChange={handleChange}
-				error={error.username}
+				error={usernameError}
 				autoFocus
 			/>
 			<Form.Input
