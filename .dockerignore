@@ -1,0 +1,14 @@
+.git
+*.pyc
+__pycache__
+*.sqlite3
+node_modules
+webclient/build
+apiserver/env
+apiserver/data/static
+apiserver/backups
+authserver/env
+ldapserver/env
+*.egg-info
+.DS_Store
+*/secrets.py
