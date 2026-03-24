@@ -6,7 +6,7 @@ import 'react-datetime/css/react-datetime.css';
 import moment from 'moment-timezone';
 import './light.css';
 import { Button, Checkbox, Form, Grid, Header, Icon, Label, Message, Table } from 'semantic-ui-react';
-import { requester, randomString } from './utils.js';
+import { requester, randomString, DISPLAY_TIMEZONE } from './utils.js';
 import { MembersDropdown } from './Members.js';
 
 class AttendanceSheet extends React.Component {
@@ -18,7 +18,7 @@ class AttendanceSheet extends React.Component {
 			<div style={{ padding: '3rem', background: 'white', width: '100%', height: '100%' }}>
 				<Header size='medium'>{clazz.course_data.name} Attendance</Header>
 				<p>
-					{moment.utc(clazz.datetime).tz('America/Edmonton').format('llll')}
+					{moment.utc(clazz.datetime).tz(DISPLAY_TIMEZONE).format('llll')}
 					{num >= 2 ? ', '+num+' students sorted by registration time.' : '.'}
 				</p>
 
@@ -298,7 +298,7 @@ function InstructorClassEditor(props) {
 		error: error[name],
 	});
 
-	const classDate = moment.utc(input.datetime).tz('America/Edmonton');
+	const classDate = moment.utc(input.datetime).tz(DISPLAY_TIMEZONE);
 
 	useEffect(() => {
 		setInput({ ...input, date_confirmed: null, no_conflicts: null });
@@ -353,9 +353,9 @@ function InstructorClassEditor(props) {
 				<Datetime
 					timeConstraints={{ minutes: { step: 15 } }}
 					value={ input.datetime ?
-						moment.utc(input.datetime).tz('America/Edmonton')
+						moment.utc(input.datetime).tz(DISPLAY_TIMEZONE)
 					:
-						moment().tz('America/Edmonton').set({ minute: 0 })
+						moment().tz(DISPLAY_TIMEZONE).set({ minute: 0 })
 					}
 					onChange={handleDatetime}
 					input={false}
@@ -509,7 +509,7 @@ export function InstructorClassList(props) {
 
 	useEffect(() => {
 		setSameClasses(classes.filter(x =>
-			moment.utc(x.datetime).tz('America/Edmonton').isSame(input.datetime, 'day')
+			moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).isSame(input.datetime, 'day')
 		).sort((a, b) => a.datetime > b.datetime ? 1 : -1));
 	}, [input.datetime]);
 
@@ -556,7 +556,7 @@ export function InstructorClassList(props) {
 									{sameClasses.length ?
 										sameClasses.map(x =>
 											<p>
-												{moment.utc(x.datetime).tz('America/Edmonton').format('LT')} — {x.course_data.name}
+												{moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format('LT')} — {x.course_data.name}
 											</p>
 										)
 									:

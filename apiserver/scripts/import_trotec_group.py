@@ -52,7 +52,7 @@ print()
 
 for m in good_members.values():
     if not m.trotec_cert_date:
-        m.trotec_cert_date = utils.today_alberta_tz()
+        m.trotec_cert_date = utils.today_local_tz()
         print('certified', m.first_name, m.last_name)
         m.save()
     else:

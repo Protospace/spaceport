@@ -101,7 +101,7 @@ def calc_member_counts():
     paused_count = members.count() - member_count
     green_count = num_current + num_prepaid
 
-    six_months_ago = utils.today_alberta_tz() - timedelta(days=183)
+    six_months_ago = utils.today_local_tz() - timedelta(days=183)
     six_month_plus_count = not_paused.filter(application_date__lte=six_months_ago).count()
 
     vetted_count = not_paused.filter(vetted_date__isnull=False).count()
@@ -135,7 +135,7 @@ def calc_member_counts():
     )
 
 def calc_signup_counts():
-    month_beginning = utils.today_alberta_tz().replace(day=1)
+    month_beginning = utils.today_local_tz().replace(day=1)
 
     members = models.Member.objects
     new_members = members.filter(application_date__gte=month_beginning)
@@ -234,9 +234,9 @@ def check_maintenance_list():
     return []
 
 def calc_card_scans():
-    date = utils.today_alberta_tz()
+    date = utils.today_local_tz()
     dt = datetime.combine(date, datetime.min.time())
-    midnight = utils.TIMEZONE_CALGARY.localize(dt)
+    midnight = utils.DISPLAY_TZ.localize(dt)
 
     cards = models.Card.objects
     count = cards.filter(last_seen__gte=midnight).count()
@@ -249,7 +249,7 @@ def calc_card_scans():
     )
 
 def calc_drink_sales():
-    six_months_ago = utils.today_alberta_tz() - timedelta(days=183)
+    six_months_ago = utils.today_local_tz() - timedelta(days=183)
 
     drinks_since = {
         '1970-01-01': {

@@ -5,7 +5,7 @@ django.setup()
 from django.db.models import Prefetch, Sum
 from apiserver.api import models, utils
 
-today = utils.today_alberta_tz()
+today = utils.today_local_tz()
 
 members = models.Member.objects.filter(paused_date__isnull=True)
 related_tx = Prefetch(

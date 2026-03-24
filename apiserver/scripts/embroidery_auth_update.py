@@ -24,7 +24,7 @@ for session in sessions:
         if student.attendance_status == 'Attended':
             member = get_member(student)
             if not member.embroidery_cert_date:
-                member.embroidery_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
+                member.embroidery_cert_date = session.datetime.astimezone(utils.DISPLAY_TZ).date()
                 member.save()
 
 print('Done.')

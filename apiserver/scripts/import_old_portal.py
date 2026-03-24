@@ -230,7 +230,7 @@ for o in old:
     new['course'] = models.Course.objects.get(id=o.course_id)
     new['old_instructor'] = o.instructor
     dt = o.datetime.replace(tzinfo=None)
-    dt = timezone.pytz.timezone('America/Edmonton').localize(dt)
+    dt = utils.DISPLAY_TZ.localize(dt)
     new['datetime'] = dt.astimezone(timezone.pytz.UTC)
 
     models.Session.objects.create(**new)

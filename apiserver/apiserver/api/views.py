@@ -225,7 +225,7 @@ class MemberViewSet(Base, Retrieve, Update):
             raise exceptions.PermissionDenied()
         member = self.get_object()
         member.status = 'Paused Member'
-        member.paused_date = utils.today_alberta_tz()
+        member.paused_date = utils.today_local_tz()
         member.save()
 
         msg = 'Member has been paused: {} {}'.format(member.preferred_name, member.last_name)
@@ -238,10 +238,10 @@ class MemberViewSet(Base, Retrieve, Update):
         if not is_admin_director(self.request.user):
             raise exceptions.PermissionDenied()
 
-        today = utils.today_alberta_tz()
+        today = utils.today_local_tz()
         member = self.get_object()
 
-        difference = utils.today_alberta_tz() - member.paused_date
+        difference = utils.today_local_tz() - member.paused_date
         if difference.days > 370:  # give some leeway
             logging.info('Member has been away for %s days (since %s), unvetting...', difference.days, member.paused_date)
             member.vetted_date = None
@@ -286,7 +286,7 @@ class MemberViewSet(Base, Retrieve, Update):
             logging.info('Auto-certifying precix...')
             if utils_ldap.is_configured():
                 utils_ldap.add_to_group(member, 'CNC-Precix-Users')
-            member.precix_cnc_cert_date = utils.today_alberta_tz()
+            member.precix_cnc_cert_date = utils.today_local_tz()
 
         RABBIT_COURSE = 247
         attended_rabbit = models.Training.objects.filter(
@@ -300,7 +300,7 @@ class MemberViewSet(Base, Retrieve, Update):
             logging.info('Auto-certifying rabbit...')
             if utils_ldap.is_configured():
                 utils_ldap.add_to_group(member, 'Laser Users')
-            member.rabbit_cert_date = utils.today_alberta_tz()
+            member.rabbit_cert_date = utils.today_local_tz()
 
         TROTEC_COURSE = 321
         attended_trotec = models.Training.objects.filter(
@@ -314,7 +314,7 @@ class MemberViewSet(Base, Retrieve, Update):
             logging.info('Auto-certifying trotec...')
             if utils_ldap.is_configured():
                 utils_ldap.add_to_group(member, 'Trotec Users')
-            member.trotec_cert_date = utils.today_alberta_tz()
+            member.trotec_cert_date = utils.today_local_tz()
 
         MOPA_COURSE = 519
         attended_mopa = models.Training.objects.filter(
@@ -328,7 +328,7 @@ class MemberViewSet(Base, Retrieve, Update):
             logging.info('Auto-certifying MOPA...')
             if utils_ldap.is_configured():
                 utils_ldap.add_to_group(member, 'MOPA Users')
-            member.mopa_cert_date = utils.today_alberta_tz()
+            member.mopa_cert_date = utils.today_local_tz()
 
         EUFYMAKEUV_COURSE = 520
         attended_eufymakeuv = models.Training.objects.filter(
@@ -342,9 +342,9 @@ class MemberViewSet(Base, Retrieve, Update):
             logging.info('Auto-certifying EUFYMAKEUV...')
             if utils_ldap.is_configured():   
                 utils_ldap.add_to_group(member, 'Eufymake Users')
-            member.eufymakeuv_cert_date = utils.today_alberta_tz()
+            member.eufymakeuv_cert_date = utils.today_local_tz()
 
-        member.vetted_date = utils.today_alberta_tz()
+        member.vetted_date = utils.today_local_tz()
         member.save()
         return Response(200)
 
@@ -543,11 +543,11 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
             if requires_vetted:
                 if status == 'Attended' and member.vetted_date:
                     logging.info('Granting certification: %s', session.course.name)
-                    return utils.today_alberta_tz()
+                    return utils.today_local_tz()
             else:
                 if status == 'Attended':
                     logging.info('Granting certification: %s', session.course.name)
-                    return utils.today_alberta_tz()
+                    return utils.today_local_tz()
 
             logging.info('Not granting certification: %s', session.course.name)
             return None
@@ -759,7 +759,7 @@ class QuizViewSet(Base):
 
             logging.info('Granting quiz certification: %s', quiz)
 
-            member.wood_cert_date = utils.today_alberta_tz()
+            member.wood_cert_date = utils.today_local_tz()
             member.save()
 
         elif quiz == 'scanner':
@@ -777,7 +777,7 @@ class QuizViewSet(Base):
 
             logging.info('Granting quiz certification: %s', quiz)
 
-            member.scanner_cert_date = utils.today_alberta_tz()
+            member.scanner_cert_date = utils.today_local_tz()
             member.save()
 
         else:
@@ -945,7 +945,7 @@ class DoorViewSet(viewsets.ViewSet, List):
         card.save()
 
         member = card.user.member
-        t = utils.now_alberta_tz().strftime('%Y-%m-%d %H:%M:%S, %a %I:%M %p')
+        t = utils.now_local_tz().strftime('%Y-%m-%d %H:%M:%S, %a %I:%M %p')
         logger.info('Scan - Time: {} | Name: {} {} ({})'.format(t, member.preferred_name, member.last_name, member.id))
 
         last_scan = dict(
@@ -1476,7 +1476,7 @@ class VettingViewSet(Base, List):
     def get_queryset(self):
         queryset = models.Member.objects
 
-        four_weeks_ago = utils.today_alberta_tz() - datetime.timedelta(days=28)
+        four_weeks_ago = utils.today_local_tz() - datetime.timedelta(days=28)
         queryset = queryset.filter(status__in=['Prepaid', 'Current', 'Due'])
         queryset = queryset.filter(paused_date__isnull=True)
         queryset = queryset.filter(vetted_date__isnull=True)
@@ -1606,7 +1606,7 @@ class ProtocoinViewSet(Base):
                 if training:
                     if training.attendance_status == 'Waiting for payment':
                         training.attendance_status = 'Confirmed'
-                    training.paid_date = utils.today_alberta_tz()
+                    training.paid_date = utils.today_local_tz()
                     training.save()
 
                 return Response(200)
@@ -2235,7 +2235,7 @@ class PinballViewSet(Base):
 
     @action(detail=False, methods=['get'])
     def monthly_high_scores(self, request):
-        now = utils.now_alberta_tz()
+        now = utils.now_local_tz()
         current_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
         members = models.Member.objects.all()
@@ -2314,7 +2314,7 @@ class HostingViewSet(Base):
                 message = '{} just offered to host for {} hours from now until {}!'.format(
                     hosting_user.member.preferred_name,
                     hours,
-                    h.finished_at.astimezone(utils.TIMEZONE_CALGARY).strftime('%-I:%M %p, %b %d'),
+                    h.finished_at.astimezone(utils.DISPLAY_TZ).strftime('%-I:%M %p, %b %d'),
                 )
                 if hosting_user.member.discourse_username:
                     message += ' Tag @{} here to get their attention.'.format(
@@ -2328,7 +2328,7 @@ class HostingViewSet(Base):
         hosting = models.Hosting.objects.order_by('-finished_at').first()
         closing = dict(
             time=hosting.finished_at.timestamp(),
-            time_str=hosting.finished_at.astimezone(utils.TIMEZONE_CALGARY).strftime('%-I:%M %p'),
+            time_str=hosting.finished_at.astimezone(utils.DISPLAY_TZ).strftime('%-I:%M %p'),
             first_name=hosting.user.member.preferred_name,
         )
         cache.set('closing', closing)
@@ -2355,7 +2355,7 @@ class HostingViewSet(Base):
 
     @action(detail=False, methods=['get'])
     def monthly_high_scores(self, request):
-        now = utils.now_alberta_tz()
+        now = utils.now_local_tz()
         current_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
         members = models.Member.objects.all()
@@ -2439,7 +2439,7 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
 
     @action(detail=False, methods=['get'], permission_classes=[])
     def available(self, request):
-        three_months_ago = utils.today_alberta_tz() - datetime.timedelta(days=89)
+        three_months_ago = utils.today_local_tz() - datetime.timedelta(days=89)
         queryset = models.StorageSpace.objects.filter(
             location='member_shelves'
         ).filter(
@@ -2480,7 +2480,7 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
 
         if storage.user:
             owner_name = storage.user.member.preferred_name
-            three_months_ago = utils.today_alberta_tz() - datetime.timedelta(days=89)  # 1 day slack from the UI
+            three_months_ago = utils.today_local_tz() - datetime.timedelta(days=89)  # 1 day slack from the UI
             owner_paused_date = storage.user.member.paused_date
             owner_long_expired = owner_paused_date and owner_paused_date <= three_months_ago
 
