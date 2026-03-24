@@ -1565,7 +1565,7 @@ class ProtocoinViewSet(Base):
                 memo = str(request.data.get('memo', ''))
 
                 # also prevents negative spending
-                if amount < 0.25:
+                if amount < 0.05:
                     raise exceptions.ValidationError(dict(amount='Amount too small.'))
 
                 source_user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
@@ -1818,7 +1818,7 @@ class ProtocoinViewSet(Base):
                     raise exceptions.ValidationError(dict(amount='Invalid number.'))
 
                 # also prevents negative spending
-                if amount < 0.25:
+                if amount < 0.05:
                     raise exceptions.ValidationError(dict(amount='Amount too small.'))
 
 
