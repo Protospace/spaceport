@@ -283,7 +283,7 @@ export function Home(props) {
 		if (printer_state === 'Running' && info?.current_layer === 0) {
 			return 'Initializing';  // because it has non-zero percentage which may be confusing
 		} else if (printer_state === 'Running') {
-			return 'Layer ' + info?.current_layer + ' / ' + info?.total_layers + ' (' + info?.print_percentage + '%)';
+			return 'Layer ' + info?.current_layer + ' / ' + info?.total_layers + ' (' + info?.print_percentage + '%) ' + info?.remaining_time + ' mins';
 		} else {
 			return printer_state;
 		}
