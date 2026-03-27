@@ -284,8 +284,8 @@ export function Home(props) {
 			return 'Initializing';  // because it has non-zero percentage which may be confusing
 		} else if (printer_state === 'Running') {
 			let time_str = '';
-			const mins = info?.remaining_time;
-			if (typeof mins === 'number') {
+			const mins = parseInt(info?.remaining_time, 10);
+			if (!isNaN(mins)) {
 				if (mins < 1) {
 					time_str = '0m';
 				} else {
