@@ -283,7 +283,19 @@ export function Home(props) {
 		if (printer_state === 'Running' && info?.current_layer === 0) {
 			return 'Initializing';  // because it has non-zero percentage which may be confusing
 		} else if (printer_state === 'Running') {
-			return 'Layer ' + info?.current_layer + ' / ' + info?.total_layers + ' (' + info?.print_percentage + '%) ' + info?.remaining_time + ' mins';
+			let time_str = '';
+			const mins = info?.remaining_time;
+			if (typeof mins === 'number') {
+				if (mins < 1) {
+					time_str = '0m';
+				} else {
+					const h = Math.floor(mins / 60);
+					const m = Math.floor(mins % 60);
+					if (h > 0) time_str += h + 'h';
+					if (m > 0) time_str += m + 'm';
+				}
+			}
+			return 'Layer ' + info?.current_layer + ' / ' + info?.total_layers + ' (' + info?.print_percentage + '%) ' + time_str;
 		} else {
 			return printer_state;
 		}
