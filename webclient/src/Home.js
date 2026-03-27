@@ -437,6 +437,19 @@ export function Home(props) {
 								</p>
 
 								<p>
+									xTool availability: {getTrackStat('MOPA-XTOOL2')} <Popup content={
+										<React.Fragment>
+											<p>
+												Last use:<br />
+												{getTrackLast('MOPA-XTOOL2')}<br />
+												{getTrackAgo('MOPA-XTOOL2')}<br />
+												by {getTrackName('MOPA-XTOOL2')}
+											</p>
+										</React.Fragment>
+									} trigger={<a>[more]</a>} />
+								</p>
+
+								<p>
 									Precix availability: {getTrackStat('CNC-PRECIX')} <Popup content={
 										<React.Fragment>
 											<p>
