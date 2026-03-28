@@ -17,7 +17,7 @@ def discourse_is_configured():
 def auth_api(url, data=None, json=None):
     try:
         headers = {'Authorization': 'Token ' + secrets.AUTH_API_KEY}
-        r = requests.post(url, data=data, json=json, headers=headers, timeout=6)
+        r = requests.post(url, data=data, json=json, headers=headers, timeout=10)
         return r.status_code
     except Timeout as e:
         logger.info('Auth {} - {} - {}'.format(url, e.__class__.__name__, str(e)))
