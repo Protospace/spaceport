@@ -2590,8 +2590,13 @@ class OIDCAuthView(views.APIView, AuthorizeView):
     def get(self, request, *args, **kwargs):
         try:
             r = super().get(request, args, kwargs)
-            location = r._headers['location'][1]
-            time.sleep(1)
+            try:
+                # for Vikunja
+                location = r._headers['location'][1]
+                time.sleep(1)
+            except:
+                # for Mediawiki
+                location = r.headers['location']
             return Response({'url': location})
         except Exception as e:
             msg = getattr(r, 'content', False) or str(e)
