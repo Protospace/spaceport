@@ -295,7 +295,7 @@ export function Home(props) {
 					if (m > 0) time_str += m + 'm';
 				}
 			}
-			return 'Layer ' + info?.current_layer + ' / ' + info?.total_layers + ' (' + info?.print_percentage + '%) ' + time_str;
+			return info?.current_layer + ' / ' + info?.total_layers + ' (' + info?.print_percentage + '%) ' + time_str;
 		} else {
 			return printer_state;
 		}
