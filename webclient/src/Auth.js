@@ -159,7 +159,7 @@ export function AuthOIDC(props) {
 			window.location = res.url;
 		})
 		.catch(err => {
-			setError(true);
+			setError(err.data.error);
 			console.log(err);
 		});
 	}, []);
@@ -289,9 +289,12 @@ export function AuthOIDC(props) {
 				<Header size='large'>Spaceport Auth</Header>
 
 				<Segment compact padded>
-					<p>Authorizing OIDC...</p>
+					{!!error && <Message negative>
+						<Message.Header>Error</Message.Header>
+						<p>{error}</p>
+					</Message>}
 
-					{error && <p>Error, are you logged in?</p>}
+					<p>Authorizing OIDC...</p>
 				</Segment>
 			</Container>
 		</>

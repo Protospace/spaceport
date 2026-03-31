@@ -17,6 +17,7 @@ from rest_framework.response import Response
 from rest_auth.views import PasswordChangeView, PasswordResetView, PasswordResetConfirmView, LoginView
 from rest_auth.registration.views import RegisterView
 from oidc_provider.views import AuthorizeView
+from oidc_provider.models import Client as OIDCClient
 from fuzzywuzzy import fuzz, process
 from collections import OrderedDict
 from dateutil import relativedelta
@@ -2590,13 +2591,30 @@ class OIDCAuthView(views.APIView, AuthorizeView):
     def get(self, request, *args, **kwargs):
         try:
             r = super().get(request, args, kwargs)
-            try:
-                # for Vikunja
+
+            client_id = request.GET.get('client_id', '')
+            client = OIDCClient.objects.get(client_id=client_id)
+            client_name = client.name.lower()
+
+            user = request.user
+
+            logger.info('OIDC login request for client %s (%s), user: %s', client_name, client_id, user)
+
+            if user.member.paused_date:
+                return Response({'error': 'Must be an active member.'}, status=drfstatus.HTTP_403_FORBIDDEN)
+
+            if client_name == 'vikunja':
                 location = r._headers['location'][1]
                 time.sleep(1)
-            except:
-                # for Mediawiki
+            elif client_name == 'wiki_dev':
                 location = r.headers['location']
+            elif client_name == 'opswiki':
+                if not user.member.vetted_date:
+                    return Response({'error': 'Must be a vetted member.'}, status=drfstatus.HTTP_403_FORBIDDEN)
+                location = r.headers['location']
+            else:
+                raise
+
             return Response({'url': location})
         except Exception as e:
             msg = getattr(r, 'content', False) or str(e)
