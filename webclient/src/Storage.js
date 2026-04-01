@@ -96,6 +96,30 @@ function EditStorage(props) {
 				</Form.Group>
 				{success && <div>Success!</div>}
 			</Form>
+
+			<Header size='small'>History</Header>
+
+			<BasicTable>
+				<Table.Body>
+					{storage.previous_owners.length ?
+						storage.previous_owners.map(x =>
+							<Table.Row>
+								<Table.Cell>
+									<Icon name='circle' color={statusColor[x.member_status]} />
+									<Link to={'/members/'+x.member_id}>
+										{x.member_name}
+									</Link>
+								</Table.Cell>
+								<Table.Cell>
+									{x.start_date} – {x.end_date || 'Current'}
+								</Table.Cell>
+							</Table.Row>
+						)
+					:
+						<p>No history</p>
+					}
+				</Table.Body>
+			</BasicTable>
 		</div>
 	);
 };
@@ -160,6 +184,7 @@ function StorageTable(props) {
 					<Table.Cell>Owner:</Table.Cell>
 					{storage.member_id ?
 						<Table.Cell>
+							<Icon name='circle' color={statusColor[storage.member_status]} />
 							<Link to={'/members/'+storage.member_id}>
 								{storage.member_name}
 							</Link>
