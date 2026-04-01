@@ -39,6 +39,9 @@ def set_wiki_password(username, password):
 
     logger.info('Output: ' + output)
 
+    if 'done.' in output:
+        return True
+
     if result.stderr:
         abort(400)
 
