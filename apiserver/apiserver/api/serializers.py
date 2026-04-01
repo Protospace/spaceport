@@ -671,7 +671,38 @@ class AdminStorageSpaceSerializer(StorageSpaceSerializer):
     previous_owners = serializers.SerializerMethodField()
 
     def get_previous_owners(self, obj):
-        pass
+        owners = []
+        history_records = list(obj.history.order_by('history_date'))
+        if len(history_records) <= 1:
+            return []
+
+        user_ids = {r.user_id for r in history_records if r.user_id}
+        users = User.objects.select_related('member').in_bulk(list(user_ids))
+
+        # Initialize with the first record
+        first_record = history_records[0]
+        prev_user_id = first_record.user_id
+        start_date = first_record.history_date
+
+        for record in history_records[1:]:
+            if record.user_id != prev_user_id:
+                if prev_user_id:
+                    prev_user = users.get(prev_user_id)
+                    if prev_user and hasattr(prev_user, 'member'):
+                        member = prev_user.member
+                        owners.append({
+                            'member_id': member.id,
+                            'member_name': member.preferred_name + ' ' + member.last_name,
+                            'member_status': member.status,
+                            'member_paused': member.paused_date,
+                            'start_date': start_date,
+                            'end_date': record.history_date,
+                        })
+
+                prev_user_id = record.user_id
+                start_date = record.history_date
+
+        return owners
 
 
 class TrainingSerializer(serializers.ModelSerializer):
