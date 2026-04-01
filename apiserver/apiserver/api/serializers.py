@@ -667,6 +667,12 @@ class UnvettedStorageSpaceSerializer(StorageSpaceSerializer):
         member = obj.user.member
         return member.preferred_name + ' ' + member.last_name[0] + '.'
 
+class AdminStorageSpaceSerializer(StorageSpaceSerializer):
+    previous_owners = serializers.SerializerMethodField()
+
+    def get_previous_owners(self, obj):
+        pass
+
 
 class TrainingSerializer(serializers.ModelSerializer):
     attendance_status = serializers.ChoiceField([
