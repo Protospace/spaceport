@@ -673,7 +673,7 @@ class AdminStorageSpaceSerializer(StorageSpaceSerializer):
     def get_previous_owners(self, obj):
         owners = []
         history_records = list(obj.history.order_by('history_date'))
-        if len(history_records) <= 1:
+        if not history_records:
             return []
 
         user_ids = {r.user_id for r in history_records if r.user_id}
@@ -694,12 +694,26 @@ class AdminStorageSpaceSerializer(StorageSpaceSerializer):
                             'member_id': member.id,
                             'member_name': member.preferred_name + ' ' + member.last_name,
                             'member_status': member.status,
+                            'member_paused': member.paused_date,
                             'start_date': start_date.astimezone(utils.TIMEZONE_CALGARY).date().isoformat(),
                             'end_date': record.history_date.astimezone(utils.TIMEZONE_CALGARY).date().isoformat(),
                         })
 
                 prev_user_id = record.user_id
                 start_date = record.history_date
+
+        if prev_user_id:
+            prev_user = users.get(prev_user_id)
+            if prev_user and hasattr(prev_user, 'member'):
+                member = prev_user.member
+                owners.append({
+                    'member_id': member.id,
+                    'member_name': member.preferred_name + ' ' + member.last_name,
+                    'member_status': member.status,
+                    'member_paused': member.paused_date,
+                    'start_date': start_date.astimezone(utils.TIMEZONE_CALGARY).date().isoformat(),
+                    'end_date': None,
+                })
 
         return owners
 
