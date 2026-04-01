@@ -159,7 +159,7 @@ export function AuthOIDC(props) {
 			window.location = res.url;
 		})
 		.catch(err => {
-			setError(err.data.error);
+			setError(err.data.error || err.data.non_field_errors);
 			console.log(err);
 		});
 	}, []);
