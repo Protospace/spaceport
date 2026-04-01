@@ -2610,6 +2610,8 @@ class OIDCAuthView(views.APIView, AuthorizeView):
                 time.sleep(1)
             elif client_name == 'wiki_dev':
                 location = r.headers['location']
+            elif client_name == 'wiki':
+                location = r.headers['location']
             elif client_name == 'opswiki':
                 if not user.member.vetted_date:
                     return Response({'error': 'Must be a vetted member.'}, status=drfstatus.HTTP_403_FORBIDDEN)
