@@ -8,6 +8,7 @@ export function Balloon(props) {
 	const [missionDuration, setMissionDuration] = useState('...');
 	const [isBlurred, setIsBlurred] = useState(true);
 	const [uiVisibility, setUiVisibility] = useState({});
+	const [globeReady, setGlobeReady] = useState(false);
 	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
 	const globeContainerRef = useRef();
 	const globeInstanceRef = useRef();
@@ -63,6 +64,7 @@ export function Balloon(props) {
 					.pathStroke(2)
 					.pathColor(() => 'rgba(255, 100, 50, 1.0)')
 					.pathTransitionDuration(0);
+				myGlobe.onGlobeReady(() => setGlobeReady(true));
 				globeInstanceRef.current = myGlobe;
 			}
 			globeInstanceRef.current.width(width).height(height);
@@ -99,8 +101,8 @@ export function Balloon(props) {
 		const globe = globeInstanceRef.current;
 		const THREE = window.THREE;
 
-		console.log('Raycaster effect running. Globe:', globe, 'THREE:', !!THREE);
-		if (!globe || !THREE) return;
+		console.log('Raycaster effect running. Globe:', globe, 'THREE:', !!THREE, 'globeReady:', globeReady);
+		if (!globe || !THREE || !globeReady) return;
 
 		const camera = globe.camera();
 		const globeMesh = globe.scene().getObjectByName('globe');
@@ -148,7 +150,7 @@ export function Balloon(props) {
 
 		const interval = setInterval(checkVisibility, 200);
 		return () => clearInterval(interval);
-	}, [width, height, balloon]);
+	}, [width, height, balloon, globeReady]);
 
 	useEffect(() => {
 		if (titleRef.current) titleRef.current.style.setProperty('font-family', 'monospace', 'important');
