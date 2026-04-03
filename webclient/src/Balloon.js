@@ -52,12 +52,12 @@ export function Balloon(props) {
 	}, [width, height]);
 
 	useEffect(() => {
-		if (globeInstanceRef.current && balloon && balloon.length > 0) {
-			const pathData = [{ points: balloon }];
+		if (globeInstanceRef.current && balloon && balloon.positions && balloon.positions.length > 0) {
+			const pathData = [{ points: balloon.positions }];
 			globeInstanceRef.current.pathsData(pathData);
 
 			if (isInitialLoad.current) {
-				const lastPoint = balloon[0]; // data is reverse chronological
+				const lastPoint = balloon.positions[0]; // data is reverse chronological
 
 				// Instantly set camera to be looking at the last point from far away
 				globeInstanceRef.current.pointOfView({ lat: lastPoint.lat, lng: lastPoint.lng, altitude: 10 });
