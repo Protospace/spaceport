@@ -4,6 +4,7 @@ import { requester, useIsMobile, useWindowSize } from './utils.js';
 
 export function Balloon(props) {
 	const [balloon, setBalloon] = useState(false);
+	const [timeAgo, setTimeAgo] = useState('...');
 	const [isBlurred, setIsBlurred] = useState(true);
 	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
 	const globeContainerRef = useRef();
@@ -90,6 +91,23 @@ export function Balloon(props) {
 		if (lastSeenRef.current) lastSeenRef.current.style.setProperty('font-family', 'monospace', 'important');
 	}, []);
 
+	useEffect(() => {
+		if (!balloon || !balloon.positions || balloon.positions.length === 0) {
+			return;
+		}
+		const lastPositionTime = moment.utc(balloon.positions[0].time);
+		const timer = setInterval(() => {
+			const now = moment();
+			const duration = moment.duration(now.diff(lastPositionTime));
+			const hours = String(Math.floor(duration.asHours())).padStart(2, '0');
+			const minutes = String(duration.minutes()).padStart(2, '0');
+			const secondsWithDecimal = (duration.seconds() + duration.milliseconds() / 1000).toFixed(1);
+			const paddedSeconds = secondsWithDecimal.padStart(4, '0');
+			setTimeAgo(`${hours}h ${minutes}m ${paddedSeconds}s ago`);
+		}, 100);
+		return () => clearInterval(timer);
+	}, [balloon]);
+
 	console.log(balloon);
 
 	const uiContainerStyle = {
@@ -142,6 +160,10 @@ export function Balloon(props) {
 		fontSize: '1em',
 	};
 
+	const timeAgoStyle = {
+		fontSize: '0.8em',
+	};
+
 	const lastSeenTime = balloon && balloon.positions && balloon.positions.length > 0
 		? moment.utc(balloon.positions[0].time).local().format()
 		: '...';
@@ -157,6 +179,7 @@ export function Balloon(props) {
 				<div style={statBoxStyle} ref={lastSeenRef}>
 					<div style={statLabelStyle}>LAST UPDATE</div>
 					<div style={statValueStyle}>{lastSeenTime}</div>
+					<div style={timeAgoStyle}>{timeAgo}</div>
 				</div>
 			</div>
 			<div
