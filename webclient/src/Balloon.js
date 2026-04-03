@@ -121,7 +121,7 @@ export function Balloon(props) {
 
 	const statsContainerStyle = {
 		position: 'fixed',
-		top: '80px',
+		top: '64px',
 		left: '20px',
 		zIndex: '4',
 		display: 'flex',
@@ -131,7 +131,7 @@ export function Balloon(props) {
 		border: '1px solid white',
 		padding: '5px 10px',
 		color: 'white',
-		textAlign: 'center',
+		textAlign: 'left',
 	};
 
 	const statLabelStyle = {
@@ -155,7 +155,7 @@ export function Balloon(props) {
 			</div>
 			<div style={statsContainerStyle}>
 				<div style={statBoxStyle} ref={lastSeenRef}>
-					<div style={statLabelStyle}>LAST SEEN</div>
+					<div style={statLabelStyle}>LAST UPDATE</div>
 					<div style={statValueStyle}>{lastSeenTime}</div>
 				</div>
 			</div>
