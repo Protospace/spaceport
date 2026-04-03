@@ -4,9 +4,9 @@ import { requester, useIsMobile, useWindowSize } from './utils.js';
 export function Balloon(props) {
 	const [balloon, setBalloon] = useState(false);
 	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
-	const globeEl = useRef();
+	const globeContainerRef = useRef();
+	const globeInstanceRef = useRef();
 	const { width, height } = useWindowSize();
-	const [globeReady, setGlobeReady] = useState(!!window.ReactGlobe);
 
 	const getBalloon = () => {
 		requester('/stats/balloon_data/', 'GET')
@@ -30,51 +30,39 @@ export function Balloon(props) {
 	}, [refreshCount]);
 
 	useEffect(() => {
-		if (globeReady) return;
-		const timer = setInterval(() => {
-			if (window.ReactGlobe) {
-				setGlobeReady(true);
-				clearInterval(timer);
+		const Globe = window.Globe;
+		if (Globe && globeContainerRef.current) {
+			if (!globeInstanceRef.current) {
+				const myGlobe = Globe()(globeContainerRef.current)
+					.globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
+					.bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+					.backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+					.pathPoints('points')
+					.pathPointLat(p => p.lat)
+					.pathPointLng(p => p.lng)
+					.pathPointAlt(p => p.altitudeFt / 200000)
+					.pathStroke(1.5)
+					.pathColor(() => 'rgba(255, 100, 50, 0.6)')
+					.pathTransitionDuration(0);
+				globeInstanceRef.current = myGlobe;
 			}
-		}, 100);
-		return () => clearInterval(timer);
-	}, [globeReady]);
+			globeInstanceRef.current.width(width).height(height);
+		}
+	}, [width, height]);
 
 	useEffect(() => {
-		if (globeEl.current && balloon && balloon.length > 0) {
+		if (globeInstanceRef.current && balloon && balloon.length > 0) {
+			const pathData = [{ points: balloon }];
+			globeInstanceRef.current.pathsData(pathData);
+
 			const lastPoint = balloon[0]; // data is reverse chronological
-			globeEl.current.pointOfView({ lat: lastPoint.lat, lng: lastPoint.lng, altitude: 2 }, 1600);
+			globeInstanceRef.current.pointOfView({ lat: lastPoint.lat, lng: lastPoint.lng, altitude: 2 }, 1600);
 		}
 	}, [balloon]);
 
 	console.log(balloon);
 
-	const pathData = balloon ? [{
-		points: balloon,
-	}] : [];
-
-	if (!globeReady) {
-		console.log('no react globe');
-		return null;
-	}
-	const ReactGlobe = window.ReactGlobe;
-
 	return (
-		<ReactGlobe
-			ref={globeEl}
-			width={width}
-			height={height}
-			globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
-			bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
-			backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
-			pathsData={pathData}
-			pathPoints="points"
-			pathPointLat={p => p.lat}
-			pathPointLng={p => p.lng}
-			pathPointAlt={p => p.altitudeFt / 200000}
-			pathStroke={1.5}
-			pathColor={() => 'rgba(255, 100, 50, 0.6)'}
-			pathTransitionDuration={0}
-		/>
+		<div ref={globeContainerRef} />
 	);
 };
