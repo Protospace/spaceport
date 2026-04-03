@@ -136,7 +136,7 @@ export function Balloon(props) {
 					ndc.y = -(y / window.innerHeight) * 2 + 1;
 
 					raycaster.setFromCamera(ndc, camera);
-					const intersects = raycaster.intersectObject(globeMesh);
+					const intersects = raycaster.intersectObject(globeMesh, true);
 					newVisibility[name] = intersects.length > 0;
 				}
 			}
