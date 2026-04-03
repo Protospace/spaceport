@@ -1287,6 +1287,10 @@ class StatsViewSet(viewsets.ViewSet, List):
 
         return Response(200)
 
+    @action(detail=False, methods=['get'])
+    def balloon_data(self, request):
+        pass
+
 
 class DrawingViewSet(Base, List, Create, Update):
     permission_classes = [IsAuthenticatedOrReadOnly]
