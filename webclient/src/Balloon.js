@@ -7,6 +7,7 @@ export function Balloon(props) {
 	const [timeAgo, setTimeAgo] = useState('...');
 	const [missionDuration, setMissionDuration] = useState('...');
 	const [isBlurred, setIsBlurred] = useState(true);
+	const [uiVisibility, setUiVisibility] = useState({});
 	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
 	const globeContainerRef = useRef();
 	const globeInstanceRef = useRef();
@@ -93,6 +94,58 @@ export function Balloon(props) {
 			}
 		}
 	}, [balloon]);
+
+	useEffect(() => {
+		const globe = globeInstanceRef.current;
+		const THREE = window.THREE;
+
+		if (!globe || !THREE) return;
+
+		const camera = globe.camera();
+		const globeMesh = globe.globe();
+		if (!globeMesh) return;
+
+		const raycaster = new THREE.Raycaster();
+		const ndc = new THREE.Vector2();
+
+		const refsToCheck = {
+			title: titleRef,
+			about: aboutButtonRef,
+			faq: faqButtonRef,
+			lastSeen: lastSeenRef,
+			missionDuration: missionDurationRef,
+			lastPosition: lastPositionRef,
+			altitude: altitudeRef,
+			callsign: callsignRef,
+			band: bandRef,
+			channel: channelRef,
+			lapCount: lapCountRef,
+			distance: distanceRef,
+			spots: spotsRef,
+		};
+
+		const checkVisibility = () => {
+			const newVisibility = {};
+			for (const [name, ref] of Object.entries(refsToCheck)) {
+				if (ref.current) {
+					const rect = ref.current.getBoundingClientRect();
+					const x = rect.left + rect.width / 2;
+					const y = rect.top + rect.height / 2;
+
+					ndc.x = (x / window.innerWidth) * 2 - 1;
+					ndc.y = -(y / window.innerHeight) * 2 + 1;
+
+					raycaster.setFromCamera(ndc, camera);
+					const intersects = raycaster.intersectObject(globeMesh);
+					newVisibility[name] = intersects.length > 0;
+				}
+			}
+			setUiVisibility(newVisibility);
+		};
+
+		const interval = setInterval(checkVisibility, 200);
+		return () => clearInterval(interval);
+	}, [width, height, balloon]);
 
 	useEffect(() => {
 		if (titleRef.current) titleRef.current.style.setProperty('font-family', 'monospace', 'important');
@@ -244,32 +297,39 @@ export function Balloon(props) {
 		alignItems: 'flex-start',
 	};
 
+	const getStyle = (baseStyle, visibilityKey) => ({
+		...baseStyle,
+		opacity: uiVisibility[visibilityKey] ? 0 : 1,
+		transition: 'opacity 0.3s ease',
+		pointerEvents: uiVisibility[visibilityKey] ? 'none' : 'auto',
+	});
+
 	return (
 		<>
 			<div style={uiContainerStyle}>
-				<div style={titleStyle} ref={titleRef}>Protoballoon</div>
-				<button style={buttonStyle} ref={aboutButtonRef}>About</button>
-				<button style={buttonStyle} ref={faqButtonRef}>FAQ</button>
+				<div style={getStyle(titleStyle, 'title')} ref={titleRef}>Protoballoon</div>
+				<button style={getStyle(buttonStyle, 'about')} ref={aboutButtonRef}>About</button>
+				<button style={getStyle(buttonStyle, 'faq')} ref={faqButtonRef}>FAQ</button>
 			</div>
 			<div style={statsContainerStyle}>
 				<div style={statRowStyle}>
-					<div style={statBoxStyle} ref={lastSeenRef}>
+					<div style={getStyle(statBoxStyle, 'lastSeen')} ref={lastSeenRef}>
 						<div style={statLabelStyle}>LAST UPDATE</div>
 						<div style={statValueStyle}>{lastSeenTime}</div>
 						<div style={timeAgoStyle}>{timeAgo}</div>
 					</div>
-					<div style={statBoxStyle} ref={missionDurationRef}>
+					<div style={getStyle(statBoxStyle, 'missionDuration')} ref={missionDurationRef}>
 						<div style={statLabelStyle}>MISSION DURATION</div>
 						<div style={statValueStyle}>{missionDuration}</div>
 						<div style={timeAgoStyle}>{sinceDate}</div>
 					</div>
 				</div>
 				<div style={{...statRowStyle, marginTop: '-1px'}}>
-					<div style={statBoxStyle} ref={lastPositionRef}>
+					<div style={getStyle(statBoxStyle, 'lastPosition')} ref={lastPositionRef}>
 						<div style={statLabelStyle}>LAST POSITION</div>
 						<div style={statValueStyle}>{lastPosition}</div>
 					</div>
-					<div style={statBoxStyle} ref={altitudeRef}>
+					<div style={getStyle(statBoxStyle, 'altitude')} ref={altitudeRef}>
 						<div style={statLabelStyle}>ALTITUDE</div>
 						<div style={statValueStyle}>{altitude}</div>
 					</div>
@@ -277,29 +337,29 @@ export function Balloon(props) {
 			</div>
 			<div style={bottomStatsContainerStyle}>
 				<div style={statRowStyle}>
-					<div style={statBoxStyle} ref={callsignRef}>
+					<div style={getStyle(statBoxStyle, 'callsign')} ref={callsignRef}>
 						<div style={statLabelStyle}>CALLSIGN</div>
 						<div style={statValueStyle}>{callsign}</div>
 					</div>
-					<div style={statBoxStyle} ref={bandRef}>
+					<div style={getStyle(statBoxStyle, 'band')} ref={bandRef}>
 						<div style={statLabelStyle}>BAND</div>
 						<div style={statValueStyle}>{band}</div>
 					</div>
-					<div style={statBoxStyle} ref={channelRef}>
+					<div style={getStyle(statBoxStyle, 'channel')} ref={channelRef}>
 						<div style={statLabelStyle}>CHANNEL</div>
 						<div style={statValueStyle}>{channel}</div>
 					</div>
 				</div>
 				<div style={{...statRowStyle, marginTop: '-1px'}}>
-					<div style={statBoxStyle} ref={distanceRef}>
+					<div style={getStyle(statBoxStyle, 'distance')} ref={distanceRef}>
 						<div style={statLabelStyle}>DISTANCE TRAVELLED</div>
 						<div style={statValueStyle}>{distanceTraveled}</div>
 					</div>
-					<div style={statBoxStyle} ref={spotsRef}>
+					<div style={getStyle(statBoxStyle, 'spots')} ref={spotsRef}>
 						<div style={statLabelStyle}>SPOTS</div>
 						<div style={statValueStyle}>{spots}</div>
 					</div>
-					<div style={statBoxStyle} ref={lapCountRef}>
+					<div style={getStyle(statBoxStyle, 'lapCount')} ref={lapCountRef}>
 						<div style={statLabelStyle}>LAP COUNT</div>
 						<div style={statValueStyle}>{lapCount}</div>
 					</div>
