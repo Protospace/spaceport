@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useReducer, useRef } from 'react';
+import moment from 'moment-timezone';
 import { requester, useIsMobile, useWindowSize } from './utils.js';
 
 export function Balloon(props) {
@@ -11,6 +12,7 @@ export function Balloon(props) {
 	const titleRef = useRef();
 	const aboutButtonRef = useRef();
 	const faqButtonRef = useRef();
+	const lastSeenRef = useRef();
 	const { width, height } = useWindowSize();
 
 	const getBalloon = () => {
@@ -85,6 +87,7 @@ export function Balloon(props) {
 		if (titleRef.current) titleRef.current.style.setProperty('font-family', 'monospace', 'important');
 		if (aboutButtonRef.current) aboutButtonRef.current.style.setProperty('font-family', 'monospace', 'important');
 		if (faqButtonRef.current) faqButtonRef.current.style.setProperty('font-family', 'monospace', 'important');
+		if (lastSeenRef.current) lastSeenRef.current.style.setProperty('font-family', 'monospace', 'important');
 	}, []);
 
 	console.log(balloon);
@@ -116,12 +119,46 @@ export function Balloon(props) {
 		marginLeft: '-1px',
 	};
 
+	const statsContainerStyle = {
+		position: 'fixed',
+		top: '80px',
+		left: '20px',
+		zIndex: '4',
+		display: 'flex',
+	};
+
+	const statBoxStyle = {
+		border: '1px solid white',
+		padding: '5px 10px',
+		color: 'white',
+		textAlign: 'center',
+	};
+
+	const statLabelStyle = {
+		fontSize: '0.7em',
+		opacity: 0.7,
+	};
+
+	const statValueStyle = {
+		fontSize: '1em',
+	};
+
+	const lastSeenTime = balloon && balloon.positions && balloon.positions.length > 0
+		? moment.utc(balloon.positions[0].time).local().format()
+		: '...';
+
 	return (
 		<>
 			<div style={uiContainerStyle}>
 				<div style={titleStyle} ref={titleRef}>Protoballoon</div>
 				<button style={buttonStyle} ref={aboutButtonRef}>About</button>
 				<button style={buttonStyle} ref={faqButtonRef}>FAQ</button>
+			</div>
+			<div style={statsContainerStyle}>
+				<div style={statBoxStyle} ref={lastSeenRef}>
+					<div style={statLabelStyle}>LAST SEEN</div>
+					<div style={statValueStyle}>{lastSeenTime}</div>
+				</div>
 			</div>
 			<div
 				ref={globeContainerRef}
