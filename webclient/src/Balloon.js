@@ -3,6 +3,7 @@ import { requester, useIsMobile, useWindowSize } from './utils.js';
 
 export function Balloon(props) {
 	const [balloon, setBalloon] = useState(false);
+	const [isBlurred, setIsBlurred] = useState(true);
 	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
 	const globeContainerRef = useRef();
 	const globeInstanceRef = useRef();
@@ -67,6 +68,11 @@ export function Balloon(props) {
 					globeInstanceRef.current.pointOfView({ altitude: 2 }, 1600);
 				}, 100);
 
+				// Un-blur halfway through zoom
+				setTimeout(() => {
+					setIsBlurred(false);
+				}, 900);
+
 				isInitialLoad.current = false;
 			}
 		}
@@ -75,6 +81,18 @@ export function Balloon(props) {
 	console.log(balloon);
 
 	return (
-		<div ref={globeContainerRef} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: '3' }} />
+		<div
+			ref={globeContainerRef}
+			style={{
+				position: 'fixed',
+				top: 0,
+				left: 0,
+				width: '100vw',
+				height: '100vh',
+				zIndex: '3',
+				filter: isBlurred ? 'blur(8px)' : 'none',
+				transition: 'filter 1s ease-out',
+			}}
+		/>
 	);
 };
