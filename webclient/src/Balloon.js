@@ -308,9 +308,7 @@ export function Balloon(props) {
 
 	const getStyle = (baseStyle, visibilityKey) => ({
 		...baseStyle,
-		opacity: uiVisibility[visibilityKey] ? 0 : 1,
-		transition: 'opacity 0.3s ease',
-		pointerEvents: uiVisibility[visibilityKey] ? 'none' : 'auto',
+		...(uiVisibility[visibilityKey] ? { display: 'none' } : {}),
 	});
 
 	return (
