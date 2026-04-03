@@ -17,6 +17,7 @@ export function Balloon(props) {
 	const lastSeenRef = useRef();
 	const missionDurationRef = useRef();
 	const lastPositionRef = useRef();
+	const altitudeRef = useRef();
 	const { width, height } = useWindowSize();
 
 	const getBalloon = () => {
@@ -94,6 +95,7 @@ export function Balloon(props) {
 		if (lastSeenRef.current) lastSeenRef.current.style.setProperty('font-family', 'monospace', 'important');
 		if (missionDurationRef.current) missionDurationRef.current.style.setProperty('font-family', 'monospace', 'important');
 		if (lastPositionRef.current) lastPositionRef.current.style.setProperty('font-family', 'monospace', 'important');
+		if (altitudeRef.current) altitudeRef.current.style.setProperty('font-family', 'monospace', 'important');
 	}, []);
 
 	useEffect(() => {
@@ -201,6 +203,10 @@ export function Balloon(props) {
 		? `${balloon.positions[0].lat}, ${balloon.positions[0].lng}`
 		: '...';
 
+	const altitude = balloon && balloon.positions && balloon.positions.length > 0
+		? `${balloon.positions[0].altitudeFt.toLocaleString()} ft`
+		: '...';
+
 	return (
 		<>
 			<div style={uiContainerStyle}>
@@ -221,9 +227,15 @@ export function Balloon(props) {
 						<div style={timeAgoStyle}>{sinceDate}</div>
 					</div>
 				</div>
-				<div style={{...statBoxStyle, marginTop: '-1px'}} ref={lastPositionRef}>
-					<div style={statLabelStyle}>LAST POSITION</div>
-					<div style={statValueStyle}>{lastPosition}</div>
+				<div style={{display: 'flex', marginTop: '-1px'}}>
+					<div style={statBoxStyle} ref={lastPositionRef}>
+						<div style={statLabelStyle}>LAST POSITION</div>
+						<div style={statValueStyle}>{lastPosition}</div>
+					</div>
+					<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={altitudeRef}>
+						<div style={statLabelStyle}>ALTITUDE</div>
+						<div style={statValueStyle}>{altitude}</div>
+					</div>
 				</div>
 			</div>
 			<div
