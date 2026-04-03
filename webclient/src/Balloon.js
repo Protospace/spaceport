@@ -18,6 +18,9 @@ export function Balloon(props) {
 	const missionDurationRef = useRef();
 	const lastPositionRef = useRef();
 	const altitudeRef = useRef();
+	const lapCountRef = useRef();
+	const distanceRef = useRef();
+	const spotsRef = useRef();
 	const { width, height } = useWindowSize();
 
 	const getBalloon = () => {
@@ -96,6 +99,9 @@ export function Balloon(props) {
 		if (missionDurationRef.current) missionDurationRef.current.style.setProperty('font-family', 'monospace', 'important');
 		if (lastPositionRef.current) lastPositionRef.current.style.setProperty('font-family', 'monospace', 'important');
 		if (altitudeRef.current) altitudeRef.current.style.setProperty('font-family', 'monospace', 'important');
+		if (lapCountRef.current) lapCountRef.current.style.setProperty('font-family', 'monospace', 'important');
+		if (distanceRef.current) distanceRef.current.style.setProperty('font-family', 'monospace', 'important');
+		if (spotsRef.current) spotsRef.current.style.setProperty('font-family', 'monospace', 'important');
 	}, []);
 
 	useEffect(() => {
@@ -207,6 +213,18 @@ export function Balloon(props) {
 		? `${balloon.positions[0].altitudeFt.toLocaleString()} ft`
 		: '...';
 
+	const lapCount = balloon && balloon.stats ? balloon.stats.lapCount : '...';
+	const distanceTraveled = balloon && balloon.stats ? `${balloon.stats.distanceTraveledKm.toLocaleString()} km` : '...';
+	const spots = balloon && balloon.stats ? balloon.stats.spots.toLocaleString() : '...';
+
+	const bottomStatsContainerStyle = {
+		position: 'fixed',
+		bottom: '20px',
+		left: '20px',
+		zIndex: '4',
+		display: 'flex',
+	};
+
 	return (
 		<>
 			<div style={uiContainerStyle}>
@@ -236,6 +254,20 @@ export function Balloon(props) {
 						<div style={statLabelStyle}>ALTITUDE</div>
 						<div style={statValueStyle}>{altitude}</div>
 					</div>
+				</div>
+			</div>
+			<div style={bottomStatsContainerStyle}>
+				<div style={statBoxStyle} ref={lapCountRef}>
+					<div style={statLabelStyle}>LAP COUNT</div>
+					<div style={statValueStyle}>{lapCount}</div>
+				</div>
+				<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={distanceRef}>
+					<div style={statLabelStyle}>DISTANCE TRAVELLED</div>
+					<div style={statValueStyle}>{distanceTraveled}</div>
+				</div>
+				<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={spotsRef}>
+					<div style={statLabelStyle}>SPOTS</div>
+					<div style={statValueStyle}>{spots}</div>
 				</div>
 			</div>
 			<div
