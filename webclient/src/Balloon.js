@@ -13,11 +13,9 @@ export function BalloonAbout(props) {
 			.then(html => {
 				const parser = new DOMParser();
 				const doc = parser.parseFromString(html, 'text/html');
-				const appContainer = doc.querySelector('div.app-container');
-				if (appContainer) {
-					const header = appContainer.querySelector('header');
-					if (header) header.remove();
-					setContent(appContainer.innerHTML);
+				const readingView = doc.querySelector('div.markdown-reading-view');
+				if (readingView) {
+					setContent(readingView.innerHTML);
 				}
 			})
 			.catch(error => {
