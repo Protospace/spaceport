@@ -102,7 +102,7 @@ export function Balloon(props) {
 		if (!globe || !THREE) return;
 
 		const camera = globe.camera();
-		const globeMesh = globe.globe();
+		const globeMesh = globe.scene().getObjectByName('globe');
 		if (!globeMesh) return;
 
 		const raycaster = new THREE.Raycaster();
