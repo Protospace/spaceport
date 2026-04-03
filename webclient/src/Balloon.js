@@ -1,13 +1,15 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect, useReducer, useRef } from 'react';
 import moment from 'moment-timezone';
 import * as THREE from 'three';
 import { Container} from 'semantic-ui-react';
-import { requester, useIsMobile } from './utils.js';
+import ReactGlobe from 'react-globe.gl';
+import { requester, useIsMobile, useWindowSize } from './utils.js';
 
 export function Balloon(props) {
 	const [balloon, setBalloon] = useState(false);
 	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
-	const mountRef = useRef(null);
+	const globeEl = useRef();
+	const { width, height } = useWindowSize();
 
 	const getBalloon = () => {
 		requester('/stats/balloon_data/', 'GET')
@@ -30,11 +32,35 @@ export function Balloon(props) {
 		getBalloon();
 	}, [refreshCount]);
 
+	useEffect(() => {
+		if (globeEl.current && balloon && balloon.length > 0) {
+			const lastPoint = balloon[0]; // data is reverse chronological
+			globeEl.current.pointOfView({ lat: lastPoint.lat, lng: lastPoint.lng, altitude: 2 }, 1600);
+		}
+	}, [balloon]);
+
 	console.log(balloon);
 
+	const pathData = balloon ? [{
+		points: balloon,
+	}] : [];
+
 	return (
-		<>
-			<div ref={mountRef} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%' }} />
-		</>
+		<ReactGlobe
+			ref={globeEl}
+			width={width}
+			height={height}
+			globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
+			bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
+			backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
+			pathsData={pathData}
+			pathPoints="points"
+			pathPointLat={p => p.lat}
+			pathPointLng={p => p.lng}
+			pathPointAlt={p => p.altitudeFt / 200000}
+			pathStroke={1.5}
+			pathColor={() => 'rgba(255, 100, 50, 0.6)'}
+			pathTransitionDuration={0}
+		/>
 	);
 };
