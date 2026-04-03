@@ -257,17 +257,17 @@ export function Balloon(props) {
 				</div>
 			</div>
 			<div style={bottomStatsContainerStyle}>
-				<div style={statBoxStyle} ref={lapCountRef}>
-					<div style={statLabelStyle}>LAP COUNT</div>
-					<div style={statValueStyle}>{lapCount}</div>
-				</div>
-				<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={distanceRef}>
+				<div style={statBoxStyle} ref={distanceRef}>
 					<div style={statLabelStyle}>DISTANCE TRAVELLED</div>
 					<div style={statValueStyle}>{distanceTraveled}</div>
 				</div>
 				<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={spotsRef}>
 					<div style={statLabelStyle}>SPOTS</div>
 					<div style={statValueStyle}>{spots}</div>
+				</div>
+				<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={lapCountRef}>
+					<div style={statLabelStyle}>LAP COUNT</div>
+					<div style={statValueStyle}>{lapCount}</div>
 				</div>
 			</div>
 			<div
