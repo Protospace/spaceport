@@ -190,11 +190,13 @@ export function Balloon(props) {
 		color: 'white',
 		textAlign: 'left',
 		whiteSpace: 'nowrap',
+		margin: '-1px 0 0 -1px',
 	};
 
 	const statRowStyle = {
 		display: 'flex',
 		flexWrap: 'wrap',
+		padding: '1px 0 0 1px',
 	};
 
 	const statLabelStyle = {
@@ -256,7 +258,7 @@ export function Balloon(props) {
 						<div style={statValueStyle}>{lastSeenTime}</div>
 						<div style={timeAgoStyle}>{timeAgo}</div>
 					</div>
-					<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={missionDurationRef}>
+					<div style={statBoxStyle} ref={missionDurationRef}>
 						<div style={statLabelStyle}>MISSION DURATION</div>
 						<div style={statValueStyle}>{missionDuration}</div>
 						<div style={timeAgoStyle}>{sinceDate}</div>
@@ -267,7 +269,7 @@ export function Balloon(props) {
 						<div style={statLabelStyle}>LAST POSITION</div>
 						<div style={statValueStyle}>{lastPosition}</div>
 					</div>
-					<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={altitudeRef}>
+					<div style={statBoxStyle} ref={altitudeRef}>
 						<div style={statLabelStyle}>ALTITUDE</div>
 						<div style={statValueStyle}>{altitude}</div>
 					</div>
@@ -279,11 +281,11 @@ export function Balloon(props) {
 						<div style={statLabelStyle}>CALLSIGN</div>
 						<div style={statValueStyle}>{callsign}</div>
 					</div>
-					<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={bandRef}>
+					<div style={statBoxStyle} ref={bandRef}>
 						<div style={statLabelStyle}>BAND</div>
 						<div style={statValueStyle}>{band}</div>
 					</div>
-					<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={channelRef}>
+					<div style={statBoxStyle} ref={channelRef}>
 						<div style={statLabelStyle}>CHANNEL</div>
 						<div style={statValueStyle}>{channel}</div>
 					</div>
@@ -293,11 +295,11 @@ export function Balloon(props) {
 						<div style={statLabelStyle}>DISTANCE TRAVELLED</div>
 						<div style={statValueStyle}>{distanceTraveled}</div>
 					</div>
-					<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={spotsRef}>
+					<div style={statBoxStyle} ref={spotsRef}>
 						<div style={statLabelStyle}>SPOTS</div>
 						<div style={statValueStyle}>{spots}</div>
 					</div>
-					<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={lapCountRef}>
+					<div style={statBoxStyle} ref={lapCountRef}>
 						<div style={statLabelStyle}>LAP COUNT</div>
 						<div style={statValueStyle}>{lapCount}</div>
 					</div>
