@@ -140,6 +140,7 @@ export function Balloon(props) {
 					newVisibility[name] = intersects.length > 0;
 				}
 			}
+			console.log('uiVisibility', newVisibility);
 			setUiVisibility(newVisibility);
 		};
 
