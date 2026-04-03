@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useReducer, useRef } from 'react';
 import moment from 'moment-timezone';
 import { requester, useIsMobile, useWindowSize } from './utils.js';
+import './balloon.css';
 
 export function BalloonAbout(props) {
 }
@@ -165,21 +166,6 @@ export function Balloon(props) {
 		return () => clearInterval(interval);
 	}, [width, height, balloon, globeReady]);
 
-	useEffect(() => {
-		if (titleRef.current) titleRef.current.style.setProperty('font-family', 'monospace', 'important');
-		if (aboutButtonRef.current) aboutButtonRef.current.style.setProperty('font-family', 'monospace', 'important');
-		if (faqButtonRef.current) faqButtonRef.current.style.setProperty('font-family', 'monospace', 'important');
-		if (lastSeenRef.current) lastSeenRef.current.style.setProperty('font-family', 'monospace', 'important');
-		if (missionDurationRef.current) missionDurationRef.current.style.setProperty('font-family', 'monospace', 'important');
-		if (lastPositionRef.current) lastPositionRef.current.style.setProperty('font-family', 'monospace', 'important');
-		if (altitudeRef.current) altitudeRef.current.style.setProperty('font-family', 'monospace', 'important');
-		if (callsignRef.current) callsignRef.current.style.setProperty('font-family', 'monospace', 'important');
-		if (bandRef.current) bandRef.current.style.setProperty('font-family', 'monospace', 'important');
-		if (channelRef.current) channelRef.current.style.setProperty('font-family', 'monospace', 'important');
-		if (lapCountRef.current) lapCountRef.current.style.setProperty('font-family', 'monospace', 'important');
-		if (distanceRef.current) distanceRef.current.style.setProperty('font-family', 'monospace', 'important');
-		if (spotsRef.current) spotsRef.current.style.setProperty('font-family', 'monospace', 'important');
-	}, []);
 
 	useEffect(() => {
 		if (!balloon || !balloon.positions || balloon.positions.length === 0) {
@@ -216,72 +202,6 @@ export function Balloon(props) {
 		return () => clearInterval(timer);
 	}, [balloon]);
 
-	const uiContainerStyle = {
-		position: 'fixed',
-		top: isMobile ? '10px' : '20px',
-		left: isMobile ? '10px' : '20px',
-		zIndex: '4',
-		display: 'flex',
-		alignItems: 'center',
-		pointerEvents: 'none',
-	};
-
-	const titleStyle = {
-		color: 'white',
-		border: '1px solid white',
-		padding: '10px 15px',
-		fontSize: '1.2em',
-		fontWeight: 'bold',
-	};
-
-	const buttonStyle = {
-		backgroundColor: 'white',
-		color: 'black',
-		border: '1px solid white',
-		padding: '10px 15px',
-		fontSize: '1.2em',
-		cursor: 'pointer',
-		marginLeft: '-1px',
-	};
-
-	const statsContainerStyle = {
-		position: 'fixed',
-		top: isMobile ? '54px' : '64px',
-		left: isMobile ? '10px' : '20px',
-		zIndex: '4',
-		display: 'flex',
-		flexDirection: 'column',
-		alignItems: 'flex-start',
-		pointerEvents: 'none',
-	};
-
-	const statBoxStyle = {
-		border: '1px solid white',
-		padding: '5px 10px',
-		color: 'white',
-		textAlign: 'left',
-		whiteSpace: 'nowrap',
-		margin: '-1px 0 0 -1px',
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
-	};
-
-	const statRowStyle = {
-		display: 'flex',
-		flexWrap: 'wrap',
-		padding: '1px 0 0 1px',
-	};
-
-	const statLabelStyle = {
-		fontSize: '0.7em',
-	};
-
-	const statValueStyle = {
-		fontSize: '1em',
-	};
-
-	const timeAgoStyle = {
-		fontSize: '1em',
-	};
 
 	const lastSeenTime = balloon && balloon.positions && balloon.positions.length > 0
 		? moment.utc(balloon.positions[0].time).tz(moment.tz.guess()).format('YYYY-MM-DD HH:mm:ss z')
@@ -306,111 +226,94 @@ export function Balloon(props) {
 	const band = balloon && balloon.stats ? balloon.stats.band : '...';
 	const channel = balloon && balloon.stats ? balloon.stats.channel : '...';
 
-	const bottomStatsContainerStyle = {
-		position: 'fixed',
-		bottom: isMobile ? '10px' : '20px',
-		left: isMobile ? '10px' : '20px',
-		zIndex: '4',
-		display: 'flex',
-		flexDirection: 'column',
-		alignItems: 'flex-start',
-		pointerEvents: 'none',
-	};
-
-	const getStyle = (baseStyle, visibilityKey) => {
+	const getStyle = (visibilityKey) => {
 		const isButton = visibilityKey === 'about' || visibilityKey === 'faq';
 		return {
-			...baseStyle,
 			opacity: uiVisibility[visibilityKey] ? 0 : 1,
 			transition: 'opacity 0.3s ease',
-			pointerEvents: isButton && !uiVisibility[visibilityKey] ? 'auto' : 'none',
+			pointerEvents: (isButton && !uiVisibility[visibilityKey]) ? 'auto' : 'none',
 		};
 	};
 
 	return (
 		<>
-			<div style={uiContainerStyle}>
-				<div style={getStyle(titleStyle, 'title')} ref={titleRef}>Protoballoon</div>
-				<button style={getStyle(buttonStyle, 'about')} ref={aboutButtonRef}>About</button>
-				<button style={getStyle(buttonStyle, 'faq')} ref={faqButtonRef}>FAQ</button>
+			<div className="ui-container">
+				<div className="title" style={getStyle('title')} ref={titleRef}>Protoballoon</div>
+				<button className="button" style={getStyle('about')} ref={aboutButtonRef}>About</button>
+				<button className="button" style={getStyle('faq')} ref={faqButtonRef}>FAQ</button>
 			</div>
-			<div style={statsContainerStyle}>
-				<div style={statRowStyle}>
-					<div style={getStyle(statBoxStyle, 'lastSeen')} ref={lastSeenRef}>
-						<div style={statLabelStyle}>LAST UPDATE</div>
-						<div style={statValueStyle}>{lastSeenTime}</div>
-						<div style={timeAgoStyle}>{timeAgo}</div>
+			<div className="stats-container">
+				<div className="stat-row">
+					<div className="stat-box" style={getStyle('lastSeen')} ref={lastSeenRef}>
+						<div className="stat-label">LAST UPDATE</div>
+						<div className="stat-value">{lastSeenTime}</div>
+						<div className="time-ago">{timeAgo}</div>
 					</div>
-					<div style={getStyle(statBoxStyle, 'missionDuration')} ref={missionDurationRef}>
-						<div style={statLabelStyle}>MISSION DURATION</div>
-						<div style={statValueStyle}>{missionDuration}</div>
-						<div style={timeAgoStyle}>{sinceDate}</div>
+					<div className="stat-box" style={getStyle('missionDuration')} ref={missionDurationRef}>
+						<div className="stat-label">MISSION DURATION</div>
+						<div className="stat-value">{missionDuration}</div>
+						<div className="time-ago">{sinceDate}</div>
 					</div>
 				</div>
 				{!isMobile &&
-					<div style={{...statRowStyle, marginTop: '-1px'}}>
-						<div style={getStyle(statBoxStyle, 'lastPosition')} ref={lastPositionRef}>
-							<div style={statLabelStyle}>LAST POSITION</div>
-							<div style={statValueStyle}>{lastPosition}</div>
+					<div className="stat-row">
+						<div className="stat-box" style={getStyle('lastPosition')} ref={lastPositionRef}>
+							<div className="stat-label">LAST POSITION</div>
+							<div className="stat-value">{lastPosition}</div>
 						</div>
-						<div style={getStyle(statBoxStyle, 'altitude')} ref={altitudeRef}>
-							<div style={statLabelStyle}>ALTITUDE</div>
-							<div style={statValueStyle}>{altitude}</div>
+						<div className="stat-box" style={getStyle('altitude')} ref={altitudeRef}>
+							<div className="stat-label">ALTITUDE</div>
+							<div className="stat-value">{altitude}</div>
 						</div>
 					</div>
 				}
 			</div>
-			<div style={bottomStatsContainerStyle}>
-				<div style={statRowStyle}>
-					<div style={getStyle(statBoxStyle, 'callsign')} ref={callsignRef}>
-						<div style={statLabelStyle}>CALLSIGN</div>
-						<div style={statValueStyle}>{callsign}</div>
+			<div className="bottom-stats-container">
+				<div className="stat-row">
+					<div className="stat-box" style={getStyle('callsign')} ref={callsignRef}>
+						<div className="stat-label">CALLSIGN</div>
+						<div className="stat-value">{callsign}</div>
 					</div>
-					<div style={getStyle(statBoxStyle, 'band')} ref={bandRef}>
-						<div style={statLabelStyle}>BAND</div>
-						<div style={statValueStyle}>{band}</div>
+					<div className="stat-box" style={getStyle('band')} ref={bandRef}>
+						<div className="stat-label">BAND</div>
+						<div className="stat-value">{band}</div>
 					</div>
-					<div style={getStyle(statBoxStyle, 'channel')} ref={channelRef}>
-						<div style={statLabelStyle}>CHANNEL</div>
-						<div style={statValueStyle}>{channel}</div>
+					<div className="stat-box" style={getStyle('channel')} ref={channelRef}>
+						<div className="stat-label">CHANNEL</div>
+						<div className="stat-value">{channel}</div>
 					</div>
 				</div>
-				<div style={{...statRowStyle, marginTop: '-1px'}}>
-					<div style={getStyle(statBoxStyle, 'distance')} ref={distanceRef}>
-						<div style={statLabelStyle}>DISTANCE TRAVELLED</div>
-						<div style={statValueStyle}>{distanceTraveled}</div>
+				<div className="stat-row">
+					<div className="stat-box" style={getStyle('distance')} ref={distanceRef}>
+						<div className="stat-label">DISTANCE TRAVELLED</div>
+						<div className="stat-value">{distanceTraveled}</div>
 					</div>
-					<div style={getStyle(statBoxStyle, 'spots')} ref={spotsRef}>
-						<div style={statLabelStyle}>SPOTS</div>
-						<div style={statValueStyle}>{spots}</div>
+					<div className="stat-box" style={getStyle('spots')} ref={spotsRef}>
+						<div className="stat-label">SPOTS</div>
+						<div className="stat-value">{spots}</div>
 					</div>
-					<div style={getStyle(statBoxStyle, 'lapCount')} ref={lapCountRef}>
-						<div style={statLabelStyle}>LAP COUNT</div>
-						<div style={statValueStyle}>{lapCount}</div>
+					<div className="stat-box" style={getStyle('lapCount')} ref={lapCountRef}>
+						<div className="stat-label">LAP COUNT</div>
+						<div className="stat-value">{lapCount}</div>
 					</div>
 				</div>
 				{isMobile &&
-					<div style={{...statRowStyle, marginTop: '-1px'}}>
-						<div style={getStyle(statBoxStyle, 'lastPosition')} ref={lastPositionRef}>
-							<div style={statLabelStyle}>LAST POSITION</div>
-							<div style={statValueStyle}>{lastPosition}</div>
+					<div className="stat-row">
+						<div className="stat-box" style={getStyle('lastPosition')} ref={lastPositionRef}>
+							<div className="stat-label">LAST POSITION</div>
+							<div className="stat-value">{lastPosition}</div>
 						</div>
-						<div style={getStyle(statBoxStyle, 'altitude')} ref={altitudeRef}>
-							<div style={statLabelStyle}>ALTITUDE</div>
-							<div style={statValueStyle}>{altitude}</div>
+						<div className="stat-box" style={getStyle('altitude')} ref={altitudeRef}>
+							<div className="stat-label">ALTITUDE</div>
+							<div className="stat-value">{altitude}</div>
 						</div>
 					</div>
 				}
 			</div>
 			<div
 				ref={globeContainerRef}
+				className="globe-container"
 				style={{
-					position: 'fixed',
-					top: 0,
-					left: 0,
-					width: '100vw',
-					height: '100vh',
-					zIndex: '3',
 					filter: isBlurred ? 'blur(8px)' : 'none',
 					transition: 'filter 0.8s ease-out',
 				}}

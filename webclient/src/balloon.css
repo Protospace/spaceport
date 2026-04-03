@@ -1,0 +1,112 @@
+.title,
+.button,
+.stat-box {
+	font-family: monospace !important;
+}
+
+.ui-container {
+	position: fixed;
+	top: 20px;
+	left: 20px;
+	z-index: 4;
+	display: flex;
+	align-items: center;
+	pointer-events: none;
+}
+
+.title {
+	color: white;
+	border: 1px solid white;
+	padding: 10px 15px;
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+.button {
+	background-color: white;
+	color: black;
+	border: 1px solid white;
+	padding: 10px 15px;
+	font-size: 1.2em;
+	cursor: pointer;
+	margin-left: -1px;
+}
+
+.stats-container {
+	position: fixed;
+	top: 64px;
+	left: 20px;
+	z-index: 4;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	pointer-events: none;
+}
+
+.stat-box {
+	border: 1px solid white;
+	padding: 5px 10px;
+	color: white;
+	text-align: left;
+	white-space: nowrap;
+	margin: -1px 0 0 -1px;
+	background-color: rgba(0, 0, 0, 0.5);
+}
+
+.stat-row {
+	display: flex;
+	flex-wrap: wrap;
+	padding: 1px 0 0 1px;
+}
+
+.stats-container > .stat-row + .stat-row,
+.bottom-stats-container > .stat-row + .stat-row {
+	margin-top: -1px;
+}
+
+.stat-label {
+	font-size: 0.7em;
+}
+
+.stat-value {
+	font-size: 1em;
+}
+
+.time-ago {
+	font-size: 1em;
+}
+
+.bottom-stats-container {
+	position: fixed;
+	bottom: 20px;
+	left: 20px;
+	z-index: 4;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	pointer-events: none;
+}
+
+.globe-container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 3;
+}
+
+@media (max-width: 767px) {
+	.ui-container {
+		top: 10px;
+		left: 10px;
+	}
+	.stats-container {
+		top: 54px;
+		left: 10px;
+	}
+	.bottom-stats-container {
+		bottom: 10px;
+		left: 10px;
+	}
+}
