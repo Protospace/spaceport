@@ -216,6 +216,7 @@ export function Balloon(props) {
 		zIndex: '4',
 		display: 'flex',
 		alignItems: 'center',
+		pointerEvents: 'none',
 	};
 
 	const titleStyle = {
@@ -244,6 +245,7 @@ export function Balloon(props) {
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'flex-start',
+		pointerEvents: 'none',
 	};
 
 	const statBoxStyle = {
@@ -304,12 +306,18 @@ export function Balloon(props) {
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'flex-start',
+		pointerEvents: 'none',
 	};
 
-	const getStyle = (baseStyle, visibilityKey) => ({
-		...baseStyle,
-		...(uiVisibility[visibilityKey] ? { display: 'none' } : {}),
-	});
+	const getStyle = (baseStyle, visibilityKey) => {
+		const isButton = visibilityKey === 'about' || visibilityKey === 'faq';
+		return {
+			...baseStyle,
+			opacity: uiVisibility[visibilityKey] ? 0 : 1,
+			transition: 'opacity 0.3s ease',
+			pointerEvents: isButton && !uiVisibility[visibilityKey] ? 'auto' : 'none',
+		};
+	};
 
 	return (
 		<>
