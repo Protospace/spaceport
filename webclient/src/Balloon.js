@@ -43,6 +43,7 @@ export function Balloon(props) {
 
 	const ReactGlobe = window.ReactGlobe;
 	if (!ReactGlobe) {
+		console.log('no react globe');
 		return null;
 	}
 
