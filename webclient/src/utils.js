@@ -145,7 +145,7 @@ export const requester = (route, method, token, data, signal=null) => {
 }
 
 // from: https://usehooks.com/useWindowSize/
-function useWindowSize() {
+export function useWindowSize() {
 	const [windowSize, setWindowSize] = useState({
 		width: undefined,
 		height: undefined,
