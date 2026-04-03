@@ -165,7 +165,7 @@ export function Balloon(props) {
 	};
 
 	const lastSeenTime = balloon && balloon.positions && balloon.positions.length > 0
-		? moment.utc(balloon.positions[0].time).local().format('YYYY-MM-DD HH:mm:ss z')
+		? moment.utc(balloon.positions[0].time).tz(moment.tz.guess()).format('YYYY-MM-DD HH:mm:ss z')
 		: '...';
 
 	return (
