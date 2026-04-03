@@ -8,6 +8,9 @@ export function Balloon(props) {
 	const globeContainerRef = useRef();
 	const globeInstanceRef = useRef();
 	const isInitialLoad = useRef(true);
+	const titleRef = useRef();
+	const aboutButtonRef = useRef();
+	const faqButtonRef = useRef();
 	const { width, height } = useWindowSize();
 
 	const getBalloon = () => {
@@ -78,6 +81,12 @@ export function Balloon(props) {
 		}
 	}, [balloon]);
 
+	useEffect(() => {
+		if (titleRef.current) titleRef.current.style.setProperty('font-family', 'monospace', 'important');
+		if (aboutButtonRef.current) aboutButtonRef.current.style.setProperty('font-family', 'monospace', 'important');
+		if (faqButtonRef.current) faqButtonRef.current.style.setProperty('font-family', 'monospace', 'important');
+	}, []);
+
 	console.log(balloon);
 
 	const uiContainerStyle = {
@@ -110,9 +119,9 @@ export function Balloon(props) {
 	return (
 		<>
 			<div style={uiContainerStyle}>
-				<div style={titleStyle}>Protoballoon</div>
-				<button style={buttonStyle}>About</button>
-				<button style={buttonStyle}>FAQ</button>
+				<div style={titleStyle} ref={titleRef}>Protoballoon</div>
+				<button style={buttonStyle} ref={aboutButtonRef}>About</button>
+				<button style={buttonStyle} ref={faqButtonRef}>FAQ</button>
 			</div>
 			<div
 				ref={globeContainerRef}
