@@ -189,6 +189,12 @@ export function Balloon(props) {
 		padding: '5px 10px',
 		color: 'white',
 		textAlign: 'left',
+		whiteSpace: 'nowrap',
+	};
+
+	const statRowStyle = {
+		display: 'flex',
+		flexWrap: 'wrap',
 	};
 
 	const statLabelStyle = {
@@ -244,7 +250,7 @@ export function Balloon(props) {
 				<button style={buttonStyle} ref={faqButtonRef}>FAQ</button>
 			</div>
 			<div style={statsContainerStyle}>
-				<div style={{display: 'flex'}}>
+				<div style={statRowStyle}>
 					<div style={statBoxStyle} ref={lastSeenRef}>
 						<div style={statLabelStyle}>LAST UPDATE</div>
 						<div style={statValueStyle}>{lastSeenTime}</div>
@@ -256,7 +262,7 @@ export function Balloon(props) {
 						<div style={timeAgoStyle}>{sinceDate}</div>
 					</div>
 				</div>
-				<div style={{display: 'flex', marginTop: '-1px'}}>
+				<div style={{...statRowStyle, marginTop: '-1px'}}>
 					<div style={statBoxStyle} ref={lastPositionRef}>
 						<div style={statLabelStyle}>LAST POSITION</div>
 						<div style={statValueStyle}>{lastPosition}</div>
@@ -268,7 +274,7 @@ export function Balloon(props) {
 				</div>
 			</div>
 			<div style={bottomStatsContainerStyle}>
-				<div style={{display: 'flex'}}>
+				<div style={statRowStyle}>
 					<div style={statBoxStyle} ref={callsignRef}>
 						<div style={statLabelStyle}>CALLSIGN</div>
 						<div style={statValueStyle}>{callsign}</div>
@@ -282,7 +288,7 @@ export function Balloon(props) {
 						<div style={statValueStyle}>{channel}</div>
 					</div>
 				</div>
-				<div style={{display: 'flex', marginTop: '-1px'}}>
+				<div style={{...statRowStyle, marginTop: '-1px'}}>
 					<div style={statBoxStyle} ref={distanceRef}>
 						<div style={statLabelStyle}>DISTANCE TRAVELLED</div>
 						<div style={statValueStyle}>{distanceTraveled}</div>
