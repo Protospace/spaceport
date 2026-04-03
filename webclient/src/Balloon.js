@@ -80,19 +80,53 @@ export function Balloon(props) {
 
 	console.log(balloon);
 
+	const uiContainerStyle = {
+		position: 'fixed',
+		top: '20px',
+		left: '20px',
+		zIndex: '4',
+		display: 'flex',
+		alignItems: 'center',
+	};
+
+	const titleStyle = {
+		color: 'white',
+		border: '1px solid white',
+		padding: '10px 15px',
+		fontSize: '1.2em',
+		fontWeight: 'bold',
+	};
+
+	const buttonStyle = {
+		backgroundColor: 'white',
+		color: 'black',
+		border: '1px solid white',
+		padding: '10px 15px',
+		fontSize: '1.2em',
+		cursor: 'pointer',
+		marginLeft: '-1px',
+	};
+
 	return (
-		<div
-			ref={globeContainerRef}
-			style={{
-				position: 'fixed',
-				top: 0,
-				left: 0,
-				width: '100vw',
-				height: '100vh',
-				zIndex: '3',
-				filter: isBlurred ? 'blur(8px)' : 'none',
-				transition: 'filter 0.8s ease-out',
-			}}
-		/>
+		<>
+			<div style={uiContainerStyle}>
+				<div style={titleStyle}>Protoballoon</div>
+				<button style={buttonStyle}>About</button>
+				<button style={buttonStyle}>FAQ</button>
+			</div>
+			<div
+				ref={globeContainerRef}
+				style={{
+					position: 'fixed',
+					top: 0,
+					left: 0,
+					width: '100vw',
+					height: '100vh',
+					zIndex: '3',
+					filter: isBlurred ? 'blur(8px)' : 'none',
+					transition: 'filter 0.8s ease-out',
+				}}
+			/>
+		</>
 	);
 };
