@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useReducer, useRef } from 'react';
 import { requester, useIsMobile, useWindowSize } from './utils.js';
-import ReactGlobe from 'react-globe.gl';
 
 export function Balloon(props) {
 	const [balloon, setBalloon] = useState(false);
@@ -41,6 +40,11 @@ export function Balloon(props) {
 	const pathData = balloon ? [{
 		points: balloon,
 	}] : [];
+
+	const ReactGlobe = window.ReactGlobe;
+	if (!ReactGlobe) {
+		return null;
+	}
 
 	return (
 		<ReactGlobe
