@@ -136,7 +136,6 @@ export function Balloon(props) {
 
 	const statLabelStyle = {
 		fontSize: '0.7em',
-		opacity: 0.7,
 	};
 
 	const statValueStyle = {
