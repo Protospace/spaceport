@@ -5,6 +5,7 @@ import { requester, useIsMobile, useWindowSize } from './utils.js';
 export function Balloon(props) {
 	const [balloon, setBalloon] = useState(false);
 	const [timeAgo, setTimeAgo] = useState('...');
+	const [missionDuration, setMissionDuration] = useState('...');
 	const [isBlurred, setIsBlurred] = useState(true);
 	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
 	const globeContainerRef = useRef();
@@ -14,6 +15,7 @@ export function Balloon(props) {
 	const aboutButtonRef = useRef();
 	const faqButtonRef = useRef();
 	const lastSeenRef = useRef();
+	const missionDurationRef = useRef();
 	const { width, height } = useWindowSize();
 
 	const getBalloon = () => {
@@ -89,6 +91,7 @@ export function Balloon(props) {
 		if (aboutButtonRef.current) aboutButtonRef.current.style.setProperty('font-family', 'monospace', 'important');
 		if (faqButtonRef.current) faqButtonRef.current.style.setProperty('font-family', 'monospace', 'important');
 		if (lastSeenRef.current) lastSeenRef.current.style.setProperty('font-family', 'monospace', 'important');
+		if (missionDurationRef.current) missionDurationRef.current.style.setProperty('font-family', 'monospace', 'important');
 	}, []);
 
 	useEffect(() => {
@@ -104,6 +107,24 @@ export function Balloon(props) {
 			const secondsWithDecimal = (duration.seconds() + duration.milliseconds() / 1000).toFixed(1);
 			const paddedSeconds = secondsWithDecimal.padStart(4, '0');
 			setTimeAgo(`${hours}h ${minutes}m ${paddedSeconds}s ago`);
+		}, 100);
+		return () => clearInterval(timer);
+	}, [balloon]);
+
+	useEffect(() => {
+		if (!balloon || !balloon.stats || !balloon.stats.timeStart) {
+			return;
+		}
+		const startTime = moment.utc(balloon.stats.timeStart);
+		const timer = setInterval(() => {
+			const now = moment();
+			const duration = moment.duration(now.diff(startTime));
+			const days = Math.floor(duration.asDays());
+			const hours = String(duration.hours()).padStart(2, '0');
+			const minutes = String(duration.minutes()).padStart(2, '0');
+			const secondsWithDecimal = (duration.seconds() + duration.milliseconds() / 1000).toFixed(1);
+			const paddedSeconds = secondsWithDecimal.padStart(4, '0');
+			setMissionDuration(`L+${days}d ${hours}:${minutes}:${paddedSeconds}`);
 		}, 100);
 		return () => clearInterval(timer);
 	}, [balloon]);
@@ -180,6 +201,10 @@ export function Balloon(props) {
 					<div style={statLabelStyle}>LAST UPDATE</div>
 					<div style={statValueStyle}>{lastSeenTime}</div>
 					<div style={timeAgoStyle}>{timeAgo}</div>
+				</div>
+				<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={missionDurationRef}>
+					<div style={statLabelStyle}>MISSION DURATION</div>
+					<div style={statValueStyle}>{missionDuration}</div>
 				</div>
 			</div>
 			<div
