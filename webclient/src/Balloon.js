@@ -6,6 +6,7 @@ export function Balloon(props) {
 	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
 	const globeContainerRef = useRef();
 	const globeInstanceRef = useRef();
+	const isInitialLoad = useRef(true);
 	const { width, height } = useWindowSize();
 
 	const getBalloon = () => {
@@ -55,8 +56,11 @@ export function Balloon(props) {
 			const pathData = [{ points: balloon }];
 			globeInstanceRef.current.pathsData(pathData);
 
-			const lastPoint = balloon[0]; // data is reverse chronological
-			globeInstanceRef.current.pointOfView({ lat: lastPoint.lat, lng: lastPoint.lng, altitude: 2 }, 1600);
+			if (isInitialLoad.current) {
+				const lastPoint = balloon[0]; // data is reverse chronological
+				globeInstanceRef.current.pointOfView({ lat: lastPoint.lat, lng: lastPoint.lng, altitude: 2 }, 1600);
+				isInitialLoad.current = false;
+			}
 		}
 	}, [balloon]);
 
