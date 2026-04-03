@@ -3,12 +3,12 @@ import moment from 'moment-timezone';
 import { requester, useIsMobile, useWindowSize } from './utils.js';
 import './balloon.css';
 
-export function BalloonAbout(props) {
-	const { onClose } = props;
+function InfoModal(props) {
+	const { url, onClose } = props;
 	const [content, setContent] = useState('');
 
 	useEffect(() => {
-		fetch('https://notes.dns.t0.vc/protoballoon-about-68e679')
+		fetch(url)
 			.then(response => response.text())
 			.then(html => {
 				const parser = new DOMParser();
@@ -19,10 +19,10 @@ export function BalloonAbout(props) {
 				}
 			})
 			.catch(error => {
-				console.error('Error fetching about content:', error);
+				console.error('Error fetching content:', error);
 				setContent('<p>Could not load content.</p>');
 			});
-	}, []);
+	}, [url]);
 
 	return (
 		<div className="modal-overlay" onClick={onClose}>
@@ -38,7 +38,14 @@ export function BalloonAbout(props) {
 	);
 }
 
+export function BalloonAbout(props) {
+	const { onClose } = props;
+	return <InfoModal url="https://notes.dns.t0.vc/protoballoon-about-68e679" onClose={onClose} />;
+}
+
 export function BalloonFAQ(props) {
+	const { onClose } = props;
+	return <InfoModal url="https://notes.dns.t0.vc/protoballoon-faq-8d3644" onClose={onClose} />;
 }
 
 export function Balloon(props) {
@@ -48,6 +55,7 @@ export function Balloon(props) {
 	const [isBlurred, setIsBlurred] = useState(true);
 	const [uiVisibility, setUiVisibility] = useState({});
 	const [showAbout, setShowAbout] = useState(false);
+	const [showFaq, setShowFaq] = useState(false);
 	const [globeReady, setGlobeReady] = useState(false);
 	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
 	const globeContainerRef = useRef();
@@ -273,7 +281,7 @@ export function Balloon(props) {
 			<div className="ui-container">
 				<div className="title" style={getStyle('title')} ref={titleRef}>Protoballoon</div>
 				<button className="button" style={getStyle('about')} ref={aboutButtonRef} onClick={() => setShowAbout(true)}>About</button>
-				<button className="button" style={getStyle('faq')} ref={faqButtonRef}>FAQ</button>
+				<button className="button" style={getStyle('faq')} ref={faqButtonRef} onClick={() => setShowFaq(true)}>FAQ</button>
 			</div>
 			<div className="stats-container">
 				<div className="stat-row">
@@ -352,6 +360,7 @@ export function Balloon(props) {
 				}}
 			/>
 			{showAbout && <BalloonAbout onClose={() => setShowAbout(false)} />}
+			{showFaq && <BalloonFAQ onClose={() => setShowFaq(false)} />}
 		</>
 	);
 };
