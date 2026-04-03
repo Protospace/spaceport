@@ -2,6 +2,12 @@ import React, { useState, useEffect, useReducer, useRef } from 'react';
 import moment from 'moment-timezone';
 import { requester, useIsMobile, useWindowSize } from './utils.js';
 
+export function BalloonAbout(props) {
+}
+
+export function BalloonFAQ(props) {
+}
+
 export function Balloon(props) {
 	const [balloon, setBalloon] = useState(false);
 	const [timeAgo, setTimeAgo] = useState('...');
