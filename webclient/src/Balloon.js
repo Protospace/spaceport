@@ -18,6 +18,9 @@ export function Balloon(props) {
 	const missionDurationRef = useRef();
 	const lastPositionRef = useRef();
 	const altitudeRef = useRef();
+	const callsignRef = useRef();
+	const bandRef = useRef();
+	const channelRef = useRef();
 	const lapCountRef = useRef();
 	const distanceRef = useRef();
 	const spotsRef = useRef();
@@ -99,6 +102,9 @@ export function Balloon(props) {
 		if (missionDurationRef.current) missionDurationRef.current.style.setProperty('font-family', 'monospace', 'important');
 		if (lastPositionRef.current) lastPositionRef.current.style.setProperty('font-family', 'monospace', 'important');
 		if (altitudeRef.current) altitudeRef.current.style.setProperty('font-family', 'monospace', 'important');
+		if (callsignRef.current) callsignRef.current.style.setProperty('font-family', 'monospace', 'important');
+		if (bandRef.current) bandRef.current.style.setProperty('font-family', 'monospace', 'important');
+		if (channelRef.current) channelRef.current.style.setProperty('font-family', 'monospace', 'important');
 		if (lapCountRef.current) lapCountRef.current.style.setProperty('font-family', 'monospace', 'important');
 		if (distanceRef.current) distanceRef.current.style.setProperty('font-family', 'monospace', 'important');
 		if (spotsRef.current) spotsRef.current.style.setProperty('font-family', 'monospace', 'important');
@@ -216,6 +222,9 @@ export function Balloon(props) {
 	const lapCount = balloon && balloon.stats ? balloon.stats.lapCount : '...';
 	const distanceTraveled = balloon && balloon.stats ? `${balloon.stats.distanceTraveledKm.toLocaleString()} km` : '...';
 	const spots = balloon && balloon.stats ? balloon.stats.spots.toLocaleString() : '...';
+	const callsign = balloon && balloon.stats ? balloon.stats.callsign : '...';
+	const band = balloon && balloon.stats ? balloon.stats.band : '...';
+	const channel = balloon && balloon.stats ? balloon.stats.channel : '...';
 
 	const bottomStatsContainerStyle = {
 		position: 'fixed',
@@ -223,6 +232,8 @@ export function Balloon(props) {
 		left: '20px',
 		zIndex: '4',
 		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'flex-start',
 	};
 
 	return (
@@ -257,17 +268,33 @@ export function Balloon(props) {
 				</div>
 			</div>
 			<div style={bottomStatsContainerStyle}>
-				<div style={statBoxStyle} ref={distanceRef}>
-					<div style={statLabelStyle}>DISTANCE TRAVELLED</div>
-					<div style={statValueStyle}>{distanceTraveled}</div>
+				<div style={{display: 'flex'}}>
+					<div style={statBoxStyle} ref={callsignRef}>
+						<div style={statLabelStyle}>CALLSIGN</div>
+						<div style={statValueStyle}>{callsign}</div>
+					</div>
+					<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={bandRef}>
+						<div style={statLabelStyle}>BAND</div>
+						<div style={statValueStyle}>{band}</div>
+					</div>
+					<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={channelRef}>
+						<div style={statLabelStyle}>CHANNEL</div>
+						<div style={statValueStyle}>{channel}</div>
+					</div>
 				</div>
-				<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={spotsRef}>
-					<div style={statLabelStyle}>SPOTS</div>
-					<div style={statValueStyle}>{spots}</div>
-				</div>
-				<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={lapCountRef}>
-					<div style={statLabelStyle}>LAP COUNT</div>
-					<div style={statValueStyle}>{lapCount}</div>
+				<div style={{display: 'flex', marginTop: '-1px'}}>
+					<div style={statBoxStyle} ref={distanceRef}>
+						<div style={statLabelStyle}>DISTANCE TRAVELLED</div>
+						<div style={statValueStyle}>{distanceTraveled}</div>
+					</div>
+					<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={spotsRef}>
+						<div style={statLabelStyle}>SPOTS</div>
+						<div style={statValueStyle}>{spots}</div>
+					</div>
+					<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={lapCountRef}>
+						<div style={statLabelStyle}>LAP COUNT</div>
+						<div style={statValueStyle}>{lapCount}</div>
+					</div>
 				</div>
 			</div>
 			<div
