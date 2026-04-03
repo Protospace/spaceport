@@ -34,7 +34,7 @@ export function Balloon(props) {
 		if (Globe && globeContainerRef.current) {
 			if (!globeInstanceRef.current) {
 				const myGlobe = Globe()(globeContainerRef.current)
-					.globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
+					.globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
 					.bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
 					.backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
 					.pathPoints('points')
@@ -63,6 +63,6 @@ export function Balloon(props) {
 	console.log(balloon);
 
 	return (
-		<div ref={globeContainerRef} />
+		<div ref={globeContainerRef} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }} />
 	);
 };
