@@ -212,8 +212,8 @@ export function Balloon(props) {
 
 	const uiContainerStyle = {
 		position: 'fixed',
-		top: '20px',
-		left: '20px',
+		top: isMobile ? '10px' : '20px',
+		left: isMobile ? '10px' : '20px',
 		zIndex: '4',
 		display: 'flex',
 		alignItems: 'center',
@@ -240,8 +240,8 @@ export function Balloon(props) {
 
 	const statsContainerStyle = {
 		position: 'fixed',
-		top: '64px',
-		left: '20px',
+		top: isMobile ? '54px' : '64px',
+		left: isMobile ? '10px' : '20px',
 		zIndex: '4',
 		display: 'flex',
 		flexDirection: 'column',
@@ -301,8 +301,8 @@ export function Balloon(props) {
 
 	const bottomStatsContainerStyle = {
 		position: 'fixed',
-		bottom: '20px',
-		left: '20px',
+		bottom: isMobile ? '10px' : '20px',
+		left: isMobile ? '10px' : '20px',
 		zIndex: '4',
 		display: 'flex',
 		flexDirection: 'column',
