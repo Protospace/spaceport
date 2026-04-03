@@ -16,6 +16,7 @@ export function Balloon(props) {
 	const faqButtonRef = useRef();
 	const lastSeenRef = useRef();
 	const missionDurationRef = useRef();
+	const lastPositionRef = useRef();
 	const { width, height } = useWindowSize();
 
 	const getBalloon = () => {
@@ -92,6 +93,7 @@ export function Balloon(props) {
 		if (faqButtonRef.current) faqButtonRef.current.style.setProperty('font-family', 'monospace', 'important');
 		if (lastSeenRef.current) lastSeenRef.current.style.setProperty('font-family', 'monospace', 'important');
 		if (missionDurationRef.current) missionDurationRef.current.style.setProperty('font-family', 'monospace', 'important');
+		if (lastPositionRef.current) lastPositionRef.current.style.setProperty('font-family', 'monospace', 'important');
 	}, []);
 
 	useEffect(() => {
@@ -164,6 +166,7 @@ export function Balloon(props) {
 		left: '20px',
 		zIndex: '4',
 		display: 'flex',
+		flexDirection: 'column',
 	};
 
 	const statBoxStyle = {
@@ -193,6 +196,10 @@ export function Balloon(props) {
 		? `since ${balloon.stats.timeStart.substring(0, 10)}`
 		: '';
 
+	const lastPosition = balloon && balloon.positions && balloon.positions.length > 0
+		? `${balloon.positions[0].lat}, ${balloon.positions[0].lng}`
+		: '...';
+
 	return (
 		<>
 			<div style={uiContainerStyle}>
@@ -201,15 +208,21 @@ export function Balloon(props) {
 				<button style={buttonStyle} ref={faqButtonRef}>FAQ</button>
 			</div>
 			<div style={statsContainerStyle}>
-				<div style={statBoxStyle} ref={lastSeenRef}>
-					<div style={statLabelStyle}>LAST UPDATE</div>
-					<div style={statValueStyle}>{lastSeenTime}</div>
-					<div style={timeAgoStyle}>{timeAgo}</div>
+				<div style={{display: 'flex'}}>
+					<div style={statBoxStyle} ref={lastSeenRef}>
+						<div style={statLabelStyle}>LAST UPDATE</div>
+						<div style={statValueStyle}>{lastSeenTime}</div>
+						<div style={timeAgoStyle}>{timeAgo}</div>
+					</div>
+					<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={missionDurationRef}>
+						<div style={statLabelStyle}>MISSION DURATION</div>
+						<div style={statValueStyle}>{missionDuration}</div>
+						<div style={timeAgoStyle}>{sinceDate}</div>
+					</div>
 				</div>
-				<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={missionDurationRef}>
-					<div style={statLabelStyle}>MISSION DURATION</div>
-					<div style={statValueStyle}>{missionDuration}</div>
-					<div style={timeAgoStyle}>{sinceDate}</div>
+				<div style={{...statBoxStyle, marginTop: '-1px'}} ref={lastPositionRef}>
+					<div style={statLabelStyle}>LAST POSITION</div>
+					<div style={statValueStyle}>{lastPosition}</div>
 				</div>
 			</div>
 			<div
