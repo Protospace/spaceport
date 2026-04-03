@@ -1289,7 +1289,12 @@ class StatsViewSet(viewsets.ViewSet, List):
 
     @action(detail=False, methods=['get'])
     def balloon_data(self, request):
-        pass
+        try:
+            with open('data/positions.json') as f:
+                data = json.load(f)
+            return Response(data)
+        except FileNotFoundError:
+            raise Http404
 
 
 class DrawingViewSet(Base, List, Create, Update):
