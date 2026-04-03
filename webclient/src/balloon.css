@@ -150,6 +150,8 @@
 .modal-content a {
 	color: #61dafb;
 	text-decoration: none;
+	overflow-wrap: anywhere;
+	word-break: break-word;
 }
 
 .modal-content a:hover {
@@ -184,4 +186,9 @@
 
 .modal-close-button:hover {
 	color: #fff;
+}
+
+.modal-content .mod-header.mod-ui,
+.modal-content .collapse-indicator {
+	display: none;
 }
