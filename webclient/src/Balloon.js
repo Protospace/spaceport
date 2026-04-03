@@ -161,7 +161,7 @@ export function Balloon(props) {
 	};
 
 	const timeAgoStyle = {
-		fontSize: '0.8em',
+		fontSize: '1em',
 	};
 
 	const lastSeenTime = balloon && balloon.positions && balloon.positions.length > 0
