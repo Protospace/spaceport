@@ -6,6 +6,7 @@ export function Balloon(props) {
 	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
 	const globeEl = useRef();
 	const { width, height } = useWindowSize();
+	const [globeReady, setGlobeReady] = useState(!!window.ReactGlobe);
 
 	const getBalloon = () => {
 		requester('/stats/balloon_data/', 'GET')
@@ -29,6 +30,17 @@ export function Balloon(props) {
 	}, [refreshCount]);
 
 	useEffect(() => {
+		if (globeReady) return;
+		const timer = setInterval(() => {
+			if (window.ReactGlobe) {
+				setGlobeReady(true);
+				clearInterval(timer);
+			}
+		}, 100);
+		return () => clearInterval(timer);
+	}, [globeReady]);
+
+	useEffect(() => {
 		if (globeEl.current && balloon && balloon.length > 0) {
 			const lastPoint = balloon[0]; // data is reverse chronological
 			globeEl.current.pointOfView({ lat: lastPoint.lat, lng: lastPoint.lng, altitude: 2 }, 1600);
@@ -41,11 +53,11 @@ export function Balloon(props) {
 		points: balloon,
 	}] : [];
 
-	const ReactGlobe = window.ReactGlobe;
-	if (!ReactGlobe) {
+	if (!globeReady) {
 		console.log('no react globe');
 		return null;
 	}
+	const ReactGlobe = window.ReactGlobe;
 
 	return (
 		<ReactGlobe
