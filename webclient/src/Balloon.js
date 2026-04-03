@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useReducer, useRef } from 'react';
 import { requester, useIsMobile, useWindowSize } from './utils.js';
-
-const ReactGlobe = React.lazy(() => import('react-globe.gl'));
+import ReactGlobe from 'react-globe.gl';
 
 export function Balloon(props) {
 	const [balloon, setBalloon] = useState(false);
@@ -44,23 +43,21 @@ export function Balloon(props) {
 	}] : [];
 
 	return (
-		<React.Suspense fallback={null}>
-			<ReactGlobe
-				ref={globeEl}
-				width={width}
-				height={height}
-				globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
-				bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
-				backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
-				pathsData={pathData}
-				pathPoints="points"
-				pathPointLat={p => p.lat}
-				pathPointLng={p => p.lng}
-				pathPointAlt={p => p.altitudeFt / 200000}
-				pathStroke={1.5}
-				pathColor={() => 'rgba(255, 100, 50, 0.6)'}
-				pathTransitionDuration={0}
-			/>
-		</React.Suspense>
+		<ReactGlobe
+			ref={globeEl}
+			width={width}
+			height={height}
+			globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
+			bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
+			backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
+			pathsData={pathData}
+			pathPoints="points"
+			pathPointLat={p => p.lat}
+			pathPointLng={p => p.lng}
+			pathPointAlt={p => p.altitudeFt / 200000}
+			pathStroke={1.5}
+			pathColor={() => 'rgba(255, 100, 50, 0.6)'}
+			pathTransitionDuration={0}
+		/>
 	);
 };
