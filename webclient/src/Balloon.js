@@ -105,7 +105,16 @@ export function Balloon(props) {
 		if (!globe || !THREE || !globeReady) return;
 
 		const camera = globe.camera();
-		const globeMesh = globe.scene().getObjectByName('globe');
+		const scene = globe.scene();
+
+		let globeMesh;
+		scene.traverse(object => {
+			// The globe is a mesh with sphere geometry
+			if (object.isMesh && object.geometry.type === 'SphereGeometry') {
+				globeMesh = object;
+			}
+		});
+
 		console.log('Globe mesh:', globeMesh);
 		if (!globeMesh) return;
 
