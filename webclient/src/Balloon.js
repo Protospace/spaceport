@@ -189,6 +189,10 @@ export function Balloon(props) {
 		? moment.utc(balloon.positions[0].time).tz(moment.tz.guess()).format('YYYY-MM-DD HH:mm:ss z')
 		: '...';
 
+	const sinceDate = balloon && balloon.stats && balloon.stats.timeStart
+		? `since ${balloon.stats.timeStart.substring(0, 10)}`
+		: '';
+
 	return (
 		<>
 			<div style={uiContainerStyle}>
@@ -205,6 +209,7 @@ export function Balloon(props) {
 				<div style={{...statBoxStyle, marginLeft: '-1px'}} ref={missionDurationRef}>
 					<div style={statLabelStyle}>MISSION DURATION</div>
 					<div style={statValueStyle}>{missionDuration}</div>
+					<div style={timeAgoStyle}>{sinceDate}</div>
 				</div>
 			</div>
 			<div
