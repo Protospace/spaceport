@@ -1,7 +1,4 @@
 import React, { useState, useEffect, useReducer, useRef } from 'react';
-import moment from 'moment-timezone';
-import * as THREE from 'three';
-import { Container} from 'semantic-ui-react';
 import { requester, useIsMobile, useWindowSize } from './utils.js';
 
 const ReactGlobe = React.lazy(() => import('react-globe.gl'));
