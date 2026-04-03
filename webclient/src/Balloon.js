@@ -4,6 +4,40 @@ import { requester, useIsMobile, useWindowSize } from './utils.js';
 import './balloon.css';
 
 export function BalloonAbout(props) {
+	const { onClose } = props;
+	const [content, setContent] = useState('');
+
+	useEffect(() => {
+		fetch('https://notes.dns.t0.vc/protoballoon-about-68e679')
+			.then(response => response.text())
+			.then(html => {
+				const parser = new DOMParser();
+				const doc = parser.parseFromString(html, 'text/html');
+				const appContainer = doc.querySelector('div.app-container');
+				if (appContainer) {
+					const header = appContainer.querySelector('header');
+					if (header) header.remove();
+					setContent(appContainer.innerHTML);
+				}
+			})
+			.catch(error => {
+				console.error('Error fetching about content:', error);
+				setContent('<p>Could not load content.</p>');
+			});
+	}, []);
+
+	return (
+		<div className="modal-overlay" onClick={onClose}>
+			<div className="modal-content" onClick={e => e.stopPropagation()}>
+				<button className="modal-close-button" onClick={onClose}>×</button>
+				{content ? (
+					<div dangerouslySetInnerHTML={{ __html: content }} />
+				) : (
+					<p>Loading...</p>
+				)}
+			</div>
+		</div>
+	);
 }
 
 export function BalloonFAQ(props) {
@@ -15,6 +49,7 @@ export function Balloon(props) {
 	const [missionDuration, setMissionDuration] = useState('...');
 	const [isBlurred, setIsBlurred] = useState(true);
 	const [uiVisibility, setUiVisibility] = useState({});
+	const [showAbout, setShowAbout] = useState(false);
 	const [globeReady, setGlobeReady] = useState(false);
 	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
 	const globeContainerRef = useRef();
@@ -239,7 +274,7 @@ export function Balloon(props) {
 		<>
 			<div className="ui-container">
 				<div className="title" style={getStyle('title')} ref={titleRef}>Protoballoon</div>
-				<button className="button" style={getStyle('about')} ref={aboutButtonRef}>About</button>
+				<button className="button" style={getStyle('about')} ref={aboutButtonRef} onClick={() => setShowAbout(true)}>About</button>
 				<button className="button" style={getStyle('faq')} ref={faqButtonRef}>FAQ</button>
 			</div>
 			<div className="stats-container">
@@ -318,6 +353,7 @@ export function Balloon(props) {
 					transition: 'filter 0.8s ease-out',
 				}}
 			/>
+			{showAbout && <BalloonAbout onClose={() => setShowAbout(false)} />}
 		</>
 	);
 };
