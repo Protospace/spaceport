@@ -256,6 +256,7 @@ export function Balloon(props) {
 		textAlign: 'left',
 		whiteSpace: 'nowrap',
 		margin: '-1px 0 0 -1px',
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
 	};
 
 	const statRowStyle = {
