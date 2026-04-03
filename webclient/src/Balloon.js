@@ -58,7 +58,15 @@ export function Balloon(props) {
 
 			if (isInitialLoad.current) {
 				const lastPoint = balloon[0]; // data is reverse chronological
-				globeInstanceRef.current.pointOfView({ lat: lastPoint.lat, lng: lastPoint.lng, altitude: 2 }, 1600);
+
+				// Instantly set camera to be looking at the last point from far away
+				globeInstanceRef.current.pointOfView({ lat: lastPoint.lat, lng: lastPoint.lng, altitude: 10 });
+
+				// Animate zoom-in
+				setTimeout(() => {
+					globeInstanceRef.current.pointOfView({ altitude: 2 }, 1600);
+				}, 100);
+
 				isInitialLoad.current = false;
 			}
 		}
