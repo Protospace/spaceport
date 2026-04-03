@@ -198,8 +198,6 @@ export function Balloon(props) {
 		return () => clearInterval(timer);
 	}, [balloon]);
 
-	console.log(balloon);
-
 	const uiContainerStyle = {
 		position: 'fixed',
 		top: '20px',
