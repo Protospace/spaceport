@@ -167,6 +167,7 @@ export function Balloon(props) {
 		zIndex: '4',
 		display: 'flex',
 		flexDirection: 'column',
+		alignItems: 'flex-start',
 	};
 
 	const statBoxStyle = {
