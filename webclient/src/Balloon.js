@@ -27,6 +27,7 @@ export function Balloon(props) {
 	const distanceRef = useRef();
 	const spotsRef = useRef();
 	const { width, height } = useWindowSize();
+	const isMobile = useIsMobile();
 
 	const getBalloon = () => {
 		requester('/stats/balloon_data/', 'GET')
@@ -339,16 +340,18 @@ export function Balloon(props) {
 						<div style={timeAgoStyle}>{sinceDate}</div>
 					</div>
 				</div>
-				<div style={{...statRowStyle, marginTop: '-1px'}}>
-					<div style={getStyle(statBoxStyle, 'lastPosition')} ref={lastPositionRef}>
-						<div style={statLabelStyle}>LAST POSITION</div>
-						<div style={statValueStyle}>{lastPosition}</div>
+				{!isMobile &&
+					<div style={{...statRowStyle, marginTop: '-1px'}}>
+						<div style={getStyle(statBoxStyle, 'lastPosition')} ref={lastPositionRef}>
+							<div style={statLabelStyle}>LAST POSITION</div>
+							<div style={statValueStyle}>{lastPosition}</div>
+						</div>
+						<div style={getStyle(statBoxStyle, 'altitude')} ref={altitudeRef}>
+							<div style={statLabelStyle}>ALTITUDE</div>
+							<div style={statValueStyle}>{altitude}</div>
+						</div>
 					</div>
-					<div style={getStyle(statBoxStyle, 'altitude')} ref={altitudeRef}>
-						<div style={statLabelStyle}>ALTITUDE</div>
-						<div style={statValueStyle}>{altitude}</div>
-					</div>
-				</div>
+				}
 			</div>
 			<div style={bottomStatsContainerStyle}>
 				<div style={statRowStyle}>
@@ -379,6 +382,18 @@ export function Balloon(props) {
 						<div style={statValueStyle}>{lapCount}</div>
 					</div>
 				</div>
+				{isMobile &&
+					<div style={{...statRowStyle, marginTop: '-1px'}}>
+						<div style={getStyle(statBoxStyle, 'lastPosition')} ref={lastPositionRef}>
+							<div style={statLabelStyle}>LAST POSITION</div>
+							<div style={statValueStyle}>{lastPosition}</div>
+						</div>
+						<div style={getStyle(statBoxStyle, 'altitude')} ref={altitudeRef}>
+							<div style={statLabelStyle}>ALTITUDE</div>
+							<div style={statValueStyle}>{altitude}</div>
+						</div>
+					</div>
+				}
 			</div>
 			<div
 				ref={globeContainerRef}
