@@ -42,7 +42,7 @@ export function Balloon(props) {
 					.pathPointLng(p => p.lng)
 					.pathPointAlt(p => p.altitudeFt / 20902231) // Earth radius in feet
 					.pathStroke(1.5)
-					.pathColor(() => 'rgba(255, 100, 50, 0.6)')
+					.pathColor(() => 'rgba(255, 100, 50, 1.0)')
 					.pathTransitionDuration(0);
 				globeInstanceRef.current = myGlobe;
 			}
