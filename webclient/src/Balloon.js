@@ -101,7 +101,6 @@ export function Balloon(props) {
 		const globe = globeInstanceRef.current;
 		const THREE = window.THREE;
 
-		console.log('Raycaster effect running. Globe:', globe, 'THREE:', !!THREE, 'globeReady:', globeReady);
 		if (!globe || !THREE || !globeReady) return;
 
 		const camera = globe.camera();
@@ -115,7 +114,6 @@ export function Balloon(props) {
 			}
 		});
 
-		console.log('Globe mesh:', globeMesh);
 		if (!globeMesh) return;
 
 		const raycaster = new THREE.Raycaster();
@@ -153,7 +151,6 @@ export function Balloon(props) {
 					newVisibility[name] = intersects.length > 0;
 				}
 			}
-			console.log('uiVisibility', newVisibility);
 			setUiVisibility(newVisibility);
 		};
 
