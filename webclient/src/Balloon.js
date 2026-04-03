@@ -68,10 +68,10 @@ export function Balloon(props) {
 					globeInstanceRef.current.pointOfView({ altitude: 2 }, 1600);
 				}, 100);
 
-				// Un-blur halfway through zoom
+				// Un-blur during first half of zoom
 				setTimeout(() => {
 					setIsBlurred(false);
-				}, 900);
+				}, 100);
 
 				isInitialLoad.current = false;
 			}
@@ -91,7 +91,7 @@ export function Balloon(props) {
 				height: '100vh',
 				zIndex: '3',
 				filter: isBlurred ? 'blur(8px)' : 'none',
-				transition: 'filter 1s ease-out',
+				transition: 'filter 0.8s ease-out',
 			}}
 		/>
 	);
