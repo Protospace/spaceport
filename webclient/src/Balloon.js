@@ -99,10 +99,12 @@ export function Balloon(props) {
 		const globe = globeInstanceRef.current;
 		const THREE = window.THREE;
 
+		console.log('Raycaster effect running. Globe:', globe, 'THREE:', !!THREE);
 		if (!globe || !THREE) return;
 
 		const camera = globe.camera();
 		const globeMesh = globe.scene().getObjectByName('globe');
+		console.log('Globe mesh:', globeMesh);
 		if (!globeMesh) return;
 
 		const raycaster = new THREE.Raycaster();
