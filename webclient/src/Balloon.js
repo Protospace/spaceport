@@ -286,16 +286,7 @@ export function Balloon(props) {
 
 	return (
 		<>
-			{globeError ? (
-				<div className="globe-error-container">
-					<div className="stat-box">
-						<div className="stat-label">ERROR</div>
-						<div className="stat-value">UNABLE TO RENDER GLOBE</div>
-					</div>
-				</div>
-			) : (
-				<>
-					<div className="ui-container">
+			<div className="ui-container">
 				<div className="title" style={getStyle('title')} ref={titleRef}>Protoballoon</div>
 				<button className="button" style={getStyle('about')} ref={aboutButtonRef} onClick={() => setShowAbout(true)}>About</button>
 				<button className="button" style={getStyle('faq')} ref={faqButtonRef} onClick={() => setShowFaq(true)}>FAQ</button>
@@ -368,15 +359,22 @@ export function Balloon(props) {
 					</div>
 				}
 			</div>
-			<div
-				ref={globeContainerRef}
-				className="globe-container"
-				style={{
-					filter: isBlurred ? 'blur(8px)' : 'none',
-					transition: 'filter 0.8s ease-out',
-				}}
-			/>
-				</>
+			{globeError ? (
+				<div className="globe-error-container">
+					<div className="stat-box">
+						<div className="stat-label">ERROR</div>
+						<div className="stat-value">UNABLE TO RENDER GLOBE</div>
+					</div>
+				</div>
+			) : (
+				<div
+					ref={globeContainerRef}
+					className="globe-container"
+					style={{
+						filter: isBlurred ? 'blur(8px)' : 'none',
+						transition: 'filter 0.8s ease-out',
+					}}
+				/>
 			)}
 			{showAbout && <BalloonAbout onClose={() => setShowAbout(false)} />}
 			{showFaq && <BalloonFAQ onClose={() => setShowFaq(false)} />}
