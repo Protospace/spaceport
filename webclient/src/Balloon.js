@@ -111,7 +111,7 @@ export function Balloon(props) {
 						.pathPoints('points')
 						.pathPointLat(p => p.lat)
 						.pathPointLng(p => p.lng)
-						.pathPointAlt(p => p.altitudeFt / 2090223) // Earth radius in feet
+						.pathPointAlt(p => p.altitudeFt / 20902231 + 0.001) // Earth radius in feet, plus offset to avoid Z-fighting
 						.pathStroke(2)
 						.pathColor(() => 'rgba(255, 100, 50, 1.0)')
 						.pathTransitionDuration(0);
