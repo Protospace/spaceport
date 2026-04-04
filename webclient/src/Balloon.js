@@ -393,6 +393,7 @@ export function Balloon(props) {
 					<div className="stat-box">
 						<div className="stat-label">ERROR</div>
 						<div className="stat-value">UNABLE TO RENDER GLOBE</div>
+						<div className="stat-value">TRY A DIFFERENT BROWSER</div>
 					</div>
 				</div>
 			) : (
