@@ -132,7 +132,7 @@ export function Balloon(props) {
 
 	useEffect(() => {
 		if (globeInstanceRef.current) {
-			const offset = zoomAltitude > 10 ? (zoomAltitude - 10) * 0.005 : 0;
+			const offset = zoomAltitude > 2 ? (zoomAltitude - 2) * 0.005 : 0;
 			globeInstanceRef.current.pathPointAlt(p => p.altitudeFt / 20902231 + offset);
 		}
 	}, [zoomAltitude]);
