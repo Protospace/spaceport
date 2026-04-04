@@ -1287,24 +1287,23 @@ class StatsViewSet(viewsets.ViewSet, List):
 
         return Response(200)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get', 'post'])
     def balloon_data(self, request):
-        try:
-            data = cache.get('balloon_data', dict(stats={}, positions=[]))
-            return Response(data)
-        except FileNotFoundError:
-            raise Http404
+        if request.method == 'POST':
+            try:
+                data = request.data['data']
 
-    @action(detail=False, methods=['post'])
-    def balloon_data(self, request):
-        try:
-            data = request.data['data']
+                cache.set('balloon_data', data)
 
-            cache.set('balloon_data', data)
-
-            return Response(200)
-        except KeyError:
-            raise exceptions.ValidationError(dict(data='This field is required.'))
+                return Response(200)
+            except KeyError:
+                raise exceptions.ValidationError(dict(data='This field is required.'))
+        else:  # GET
+            try:
+                data = cache.get('balloon_data', dict(stats={}, positions=[]))
+                return Response(data)
+            except FileNotFoundError:
+                raise Http404
 
 
 class DrawingViewSet(Base, List, Create, Update):
