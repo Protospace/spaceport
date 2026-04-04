@@ -513,6 +513,8 @@ export function Home(props) {
 									} trigger={<a>[more]</a>} />
 								</p>}
 
+								<p>Protoballoon: {getBalloonStat()} <Link to='/balloon'>[Dashboard]</Link></p>
+
 								{stats && stats?.solar?.hasOwnProperty('total') && <p>
 									Members' solar power: {stats.solar.total.toLocaleString()} W <Popup content={
 										<React.Fragment>
