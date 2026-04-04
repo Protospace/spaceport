@@ -127,7 +127,7 @@
 .modal-content {
 	background-color: #222;
 	color: #ddd;
-	padding: 10px 20px;
+	padding: 0px 20px;
 	border-radius: 5px;
 	max-width: 1200px;
 	width: 90%;
@@ -145,6 +145,11 @@
 
 .modal-content p {
 	margin-bottom: 1em;
+}
+
+.modal-content img {
+	width: 100%;
+	max-width: 30rem;
 }
 
 .modal-content a {
@@ -175,7 +180,7 @@
 
 .modal-close-button {
 	position: absolute;
-	top: 10px;
+	top: 0px;
 	right: 10px;
 	background: none;
 	border: none;

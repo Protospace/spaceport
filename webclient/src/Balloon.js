@@ -31,7 +31,7 @@ function InfoModal(props) {
 				{content ? (
 					<div dangerouslySetInnerHTML={{ __html: content }} />
 				) : (
-					<p>Loading...</p>
+					<p><br/>Loading...<br/></p>
 				)}
 			</div>
 		</div>
