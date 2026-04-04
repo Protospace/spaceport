@@ -58,6 +58,7 @@ export function Balloon(props) {
 	const [showFaq, setShowFaq] = useState(false);
 	const [globeReady, setGlobeReady] = useState(false);
 	const [globeError, setGlobeError] = useState(false);
+	const [zoomAltitude, setZoomAltitude] = useState(10);
 	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
 	const globeContainerRef = useRef();
 	const globeInstanceRef = useRef();
@@ -111,11 +112,12 @@ export function Balloon(props) {
 						.pathPoints('points')
 						.pathPointLat(p => p.lat)
 						.pathPointLng(p => p.lng)
-						.pathPointAlt(p => p.altitudeFt / 20902231 + 0.05) // Earth radius in feet, plus offset to avoid Z-fighting
+						.pathPointAlt(p => p.altitudeFt / 20902231) // Earth radius in feet
 						.pathStroke(2)
 						.pathColor(() => 'rgba(255, 100, 50, 1.0)')
 						.pathTransitionDuration(0);
 					myGlobe.onGlobeReady(() => setGlobeReady(true));
+					myGlobe.onZoom(pov => setZoomAltitude(pov.altitude));
 					globeInstanceRef.current = myGlobe;
 				} catch (e) {
 					console.error('Error initializing Globe:', e);
@@ -127,6 +129,13 @@ export function Balloon(props) {
 			}
 		}
 	}, [width, height, globeError]);
+
+	useEffect(() => {
+		if (globeInstanceRef.current) {
+			const offset = zoomAltitude > 2.5 ? 0.05 : 0;
+			globeInstanceRef.current.pathPointAlt(p => p.altitudeFt / 20902231 + offset);
+		}
+	}, [zoomAltitude]);
 
 	useEffect(() => {
 		if (globeInstanceRef.current && balloon && balloon.positions && balloon.positions.length > 0) {
