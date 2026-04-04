@@ -272,7 +272,7 @@ export function Home(props) {
 		if (hours < 0 || minutes < 0) {
 			return 'Unknown';
 		}
-		return `last update ${hours}h${minutes}m ago`;
+		return `seen ${hours}h${minutes}m ago`;
 	};
 
 	const alarmStat = (x) => stats && stats.alarm && moment().unix() - stats.alarm.time < 60*60*24 ? stats.alarm.data : 'Unknown';
@@ -527,7 +527,7 @@ export function Home(props) {
 									} trigger={<a>[more]</a>} />
 								</p>}
 
-								<p>Protoballoon: {getBalloonStat()} <Link to='/balloon'>[Dashboard]</Link></p>
+								<p>Protoballoon: {getBalloonStat()} <Link to='/balloon'>[dashboard]</Link></p>
 
 								{stats && stats?.solar?.hasOwnProperty('total') && <p>
 									Members' solar power: {stats.solar.total.toLocaleString()} W <Popup content={

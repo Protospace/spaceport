@@ -38,6 +38,7 @@ DEFAULTS = {
     'solar': {},
     'shopping_list': [],
     'maintenance_list': [],
+    'protoballoon': {},
 }
 
 if secrets.MUMBLE:

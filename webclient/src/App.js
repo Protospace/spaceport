@@ -30,6 +30,7 @@ import { Debug } from './Debug.js';
 import { Gallery } from './Draw.js';
 import { Storage, StorageDetail, ClaimShelf } from './Storage.js';
 import { Garden } from './Garden.js';
+import { Balloon } from './Balloon.js';
 import { Footer } from './Footer.js';
 import { ScannerQuiz, SawstopQuiz } from './Quiz.js';
 import { LCARS1Display, LCARS2Display, LCARS3Display } from './Display.js';
@@ -310,6 +311,10 @@ function App() {
 
 							<Route path='/garden'>
 								<Garden />
+							</Route>
+
+							<Route path='/balloon'>
+								<Balloon />
 							</Route>
 
 							{token ?

@@ -314,7 +314,7 @@ export function Balloon(props) {
 	};
 
 	return (
-		<>
+		<div className="balloon-dashboard">
 			<div className="ui-container">
 				<div className="title" style={getStyle('title')} ref={titleRef}>Protoballoon</div>
 				<button className="button" style={getStyle('about')} ref={aboutButtonRef} onClick={() => setShowAbout(true)}>About</button>
@@ -424,6 +424,6 @@ export function Balloon(props) {
 			</div>
 			{showAbout && <BalloonAbout onClose={() => setShowAbout(false)} />}
 			{showFaq && <BalloonFAQ onClose={() => setShowFaq(false)} />}
-		</>
+		</div>
 	);
 };
