@@ -1,10 +1,10 @@
-.title,
-.button,
-.stat-box {
+.balloon-dashboard .title,
+.balloon-dashboard .button,
+.balloon-dashboard .stat-box {
 	font-family: monospace !important;
 }
 
-.ui-container {
+.balloon-dashboard .ui-container {
 	position: fixed;
 	top: 20px;
 	left: 20px;
@@ -14,7 +14,7 @@
 	pointer-events: none;
 }
 
-.title {
+.balloon-dashboard .title {
 	color: white;
 	border: 1px solid white;
 	padding: 10px 15px;
@@ -22,7 +22,7 @@
 	font-weight: bold;
 }
 
-.button {
+.balloon-dashboard .button {
 	background-color: white;
 	color: black;
 	border: 1px solid white;
@@ -32,7 +32,7 @@
 	margin-left: -1px;
 }
 
-.stats-container {
+.balloon-dashboard .stats-container {
 	position: fixed;
 	top: 64px;
 	left: 20px;
@@ -43,7 +43,7 @@
 	pointer-events: none;
 }
 
-.stat-box {
+.balloon-dashboard .stat-box {
 	border: 1px solid white;
 	padding: 5px 10px;
 	color: white;
@@ -53,30 +53,30 @@
 	background-color: rgba(0, 0, 0, 0.5);
 }
 
-.stat-row {
+.balloon-dashboard .stat-row {
 	display: flex;
 	flex-wrap: wrap;
 	padding: 1px 0 0 1px;
 }
 
-.stats-container > .stat-row + .stat-row,
-.bottom-stats-container > .stat-row + .stat-row {
+.balloon-dashboard .stats-container > .stat-row + .stat-row,
+.balloon-dashboard .bottom-stats-container > .stat-row + .stat-row {
 	margin-top: -1px;
 }
 
-.stat-label {
+.balloon-dashboard .stat-label {
 	font-size: 0.7em;
 }
 
-.stat-value {
+.balloon-dashboard .stat-value {
 	font-size: 1em;
 }
 
-.time-ago {
+.balloon-dashboard .time-ago {
 	font-size: 1em;
 }
 
-.bottom-stats-container {
+.balloon-dashboard .bottom-stats-container {
 	position: fixed;
 	bottom: 20px;
 	left: 20px;
@@ -87,7 +87,7 @@
 	pointer-events: none;
 }
 
-.bottom-right-container {
+.balloon-dashboard .bottom-right-container {
 	position: fixed;
 	bottom: 20px;
 	right: 20px;
@@ -95,54 +95,54 @@
 	pointer-events: none;
 }
 
-.fullscreen-button {
+.balloon-dashboard .fullscreen-button {
 	padding: 8px 10px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 }
 
-.fullscreen-icon-container {
+.balloon-dashboard .fullscreen-icon-container {
 	width: 16px;
 	height: 16px;
 	position: relative;
 }
 
-.fullscreen-icon-corner {
+.balloon-dashboard .fullscreen-icon-corner {
 	width: 6px;
 	height: 6px;
 	position: absolute;
 }
 
-.fullscreen-icon-corner.top-left {
+.balloon-dashboard .fullscreen-icon-corner.top-left {
 	top: 0;
 	left: 0;
 	border-top: 2px solid white;
 	border-left: 2px solid white;
 }
 
-.fullscreen-icon-corner.top-right {
+.balloon-dashboard .fullscreen-icon-corner.top-right {
 	top: 0;
 	right: 0;
 	border-top: 2px solid white;
 	border-right: 2px solid white;
 }
 
-.fullscreen-icon-corner.bottom-left {
+.balloon-dashboard .fullscreen-icon-corner.bottom-left {
 	bottom: 0;
 	left: 0;
 	border-bottom: 2px solid white;
 	border-left: 2px solid white;
 }
 
-.fullscreen-icon-corner.bottom-right {
+.balloon-dashboard .fullscreen-icon-corner.bottom-right {
 	bottom: 0;
 	right: 0;
 	border-bottom: 2px solid white;
 	border-right: 2px solid white;
 }
 
-.globe-container {
+.balloon-dashboard .globe-container {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -151,7 +151,7 @@
 	z-index: 3;
 }
 
-.globe-error-container {
+.balloon-dashboard .globe-error-container {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -165,25 +165,25 @@
 }
 
 @media (max-width: 767px) {
-	.ui-container {
+	.balloon-dashboard .ui-container {
 		top: 10px;
 		left: 10px;
 	}
-	.stats-container {
+	.balloon-dashboard .stats-container {
 		top: 54px;
 		left: 10px;
 	}
-	.bottom-stats-container {
+	.balloon-dashboard .bottom-stats-container {
 		bottom: 10px;
 		left: 10px;
 	}
-	.bottom-right-container {
+	.balloon-dashboard .bottom-right-container {
 		bottom: 10px;
 		right: 10px;
 	}
 }
 
-.modal-overlay {
+.balloon-dashboard .modal-overlay {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -196,7 +196,7 @@
 	align-items: center;
 }
 
-.modal-content {
+.balloon-dashboard .modal-content {
 	background-color: #222;
 	color: #ddd;
 	padding: 0px 20px;
@@ -210,39 +210,39 @@
 	border: 1px solid #444;
 }
 
-.modal-content h1, .modal-content h2, .modal-content h3 {
+.balloon-dashboard .modal-content h1, .balloon-dashboard .modal-content h2, .balloon-dashboard .modal-content h3 {
 	margin-top: 1em;
 	margin-bottom: 0.5em;
 }
 
-.modal-content p {
+.balloon-dashboard .modal-content p {
 	margin-bottom: 1em;
 }
 
-.modal-content img {
+.balloon-dashboard .modal-content img {
 	width: 100%;
 	max-width: 30rem;
 }
 
-.modal-content a {
+.balloon-dashboard .modal-content a {
 	color: #61dafb;
 	text-decoration: none;
 	overflow-wrap: anywhere;
 	word-break: break-word;
 }
 
-.modal-content a:hover {
+.balloon-dashboard .modal-content a:hover {
 	text-decoration: underline;
 }
 
-.modal-content code {
+.balloon-dashboard .modal-content code {
 	background-color: #333;
 	color: #eee;
 	padding: 2px 4px;
 	border-radius: 3px;
 }
 
-.modal-content pre {
+.balloon-dashboard .modal-content pre {
 	background-color: #333;
 	color: #eee;
 	padding: 10px;
@@ -250,7 +250,7 @@
 	overflow-x: auto;
 }
 
-.modal-close-button {
+.balloon-dashboard .modal-close-button {
 	position: absolute;
 	top: 0px;
 	right: 10px;
@@ -261,11 +261,11 @@
 	color: #aaa;
 }
 
-.modal-close-button:hover {
+.balloon-dashboard .modal-close-button:hover {
 	color: #fff;
 }
 
-.modal-content .mod-header.mod-ui,
-.modal-content .collapse-indicator {
+.balloon-dashboard .modal-content .mod-header.mod-ui,
+.balloon-dashboard .modal-content .collapse-indicator {
 	display: none;
 }
