@@ -261,6 +261,20 @@ export function Home(props) {
 	const getScannerAgo = (name) => stats?.scanner3d?.[name] ? moment.unix(stats.scanner3d[name]['time']).tz('America/Edmonton').fromNow() : '';
 	const getScannerName = (name) => stats?.scanner3d?.[name]?.['first_name'] ? stats.scanner3d[name]['first_name'] : 'Unknown';
 
+	const getBalloonStat = () => {
+		if (!stats?.protoballoon?.last?.time) {
+			return 'Unknown';
+		}
+		const balloonTime = moment.utc(stats.protoballoon.last.time);
+		const duration = moment.duration(moment().diff(balloonTime));
+		const hours = Math.floor(duration.asHours());
+		const minutes = duration.minutes();
+		if (hours < 0 || minutes < 0) {
+			return 'Unknown';
+		}
+		return `last update ${hours}h${minutes}m ago`;
+	};
+
 	const alarmStat = (x) => stats && stats.alarm && moment().unix() - stats.alarm.time < 60*60*24 ? stats.alarm.data : 'Unknown';
 	const alarmUpdateLast = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz('America/Edmonton').format('llll') : 'Unknown';
 	const alarmUpdateAgo = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz('America/Edmonton').fromNow() : 'Unknown';
