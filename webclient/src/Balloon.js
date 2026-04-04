@@ -59,6 +59,7 @@ export function Balloon(props) {
 	const [globeReady, setGlobeReady] = useState(false);
 	const [globeError, setGlobeError] = useState(false);
 	const [zoomAltitude, setZoomAltitude] = useState(10);
+	const [isFullscreen, setIsFullscreen] = useState(!!document.fullscreenElement);
 	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
 	const globeContainerRef = useRef();
 	const globeInstanceRef = useRef();
@@ -76,8 +77,29 @@ export function Balloon(props) {
 	const lapCountRef = useRef();
 	const distanceRef = useRef();
 	const spotsRef = useRef();
+	const fullscreenButtonRef = useRef();
 	const { width, height } = useWindowSize();
 	const isMobile = useIsMobile();
+
+	const toggleFullscreen = () => {
+		if (!document.fullscreenElement) {
+			document.documentElement.requestFullscreen().catch(err => {
+				console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+			});
+		} else {
+			if (document.exitFullscreen) {
+				document.exitFullscreen();
+			}
+		}
+	};
+
+	useEffect(() => {
+		const handleFullscreenChange = () => {
+			setIsFullscreen(!!document.fullscreenElement);
+		};
+		document.addEventListener('fullscreenchange', handleFullscreenChange);
+		return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+	}, []);
 
 	const getBalloon = () => {
 		requester('/stats/balloon_data/', 'GET')
@@ -199,6 +221,7 @@ export function Balloon(props) {
 			lapCount: lapCountRef,
 			distance: distanceRef,
 			spots: spotsRef,
+			fullscreen: fullscreenButtonRef,
 		};
 
 		const checkVisibility = () => {
@@ -285,11 +308,12 @@ export function Balloon(props) {
 	const channel = balloon && balloon.stats ? balloon.stats.channel : '...';
 
 	const getStyle = (visibilityKey) => {
-		const isButton = visibilityKey === 'about' || visibilityKey === 'faq';
+		const isButton = visibilityKey === 'about' || visibilityKey === 'faq' || visibilityKey === 'fullscreen';
 		return {
 			opacity: uiVisibility[visibilityKey] ? 0 : 1,
 			transition: 'opacity 0.3s ease',
 			pointerEvents: (isButton && !uiVisibility[visibilityKey]) ? 'auto' : 'none',
+			cursor: (isButton && !uiVisibility[visibilityKey]) ? 'pointer' : 'default',
 		};
 	};
 
@@ -385,6 +409,16 @@ export function Balloon(props) {
 					}}
 				/>
 			)}
+			<div className="bottom-right-container">
+				<div
+					ref={fullscreenButtonRef}
+					className="stat-box"
+					style={getStyle('fullscreen')}
+					onClick={toggleFullscreen}
+				>
+					<div className="stat-value">{isFullscreen ? 'EXIT FULLSCREEN' : 'FULLSCREEN'}</div>
+				</div>
+			</div>
 			{showAbout && <BalloonAbout onClose={() => setShowAbout(false)} />}
 			{showFaq && <BalloonFAQ onClose={() => setShowFaq(false)} />}
 		</>
