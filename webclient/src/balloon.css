@@ -96,6 +96,19 @@
 	z-index: 3;
 }
 
+.globe-error-container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: black;
+	z-index: 3;
+}
+
 @media (max-width: 767px) {
 	.ui-container {
 		top: 10px;

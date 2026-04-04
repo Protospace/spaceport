@@ -57,6 +57,7 @@ export function Balloon(props) {
 	const [showAbout, setShowAbout] = useState(false);
 	const [showFaq, setShowFaq] = useState(false);
 	const [globeReady, setGlobeReady] = useState(false);
+	const [globeError, setGlobeError] = useState(false);
 	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
 	const globeContainerRef = useRef();
 	const globeInstanceRef = useRef();
@@ -101,24 +102,31 @@ export function Balloon(props) {
 	useEffect(() => {
 		const Globe = window.Globe;
 		if (Globe && globeContainerRef.current) {
-			if (!globeInstanceRef.current) {
-				const myGlobe = Globe({ animateIn: false })(globeContainerRef.current)
-					.globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-					.bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-					.backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
-					.pathPoints('points')
-					.pathPointLat(p => p.lat)
-					.pathPointLng(p => p.lng)
-					.pathPointAlt(p => p.altitudeFt / 20902231) // Earth radius in feet
-					.pathStroke(2)
-					.pathColor(() => 'rgba(255, 100, 50, 1.0)')
-					.pathTransitionDuration(0);
-				myGlobe.onGlobeReady(() => setGlobeReady(true));
-				globeInstanceRef.current = myGlobe;
+			if (!globeInstanceRef.current && !globeError) {
+				try {
+					const myGlobe = Globe({ animateIn: false })(globeContainerRef.current)
+						.globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+						.bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+						.backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+						.pathPoints('points')
+						.pathPointLat(p => p.lat)
+						.pathPointLng(p => p.lng)
+						.pathPointAlt(p => p.altitudeFt / 20902231) // Earth radius in feet
+						.pathStroke(2)
+						.pathColor(() => 'rgba(255, 100, 50, 1.0)')
+						.pathTransitionDuration(0);
+					myGlobe.onGlobeReady(() => setGlobeReady(true));
+					globeInstanceRef.current = myGlobe;
+				} catch (e) {
+					console.error('Error initializing Globe:', e);
+					setGlobeError(true);
+				}
 			}
-			globeInstanceRef.current.width(width).height(height);
+			if (globeInstanceRef.current) {
+				globeInstanceRef.current.width(width).height(height);
+			}
 		}
-	}, [width, height]);
+	}, [width, height, globeError]);
 
 	useEffect(() => {
 		if (globeInstanceRef.current && balloon && balloon.positions && balloon.positions.length > 0) {
@@ -278,7 +286,16 @@ export function Balloon(props) {
 
 	return (
 		<>
-			<div className="ui-container">
+			{globeError ? (
+				<div className="globe-error-container">
+					<div className="stat-box">
+						<div className="stat-label">ERROR</div>
+						<div className="stat-value">UNABLE TO RENDER GLOBE</div>
+					</div>
+				</div>
+			) : (
+				<>
+					<div className="ui-container">
 				<div className="title" style={getStyle('title')} ref={titleRef}>Protoballoon</div>
 				<button className="button" style={getStyle('about')} ref={aboutButtonRef} onClick={() => setShowAbout(true)}>About</button>
 				<button className="button" style={getStyle('faq')} ref={faqButtonRef} onClick={() => setShowFaq(true)}>FAQ</button>
@@ -359,6 +376,8 @@ export function Balloon(props) {
 					transition: 'filter 0.8s ease-out',
 				}}
 			/>
+				</>
+			)}
 			{showAbout && <BalloonAbout onClose={() => setShowAbout(false)} />}
 			{showFaq && <BalloonFAQ onClose={() => setShowFaq(false)} />}
 		</>
