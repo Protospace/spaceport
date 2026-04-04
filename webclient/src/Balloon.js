@@ -81,15 +81,11 @@ export function Balloon(props) {
 	const { width, height } = useWindowSize();
 	const isMobile = useIsMobile();
 
-	const toggleFullscreen = () => {
+	const enterFullscreen = () => {
 		if (!document.fullscreenElement) {
 			document.documentElement.requestFullscreen().catch(err => {
 				console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
 			});
-		} else {
-			if (document.exitFullscreen) {
-				document.exitFullscreen();
-			}
 		}
 	};
 
@@ -410,14 +406,21 @@ export function Balloon(props) {
 				/>
 			)}
 			<div className="bottom-right-container">
-				<div
-					ref={fullscreenButtonRef}
-					className="stat-box"
-					style={getStyle('fullscreen')}
-					onClick={toggleFullscreen}
-				>
-					<div className="stat-value">{isFullscreen ? 'EXIT FULLSCREEN' : 'FULLSCREEN'}</div>
-				</div>
+				{!isFullscreen && (
+					<div
+						ref={fullscreenButtonRef}
+						className="stat-box fullscreen-button"
+						style={getStyle('fullscreen')}
+						onClick={enterFullscreen}
+					>
+						<div className="fullscreen-icon-container">
+							<div className="fullscreen-icon-corner top-left" />
+							<div className="fullscreen-icon-corner top-right" />
+							<div className="fullscreen-icon-corner bottom-left" />
+							<div className="fullscreen-icon-corner bottom-right" />
+						</div>
+					</div>
+				)}
 			</div>
 			{showAbout && <BalloonAbout onClose={() => setShowAbout(false)} />}
 			{showFaq && <BalloonFAQ onClose={() => setShowFaq(false)} />}

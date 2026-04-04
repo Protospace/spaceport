@@ -95,6 +95,53 @@
 	pointer-events: none;
 }
 
+.fullscreen-button {
+	padding: 8px 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.fullscreen-icon-container {
+	width: 16px;
+	height: 16px;
+	position: relative;
+}
+
+.fullscreen-icon-corner {
+	width: 6px;
+	height: 6px;
+	position: absolute;
+}
+
+.fullscreen-icon-corner.top-left {
+	top: 0;
+	left: 0;
+	border-top: 2px solid white;
+	border-left: 2px solid white;
+}
+
+.fullscreen-icon-corner.top-right {
+	top: 0;
+	right: 0;
+	border-top: 2px solid white;
+	border-right: 2px solid white;
+}
+
+.fullscreen-icon-corner.bottom-left {
+	bottom: 0;
+	left: 0;
+	border-bottom: 2px solid white;
+	border-left: 2px solid white;
+}
+
+.fullscreen-icon-corner.bottom-right {
+	bottom: 0;
+	right: 0;
+	border-bottom: 2px solid white;
+	border-right: 2px solid white;
+}
+
 .globe-container {
 	position: fixed;
 	top: 0;
