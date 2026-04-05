@@ -156,6 +156,18 @@ export function Balloon(props) {
 	}, [zoomAltitude]);
 
 	useEffect(() => {
+		if (globeInstanceRef.current) {
+			if (zoomAltitude < 0.15) {
+				globeInstanceRef.current.globeImageUrl(null)
+					.tileImageUrl('//a.tile.openstreetmap.org/{z}/{x}/{y}.png');
+			} else {
+				globeInstanceRef.current.globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+					.tileImageUrl(null);
+			}
+		}
+	}, [zoomAltitude]);
+
+	useEffect(() => {
 		if (globeInstanceRef.current && balloon && balloon.positions && balloon.positions.length > 0) {
 			const pathData = [{ points: balloon.positions }];
 			globeInstanceRef.current.pathsData(pathData);
