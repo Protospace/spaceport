@@ -108,7 +108,6 @@ export function Balloon(props) {
 	const [showFaq, setShowFaq] = useState(false);
 	const [globeReady, setGlobeReady] = useState(false);
 	const [globeError, setGlobeError] = useState(false);
-	const [zoomAltitude, setZoomAltitude] = useState(10);
 	const [isFullscreen, setIsFullscreen] = useState(!!document.fullscreenElement);
 	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
 	const globeContainerRef = useRef();
@@ -187,7 +186,10 @@ export function Balloon(props) {
 						.pathTransitionDuration(0);
 					globeMaterialRef.current = myGlobe.globeMaterial();
 					myGlobe.onGlobeReady(() => setGlobeReady(true));
-					myGlobe.onZoom(pov => setZoomAltitude(pov.altitude));
+					myGlobe.onZoom(pov => {
+						const offset = pov.altitude > 2 ? (pov.altitude - 2) * 0.005 : 0;
+						myGlobe.pathPointAlt(p => p.altitudeFt / 20902231 + offset);
+					});
 					globeInstanceRef.current = myGlobe;
 				} catch (e) {
 					console.error('Error initializing Globe:', e);
@@ -199,13 +201,6 @@ export function Balloon(props) {
 			}
 		}
 	}, [width, height, globeError]);
-
-	useEffect(() => {
-		if (globeInstanceRef.current) {
-			const offset = zoomAltitude > 2 ? (zoomAltitude - 2) * 0.005 : 0;
-			globeInstanceRef.current.pathPointAlt(p => p.altitudeFt / 20902231 + offset);
-		}
-	}, [zoomAltitude]);
 
 	useEffect(() => {
 		if (globeInstanceRef.current && balloon && balloon.positions && balloon.positions.length > 0) {
