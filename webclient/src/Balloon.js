@@ -187,19 +187,6 @@ export function Balloon(props) {
 
 		if (!globe || !THREE || !globeReady) return;
 
-		const camera = globe.camera();
-		const scene = globe.scene();
-
-		let globeMesh;
-		scene.traverse(object => {
-			// The globe is a mesh with sphere geometry
-			if (object.isMesh && object.geometry.type === 'SphereGeometry' && object.material.side === THREE.FrontSide) {
-				globeMesh = object;
-			}
-		});
-
-		if (!globeMesh) return;
-
 		const raycaster = new THREE.Raycaster();
 		const ndc = new THREE.Vector2();
 
@@ -221,6 +208,19 @@ export function Balloon(props) {
 		};
 
 		const checkVisibility = () => {
+			const camera = globe.camera();
+			const scene = globe.scene();
+
+			let globeMesh;
+			scene.traverse(object => {
+				// The globe is a mesh with sphere geometry
+				if (object.isMesh && object.geometry.type === 'SphereGeometry' && object.material.side === THREE.FrontSide) {
+					globeMesh = object;
+				}
+			});
+
+			if (!globeMesh) return;
+
 			const newVisibility = {};
 			for (const [name, ref] of Object.entries(refsToCheck)) {
 				if (ref.current) {
