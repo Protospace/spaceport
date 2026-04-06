@@ -109,7 +109,6 @@ export function Balloon(props) {
 	const [globeReady, setGlobeReady] = useState(false);
 	const [globeError, setGlobeError] = useState(false);
 	const [isFullscreen, setIsFullscreen] = useState(!!document.fullscreenElement);
-	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
 	const globeContainerRef = useRef();
 	const globeInstanceRef = useRef();
 	const globeMaterialRef = useRef();
@@ -163,10 +162,6 @@ export function Balloon(props) {
 		const interval = setInterval(getBalloon, 60000);
 		return () => clearInterval(interval);
 	}, []);
-
-	useEffect(() => {
-		getBalloon();
-	}, [refreshCount]);
 
 	useEffect(() => {
 		const Globe = window.Globe;
