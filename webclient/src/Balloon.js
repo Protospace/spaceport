@@ -49,10 +49,59 @@ export function BalloonFAQ(props) {
 	return <InfoModal url="https://notes.dns.t0.vc/protoballoon-faq-8d3644" onClose={onClose} />;
 }
 
+function TimeAgo(props) {
+	const { time } = props;
+	const [timeAgo, setTimeAgo] = useState('...');
+
+	useEffect(() => {
+		if (!time) {
+			setTimeAgo('...');
+			return;
+		}
+		const lastPositionTime = moment.utc(time);
+		const timer = setInterval(() => {
+			const now = moment();
+			const duration = moment.duration(now.diff(lastPositionTime));
+			const hours = String(Math.floor(duration.asHours())).padStart(2, '0');
+			const minutes = String(duration.minutes()).padStart(2, '0');
+			const secondsWithDecimal = (duration.seconds() + duration.milliseconds() / 1000).toFixed(1);
+			const paddedSeconds = secondsWithDecimal.padStart(4, '0');
+			setTimeAgo(`${hours}h ${minutes}m ${paddedSeconds}s ago`);
+		}, 100);
+		return () => clearInterval(timer);
+	}, [time]);
+
+	return <div className="time-ago">{timeAgo}</div>;
+}
+
+function MissionDuration(props) {
+	const { startTime } = props;
+	const [missionDuration, setMissionDuration] = useState('...');
+
+	useEffect(() => {
+		if (!startTime) {
+			setMissionDuration('...');
+			return;
+		}
+		const startTimeMoment = moment.utc(startTime);
+		const timer = setInterval(() => {
+			const now = moment();
+			const duration = moment.duration(now.diff(startTimeMoment));
+			const days = Math.floor(duration.asDays());
+			const hours = String(duration.hours()).padStart(2, '0');
+			const minutes = String(duration.minutes()).padStart(2, '0');
+			const secondsWithDecimal = (duration.seconds() + duration.milliseconds() / 1000).toFixed(1);
+			const paddedSeconds = secondsWithDecimal.padStart(4, '0');
+			setMissionDuration(`L+${days}d ${hours}:${minutes}:${paddedSeconds}`);
+		}, 100);
+		return () => clearInterval(timer);
+	}, [startTime]);
+
+	return <div className="stat-value">{missionDuration}</div>;
+}
+
 export function Balloon(props) {
 	const [balloon, setBalloon] = useState(false);
-	const [timeAgo, setTimeAgo] = useState('...');
-	const [missionDuration, setMissionDuration] = useState('...');
 	const [isBlurred, setIsBlurred] = useState(true);
 	const [uiVisibility, setUiVisibility] = useState({});
 	const [showAbout, setShowAbout] = useState(false);
@@ -246,42 +295,6 @@ export function Balloon(props) {
 	}, [width, height, balloon, globeReady]);
 
 
-	useEffect(() => {
-		if (!balloon || !balloon.positions || balloon.positions.length === 0) {
-			return;
-		}
-		const lastPositionTime = moment.utc(balloon.positions[0].time);
-		const timer = setInterval(() => {
-			const now = moment();
-			const duration = moment.duration(now.diff(lastPositionTime));
-			const hours = String(Math.floor(duration.asHours())).padStart(2, '0');
-			const minutes = String(duration.minutes()).padStart(2, '0');
-			const secondsWithDecimal = (duration.seconds() + duration.milliseconds() / 1000).toFixed(1);
-			const paddedSeconds = secondsWithDecimal.padStart(4, '0');
-			setTimeAgo(`${hours}h ${minutes}m ${paddedSeconds}s ago`);
-		}, 100);
-		return () => clearInterval(timer);
-	}, [balloon]);
-
-	useEffect(() => {
-		if (!balloon || !balloon.stats || !balloon.stats.timeStart) {
-			return;
-		}
-		const startTime = moment.utc(balloon.stats.timeStart);
-		const timer = setInterval(() => {
-			const now = moment();
-			const duration = moment.duration(now.diff(startTime));
-			const days = Math.floor(duration.asDays());
-			const hours = String(duration.hours()).padStart(2, '0');
-			const minutes = String(duration.minutes()).padStart(2, '0');
-			const secondsWithDecimal = (duration.seconds() + duration.milliseconds() / 1000).toFixed(1);
-			const paddedSeconds = secondsWithDecimal.padStart(4, '0');
-			setMissionDuration(`L+${days}d ${hours}:${minutes}:${paddedSeconds}`);
-		}, 100);
-		return () => clearInterval(timer);
-	}, [balloon]);
-
-
 	const lastSeenTime = balloon && balloon.positions && balloon.positions.length > 0
 		? moment.utc(balloon.positions[0].time).tz(moment.tz.guess()).format('YYYY-MM-DD HH:mm:ss z')
 		: '...';
@@ -327,11 +340,11 @@ export function Balloon(props) {
 					<div className="stat-box" style={getStyle('lastSeen')} ref={lastSeenRef}>
 						<div className="stat-label">LAST UPDATE</div>
 						<div className="stat-value">{lastSeenTime}</div>
-						<div className="time-ago">{timeAgo}</div>
+						<TimeAgo time={balloon?.positions?.[0]?.time} />
 					</div>
 					<div className="stat-box" style={getStyle('missionDuration')} ref={missionDurationRef}>
 						<div className="stat-label">MISSION DURATION</div>
-						<div className="stat-value">{missionDuration}</div>
+						<MissionDuration startTime={balloon?.stats?.timeStart} />
 						<div className="time-ago">{sinceDate}</div>
 					</div>
 				</div>
