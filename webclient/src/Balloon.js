@@ -211,17 +211,15 @@ export function Balloon(props) {
 			const camera = globe.camera();
 			const scene = globe.scene();
 
-			let globeMesh;
+			const globeMeshes = [];
 			scene.traverse(object => {
 				// The globe is a mesh with sphere geometry
 				if (object.isMesh && object.geometry.type === 'SphereGeometry' && object.material.side === THREE.FrontSide) {
-					globeMesh = object;
+					globeMeshes.push(object);
 				}
 			});
 
-			console.log(globeMesh);
-
-			if (!globeMesh) return;
+			if (globeMeshes.length === 0) return;
 
 			const newVisibility = {};
 			for (const [name, ref] of Object.entries(refsToCheck)) {
@@ -234,7 +232,7 @@ export function Balloon(props) {
 					ndc.y = -(y / window.innerHeight) * 2 + 1;
 
 					raycaster.setFromCamera(ndc, camera);
-					const intersects = raycaster.intersectObject(globeMesh, true);
+					const intersects = raycaster.intersectObjects(globeMeshes, true);
 					newVisibility[name] = intersects.length > 0;
 				}
 			}
