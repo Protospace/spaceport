@@ -328,6 +328,8 @@ export function Balloon(props) {
 		};
 	};
 
+	console.log('rerender');
+
 	return (
 		<div className="balloon-dashboard">
 			<div className="ui-container">
