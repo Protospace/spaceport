@@ -206,7 +206,7 @@ export function Balloon(props) {
 				const lastPoint = balloon.positions[0]; // data is reverse chronological
 
 				// Instantly set camera to be looking at the last point from far away
-				globeInstanceRef.current.pointOfView({ lat: lastPoint.lat, lng: lastPoint.lng, altitude: 10 });
+				globeInstanceRef.current.pointOfView({ lat: lastPoint.lat, lng: lastPoint.lng, altitude: 20 });
 
 				// Animate zoom-in
 				setTimeout(() => {
@@ -325,8 +325,6 @@ export function Balloon(props) {
 			cursor: (isButton && !uiVisibility[visibilityKey]) ? 'pointer' : 'default',
 		};
 	};
-
-	console.log('rerender');
 
 	return (
 		<div className="balloon-dashboard">
