@@ -287,7 +287,15 @@ export function Balloon(props) {
 					newVisibility[name] = intersects.length > 0;
 				}
 			}
-			setUiVisibility(newVisibility);
+			setUiVisibility(prevVisibility => {
+				const allKeys = new Set([...Object.keys(prevVisibility), ...Object.keys(newVisibility)]);
+				for (const key of allKeys) {
+					if (prevVisibility[key] !== newVisibility[key]) {
+						return newVisibility; // Found a difference, update state
+					}
+				}
+				return prevVisibility; // No difference, return old state
+			});
 		};
 
 		const interval = setInterval(checkVisibility, 200);
