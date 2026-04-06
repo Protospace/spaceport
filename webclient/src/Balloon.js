@@ -219,6 +219,8 @@ export function Balloon(props) {
 				}
 			});
 
+			console.log(globeMesh);
+
 			if (!globeMesh) return;
 
 			const newVisibility = {};
