@@ -184,9 +184,6 @@ export function Balloon(props) {
 
 	useEffect(() => {
 		const globe = globeInstanceRef.current;
-		//const THREE = window.THREE;
-
-		console.log(THREE.REVISION);
 
 		if (!globe || !THREE || !globeReady) return;
 
