@@ -64,6 +64,7 @@ export function Balloon(props) {
 	const [refreshCount, refreshBalloon] = useReducer(x => x + 1, 0);
 	const globeContainerRef = useRef();
 	const globeInstanceRef = useRef();
+	const globeMaterialRef = useRef();
 	const isInitialLoad = useRef(true);
 	const titleRef = useRef();
 	const aboutButtonRef = useRef();
@@ -135,6 +136,7 @@ export function Balloon(props) {
 						.pathStroke(2)
 						.pathColor(() => 'rgba(255, 100, 50, 1.0)')
 						.pathTransitionDuration(0);
+					globeMaterialRef.current = myGlobe.globeMaterial();
 					myGlobe.onGlobeReady(() => setGlobeReady(true));
 					myGlobe.onZoom(pov => setZoomAltitude(pov.altitude));
 					globeInstanceRef.current = myGlobe;
@@ -184,8 +186,9 @@ export function Balloon(props) {
 
 	useEffect(() => {
 		const globe = globeInstanceRef.current;
+		const globeMaterial = globeMaterialRef.current;
 
-		if (!globe || !THREE || !globeReady) return;
+		if (!globe || !THREE || !globeReady || !globeMaterial) return;
 
 		const raycaster = new THREE.Raycaster();
 		const ndc = new THREE.Vector2();
@@ -213,8 +216,7 @@ export function Balloon(props) {
 
 			const globeMeshes = [];
 			scene.traverse(object => {
-				// The globe is a mesh with sphere geometry
-				if (object.isMesh && object.geometry.type === 'SphereGeometry' && object.material.side === THREE.FrontSide) {
+				if (object.isMesh && object.material === globeMaterial) {
 					globeMeshes.push(object);
 				}
 			});
