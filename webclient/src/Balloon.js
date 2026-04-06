@@ -193,7 +193,7 @@ export function Balloon(props) {
 		let globeMesh;
 		scene.traverse(object => {
 			// The globe is a mesh with sphere geometry
-			if (object.isMesh && object.geometry.type === 'SphereGeometry') {
+			if (object.isMesh && object.geometry instanceof THREE.SphereGeometry && object.material.side === THREE.FrontSide) {
 				globeMesh = object;
 			}
 		});
