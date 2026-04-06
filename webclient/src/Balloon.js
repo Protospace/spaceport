@@ -124,7 +124,7 @@ export function Balloon(props) {
 			if (!globeInstanceRef.current && !globeError) {
 				try {
 					const myGlobe = Globe({ animateIn: false })(globeContainerRef.current)
-						.globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+						.globeTileEngineUrl((x, y, z) => `https://api.maptiler.com/maps/hybrid-v4/${z}/${x}/${y}.jpg?key=Ou4yAFS8EELRHVOowoGz`)
 						.bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
 						.backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
 						.pathPoints('points')
@@ -152,18 +152,6 @@ export function Balloon(props) {
 		if (globeInstanceRef.current) {
 			const offset = zoomAltitude > 2 ? (zoomAltitude - 2) * 0.005 : 0;
 			globeInstanceRef.current.pathPointAlt(p => p.altitudeFt / 20902231 + offset);
-		}
-	}, [zoomAltitude]);
-
-	useEffect(() => {
-		if (globeInstanceRef.current) {
-			if (zoomAltitude < 0.15) {
-				globeInstanceRef.current.globeImageUrl(null)
-					.tileImageUrl('//a.tile.openstreetmap.org/{z}/{x}/{y}.png');
-			} else {
-				globeInstanceRef.current.globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-					.tileImageUrl(null);
-			}
 		}
 	}, [zoomAltitude]);
 
