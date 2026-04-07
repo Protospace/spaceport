@@ -182,7 +182,7 @@ export function Balloon(props) {
 						.labelLat(p => p.lat)
 						.labelLng(p => p.lng)
 						.labelAltitude(p => p.altitudeFt / 20902231)
-						.labelDotRadius(0.15)
+						.labelDotRadius(0.5)
 						.labelColor(() => 'rgba(255, 100, 50, 0.75)')
 						.labelLabel(p => `
 							<div style="padding: 4px; background: rgba(0,0,0,0.5); border-radius: 4px; color: white;">
@@ -196,6 +196,7 @@ export function Balloon(props) {
 					myGlobe.onZoom(pov => {
 						const offset = pov.altitude > 2 ? (pov.altitude - 2) * 0.002 : 0;
 						myGlobe.pathPointAlt(p => p.altitudeFt / 20902231 + offset);
+						myGlobe.labelDotRadius(pov.altitude * 0.2);
 					});
 					globeInstanceRef.current = myGlobe;
 				} catch (e) {
