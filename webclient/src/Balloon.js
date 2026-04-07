@@ -187,8 +187,10 @@ export function Balloon(props) {
 						.labelLabel(p => `
 							<div style="padding: 4px; background: rgba(0,0,0,0.5); border-radius: 4px; color: white;">
 								<b>${moment.utc(p.time).tz(moment.tz.guess()).format('YYYY-MM-DD HH:mm:ss z')}</b><br />
+								Received ${moment.utc(p.time).fromNow()}<br />
 								Lat: ${p.lat.toFixed(4)}, Lng: ${p.lng.toFixed(4)}<br />
-								Altitude: ${p.altitudeFt.toLocaleString()} ft
+								Altitude: ${p.altitudeFt.toLocaleString()} ft<br />
+								Sun Angle: ${p.solAngle}°, Temp (°C): ${p.tempC}, Voltage: ${p.voltage}V
 							</div>
 						`);
 					globeMaterialRef.current = myGlobe.globeMaterial();
