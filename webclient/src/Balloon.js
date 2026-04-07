@@ -189,8 +189,8 @@ export function Balloon(props) {
 								<b>${moment.utc(p.time).tz(moment.tz.guess()).format('YYYY-MM-DD HH:mm:ss z')}</b><br />
 								Received ${moment.utc(p.time).fromNow()}<br />
 								Lat: ${p.lat.toFixed(4)}, Lng: ${p.lng.toFixed(4)}<br />
-								Altitude: ${p.altitudeFt.toLocaleString()} ft<br />
-								Sun Angle: ${p.solAngle}°, Temp (°C): ${p.tempC}, Voltage: ${p.voltage}V
+								Altitude: ${p.altitudeFt.toLocaleString()} ft, Temp: ${p.tempC} °C<br />
+								Sun Angle: ${p.solAngle}°, Voltage: ${p.voltage} V
 							</div>
 						`);
 					globeMaterialRef.current = myGlobe.globeMaterial();
