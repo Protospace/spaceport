@@ -108,6 +108,7 @@ export function Balloon(props) {
 	const [showFaq, setShowFaq] = useState(false);
 	const [globeReady, setGlobeReady] = useState(false);
 	const [globeError, setGlobeError] = useState(false);
+	const [hoveredLabel, setHoveredLabel] = useState(null);
 	const [isFullscreen, setIsFullscreen] = useState(!!document.fullscreenElement);
 	const globeContainerRef = useRef();
 	const globeInstanceRef = useRef();
@@ -178,11 +179,10 @@ export function Balloon(props) {
 						.pathStroke(2)
 						.pathColor(() => 'rgba(255, 100, 50, 1.0)')
 						.pathTransitionDuration(0)
-						.labelText(() => '')
+						.labelText(() => null)
 						.labelLat(p => p.lat)
 						.labelLng(p => p.lng)
 						.labelAltitude(p => p.altitudeFt / 20902231)
-						.labelColor(() => 'rgba(255, 100, 50, 0.75)')
 						.labelLabel(p => `
 							<div style="padding: 4px; background: rgba(0,0,0,0.5); border-radius: 4px; color: white;">
 								<b>${moment.utc(p.time).tz(moment.tz.guess()).format('YYYY-MM-DD HH:mm:ss z')}</b><br />
@@ -197,6 +197,7 @@ export function Balloon(props) {
 						myGlobe.pathPointAlt(p => p.altitudeFt / 20902231 + offset);
 						myGlobe.labelDotRadius(pov.altitude * 0.2 + 0.02);
 					});
+					myGlobe.onLabelHover(setHoveredLabel);
 					globeInstanceRef.current = myGlobe;
 				} catch (e) {
 					console.error('Error initializing Globe:', e);
@@ -235,6 +236,12 @@ export function Balloon(props) {
 			}
 		}
 	}, [balloon]);
+
+	useEffect(() => {
+		if (globeInstanceRef.current) {
+			globeInstanceRef.current.labelColor(p => (hoveredLabel && p.time === hoveredLabel.time) ? 'rgba(255, 100, 50, 1.0)' : 'rgba(255, 100, 50, 0.75)');
+		}
+	}, [hoveredLabel]);
 
 	useEffect(() => {
 		const globe = globeInstanceRef.current;
