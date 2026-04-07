@@ -186,7 +186,7 @@ export function Balloon(props) {
 						.labelAltitude(p => (p.altitudeFt+100) / 20902231)
 						.labelsTransitionDuration(0)
 						.labelLabel(p => `
-							<div style="padding: 4px; background: rgba(0,0,0,0.5); border-radius: 4px; color: white;">
+							<div style="padding: 4px; background: rgba(0,0,0,0.5); border-radius: 4px; color: white; white-space: nowrap;">
 								<b>${moment.utc(p.time).tz(moment.tz.guess()).format('YYYY-MM-DD HH:mm:ss z')}</b><br />
 								Received ${moment.utc(p.time).fromNow()}<br />
 								Lat: ${p.lat.toFixed(4)}, Lng: ${p.lng.toFixed(4)}<br />
