@@ -104,6 +104,10 @@
 	text-align: right;
 }
 
+.balloon-dashboard .top-right-container .stat-box {
+	text-align: right;
+}
+
 .balloon-dashboard .fullscreen-button {
 	padding: 8px 10px;
 	display: flex;

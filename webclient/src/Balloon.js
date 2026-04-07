@@ -362,9 +362,12 @@ export function Balloon(props) {
 				<div className="stat-box" style={getStyle('telemetry')} ref={telemetryRef}>
 					<div className="stat-label">LATEST TELEMETRY</div>
 					<div className="stat-value">
-						{balloon?.positions?.slice(0, 5).map(pos => (
-							<div key={pos.time} style={{lineHeight: '1.4em'}}>
-								{`${pos.altitudeFt.toLocaleString()} ft, ${pos.voltage} V, ${pos.tempC}°C`}
+						{balloon?.positions?.slice(0, 5).map((pos, index) => (
+							<div key={pos.time} style={{ marginTop: index > 0 ? '0.5em' : 0 }}>
+								<div>{moment.utc(pos.time).tz(moment.tz.guess()).format('YYYY-MM-DD HH:mm z')}</div>
+								<div>{`${pos.lat.toFixed(5)}, ${pos.lng.toFixed(4)}`}</div>
+								<div>{`${pos.altitudeFt.toLocaleString()} FT, ${pos.tempC} °C`}</div>
+								<div>{`SUN: ${pos.solAngle}°, ${pos.voltage.toFixed(2)} V`}</div>
 							</div>
 						))}
 					</div>
