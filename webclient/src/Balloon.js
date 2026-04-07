@@ -179,10 +179,11 @@ export function Balloon(props) {
 						.pathStroke(2)
 						.pathColor(() => 'rgba(255, 100, 50, 1.0)')
 						.pathTransitionDuration(0)
-						.labelText(() => null)
+						.labelText(() => '')
 						.labelLat(p => p.lat)
 						.labelLng(p => p.lng)
-						.labelAltitude(p => p.altitudeFt / 20902231)
+						.labelAltitude(p => (p.altitudeFt+100) / 20902231)
+						.labelsTransitionDuration(0)
 						.labelLabel(p => `
 							<div style="padding: 4px; background: rgba(0,0,0,0.5); border-radius: 4px; color: white;">
 								<b>${moment.utc(p.time).tz(moment.tz.guess()).format('YYYY-MM-DD HH:mm:ss z')}</b><br />
@@ -195,7 +196,7 @@ export function Balloon(props) {
 					myGlobe.onZoom(pov => {
 						const offset = pov.altitude > 2 ? (pov.altitude - 2) * 0.002 : 0;
 						myGlobe.pathPointAlt(p => p.altitudeFt / 20902231 + offset);
-						myGlobe.labelDotRadius(pov.altitude * 0.2 + 0.02);
+						myGlobe.labelDotRadius(pov.altitude * 0.3 + 0.01);
 					});
 					myGlobe.onLabelHover(setHoveredLabel);
 					globeInstanceRef.current = myGlobe;
@@ -214,7 +215,7 @@ export function Balloon(props) {
 		if (globeInstanceRef.current && balloon && balloon.positions && balloon.positions.length > 0) {
 			const pathData = [{ points: balloon.positions }];
 			globeInstanceRef.current.pathsData(pathData);
-			globeInstanceRef.current.labelsData(balloon.positions.slice(0, 50));
+			globeInstanceRef.current.labelsData(balloon.positions.slice(0, 25));
 
 			if (isInitialLoad.current) {
 				const lastPoint = balloon.positions[0]; // data is reverse chronological
@@ -239,7 +240,7 @@ export function Balloon(props) {
 
 	useEffect(() => {
 		if (globeInstanceRef.current) {
-			globeInstanceRef.current.labelColor(p => (hoveredLabel && p.time === hoveredLabel.time) ? 'rgba(255, 100, 50, 1.0)' : 'rgba(255, 100, 50, 0.75)');
+			globeInstanceRef.current.labelColor(p => (hoveredLabel && p.time === hoveredLabel.time) ? 'rgba(255, 100, 50, 1.0)' : 'rgba(255, 100, 50, 0.60)');
 		}
 	}, [hoveredLabel]);
 
