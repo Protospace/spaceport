@@ -121,6 +121,9 @@ export function Balloon(props) {
 	const missionDurationRef = useRef();
 	const lastPositionRef = useRef();
 	const altitudeRef = useRef();
+	const voltageRef = useRef();
+	const temperatureRef = useRef();
+	const sunAngleRef = useRef();
 	const callsignRef = useRef();
 	const bandRef = useRef();
 	const channelRef = useRef();
@@ -264,6 +267,9 @@ export function Balloon(props) {
 			missionDuration: missionDurationRef,
 			lastPosition: lastPositionRef,
 			altitude: altitudeRef,
+			voltage: voltageRef,
+			temperature: temperatureRef,
+			sunAngle: sunAngleRef,
 			callsign: callsignRef,
 			band: bandRef,
 			channel: channelRef,
@@ -334,6 +340,18 @@ export function Balloon(props) {
 		? `${balloon.positions[0].altitudeFt.toLocaleString()} ft`
 		: '...';
 
+	const voltage = balloon && balloon.positions && balloon.positions.length > 0
+		? `${balloon.positions[0].voltage.toFixed(2)} V`
+		: '...';
+
+	const temperature = balloon && balloon.positions && balloon.positions.length > 0
+		? `${balloon.positions[0].tempC} °C`
+		: '...';
+
+	const sunAngle = balloon && balloon.positions && balloon.positions.length > 0
+		? `${balloon.positions[0].solAngle}°`
+		: '...';
+
 	const lapCount = balloon && balloon.stats ? balloon.stats.lapCount : '...';
 	const distanceTraveled = balloon && balloon.stats ? `${balloon.stats.distanceTraveledKm.toLocaleString()} km` : '...';
 	const spots = balloon && balloon.stats ? balloon.stats.spots.toLocaleString() : '...';
@@ -389,16 +407,32 @@ export function Balloon(props) {
 					</div>
 				</div>
 				{!isMobile &&
-					<div className="stat-row">
-						<div className="stat-box" style={getStyle('lastPosition')} ref={lastPositionRef}>
-							<div className="stat-label">LAST POSITION</div>
-							<div className="stat-value">{lastPosition}</div>
+					<>
+						<div className="stat-row">
+							<div className="stat-box" style={getStyle('lastPosition')} ref={lastPositionRef}>
+								<div className="stat-label">LAST POSITION</div>
+								<div className="stat-value">{lastPosition}</div>
+							</div>
+							<div className="stat-box" style={getStyle('altitude')} ref={altitudeRef}>
+								<div className="stat-label">ALTITUDE</div>
+								<div className="stat-value">{altitude}</div>
+							</div>
 						</div>
-						<div className="stat-box" style={getStyle('altitude')} ref={altitudeRef}>
-							<div className="stat-label">ALTITUDE</div>
-							<div className="stat-value">{altitude}</div>
+						<div className="stat-row">
+							<div className="stat-box" style={getStyle('voltage')} ref={voltageRef}>
+								<div className="stat-label">VOLTAGE</div>
+								<div className="stat-value">{voltage}</div>
+							</div>
+							<div className="stat-box" style={getStyle('temperature')} ref={temperatureRef}>
+								<div className="stat-label">TEMPERATURE</div>
+								<div className="stat-value">{temperature}</div>
+							</div>
+							<div className="stat-box" style={getStyle('sunAngle')} ref={sunAngleRef}>
+								<div className="stat-label">SUN ANGLE</div>
+								<div className="stat-value">{sunAngle}</div>
+							</div>
 						</div>
-					</div>
+					</>
 				}
 			</div>
 			<div className="bottom-stats-container">
