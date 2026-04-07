@@ -170,7 +170,6 @@ export function Balloon(props) {
 				try {
 					const myGlobe = Globe({ animateIn: false })(globeContainerRef.current)
 						.globeTileEngineUrl((x, y, z) => `https://static.my.protospace.ca/balloon-tile/${z}/${x}/${y}.jpg`)
-						.bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
 						.backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
 						.pathPoints('points')
 						.pathPointLat(p => p.lat)
@@ -182,7 +181,7 @@ export function Balloon(props) {
 					globeMaterialRef.current = myGlobe.globeMaterial();
 					myGlobe.onGlobeReady(() => setGlobeReady(true));
 					myGlobe.onZoom(pov => {
-						const offset = pov.altitude > 2 ? (pov.altitude - 2) * 0.005 : 0;
+						const offset = pov.altitude > 2 ? (pov.altitude - 2) * 0.002 : 0;
 						myGlobe.pathPointAlt(p => p.altitudeFt / 20902231 + offset);
 					});
 					globeInstanceRef.current = myGlobe;
