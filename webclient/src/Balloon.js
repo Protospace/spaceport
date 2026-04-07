@@ -436,20 +436,37 @@ export function Balloon(props) {
 				}
 			</div>
 			<div className="bottom-stats-container">
-				<div className="stat-row">
-					<div className="stat-box" style={getStyle('callsign')} ref={callsignRef}>
-						<div className="stat-label">CALLSIGN</div>
-						<div className="stat-value">{callsign}</div>
+				{isMobile ?
+					<div className="stat-row">
+						<div className="stat-box" style={getStyle('voltage')} ref={voltageRef}>
+							<div className="stat-label">VOLTAGE</div>
+							<div className="stat-value">{voltage}</div>
+						</div>
+						<div className="stat-box" style={getStyle('temperature')} ref={temperatureRef}>
+							<div className="stat-label">TEMPERATURE</div>
+							<div className="stat-value">{temperature}</div>
+						</div>
+						<div className="stat-box" style={getStyle('sunAngle')} ref={sunAngleRef}>
+							<div className="stat-label">SUN ANGLE</div>
+							<div className="stat-value">{sunAngle}</div>
+						</div>
 					</div>
-					<div className="stat-box" style={getStyle('band')} ref={bandRef}>
-						<div className="stat-label">BAND</div>
-						<div className="stat-value">{band}</div>
+				:
+					<div className="stat-row">
+						<div className="stat-box" style={getStyle('callsign')} ref={callsignRef}>
+							<div className="stat-label">CALLSIGN</div>
+							<div className="stat-value">{callsign}</div>
+						</div>
+						<div className="stat-box" style={getStyle('band')} ref={bandRef}>
+							<div className="stat-label">BAND</div>
+							<div className="stat-value">{band}</div>
+						</div>
+						<div className="stat-box" style={getStyle('channel')} ref={channelRef}>
+							<div className="stat-label">CHANNEL</div>
+							<div className="stat-value">{channel}</div>
+						</div>
 					</div>
-					<div className="stat-box" style={getStyle('channel')} ref={channelRef}>
-						<div className="stat-label">CHANNEL</div>
-						<div className="stat-value">{channel}</div>
-					</div>
-				</div>
+				}
 				<div className="stat-row">
 					<div className="stat-box" style={getStyle('distance')} ref={distanceRef}>
 						<div className="stat-label">DISTANCE TRAVELLED</div>
