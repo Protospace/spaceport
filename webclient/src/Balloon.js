@@ -358,21 +358,23 @@ export function Balloon(props) {
 				<button className="button" style={getStyle('about')} ref={aboutButtonRef} onClick={() => setShowAbout(true)}>About</button>
 				<button className="button" style={getStyle('faq')} ref={faqButtonRef} onClick={() => setShowFaq(true)}>FAQ</button>
 			</div>
-			<div className="top-right-container">
-				<div className="stat-box" style={getStyle('telemetry')} ref={telemetryRef}>
-					<div className="stat-label">LATEST TELEMETRY</div>
-					<div className="stat-value">
-						{balloon?.positions?.slice(0, 5).map((pos, index) => (
-							<div key={pos.time} style={{ marginTop: index > 0 ? '0.5em' : 0 }}>
-								<div>{moment.utc(pos.time).tz(moment.tz.guess()).format('YYYY-MM-DD HH:mm z')}</div>
-								<div>{`${pos.lat.toFixed(5)}, ${pos.lng.toFixed(4)}`}</div>
-								<div>{`${pos.altitudeFt.toLocaleString()} FT, ${pos.tempC} °C`}</div>
-								<div>{`SUN: ${pos.solAngle}°, ${pos.voltage.toFixed(2)} V`}</div>
-							</div>
-						))}
+			{!isMobile &&
+				<div className="top-right-container">
+					<div className="stat-box" style={getStyle('telemetry')} ref={telemetryRef}>
+						<div className="stat-label">LATEST TELEMETRY</div>
+						<div className="stat-value">
+							{balloon?.positions?.slice(0, 5).map((pos, index) => (
+								<div key={pos.time} style={{ marginTop: index > 0 ? '0.5em' : 0 }}>
+									<div>{moment.utc(pos.time).tz(moment.tz.guess()).format('YYYY-MM-DD HH:mm z')}</div>
+									<div>{`${pos.lat.toFixed(5)}, ${pos.lng.toFixed(4)}`}</div>
+									<div>{`${pos.altitudeFt.toLocaleString()} FT, ${pos.tempC} °C`}</div>
+									<div>{`SUN: ${pos.solAngle}°, ${pos.voltage.toFixed(2)} V`}</div>
+								</div>
+							))}
+						</div>
 					</div>
 				</div>
-			</div>
+			}
 			<div className="stats-container">
 				<div className="stat-row">
 					<div className="stat-box" style={getStyle('lastSeen')} ref={lastSeenRef}>
@@ -460,7 +462,7 @@ export function Balloon(props) {
 				/>
 			)}
 			<div className="bottom-right-container">
-				{!isFullscreen && (
+				{!isMobile && !isFullscreen && (
 					<div
 						ref={fullscreenButtonRef}
 						className="stat-box fullscreen-button"
