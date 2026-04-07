@@ -214,7 +214,7 @@ export function Balloon(props) {
 		if (globeInstanceRef.current && balloon && balloon.positions && balloon.positions.length > 0) {
 			const pathData = [{ points: balloon.positions }];
 			globeInstanceRef.current.pathsData(pathData);
-			globeInstanceRef.current.labelsData(balloon.positions);
+			globeInstanceRef.current.labelsData(balloon.positions.slice(0, 50));
 
 			if (isInitialLoad.current) {
 				const lastPoint = balloon.positions[0]; // data is reverse chronological
