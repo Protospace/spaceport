@@ -169,7 +169,7 @@ export function Balloon(props) {
 			if (!globeInstanceRef.current && !globeError) {
 				try {
 					const myGlobe = Globe({ animateIn: false })(globeContainerRef.current)
-						.globeTileEngineUrl((x, y, z) => `https://api.maptiler.com/maps/hybrid-v4/${z}/${x}/${y}.jpg?key=Ou4yAFS8EELRHVOowoGz`)
+						.globeTileEngineUrl((x, y, z) => `https://static.my.protospace.ca/balloon-tile/${z}/${x}/${y}.jpg`)
 						.bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
 						.backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
 						.pathPoints('points')
