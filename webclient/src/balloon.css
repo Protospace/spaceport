@@ -95,6 +95,15 @@
 	pointer-events: none;
 }
 
+.balloon-dashboard .top-right-container {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	z-index: 4;
+	pointer-events: none;
+	text-align: right;
+}
+
 .balloon-dashboard .fullscreen-button {
 	padding: 8px 10px;
 	display: flex;
@@ -179,6 +188,10 @@
 	}
 	.balloon-dashboard .bottom-right-container {
 		bottom: 10px;
+		right: 10px;
+	}
+	.balloon-dashboard .top-right-container {
+		top: 10px;
 		right: 10px;
 	}
 }

@@ -128,6 +128,7 @@ export function Balloon(props) {
 	const distanceRef = useRef();
 	const spotsRef = useRef();
 	const fullscreenButtonRef = useRef();
+	const telemetryRef = useRef();
 	const { width, height } = useWindowSize();
 	const isMobile = useIsMobile();
 
@@ -270,6 +271,7 @@ export function Balloon(props) {
 			distance: distanceRef,
 			spots: spotsRef,
 			fullscreen: fullscreenButtonRef,
+			telemetry: telemetryRef,
 		};
 
 		const checkVisibility = () => {
@@ -355,6 +357,18 @@ export function Balloon(props) {
 				<div className="title" style={getStyle('title')} ref={titleRef}>Protoballoon</div>
 				<button className="button" style={getStyle('about')} ref={aboutButtonRef} onClick={() => setShowAbout(true)}>About</button>
 				<button className="button" style={getStyle('faq')} ref={faqButtonRef} onClick={() => setShowFaq(true)}>FAQ</button>
+			</div>
+			<div className="top-right-container">
+				<div className="stat-box" style={getStyle('telemetry')} ref={telemetryRef}>
+					<div className="stat-label">LATEST TELEMETRY</div>
+					<div className="stat-value">
+						{balloon?.positions?.slice(0, 5).map(pos => (
+							<div key={pos.time} style={{lineHeight: '1.4em'}}>
+								{`${pos.altitudeFt.toLocaleString()} ft, ${pos.voltage} V, ${pos.tempC}°C`}
+							</div>
+						))}
+					</div>
+				</div>
 			</div>
 			<div className="stats-container">
 				<div className="stat-row">
