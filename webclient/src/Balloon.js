@@ -178,7 +178,7 @@ export function Balloon(props) {
 						.pathStroke(2)
 						.pathColor(() => 'rgba(255, 100, 50, 1.0)')
 						.pathTransitionDuration(0)
-						.labelText(() => null)
+						.labelText(() => '')
 						.labelLat(p => p.lat)
 						.labelLng(p => p.lng)
 						.labelAltitude(p => p.altitudeFt / 20902231)
