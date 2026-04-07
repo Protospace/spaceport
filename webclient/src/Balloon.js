@@ -177,7 +177,20 @@ export function Balloon(props) {
 						.pathPointAlt(p => p.altitudeFt / 20902231) // Earth radius in feet
 						.pathStroke(2)
 						.pathColor(() => 'rgba(255, 100, 50, 1.0)')
-						.pathTransitionDuration(0);
+						.pathTransitionDuration(0)
+						.labelText(() => null)
+						.labelLat(p => p.lat)
+						.labelLng(p => p.lng)
+						.labelAltitude(p => p.altitudeFt / 20902231)
+						.labelDotRadius(0.15)
+						.labelColor(() => 'rgba(255, 100, 50, 0.75)')
+						.labelLabel(p => `
+							<div style="padding: 4px; background: rgba(0,0,0,0.5); border-radius: 4px; color: white;">
+								<b>${moment.utc(p.time).tz(moment.tz.guess()).format('YYYY-MM-DD HH:mm:ss z')}</b><br />
+								Lat: ${p.lat.toFixed(4)}, Lng: ${p.lng.toFixed(4)}<br />
+								Altitude: ${p.altitudeFt.toLocaleString()} ft
+							</div>
+						`);
 					globeMaterialRef.current = myGlobe.globeMaterial();
 					myGlobe.onGlobeReady(() => setGlobeReady(true));
 					myGlobe.onZoom(pov => {
@@ -200,6 +213,7 @@ export function Balloon(props) {
 		if (globeInstanceRef.current && balloon && balloon.positions && balloon.positions.length > 0) {
 			const pathData = [{ points: balloon.positions }];
 			globeInstanceRef.current.pathsData(pathData);
+			globeInstanceRef.current.labelsData(balloon.positions);
 
 			if (isInitialLoad.current) {
 				const lastPoint = balloon.positions[0]; // data is reverse chronological
