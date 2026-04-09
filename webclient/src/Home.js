@@ -267,12 +267,35 @@ export function Home(props) {
 		}
 		const balloonTime = moment.utc(stats.protoballoon.last.time);
 		const duration = moment.duration(moment().diff(balloonTime));
-		const hours = Math.floor(duration.asHours());
-		const minutes = duration.minutes();
-		if (hours < 0 || minutes < 0) {
+
+		if (duration.asSeconds() < 0) {
 			return 'Unknown';
 		}
-		return `seen ${hours}h${minutes}m ago`;
+
+		if (duration.asMinutes() < 1) {
+			return 'seen just now';
+		}
+
+		if (duration.asHours() < 1) {
+			return `seen ${duration.minutes()}m ago`;
+		}
+
+		const days = duration.days();
+		const hours = duration.hours();
+		const minutes = duration.minutes();
+
+		let timeParts = [];
+		if (days > 0) {
+			timeParts.push(`${days}d`);
+		}
+		if (hours > 0) {
+			timeParts.push(`${hours}h`);
+		}
+		if (minutes > 0) {
+			timeParts.push(`${minutes}m`);
+		}
+
+		return `seen ${timeParts.join('')} ago`;
 	};
 
 	const alarmStat = (x) => stats && stats.alarm && moment().unix() - stats.alarm.time < 60*60*24 ? stats.alarm.data : 'Unknown';
