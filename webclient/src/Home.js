@@ -273,11 +273,7 @@ export function Home(props) {
 		}
 
 		if (duration.asMinutes() < 1) {
-			return 'seen just now';
-		}
-
-		if (duration.asHours() < 1) {
-			return `seen ${duration.minutes()}m ago`;
+			return 'seen 0m ago';
 		}
 
 		const days = duration.days();
@@ -550,7 +546,7 @@ export function Home(props) {
 									} trigger={<a>[more]</a>} />
 								</p>}
 
-								<p>Protoballoon: {getBalloonStat()} <Link to='/balloon'>[dashboard]</Link></p>
+								<p>Protoballoon: {getBalloonStat()} <Link to='/balloon'>[globe]</Link></p>
 
 								{stats && stats?.solar?.hasOwnProperty('total') && <p>
 									Members' solar power: {stats.solar.total.toLocaleString()} W <Popup content={
