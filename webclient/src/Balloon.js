@@ -2,6 +2,7 @@ import React, { useState, useEffect, useReducer, useRef } from 'react';
 import moment from 'moment-timezone';
 import * as THREE from 'three/build/three.module';
 import { requester, useIsMobile, useWindowSize } from './utils.js';
+import { parseEpak } from './utils-balloon.js';
 import './balloon.css';
 
 function InfoModal(props) {
@@ -254,136 +255,184 @@ export function Balloon(props) {
 	useEffect(() => {
 		const globe = globeInstanceRef.current;
 		if (globe && THREE && globeReady && !windParticlesRef.current) {
-			const globeRadius = 101; // default radius in three-globe is 100
-			const particlesGeometry = new THREE.BufferGeometry();
-			const particleCount = 10000;
-			const positions = new Float32Array(particleCount * 3 * 2);
-			const particleSpeeds = new Float32Array(particleCount * 2);
-			const rotationAxes = new Float32Array(particleCount * 3 * 2);
-			const isHead = new Float32Array(particleCount * 2);
-
-			const phi = Math.PI * (3. - Math.sqrt(5.)); // golden angle
-
-			for (let i = 0; i < particleCount; i++) {
-				const y = 1 - (i / (particleCount - 1)) * 2;  // y goes from 1 to -1
-				const radius = Math.sqrt(1 - y * y);
-				const theta = phi * i;
-
-				const x = Math.cos(theta) * radius * globeRadius;
-				const z = Math.sin(theta) * radius * globeRadius;
-
-				const p_idx = i * 2;
-				positions[p_idx * 3] = x;
-				positions[p_idx * 3 + 1] = y * globeRadius;
-				positions[p_idx * 3 + 2] = z;
-				isHead[p_idx] = 0.0; // tail
-
-				positions[(p_idx + 1) * 3] = x;
-				positions[(p_idx + 1) * 3 + 1] = y * globeRadius;
-				positions[(p_idx + 1) * 3 + 2] = z;
-				isHead[p_idx + 1] = 1.0; // head
-
-				const speed = (Math.random() - 0.5) * 0.15 + 0.05;
-				particleSpeeds[p_idx] = speed;
-				particleSpeeds[p_idx + 1] = speed;
-
-				// random rotation axis
-				const u = Math.random();
-				const v = Math.random();
-				const rand_theta = 2 * Math.PI * u;
-				const rand_phi = Math.acos(2 * v - 1);
-				const axisX = Math.cos(rand_theta) * Math.sin(rand_phi);
-				const axisY = Math.sin(rand_theta) * Math.sin(rand_phi);
-				const axisZ = Math.cos(rand_phi);
-
-				rotationAxes[p_idx * 3] = axisX;
-				rotationAxes[p_idx * 3 + 1] = axisY;
-				rotationAxes[p_idx * 3 + 2] = axisZ;
-
-				rotationAxes[(p_idx + 1) * 3] = axisX;
-				rotationAxes[(p_idx + 1) * 3 + 1] = axisY;
-				rotationAxes[(p_idx + 1) * 3 + 2] = axisZ;
-			}
-
-			particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-			particlesGeometry.setAttribute('speed', new THREE.BufferAttribute(particleSpeeds, 1));
-			particlesGeometry.setAttribute('rotationAxis', new THREE.BufferAttribute(rotationAxes, 3));
-			particlesGeometry.setAttribute('isHead', new THREE.BufferAttribute(isHead, 1));
-
-			const vertexShader = `
-				attribute float speed;
-				attribute vec3 rotationAxis;
-				attribute float isHead;
-				uniform float u_time;
-				uniform float u_tail_length;
-				varying float v_speed;
-
-				void main() {
-					float time = u_time - (1.0 - isHead) * u_tail_length;
-					float angle = time * speed;
-					vec3 pos = position * cos(angle) + cross(rotationAxis, position) * sin(angle) + rotationAxis * dot(rotationAxis, position) * (1.0 - cos(angle));
-
-					vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-					gl_Position = projectionMatrix * mvPosition;
-					v_speed = speed;
-				}
-			`;
-
-			const fragmentShader = `
-				varying float v_speed;
-
-				vec3 colorMap(float t) { // t is 0..1
-					vec3 blue = vec3(0.2, 0.2, 1.0);
-					vec3 green = vec3(0.2, 1.0, 0.2);
-					vec3 yellow = vec3(1.0, 1.0, 0.2);
-					if (t < 0.5) {
-						return mix(blue, green, t * 2.0);
-					} else {
-						return mix(green, yellow, (t - 0.5) * 2.0);
-					}
-				}
-
-				void main() {
-					float speed_abs = abs(v_speed);
-					float normalized_speed = clamp(speed_abs, 0.0, 0.15) / 0.15;
-					float alpha = smoothstep(0.0, 0.15, speed_abs) * 0.6;
-					gl_FragColor = vec4(colorMap(normalized_speed), alpha);
-				}
-			`;
-
-			const particlesMaterial = new THREE.ShaderMaterial({
-				uniforms: {
-					u_time: { value: 0.0 },
-					u_tail_length: { value: 0.2 },
-				},
-				vertexShader,
-				fragmentShader,
-				transparent: true,
-				blending: THREE.AdditiveBlending,
-				depthWrite: false,
-			});
-
-			const windParticles = new THREE.LineSegments(particlesGeometry, particlesMaterial);
-			windParticlesRef.current = windParticles;
-			globe.scene().add(windParticles);
-
+			const globeRadius = 101;
 			let animationFrameId;
-			const animate = () => {
-				if (particlesMaterial) {
-					particlesMaterial.uniforms.u_time.value += 0.1;
-				}
-				animationFrameId = requestAnimationFrame(animate);
+
+			const buildVectorField = (epakData) => {
+				const ppakBlocks = epakData.blocks.filter(b => b.type === 'ppak');
+				const uBlock = ppakBlocks[0];
+				const vBlock = ppakBlocks[1];
+
+				const vectorField = {
+					cols: uBlock.cols,
+					rows: uBlock.rows,
+					u: uBlock.data,
+					v: vBlock.data,
+					interpolate: (lon, lat) => {
+						const i = (lon + 360) % 360 / (360 / vectorField.cols);
+						const j = (90 - lat) / (180 / (vectorField.rows - 1));
+
+						const i0 = Math.floor(i);
+						const j0 = Math.floor(j);
+						const i1 = (i0 + 1) % vectorField.cols;
+						const j1 = Math.min(j0 + 1, vectorField.rows - 1);
+
+						if (j0 < 0 || j1 >= vectorField.rows) return [0, 0];
+
+						const u00 = vectorField.u[j0 * vectorField.cols + i0];
+						const u10 = vectorField.u[j0 * vectorField.cols + i1];
+						const u01 = vectorField.u[j1 * vectorField.cols + i0];
+						const u11 = vectorField.u[j1 * vectorField.cols + i1];
+
+						const v00 = vectorField.v[j0 * vectorField.cols + i0];
+						const v10 = vectorField.v[j0 * vectorField.cols + i1];
+						const v01 = vectorField.v[j1 * vectorField.cols + i0];
+						const v11 = vectorField.v[j1 * vectorField.cols + i1];
+
+						const x = i - i0;
+						const y = j - j0;
+
+						const u = u00 * (1 - x) * (1 - y) + u10 * x * (1 - y) + u01 * (1 - x) * y + u11 * x * y;
+						const v = v00 * (1 - x) * (1 - y) + v10 * x * (1 - y) + v01 * (1 - x) * y + v11 * x * y;
+
+						return [u, v];
+					}
+				};
+				return vectorField;
 			};
-			animate();
+
+			const lonLatToVector3 = (lon, lat, radius) => {
+				const phi = (90 - lat) * Math.PI / 180;
+				const theta = (lon + 180) * Math.PI / 180;
+				const x = -radius * Math.sin(phi) * Math.cos(theta);
+				const y = radius * Math.cos(phi);
+				const z = radius * Math.sin(phi) * Math.sin(theta);
+				return new THREE.Vector3(x, y, z);
+			};
+
+			fetch('https://static.my.protospace.ca/wind-data/current-wind-isobaric-250hPa-gfs-0.5.epak')
+				.then(response => response.arrayBuffer())
+				.then(arrayBuffer => {
+					const vectorField = buildVectorField(parseEpak(arrayBuffer));
+					const particleCount = 5000;
+					const particles = [];
+
+					const respawnParticle = (p) => {
+						p.lon = Math.random() * 360 - 180;
+						p.lat = Math.random() * 180 - 90;
+						p.age = Math.floor(Math.random() * 200);
+						return p;
+					};
+
+					for (let i = 0; i < particleCount; i++) {
+						particles.push(respawnParticle({}));
+					}
+
+					const particlesGeometry = new THREE.BufferGeometry();
+					const positions = new Float32Array(particleCount * 3 * 2);
+					const particleSpeeds = new Float32Array(particleCount * 2);
+					particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+					particlesGeometry.setAttribute('speed', new THREE.BufferAttribute(particleSpeeds, 1));
+
+					const vertexShader = `
+						attribute float speed;
+						varying float v_speed;
+						void main() {
+							gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+							v_speed = speed;
+						}
+					`;
+
+					const fragmentShader = `
+						varying float v_speed;
+
+						vec3 colorMap(float t) { // t is 0..1
+							vec3 blue = vec3(0.2, 0.2, 1.0);
+							vec3 green = vec3(0.2, 1.0, 0.2);
+							vec3 yellow = vec3(1.0, 1.0, 0.2);
+							if (t < 0.5) {
+								return mix(blue, green, t * 2.0);
+							} else {
+								return mix(green, yellow, (t - 0.5) * 2.0);
+							}
+						}
+
+						void main() {
+							float normalized_speed = clamp(abs(v_speed), 0.0, 50.0) / 50.0;
+							float alpha = smoothstep(0.0, 50.0, abs(v_speed)) * 0.6;
+							gl_FragColor = vec4(colorMap(normalized_speed), alpha);
+						}
+					`;
+
+					const particlesMaterial = new THREE.ShaderMaterial({
+						vertexShader,
+						fragmentShader,
+						transparent: true,
+						blending: THREE.AdditiveBlending,
+						depthWrite: false,
+					});
+
+					const windParticles = new THREE.LineSegments(particlesGeometry, particlesMaterial);
+					windParticlesRef.current = windParticles;
+					globe.scene().add(windParticles);
+
+					const animate = () => {
+						const positions = particlesGeometry.attributes.position.array;
+						const speeds = particlesGeometry.attributes.speed.array;
+						const tailLength = 2; // In animation steps
+
+						particles.forEach((p, i) => {
+							if (p.age++ > 200) respawnParticle(p);
+
+							const [u, v] = vectorField.interpolate(p.lon, p.lat);
+							const speed = Math.sqrt(u * u + v * v);
+
+							const dt = 0.01;
+							const dx = u * dt;
+							const dy = v * dt;
+							const dLon = dx * 180 / (Math.PI * globeRadius * Math.cos(p.lat * Math.PI / 180));
+							const dLat = dy * 180 / (Math.PI * globeRadius);
+
+							const head_pos = lonLatToVector3(p.lon, p.lat, globeRadius);
+							positions[i * 6 + 3] = head_pos.x;
+							positions[i * 6 + 4] = head_pos.y;
+							positions[i * 6 + 5] = head_pos.z;
+
+							const tail_lon = p.lon - dLon * tailLength;
+							const tail_lat = p.lat - dLat * tailLength;
+							const tail_pos = lonLatToVector3(tail_lon, tail_lat, globeRadius);
+							positions[i * 6 + 0] = tail_pos.x;
+							positions[i * 6 + 1] = tail_pos.y;
+							positions[i * 6 + 2] = tail_pos.z;
+
+							speeds[i * 2] = speed;
+							speeds[i * 2 + 1] = speed;
+
+							p.lon += dLon;
+							p.lat += dLat;
+
+							if (p.lon > 180) p.lon -= 360;
+							if (p.lon < -180) p.lon += 360;
+							if (p.lat > 90 || p.lat < -90) respawnParticle(p);
+						});
+
+						particlesGeometry.attributes.position.needsUpdate = true;
+						particlesGeometry.attributes.speed.needsUpdate = true;
+						animationFrameId = requestAnimationFrame(animate);
+					};
+					animate();
+
+				})
+				.catch(error => console.error('Error loading wind data:', error));
 
 			return () => {
 				cancelAnimationFrame(animationFrameId);
-				if (globe.scene()) {
-					globe.scene().remove(windParticles);
+				if (windParticlesRef.current && globe.scene()) {
+					globe.scene().remove(windParticlesRef.current);
+					windParticlesRef.current.geometry.dispose();
+					windParticlesRef.current.material.dispose();
+					windParticlesRef.current = null;
 				}
-				particlesGeometry.dispose();
-				particlesMaterial.dispose();
-				windParticlesRef.current = null;
 			};
 		}
 	}, [globeReady]);
