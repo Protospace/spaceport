@@ -113,6 +113,7 @@ export function Balloon(props) {
 	const globeContainerRef = useRef();
 	const globeInstanceRef = useRef();
 	const globeMaterialRef = useRef();
+	const windParticlesRef = useRef();
 	const isInitialLoad = useRef(true);
 	const titleRef = useRef();
 	const aboutButtonRef = useRef();
@@ -249,6 +250,111 @@ export function Balloon(props) {
 			globeInstanceRef.current.labelColor(p => (hoveredLabel && p.time === hoveredLabel.time) ? 'rgba(255, 100, 50, 1.0)' : 'rgba(255, 100, 50, 0.60)');
 		}
 	}, [hoveredLabel]);
+
+	useEffect(() => {
+		const globe = globeInstanceRef.current;
+		if (globe && THREE && globeReady && !windParticlesRef.current) {
+			const globeRadius = 101; // default radius in three-globe is 100
+			const particlesGeometry = new THREE.BufferGeometry();
+			const particleCount = 20000;
+			const positions = new Float32Array(particleCount * 3);
+			const particleSpeeds = new Float32Array(particleCount);
+			const rotationAxes = new Float32Array(particleCount * 3);
+
+			const phi = Math.PI * (3. - Math.sqrt(5.)); // golden angle
+
+			for (let i = 0; i < particleCount; i++) {
+				const y = 1 - (i / (particleCount - 1)) * 2;  // y goes from 1 to -1
+				const radius = Math.sqrt(1 - y * y);
+				const theta = phi * i;
+
+				const x = Math.cos(theta) * radius * globeRadius;
+				const z = Math.sin(theta) * radius * globeRadius;
+
+				positions[i * 3] = x;
+				positions[i * 3 + 1] = y * globeRadius;
+				positions[i * 3 + 2] = z;
+
+				particleSpeeds[i] = (Math.random() - 0.5) * 0.15 + 0.05;
+
+				// random rotation axis
+				const u = Math.random();
+				const v = Math.random();
+				const rand_theta = 2 * Math.PI * u;
+				const rand_phi = Math.acos(2 * v - 1);
+				const axisX = Math.cos(rand_theta) * Math.sin(rand_phi);
+				const axisY = Math.sin(rand_theta) * Math.sin(rand_phi);
+				const axisZ = Math.cos(rand_phi);
+				rotationAxes[i * 3] = axisX;
+				rotationAxes[i * 3 + 1] = axisY;
+				rotationAxes[i * 3 + 2] = axisZ;
+			}
+
+			particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+			particlesGeometry.setAttribute('speed', new THREE.BufferAttribute(particleSpeeds, 1));
+			particlesGeometry.setAttribute('rotationAxis', new THREE.BufferAttribute(rotationAxes, 3));
+
+			const vertexShader = `
+				attribute float speed;
+				attribute vec3 rotationAxis;
+				uniform float u_time;
+				varying float v_opacity;
+
+				void main() {
+					float angle = u_time * speed;
+					vec3 pos = position * cos(angle) + cross(rotationAxis, position) * sin(angle) + rotationAxis * dot(rotationAxis, position) * (1.0 - cos(angle));
+
+					vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+					gl_PointSize = 1.5 * (100.0 / -mvPosition.z);
+					gl_Position = projectionMatrix * mvPosition;
+
+					v_opacity = 0.5;
+				}
+			`;
+
+			const fragmentShader = `
+				varying float v_opacity;
+
+				void main() {
+					gl_FragColor = vec4(0.7, 0.7, 1.0, v_opacity);
+				}
+			`;
+
+			const particlesMaterial = new THREE.ShaderMaterial({
+				uniforms: {
+					u_time: { value: 0.0 }
+				},
+				vertexShader,
+				fragmentShader,
+				transparent: true,
+				blending: THREE.AdditiveBlending,
+				depthWrite: false,
+			});
+
+			const windParticles = new THREE.Points(particlesGeometry, particlesMaterial);
+			windParticlesRef.current = windParticles;
+			globe.scene().add(windParticles);
+
+			let animationFrameId;
+			const animate = () => {
+				if (particlesMaterial) {
+					particlesMaterial.uniforms.u_time.value += 0.1;
+				}
+				animationFrameId = requestAnimationFrame(animate);
+			};
+			animate();
+
+			return () => {
+				cancelAnimationFrame(animationFrameId);
+				if (globe.scene()) {
+					globe.scene().remove(windParticles);
+				}
+				particlesGeometry.dispose();
+				particlesMaterial.dispose();
+				windParticlesRef.current = null;
+			};
+		}
+	}, [globeReady]);
 
 	useEffect(() => {
 		const globe = globeInstanceRef.current;
