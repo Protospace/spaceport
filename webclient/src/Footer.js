@@ -10,7 +10,7 @@ export const Footer = () => {
 	useEffect(() => {
 		if (!footerRef.current) return;
 		if (footerRef.current.clientWidth < 650) return
-		if (window.location.hostname === 'my.protospace.ca') scene({ ref: footerRef });
+		scene({ ref: footerRef });
 	}, [footerRef]);
 
 	return (

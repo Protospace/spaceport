@@ -34,12 +34,12 @@ export const scene = ({ ref }) => {
 
 	ref.current.appendChild(renderer.domElement);
 
-	const light1 = new THREE.DirectionalLight('#fff', 1);
+	const light1 = new THREE.DirectionalLight('#fff', 3);
 	light1.position.x = 3;
 	light1.position.z = 1;
 	scene.add(light1);
 
-	const light2 = new THREE.PointLight('#fff', 2);
+	const light2 = new THREE.PointLight('#fff', 800);
 	light2.position.x = 5;
 	light2.position.y = 5;
 	light2.position.z = 1;
