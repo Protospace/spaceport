@@ -317,15 +317,33 @@ export function Balloon(props) {
 					const particleCount = 5000;
 					const particles = [];
 
-					const respawnParticle = (p) => {
-						p.lon = Math.random() * 360 - 180;
-						p.lat = Math.random() * 180 - 90;
+					const respawnParticle = (p, camera) => {
+						let lon, lat, particlePos, angle, screenPos;
+						let isBehind = true;
+						let isOffScreen = true;
+
+						while (isBehind || isOffScreen) {
+							lon = Math.random() * 360 - 180;
+							lat = Math.random() * 180 - 90;
+							particlePos = lonLatToVector3(lon, lat, globeRadius);
+							angle = camera.position.angleTo(particlePos);
+							isBehind = angle > Math.PI / 2;
+
+							if (!isBehind) {
+								screenPos = particlePos.clone().project(camera);
+								isOffScreen = screenPos.x < -1 || screenPos.x > 1 || screenPos.y < -1 || screenPos.y > 1;
+							}
+						}
+
+						p.lon = lon;
+						p.lat = lat;
 						p.age = Math.floor(Math.random() * 200);
 						return p;
 					};
 
+					const camera = globe.camera();
 					for (let i = 0; i < particleCount; i++) {
-						particles.push(respawnParticle({}));
+						particles.push(respawnParticle({}, camera));
 					}
 
 					const particlesGeometry = new THREE.BufferGeometry();
@@ -380,9 +398,18 @@ export function Balloon(props) {
 						const positions = particlesGeometry.attributes.position.array;
 						const speeds = particlesGeometry.attributes.speed.array;
 						const tailLength = 2; // In animation steps
+						const camera = globe.camera();
 
 						particles.forEach((p, i) => {
-							if (p.age++ > 200) respawnParticle(p);
+							// Respawn particle if it's on the back of the globe, off-screen, or too old
+							const particlePos = lonLatToVector3(p.lon, p.lat, globeRadius);
+							const angle = camera.position.angleTo(particlePos);
+							const screenPos = particlePos.clone().project(camera);
+							const isOffScreen = screenPos.x < -1.1 || screenPos.x > 1.1 || screenPos.y < -1.1 || screenPos.y > 1.1;
+
+							if (p.age++ > 200 || angle > Math.PI / 2 || isOffScreen) {
+								respawnParticle(p, camera);
+							}
 
 							const [u, v] = vectorField.interpolate(p.lon, p.lat);
 							const speed = Math.sqrt(u * u + v * v);
