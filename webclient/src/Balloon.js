@@ -258,6 +258,15 @@ export function Balloon(props) {
 			const globeRadius = 101;
 			let animationFrameId;
 
+			// Tunable animation parameters
+			const PARTICLE_COUNT = 5000; // Total number of wind particles
+			const PARTICLE_SPEED_FACTOR = 0.01; // Multiplier for particle speed
+			const PARTICLE_MAX_AGE = 200; // Steps before a particle is respawned
+			const TAIL_LENGTH = 2; // Length of particle tails in animation steps
+			const PARTICLE_MIN_SPEED_TO_RENDER = 0.0; // Min speed to be visible
+			const PARTICLE_MAX_SPEED_TO_RENDER = 50.0; // Max speed for color mapping
+			const PARTICLE_ALPHA = 0.6; // Base transparency of particles
+
 			const buildVectorField = (epakData) => {
 				const ppakBlocks = epakData.blocks.filter(b => b.type === 'ppak');
 				const uBlock = ppakBlocks[0];
@@ -314,7 +323,6 @@ export function Balloon(props) {
 				.then(response => response.arrayBuffer())
 				.then(arrayBuffer => {
 					const vectorField = buildVectorField(parseEpak(arrayBuffer));
-					const particleCount = 5000;
 					const particles = [];
 
 					const respawnParticle = (p, camera) => {
@@ -337,18 +345,18 @@ export function Balloon(props) {
 
 						p.lon = lon;
 						p.lat = lat;
-						p.age = Math.floor(Math.random() * 200);
+						p.age = Math.floor(Math.random() * PARTICLE_MAX_AGE);
 						return p;
 					};
 
 					const camera = globe.camera();
-					for (let i = 0; i < particleCount; i++) {
+					for (let i = 0; i < PARTICLE_COUNT; i++) {
 						particles.push(respawnParticle({}, camera));
 					}
 
 					const particlesGeometry = new THREE.BufferGeometry();
-					const positions = new Float32Array(particleCount * 3 * 2);
-					const particleSpeeds = new Float32Array(particleCount * 2);
+					const positions = new Float32Array(PARTICLE_COUNT * 3 * 2);
+					const particleSpeeds = new Float32Array(PARTICLE_COUNT * 2);
 					particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 					particlesGeometry.setAttribute('speed', new THREE.BufferAttribute(particleSpeeds, 1));
 
@@ -376,8 +384,8 @@ export function Balloon(props) {
 						}
 
 						void main() {
-							float normalized_speed = clamp(abs(v_speed), 0.0, 50.0) / 50.0;
-							float alpha = smoothstep(0.0, 50.0, abs(v_speed)) * 0.6;
+							float normalized_speed = clamp(abs(v_speed), ${PARTICLE_MIN_SPEED_TO_RENDER.toFixed(1)}, ${PARTICLE_MAX_SPEED_TO_RENDER.toFixed(1)}) / ${PARTICLE_MAX_SPEED_TO_RENDER.toFixed(1)};
+							float alpha = smoothstep(${PARTICLE_MIN_SPEED_TO_RENDER.toFixed(1)}, ${PARTICLE_MAX_SPEED_TO_RENDER.toFixed(1)}, abs(v_speed)) * ${PARTICLE_ALPHA.toFixed(1)};
 							gl_FragColor = vec4(colorMap(normalized_speed), alpha);
 						}
 					`;
@@ -397,7 +405,6 @@ export function Balloon(props) {
 					const animate = () => {
 						const positions = particlesGeometry.attributes.position.array;
 						const speeds = particlesGeometry.attributes.speed.array;
-						const tailLength = 2; // In animation steps
 						const camera = globe.camera();
 
 						particles.forEach((p, i) => {
@@ -407,14 +414,14 @@ export function Balloon(props) {
 							const screenPos = particlePos.clone().project(camera);
 							const isOffScreen = screenPos.x < -1.1 || screenPos.x > 1.1 || screenPos.y < -1.1 || screenPos.y > 1.1;
 
-							if (p.age++ > 200 || angle > Math.PI / 2 || isOffScreen) {
+							if (p.age++ > PARTICLE_MAX_AGE || angle > Math.PI / 2 || isOffScreen) {
 								respawnParticle(p, camera);
 							}
 
 							const [u, v] = vectorField.interpolate(p.lon, p.lat);
 							const speed = Math.sqrt(u * u + v * v);
 
-							const dt = 0.01;
+							const dt = PARTICLE_SPEED_FACTOR;
 							const dx = u * dt;
 							const dy = v * dt;
 							const dLon = dx * 180 / (Math.PI * globeRadius * Math.cos(p.lat * Math.PI / 180));
@@ -425,8 +432,8 @@ export function Balloon(props) {
 							positions[i * 6 + 4] = head_pos.y;
 							positions[i * 6 + 5] = head_pos.z;
 
-							const tail_lon = p.lon - dLon * tailLength;
-							const tail_lat = p.lat - dLat * tailLength;
+							const tail_lon = p.lon - dLon * TAIL_LENGTH;
+							const tail_lat = p.lat - dLat * TAIL_LENGTH;
 							const tail_pos = lonLatToVector3(tail_lon, tail_lat, globeRadius);
 							positions[i * 6 + 0] = tail_pos.x;
 							positions[i * 6 + 1] = tail_pos.y;
