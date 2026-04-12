@@ -256,10 +256,11 @@ export function Balloon(props) {
 		if (globe && THREE && globeReady && !windParticlesRef.current) {
 			const globeRadius = 101; // default radius in three-globe is 100
 			const particlesGeometry = new THREE.BufferGeometry();
-			const particleCount = 20000;
-			const positions = new Float32Array(particleCount * 3);
-			const particleSpeeds = new Float32Array(particleCount);
-			const rotationAxes = new Float32Array(particleCount * 3);
+			const particleCount = 10000;
+			const positions = new Float32Array(particleCount * 3 * 2);
+			const particleSpeeds = new Float32Array(particleCount * 2);
+			const rotationAxes = new Float32Array(particleCount * 3 * 2);
+			const isHead = new Float32Array(particleCount * 2);
 
 			const phi = Math.PI * (3. - Math.sqrt(5.)); // golden angle
 
@@ -271,11 +272,20 @@ export function Balloon(props) {
 				const x = Math.cos(theta) * radius * globeRadius;
 				const z = Math.sin(theta) * radius * globeRadius;
 
-				positions[i * 3] = x;
-				positions[i * 3 + 1] = y * globeRadius;
-				positions[i * 3 + 2] = z;
+				const p_idx = i * 2;
+				positions[p_idx * 3] = x;
+				positions[p_idx * 3 + 1] = y * globeRadius;
+				positions[p_idx * 3 + 2] = z;
+				isHead[p_idx] = 0.0; // tail
 
-				particleSpeeds[i] = (Math.random() - 0.5) * 0.15 + 0.05;
+				positions[(p_idx + 1) * 3] = x;
+				positions[(p_idx + 1) * 3 + 1] = y * globeRadius;
+				positions[(p_idx + 1) * 3 + 2] = z;
+				isHead[p_idx + 1] = 1.0; // head
+
+				const speed = (Math.random() - 0.5) * 0.15 + 0.05;
+				particleSpeeds[p_idx] = speed;
+				particleSpeeds[p_idx + 1] = speed;
 
 				// random rotation axis
 				const u = Math.random();
@@ -285,44 +295,66 @@ export function Balloon(props) {
 				const axisX = Math.cos(rand_theta) * Math.sin(rand_phi);
 				const axisY = Math.sin(rand_theta) * Math.sin(rand_phi);
 				const axisZ = Math.cos(rand_phi);
-				rotationAxes[i * 3] = axisX;
-				rotationAxes[i * 3 + 1] = axisY;
-				rotationAxes[i * 3 + 2] = axisZ;
+
+				rotationAxes[p_idx * 3] = axisX;
+				rotationAxes[p_idx * 3 + 1] = axisY;
+				rotationAxes[p_idx * 3 + 2] = axisZ;
+
+				rotationAxes[(p_idx + 1) * 3] = axisX;
+				rotationAxes[(p_idx + 1) * 3 + 1] = axisY;
+				rotationAxes[(p_idx + 1) * 3 + 2] = axisZ;
 			}
 
 			particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 			particlesGeometry.setAttribute('speed', new THREE.BufferAttribute(particleSpeeds, 1));
 			particlesGeometry.setAttribute('rotationAxis', new THREE.BufferAttribute(rotationAxes, 3));
+			particlesGeometry.setAttribute('isHead', new THREE.BufferAttribute(isHead, 1));
 
 			const vertexShader = `
 				attribute float speed;
 				attribute vec3 rotationAxis;
+				attribute float isHead;
 				uniform float u_time;
-				varying float v_opacity;
+				uniform float u_tail_length;
+				varying float v_speed;
 
 				void main() {
-					float angle = u_time * speed;
+					float time = u_time - (1.0 - isHead) * u_tail_length;
+					float angle = time * speed;
 					vec3 pos = position * cos(angle) + cross(rotationAxis, position) * sin(angle) + rotationAxis * dot(rotationAxis, position) * (1.0 - cos(angle));
 
 					vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-					gl_PointSize = 1.5 * (100.0 / -mvPosition.z);
 					gl_Position = projectionMatrix * mvPosition;
-
-					v_opacity = 0.5;
+					v_speed = speed;
 				}
 			`;
 
 			const fragmentShader = `
-				varying float v_opacity;
+				varying float v_speed;
+
+				vec3 colorMap(float t) { // t is 0..1
+					vec3 blue = vec3(0.2, 0.2, 1.0);
+					vec3 green = vec3(0.2, 1.0, 0.2);
+					vec3 yellow = vec3(1.0, 1.0, 0.2);
+					if (t < 0.5) {
+						return mix(blue, green, t * 2.0);
+					} else {
+						return mix(green, yellow, (t - 0.5) * 2.0);
+					}
+				}
 
 				void main() {
-					gl_FragColor = vec4(0.7, 0.7, 1.0, v_opacity);
+					float speed_abs = abs(v_speed);
+					float normalized_speed = clamp(speed_abs, 0.0, 0.15) / 0.15;
+					float alpha = smoothstep(0.0, 0.15, speed_abs) * 0.6;
+					gl_FragColor = vec4(colorMap(normalized_speed), alpha);
 				}
 			`;
 
 			const particlesMaterial = new THREE.ShaderMaterial({
 				uniforms: {
-					u_time: { value: 0.0 }
+					u_time: { value: 0.0 },
+					u_tail_length: { value: 0.2 },
 				},
 				vertexShader,
 				fragmentShader,
@@ -331,7 +363,7 @@ export function Balloon(props) {
 				depthWrite: false,
 			});
 
-			const windParticles = new THREE.Points(particlesGeometry, particlesMaterial);
+			const windParticles = new THREE.LineSegments(particlesGeometry, particlesMaterial);
 			windParticlesRef.current = windParticles;
 			globe.scene().add(windParticles);
 
