@@ -440,7 +440,7 @@ export function Balloon(props) {
 
 							if (p.lon > 180) p.lon -= 360;
 							if (p.lon < -180) p.lon += 360;
-							if (p.lat > 90 || p.lat < -90) respawnParticle(p);
+							if (p.lat > 90 || p.lat < -90) respawnParticle(p, camera);
 						});
 
 						particlesGeometry.attributes.position.needsUpdate = true;
