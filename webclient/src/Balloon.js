@@ -653,22 +653,24 @@ export function Balloon(props) {
 	return (
 		<div className="balloon-dashboard">
 			<div className="ui-container">
-				<div className="title" style={getStyle('title')} ref={titleRef}>Protoballoon</div>
-				<button className="button" style={getStyle('about')} ref={aboutButtonRef} onClick={() => setShowAbout(true)}>About</button>
-				<button className="button" style={getStyle('faq')} ref={faqButtonRef} onClick={() => setShowFaq(true)}>FAQ</button>
-				<button
-					className="button"
+				<div className="top-row">
+					<div className="title" style={getStyle('title')} ref={titleRef}>Protoballoon</div>
+					<button className="button" style={getStyle('about')} ref={aboutButtonRef} onClick={() => setShowAbout(true)}>About</button>
+					<button className="button" style={getStyle('faq')} ref={faqButtonRef} onClick={() => setShowFaq(true)}>FAQ</button>
+				</div>
+				<div
+					className="show-wind-control stat-box"
 					style={{
 						opacity: uiVisibility.title ? 1 : 0,
 						transition: 'opacity 0.3s ease',
 						pointerEvents: uiVisibility.title ? 'auto' : 'none',
-						backgroundColor: showWind ? 'white' : 'transparent',
-						color: showWind ? 'black' : 'white',
+						cursor: 'pointer',
 					}}
 					onClick={() => setShowWind(!showWind)}
 				>
-					SHOW WIND
-				</button>
+					<div className={`checkbox ${showWind ? 'checked' : ''}`} />
+					<span>SHOW WIND</span>
+				</div>
 			</div>
 			{!isMobile &&
 				<div className="top-right-container">

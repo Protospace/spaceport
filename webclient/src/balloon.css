@@ -10,7 +10,8 @@
 	left: 20px;
 	z-index: 4;
 	display: flex;
-	align-items: center;
+	flex-direction: column;
+	align-items: flex-start;
 	pointer-events: none;
 }
 
@@ -30,6 +31,30 @@
 	font-size: 1.2em;
 	cursor: pointer;
 	margin-left: -1px;
+}
+
+.balloon-dashboard .top-row {
+	display: flex;
+	align-items: center;
+}
+
+.balloon-dashboard .show-wind-control {
+	display: flex;
+	align-items: center;
+	font-size: 1.2em;
+	padding: 10px 15px;
+}
+
+.balloon-dashboard .show-wind-control .checkbox {
+	width: 0.8em;
+	height: 0.8em;
+	border: 1px solid white;
+	margin-right: 0.7em;
+	background-color: transparent;
+}
+
+.balloon-dashboard .show-wind-control .checkbox.checked {
+	background-color: white;
 }
 
 .balloon-dashboard .stats-container {
