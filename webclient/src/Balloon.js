@@ -340,6 +340,8 @@ export function Balloon(props) {
 							{ lat: 33.84, lng: -120.82, expected_mag: 167, expected_dir: 250 },
 							{ lat: 24.85, lng: -34.91, expected_mag: 36, expected_dir: 85 },
 							{ lat: -27.30, lng: 160.02, expected_mag: 179, expected_dir: 270 },
+							{ lat: -43.57, lng: 171.34, expected_mag: 193, expected_dir: 350 },
+							{ lat: 40.39, lng: -8.57, expected_mag: 193, expected_dir: 350 },
 						];
 
 						const mag_tolerance = 10; // km/h
