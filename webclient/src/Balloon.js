@@ -336,8 +336,10 @@ export function Balloon(props) {
 						let lon, lat, particlePos, angle, screenPos;
 						let isBehind = true;
 						let isOffScreen = true;
+						let attempts = 0;
+						const MAX_ATTEMPTS = 20;
 
-						while (isBehind || isOffScreen) {
+						while ((isBehind || isOffScreen) && attempts < MAX_ATTEMPTS) {
 							lon = Math.random() * 360 - 180;
 							lat = Math.random() * 170 - 85; // -85 to 85 degrees
 							particlePos = lonLatToVector3(lon, lat, globeRadius);
@@ -346,13 +348,18 @@ export function Balloon(props) {
 
 							if (!isBehind) {
 								screenPos = particlePos.clone().project(camera);
-								isOffScreen = screenPos.x < -1 || screenPos.x > 1 || screenPos.y < -1 || screenPos.y > 1;
+								isOffScreen = screenPos.x < -1.1 || screenPos.x > 1.1 || screenPos.y < -1.1 || screenPos.y > 1.1;
 							}
+							attempts++;
 						}
 
-						p.lon = lon;
-						p.lat = lat;
-						p.age = Math.floor(Math.random() * PARTICLE_MAX_AGE);
+						if (isBehind || isOffScreen) {
+							p.age = PARTICLE_MAX_AGE + 1; // Mark as "dead"
+						} else {
+							p.lon = lon;
+							p.lat = lat;
+							p.age = Math.floor(Math.random() * PARTICLE_MAX_AGE);
+						}
 						return p;
 					};
 
@@ -423,6 +430,14 @@ export function Balloon(props) {
 
 							if (p.age++ > PARTICLE_MAX_AGE || angle > Math.PI / 2 || isOffScreen) {
 								respawnParticle(p, camera);
+							}
+
+							if (p.age > PARTICLE_MAX_AGE) {
+								// Particle is "dead" (couldn't be respawned visibly). Hide it.
+								positions[i * 6 + 0] = positions[i * 6 + 3] = 0;
+								positions[i * 6 + 1] = positions[i * 6 + 4] = 0;
+								positions[i * 6 + 2] = positions[i * 6 + 5] = 0;
+								return;
 							}
 
 							const [u, v] = vectorField.interpolate(p.lon, p.lat);
