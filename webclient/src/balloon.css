@@ -32,26 +32,9 @@
 	margin-left: -1px;
 }
 
-.balloon-dashboard .checkbox-container {
-	color: white;
-	padding: 10px 15px;
-	font-size: 1.2em;
-	display: flex;
-	align-items: center;
-}
-
-.balloon-dashboard .checkbox-container label {
-	margin-left: 0.5em;
-	cursor: pointer;
-}
-
-.balloon-dashboard .checkbox-container input {
-	cursor: pointer;
-}
-
 .balloon-dashboard .stats-container {
 	position: fixed;
-	top: 64px;
+	top: 80px;
 	left: 20px;
 	z-index: 4;
 	display: flex;
@@ -200,7 +183,7 @@
 		left: 10px;
 	}
 	.balloon-dashboard .stats-container {
-		top: 54px;
+		top: 65px;
 		left: 10px;
 	}
 	.balloon-dashboard .bottom-stats-container {

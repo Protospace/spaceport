@@ -656,19 +656,19 @@ export function Balloon(props) {
 				<div className="title" style={getStyle('title')} ref={titleRef}>Protoballoon</div>
 				<button className="button" style={getStyle('about')} ref={aboutButtonRef} onClick={() => setShowAbout(true)}>About</button>
 				<button className="button" style={getStyle('faq')} ref={faqButtonRef} onClick={() => setShowFaq(true)}>FAQ</button>
-				<div className="checkbox-container" style={{
-					opacity: uiVisibility.title ? 1 : 0,
-					transition: 'opacity 0.3s ease',
-					pointerEvents: uiVisibility.title ? 'auto' : 'none',
-				}}>
-					<input
-						type="checkbox"
-						id="showWindCheckbox"
-						checked={showWind}
-						onChange={(e) => setShowWind(e.target.checked)}
-					/>
-					<label htmlFor="showWindCheckbox">SHOW WIND</label>
-				</div>
+				<button
+					className="button"
+					style={{
+						opacity: uiVisibility.title ? 1 : 0,
+						transition: 'opacity 0.3s ease',
+						pointerEvents: uiVisibility.title ? 'auto' : 'none',
+						backgroundColor: showWind ? 'white' : 'transparent',
+						color: showWind ? 'black' : 'white',
+					}}
+					onClick={() => setShowWind(!showWind)}
+				>
+					SHOW WIND
+				</button>
 			</div>
 			{!isMobile &&
 				<div className="top-right-container">
