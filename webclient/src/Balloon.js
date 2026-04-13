@@ -328,11 +328,8 @@ export function Balloon(props) {
 
 			const lonLatToVector3 = (lon, lat, radius) => {
 				const phi = (90 - lat) * Math.PI / 180;
-				const theta = (270 - lon) * Math.PI / 180;
-				const x = -radius * Math.sin(phi) * Math.cos(theta);
-				const y = radius * Math.cos(phi);
-				const z = radius * Math.sin(phi) * Math.sin(theta);
-				return new THREE.Vector3(x, y, z);
+				const theta = (180 - lon) * Math.PI / 180;
+				return new THREE.Vector3().setFromSphericalCoords(radius, phi, theta);
 			};
 
 			fetch('https://static.my.protospace.ca/wind-data/current-wind-isobaric-250hPa-gfs-0.5.epak')
@@ -355,9 +352,8 @@ export function Balloon(props) {
 							let lon = -180 + i * (360 / vectorField.cols);
 							const lat = 90 - j * (180 / (vectorField.rows - 1));
 							const pos = lonLatToVector3(lon, lat, globeRadius);
-							dotsPositions[dotIndex++] = pos.x;
-							dotsPositions[dotIndex++] = pos.y;
-							dotsPositions[dotIndex++] = pos.z;
+							pos.toArray(dotsPositions, dotIndex);
+							dotIndex += 3;
 
 							const [u, v] = vectorField.interpolate(lon, lat);
 							const dt = VECTOR_SCALE_FACTOR;
@@ -367,12 +363,10 @@ export function Balloon(props) {
 							const dLat = dy * 180 / (Math.PI * EARTH_RADIUS_METERS);
 
 							const end_pos = lonLatToVector3(lon + dLon, lat + dLat, globeRadius);
-							linesPositions[lineIndex++] = pos.x;
-							linesPositions[lineIndex++] = pos.y;
-							linesPositions[lineIndex++] = pos.z;
-							linesPositions[lineIndex++] = end_pos.x;
-							linesPositions[lineIndex++] = end_pos.y;
-							linesPositions[lineIndex++] = end_pos.z;
+							pos.toArray(linesPositions, lineIndex);
+							lineIndex += 3;
+							end_pos.toArray(linesPositions, lineIndex);
+							lineIndex += 3;
 						}
 					}
 					dotsGeometry.setAttribute('position', new THREE.BufferAttribute(dotsPositions, 3));
