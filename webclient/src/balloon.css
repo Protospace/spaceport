@@ -48,7 +48,7 @@
 
 .balloon-dashboard .show-wind-control {
 	position: absolute;
-	top: 100%;
+	top: 0;
 	left: 0;
 	display: flex;
 	align-items: center;
@@ -62,7 +62,6 @@
 .balloon-dashboard .show-wind-control.visible {
 	opacity: 1;
 	padding: 10px 15px;
-	margin-top: -1px;
 }
 
 .balloon-dashboard .show-wind-control .checkbox {
