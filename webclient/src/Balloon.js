@@ -511,7 +511,7 @@ export function Balloon(props) {
 
 					const windParticles = new THREE.LineSegments(particlesGeometry, particlesMaterial);
 					windParticlesRef.current = windParticles;
-					// globe.scene().add(windParticles);
+					globe.scene().add(windParticles);
 
 					const animate = () => {
 						const positions = particlesGeometry.attributes.position.array;
@@ -565,7 +565,7 @@ export function Balloon(props) {
 						particlesGeometry.attributes.speed.needsUpdate = true;
 						animationFrameId = requestAnimationFrame(animate);
 					};
-					// animate();
+					animate();
 
 				})
 				.catch(error => console.error('Error loading wind data:', error));
