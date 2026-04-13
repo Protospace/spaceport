@@ -288,10 +288,16 @@ export function Balloon(props) {
 
 						if (j0 < 0 || j1 >= vectorField.rows) return [0, 0];
 
-						const u00 = vectorField.u[j0 * vectorField.cols + i0];
-						const u10 = vectorField.u[j0 * vectorField.cols + i1];
-						const u01 = vectorField.u[j1 * vectorField.cols + i0];
-						const u11 = vectorField.u[j1 * vectorField.cols + i1];
+						const lat0 = 90 - j0 * (180 / (vectorField.rows - 1));
+						const lat1 = 90 - j1 * (180 / (vectorField.rows - 1));
+						const cos_lat0 = Math.cos(lat0 * Math.PI / 180);
+						const cos_lat1 = Math.cos(lat1 * Math.PI / 180);
+
+						// Correct for equirectangular projection distortion by interpolating angular velocity instead of linear
+						const u00 = vectorField.u[j0 * vectorField.cols + i0] / cos_lat0;
+						const u10 = vectorField.u[j0 * vectorField.cols + i1] / cos_lat0;
+						const u01 = vectorField.u[j1 * vectorField.cols + i0] / cos_lat1;
+						const u11 = vectorField.u[j1 * vectorField.cols + i1] / cos_lat1;
 
 						const v00 = vectorField.v[j0 * vectorField.cols + i0];
 						const v10 = vectorField.v[j0 * vectorField.cols + i1];
@@ -301,8 +307,10 @@ export function Balloon(props) {
 						const x = i - i0;
 						const y = j - j0;
 
-						const u = u00 * (1 - x) * (1 - y) + u10 * x * (1 - y) + u01 * (1 - x) * y + u11 * x * y;
+						const u_angular = u00 * (1 - x) * (1 - y) + u10 * x * (1 - y) + u01 * (1 - x) * y + u11 * x * y;
 						const v = v00 * (1 - x) * (1 - y) + v10 * x * (1 - y) + v01 * (1 - x) * y + v11 * x * y;
+
+						const u = u_angular * Math.cos(lat * Math.PI / 180);
 
 						return [u, v];
 					}
