@@ -114,6 +114,7 @@ export function Balloon(props) {
 	const globeContainerRef = useRef();
 	const globeInstanceRef = useRef();
 	const globeMaterialRef = useRef();
+	const windParticlesRef = useRef();
 	const windDotsRef = useRef();
 	const windVectorsRef = useRef();
 	const isInitialLoad = useRef(true);
@@ -255,9 +256,19 @@ export function Balloon(props) {
 
 	useEffect(() => {
 		const globe = globeInstanceRef.current;
-		if (globe && THREE && globeReady && !windVectorsRef.current) {
+		if (globe && THREE && globeReady && !windParticlesRef.current) {
 			const globeRadius = 101;
 			const EARTH_RADIUS_METERS = 6371e3;
+			let animationFrameId;
+
+			// Tunable animation parameters
+			const PARTICLE_COUNT = 5000; // Total number of wind particles
+			const PARTICLE_SPEED_FACTOR = 600; // Multiplier for particle speed
+			const PARTICLE_MAX_AGE = 200; // Steps before a particle is respawned
+			const TAIL_LENGTH = 3; // Length of particle tails in animation steps
+			const PARTICLE_MIN_SPEED_TO_RENDER = 0.0; // Min speed to be visible
+			const PARTICLE_MAX_SPEED_TO_RENDER = 30.0; // Max speed for color mapping
+			const PARTICLE_ALPHA = 0.6; // Base transparency of particles
 
 			const buildVectorField = (epakData) => {
 				const ppakBlocks = epakData.blocks.filter(b => b.type === 'ppak');
@@ -365,10 +376,151 @@ export function Balloon(props) {
 					windVectorsRef.current = windVectors;
 					globe.scene().add(windVectors);
 
+					const particles = [];
+
+					const respawnParticle = (p, camera) => {
+						let lon, lat, particlePos, angle, screenPos;
+						let isBehind = true;
+						let isOffScreen = true;
+
+						while (isBehind || isOffScreen) {
+							lon = Math.random() * 360 - 180;
+							lat = Math.random() * 170 - 85; // -85 to 85 degrees
+							particlePos = lonLatToVector3(lon, lat, globeRadius);
+							angle = camera.position.angleTo(particlePos);
+							isBehind = angle > Math.PI / 2;
+
+							if (!isBehind) {
+								screenPos = particlePos.clone().project(camera);
+								isOffScreen = screenPos.x < -1 || screenPos.x > 1 || screenPos.y < -1 || screenPos.y > 1;
+							}
+						}
+
+						p.lon = lon;
+						p.lat = lat;
+						p.age = Math.floor(Math.random() * PARTICLE_MAX_AGE);
+						return p;
+					};
+
+					const camera = globe.camera();
+					for (let i = 0; i < PARTICLE_COUNT; i++) {
+						particles.push(respawnParticle({}, camera));
+					}
+
+					const particlesGeometry = new THREE.BufferGeometry();
+					const positions = new Float32Array(PARTICLE_COUNT * 3 * 2);
+					const particleSpeeds = new Float32Array(PARTICLE_COUNT * 2);
+					particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+					particlesGeometry.setAttribute('speed', new THREE.BufferAttribute(particleSpeeds, 1));
+
+					const vertexShader = `
+						attribute float speed;
+						varying float v_speed;
+						void main() {
+							gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+							v_speed = speed;
+						}
+					`;
+
+					const fragmentShader = `
+						varying float v_speed;
+
+						vec3 colorMap(float t) { // t is 0..1
+							vec3 blue = vec3(0.2, 0.2, 1.0);
+							vec3 green = vec3(0.2, 1.0, 0.2);
+							vec3 yellow = vec3(1.0, 1.0, 0.2);
+							if (t < 0.5) {
+								return mix(blue, green, t * 2.0);
+							} else {
+								return mix(green, yellow, (t - 0.5) * 2.0);
+							}
+						}
+
+						void main() {
+							float normalized_speed = clamp(abs(v_speed), ${PARTICLE_MIN_SPEED_TO_RENDER.toFixed(1)}, ${PARTICLE_MAX_SPEED_TO_RENDER.toFixed(1)}) / ${PARTICLE_MAX_SPEED_TO_RENDER.toFixed(1)};
+							float alpha = smoothstep(${PARTICLE_MIN_SPEED_TO_RENDER.toFixed(1)}, ${PARTICLE_MAX_SPEED_TO_RENDER.toFixed(1)}, abs(v_speed)) * ${PARTICLE_ALPHA.toFixed(1)};
+							gl_FragColor = vec4(colorMap(normalized_speed), alpha);
+						}
+					`;
+
+					const particlesMaterial = new THREE.ShaderMaterial({
+						vertexShader,
+						fragmentShader,
+						transparent: true,
+						blending: THREE.AdditiveBlending,
+						depthWrite: false,
+					});
+
+					const windParticles = new THREE.LineSegments(particlesGeometry, particlesMaterial);
+					windParticlesRef.current = windParticles;
+					globe.scene().add(windParticles);
+
+					const animate = () => {
+						const positions = particlesGeometry.attributes.position.array;
+						const speeds = particlesGeometry.attributes.speed.array;
+						const camera = globe.camera();
+
+						particles.forEach((p, i) => {
+							// Respawn particle if it's on the back of the globe, off-screen, or too old
+							const particlePos = lonLatToVector3(p.lon, p.lat, globeRadius);
+							const angle = camera.position.angleTo(particlePos);
+							const screenPos = particlePos.clone().project(camera);
+							const isOffScreen = screenPos.x < -1.1 || screenPos.x > 1.1 || screenPos.y < -1.1 || screenPos.y > 1.1;
+
+							if (p.age++ > PARTICLE_MAX_AGE || angle > Math.PI / 2 || isOffScreen) {
+								respawnParticle(p, camera);
+							}
+
+							const [u, v] = vectorField.interpolate(p.lon, p.lat);
+							const speed = Math.sqrt(u * u + v * v);
+
+							const dt = PARTICLE_SPEED_FACTOR;
+							const dx = u * dt;
+							const dy = v * dt;
+							const cos_lat = Math.cos(p.lat * Math.PI / 180);
+							const dLon = dx * 180 / (Math.PI * EARTH_RADIUS_METERS * Math.max(cos_lat, 0.05)); // Avoid division by zero at poles
+							const dLat = dy * 180 / (Math.PI * EARTH_RADIUS_METERS);
+
+							const head_pos = lonLatToVector3(p.lon, p.lat, globeRadius);
+							positions[i * 6 + 3] = head_pos.x;
+							positions[i * 6 + 4] = head_pos.y;
+							positions[i * 6 + 5] = head_pos.z;
+
+							const tail_lon = p.lon - dLon * TAIL_LENGTH;
+							const tail_lat = p.lat - dLat * TAIL_LENGTH;
+							const tail_pos = lonLatToVector3(tail_lon, tail_lat, globeRadius);
+							positions[i * 6 + 0] = tail_pos.x;
+							positions[i * 6 + 1] = tail_pos.y;
+							positions[i * 6 + 2] = tail_pos.z;
+
+							speeds[i * 2] = speed;
+							speeds[i * 2 + 1] = speed;
+
+							p.lon += dLon;
+							p.lat += dLat;
+
+							if (p.lon > 180) p.lon -= 360;
+							if (p.lon < -180) p.lon += 360;
+							if (p.lat > 90 || p.lat < -90) respawnParticle(p, camera);
+						});
+
+						particlesGeometry.attributes.position.needsUpdate = true;
+						particlesGeometry.attributes.speed.needsUpdate = true;
+						animationFrameId = requestAnimationFrame(animate);
+					};
+					animate();
+
 				})
 				.catch(error => console.error('Error loading wind data:', error));
 
 			return () => {
+				cancelAnimationFrame(animationFrameId);
+				if (windParticlesRef.current && globe.scene()) {
+					globe.scene().remove(windParticlesRef.current);
+					windParticlesRef.current.geometry.dispose();
+					windParticlesRef.current.material.dispose();
+					windParticlesRef.current = null;
+				}
 				if (windDotsRef.current && globe.scene()) {
 					globe.scene().remove(windDotsRef.current);
 					windDotsRef.current.geometry.dispose();
