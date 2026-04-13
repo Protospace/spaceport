@@ -115,8 +115,6 @@ export function Balloon(props) {
 	const globeInstanceRef = useRef();
 	const globeMaterialRef = useRef();
 	const windParticlesRef = useRef();
-	const windDotsRef = useRef();
-	const windVectorsRef = useRef();
 	const isInitialLoad = useRef(true);
 	const titleRef = useRef();
 	const aboutButtonRef = useRef();
@@ -332,50 +330,6 @@ export function Balloon(props) {
 				.then(arrayBuffer => {
 					const vectorField = buildVectorField(parseEpak(arrayBuffer));
 
-					// Add red dots and vectors for wind data points
-					const VECTOR_SCALE_FACTOR = 5000;
-					const dotsGeometry = new THREE.BufferGeometry();
-					const dotsPositions = new Float32Array(vectorField.cols * (vectorField.rows - 4) * 3);
-					const linesGeometry = new THREE.BufferGeometry();
-					const linesPositions = new Float32Array(vectorField.cols * (vectorField.rows - 4) * 3 * 2);
-					let dotIndex = 0;
-					let lineIndex = 0;
-
-					// Exclude 2 rows from each pole to avoid visual artifacts
-					for (let j = 2; j < vectorField.rows - 2; j++) {
-						for (let i = 0; i < vectorField.cols; i++) {
-							let lon = -180 + i * (360 / vectorField.cols);
-							const lat = 90 - j * (180 / (vectorField.rows - 1));
-							const pos = lonLatToVector3(lon, lat, globeRadius);
-							pos.toArray(dotsPositions, dotIndex);
-							dotIndex += 3;
-
-							const [u, v] = vectorField.interpolate(lon, lat);
-							const dt = VECTOR_SCALE_FACTOR;
-							const dx = u * dt;
-							const dy = v * dt;
-							const dLon = dx * 180 / (Math.PI * EARTH_RADIUS_METERS * Math.cos(lat * Math.PI / 180));
-							const dLat = dy * 180 / (Math.PI * EARTH_RADIUS_METERS);
-
-							const end_pos = lonLatToVector3(lon + dLon, lat + dLat, globeRadius);
-							pos.toArray(linesPositions, lineIndex);
-							lineIndex += 3;
-							end_pos.toArray(linesPositions, lineIndex);
-							lineIndex += 3;
-						}
-					}
-					dotsGeometry.setAttribute('position', new THREE.BufferAttribute(dotsPositions, 3));
-					const dotsMaterial = new THREE.PointsMaterial({ color: 0xff0000, size: 0.2 });
-					const windDots = new THREE.Points(dotsGeometry, dotsMaterial);
-					windDotsRef.current = windDots;
-					globe.scene().add(windDots);
-
-					linesGeometry.setAttribute('position', new THREE.BufferAttribute(linesPositions, 3));
-					const linesMaterial = new THREE.LineBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.7 });
-					const windVectors = new THREE.LineSegments(linesGeometry, linesMaterial);
-					windVectorsRef.current = windVectors;
-					globe.scene().add(windVectors);
-
 					const particles = [];
 
 					const respawnParticle = (p, camera) => {
@@ -520,18 +474,6 @@ export function Balloon(props) {
 					windParticlesRef.current.geometry.dispose();
 					windParticlesRef.current.material.dispose();
 					windParticlesRef.current = null;
-				}
-				if (windDotsRef.current && globe.scene()) {
-					globe.scene().remove(windDotsRef.current);
-					windDotsRef.current.geometry.dispose();
-					windDotsRef.current.material.dispose();
-					windDotsRef.current = null;
-				}
-				if (windVectorsRef.current && globe.scene()) {
-					globe.scene().remove(windVectorsRef.current);
-					windVectorsRef.current.geometry.dispose();
-					windVectorsRef.current.material.dispose();
-					windVectorsRef.current = null;
 				}
 			};
 		}
