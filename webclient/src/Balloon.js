@@ -261,12 +261,21 @@ export function Balloon(props) {
 
 			// Tunable animation parameters
 			const PARTICLE_COUNT = 5000; // Total number of wind particles
+			const PARTICLE_DENSITY_ZOOM_MULTIPLIER = 0.2; // Higher value means more particles visible when zoomed in.
 			const PARTICLE_SPEED_FACTOR = 200; // Multiplier for particle speed
 			const PARTICLE_MAX_AGE = 200; // Steps before a particle is respawned
 			const TAIL_LENGTH = 10; // Length of particle tails in animation steps
 			const PARTICLE_MIN_SPEED_TO_RENDER = 0.0; // Min speed to be visible
 			const PARTICLE_MAX_SPEED_TO_RENDER = 30.0; // Max speed for color mapping
 			const PARTICLE_ALPHA = 0.6; // Base transparency of particles
+
+			const activeParticleCount = { current: PARTICLE_COUNT };
+			const originalOnZoom = globe.onZoom();
+			globe.onZoom(pov => {
+				if (originalOnZoom) originalOnZoom(pov);
+				const zoomFactor = Math.min(1.0, pov.altitude * PARTICLE_DENSITY_ZOOM_MULTIPLIER);
+				activeParticleCount.current = Math.floor(PARTICLE_COUNT * zoomFactor);
+			});
 
 			const buildVectorField = (epakData) => {
 				const ppakBlocks = epakData.blocks.filter(b => b.type === 'ppak');
@@ -425,8 +434,17 @@ export function Balloon(props) {
 						const positions = particlesGeometry.attributes.position.array;
 						const speeds = particlesGeometry.attributes.speed.array;
 						const camera = globe.camera();
+						const currentActiveCount = activeParticleCount.current;
 
 						particles.forEach((p, i) => {
+							if (i >= currentActiveCount) {
+								// Hide particle if it's beyond the active count
+								positions[i * 6 + 0] = positions[i * 6 + 3] = 0;
+								positions[i * 6 + 1] = positions[i * 6 + 4] = 0;
+								positions[i * 6 + 2] = positions[i * 6 + 5] = 0;
+								return;
+							}
+
 							// Respawn particle if it's on the back of the globe, off-screen, or too old
 							const particlePos = lonLatToVector3(p.lon, p.lat, globeRadius);
 							const angle = camera.position.angleTo(particlePos);
@@ -494,6 +512,9 @@ export function Balloon(props) {
 					windParticlesRef.current.geometry.dispose();
 					windParticlesRef.current.material.dispose();
 					windParticlesRef.current = null;
+				}
+				if (globe) {
+					globe.onZoom(originalOnZoom);
 				}
 			};
 		}
