@@ -107,6 +107,12 @@ export function Balloon(props) {
 	const [uiVisibility, setUiVisibility] = useState({});
 	const [showAbout, setShowAbout] = useState(false);
 	const [showFaq, setShowFaq] = useState(false);
+	const [showWind, setShowWind] = useState(() => {
+		const saved = localStorage.getItem('balloonShowWind');
+		return saved !== null ? JSON.parse(saved) : false;
+	});
+	const showWindRef = useRef(showWind);
+	useEffect(() => { showWindRef.current = showWind; }, [showWind]);
 	const [globeReady, setGlobeReady] = useState(false);
 	const [globeError, setGlobeError] = useState(false);
 	const [hoveredLabel, setHoveredLabel] = useState(null);
@@ -163,6 +169,10 @@ export function Balloon(props) {
 			setBalloon(false);
 		});
 	};
+
+	useEffect(() => {
+		localStorage.setItem('balloonShowWind', JSON.stringify(showWind));
+	}, [showWind]);
 
 	useEffect(() => {
 		getBalloon();
@@ -431,6 +441,7 @@ export function Balloon(props) {
 					globe.scene().add(windParticles);
 
 					const animate = () => {
+						windParticles.visible = showWindRef.current;
 						const positions = particlesGeometry.attributes.position.array;
 						const speeds = particlesGeometry.attributes.speed.array;
 						const camera = globe.camera();
@@ -645,6 +656,19 @@ export function Balloon(props) {
 				<div className="title" style={getStyle('title')} ref={titleRef}>Protoballoon</div>
 				<button className="button" style={getStyle('about')} ref={aboutButtonRef} onClick={() => setShowAbout(true)}>About</button>
 				<button className="button" style={getStyle('faq')} ref={faqButtonRef} onClick={() => setShowFaq(true)}>FAQ</button>
+				<div className="checkbox-container" style={{
+					opacity: uiVisibility.title ? 1 : 0,
+					transition: 'opacity 0.3s ease',
+					pointerEvents: uiVisibility.title ? 'auto' : 'none',
+				}}>
+					<input
+						type="checkbox"
+						id="showWindCheckbox"
+						checked={showWind}
+						onChange={(e) => setShowWind(e.target.checked)}
+					/>
+					<label htmlFor="showWindCheckbox">SHOW WIND</label>
+				</div>
 			</div>
 			{!isMobile &&
 				<div className="top-right-container">

@@ -32,6 +32,23 @@
 	margin-left: -1px;
 }
 
+.balloon-dashboard .checkbox-container {
+	color: white;
+	padding: 10px 15px;
+	font-size: 1.2em;
+	display: flex;
+	align-items: center;
+}
+
+.balloon-dashboard .checkbox-container label {
+	margin-left: 0.5em;
+	cursor: pointer;
+}
+
+.balloon-dashboard .checkbox-container input {
+	cursor: pointer;
+}
+
 .balloon-dashboard .stats-container {
 	position: fixed;
 	top: 64px;
