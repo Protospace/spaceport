@@ -270,9 +270,8 @@ export function Balloon(props) {
 
 			const buildVectorField = (epakData) => {
 				const ppakBlocks = epakData.blocks.filter(b => b.type === 'ppak');
-				// In the GFS data, the v-component (North-South) appears before the u-component (East-West).
-				const vBlock = ppakBlocks[0];
-				const uBlock = ppakBlocks[1];
+				const uBlock = ppakBlocks[0];
+				const vBlock = ppakBlocks[1];
 
 				const vectorField = {
 					cols: uBlock.cols,
@@ -472,8 +471,8 @@ export function Balloon(props) {
 							const dt = PARTICLE_SPEED_FACTOR;
 							const dx = u * dt;
 							const dy = v * dt;
-							const dLon = dx * 180 / (Math.PI * EARTH_RADIUS_METERS * Math.cos(p.lat * Math.PI / 180));
-							const dLat = dy * 180 / (Math.PI * EARTH_RADIUS_METERS);
+							const dLon = dy * 180 / (Math.PI * EARTH_RADIUS_METERS * Math.cos(p.lat * Math.PI / 180));
+							const dLat = -dx * 180 / (Math.PI * EARTH_RADIUS_METERS);
 
 							const head_pos = lonLatToVector3(p.lon, p.lat, globeRadius);
 							positions[i * 6 + 3] = head_pos.x;
