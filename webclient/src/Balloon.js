@@ -262,9 +262,9 @@ export function Balloon(props) {
 			const PARTICLE_COUNT = 5000; // Total number of wind particles
 			const PARTICLE_SPEED_FACTOR = 0.01; // Multiplier for particle speed
 			const PARTICLE_MAX_AGE = 200; // Steps before a particle is respawned
-			const TAIL_LENGTH = 2; // Length of particle tails in animation steps
+			const TAIL_LENGTH = 3; // Length of particle tails in animation steps
 			const PARTICLE_MIN_SPEED_TO_RENDER = 0.0; // Min speed to be visible
-			const PARTICLE_MAX_SPEED_TO_RENDER = 50.0; // Max speed for color mapping
+			const PARTICLE_MAX_SPEED_TO_RENDER = 10.0; // Max speed for color mapping
 			const PARTICLE_ALPHA = 0.6; // Base transparency of particles
 
 			const buildVectorField = (epakData) => {
