@@ -444,7 +444,7 @@ export function Balloon(props) {
 
 						while (isBehind || isOffScreen) {
 							lon = Math.random() * 360 - 180;
-							lat = Math.random() * 180 - 90;
+							lat = Math.random() * 170 - 85; // -85 to 85 degrees
 							particlePos = lonLatToVector3(lon, lat, globeRadius);
 							angle = camera.position.angleTo(particlePos);
 							isBehind = angle > Math.PI / 2;
@@ -536,7 +536,8 @@ export function Balloon(props) {
 							const dt = PARTICLE_SPEED_FACTOR;
 							const dx = u * dt;
 							const dy = v * dt;
-							const dLon = dx * 180 / (Math.PI * EARTH_RADIUS_METERS * Math.cos(p.lat * Math.PI / 180));
+							const cos_lat = Math.cos(p.lat * Math.PI / 180);
+							const dLon = dx * 180 / (Math.PI * EARTH_RADIUS_METERS * Math.max(cos_lat, 0.05)); // Avoid division by zero at poles
 							const dLat = dy * 180 / (Math.PI * EARTH_RADIUS_METERS);
 
 							const head_pos = lonLatToVector3(p.lon, p.lat, globeRadius);
