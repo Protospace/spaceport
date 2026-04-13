@@ -264,27 +264,11 @@ export function Balloon(props) {
 				const uBlock = ppakBlocks[0];
 				const vBlock = ppakBlocks[1];
 
-				const { cols, rows } = uBlock;
-				const u_orig = uBlock.data;
-				const v_orig = vBlock.data;
-				const u_mirrored = new Float32Array(u_orig.length);
-				const v_mirrored = new Float32Array(v_orig.length);
-
-				for (let j = 0; j < rows; j++) {
-					for (let i = 0; i < cols; i++) {
-						const source_i = cols - 1 - i;
-						const source_index = j * cols + source_i;
-						const target_index = j * cols + i;
-						u_mirrored[target_index] = -u_orig[source_index];
-						v_mirrored[target_index] = v_orig[source_index];
-					}
-				}
-
 				const vectorField = {
 					cols: uBlock.cols,
 					rows: uBlock.rows,
-					u: u_mirrored,
-					v: v_mirrored,
+					u: uBlock.data,
+					v: vBlock.data,
 					interpolate: (lon, lat) => {
 						const i = (lon + 180) / (360 / vectorField.cols);
 						const j = (90 - lat) / (180 / (vectorField.rows - 1));
@@ -328,7 +312,7 @@ export function Balloon(props) {
 
 			const lonLatToVector3 = (lon, lat, radius) => {
 				const phi = (90 - lat) * Math.PI / 180;
-				const theta = (180 - lon) * Math.PI / 180;
+				const theta = (lon + 180) * Math.PI / 180;
 				return new THREE.Vector3().setFromSphericalCoords(radius, phi, theta);
 			};
 
