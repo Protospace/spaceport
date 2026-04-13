@@ -29,14 +29,14 @@ function decodeVarInt(out, data) {
             o = o << 25 >> 25;
         } else {
             switch (o >> 4) {
-                case 8: case 9: case 10: case 11:
-                    o = o << 26 >> 18 | data[r++];
+                case 8: case 9: case 10: case 11: // 14-bit signed
+                    o = (((o & 0x3f) << 8 | data[r++]) << 18) >> 18;
                     break;
-                case 12: case 13:
-                    o = o << 27 >> 11 | data[r++] << 8 | data[r++];
+                case 12: case 13: // 21-bit signed
+                    o = (((o & 0x1f) << 16 | data[r++] << 8 | data[r++]) << 11) >> 11;
                     break;
-                case 14:
-                    o = o << 28 >> 4 | data[r++] << 16 | data[r++] << 8 | data[r++];
+                case 14: // 28-bit signed
+                    o = (((o & 0x0f) << 24 | data[r++] << 16 | data[r++] << 8 | data[r++]) << 4) >> 4;
                     break;
                 case 15:
                     if (o === 255) {
