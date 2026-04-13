@@ -281,7 +281,7 @@ export function Balloon(props) {
 					u: uBlock.data,
 					v: vBlock.data,
 					interpolate: (lon, lat) => {
-						const i = (lon + 360) % 360 / (360 / vectorField.cols);
+						const i = (lon + 180) / (360 / vectorField.cols);
 						const j = (90 - lat) / (180 / (vectorField.rows - 1));
 
 						const i0 = Math.floor(i);
@@ -383,8 +383,7 @@ export function Balloon(props) {
 
 					for (let j = 0; j < vectorField.rows; j++) {
 						for (let i = 0; i < vectorField.cols; i++) {
-							let lon = i * (360 / vectorField.cols);
-							if (lon > 180) lon -= 360;
+							let lon = -180 + i * (360 / vectorField.cols);
 							const lat = 90 - j * (180 / (vectorField.rows - 1));
 							const pos = lonLatToVector3(lon, lat, globeRadius);
 							dotsPositions[dotIndex++] = pos.x;
