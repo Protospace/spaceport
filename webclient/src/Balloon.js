@@ -261,9 +261,9 @@ export function Balloon(props) {
 
 			// Tunable animation parameters
 			const PARTICLE_COUNT = 5000; // Total number of wind particles
-			const PARTICLE_SPEED_FACTOR = 600; // Multiplier for particle speed
+			const PARTICLE_SPEED_FACTOR = 200; // Multiplier for particle speed
 			const PARTICLE_MAX_AGE = 200; // Steps before a particle is respawned
-			const TAIL_LENGTH = 3; // Length of particle tails in animation steps
+			const TAIL_LENGTH = 10; // Length of particle tails in animation steps
 			const PARTICLE_MIN_SPEED_TO_RENDER = 0.0; // Min speed to be visible
 			const PARTICLE_MAX_SPEED_TO_RENDER = 30.0; // Max speed for color mapping
 			const PARTICLE_ALPHA = 0.6; // Base transparency of particles
@@ -404,7 +404,7 @@ export function Balloon(props) {
 
 						void main() {
 							float normalized_speed = clamp(abs(v_speed), ${PARTICLE_MIN_SPEED_TO_RENDER.toFixed(1)}, ${PARTICLE_MAX_SPEED_TO_RENDER.toFixed(1)}) / ${PARTICLE_MAX_SPEED_TO_RENDER.toFixed(1)};
-							float alpha = smoothstep(${PARTICLE_MIN_SPEED_TO_RENDER.toFixed(1)}, ${PARTICLE_MAX_SPEED_TO_RENDER.toFixed(1)}, abs(v_speed)) * ${PARTICLE_ALPHA.toFixed(1)};
+							float alpha = smoothstep(${PARTICLE_MIN_SPEED_TO_RENDER.toFixed(1)}, ${PARTICLE_MAX_SPEED_TO_RENDER.toFixed(1)}, abs(v_speed)) * ${PARTICLE_ALPHA.toFixed(1)} + 0.4;
 							gl_FragColor = vec4(colorMap(normalized_speed), alpha);
 						}
 					`;
