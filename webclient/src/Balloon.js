@@ -331,6 +331,27 @@ export function Balloon(props) {
 				.then(response => response.arrayBuffer())
 				.then(arrayBuffer => {
 					const vectorField = buildVectorField(parseEpak(arrayBuffer));
+
+					const runWindDataTests = (vf) => {
+						console.log("--- Running wind data integrity tests ---");
+						const tests = [
+							{ lat: 37.30, lng: -167.35, test: (mag) => mag < 5, desc: "< 5 km/h" },
+							{ lat: 27.85, lng: -164.50, test: (mag) => mag > 100, desc: "> 100 km/h" },
+							{ lat: 8.21, lng: -156.76, test: (mag) => mag < 5, desc: "< 5 km/h" },
+							{ lat: 50.31, lng: -65.70, test: (mag) => mag > 100, desc: "> 100 km/h" },
+						];
+
+						tests.forEach(({ lat, lng, test, desc }) => {
+							const [u, v] = vf.interpolate(lng, lat);
+							const magnitude_ms = Math.sqrt(u * u + v * v);
+							const magnitude_kmh = magnitude_ms * 3.6;
+							const result = test(magnitude_kmh) ? "PASS" : "FAIL";
+							console.log(`Test at (lat: ${lat.toFixed(2)}, lng: ${lng.toFixed(2)}): Expected: ${desc}, Actual: ${magnitude_kmh.toFixed(2)} km/h, Result: ${result}`);
+						});
+						console.log("--- Wind data tests complete ---");
+					};
+					runWindDataTests(vectorField);
+
 					const particles = [];
 
 					const respawnParticle = (p, camera) => {
