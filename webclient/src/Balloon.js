@@ -270,8 +270,9 @@ export function Balloon(props) {
 
 			const buildVectorField = (epakData) => {
 				const ppakBlocks = epakData.blocks.filter(b => b.type === 'ppak');
-				const uBlock = ppakBlocks[0];
-				const vBlock = ppakBlocks[1];
+				// In the GFS data, the v-component (North-South) appears before the u-component (East-West).
+				const vBlock = ppakBlocks[0];
+				const uBlock = ppakBlocks[1];
 
 				const vectorField = {
 					cols: uBlock.cols,
