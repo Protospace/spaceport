@@ -313,7 +313,7 @@ export function Balloon(props) {
 
 						const u = u_angular * Math.cos(lat * Math.PI / 180);
 
-						return [u, -v];
+						return [u, v];
 					}
 				};
 				return vectorField;
