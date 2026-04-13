@@ -4,12 +4,20 @@
 	font-family: monospace !important;
 }
 
-.balloon-dashboard .ui-container {
+.balloon-dashboard .top-left-container {
 	position: fixed;
 	top: 20px;
 	left: 20px;
 	z-index: 4;
 	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	pointer-events: none;
+}
+
+.balloon-dashboard .ui-container {
+	display: flex;
+	flex-direction: column;
 	align-items: flex-start;
 	pointer-events: none;
 }
@@ -38,12 +46,22 @@
 }
 
 .balloon-dashboard .show-wind-control {
-	position: absolute;
 	display: flex;
 	align-items: center;
 	font-size: 1.2em;
-	padding: 10px 15px;
+	padding: 0 15px;
 	margin: 0;
+	max-height: 0;
+	opacity: 0;
+	overflow: hidden;
+	transition: opacity .3s ease, max-height .3s ease, padding .3s ease, margin-top .3s ease;
+}
+
+.balloon-dashboard .show-wind-control.visible {
+	opacity: 1;
+	max-height: 40px;
+	padding: 10px 15px;
+	margin-top: -1px;
 }
 
 .balloon-dashboard .show-wind-control .checkbox {
@@ -59,14 +77,12 @@
 }
 
 .balloon-dashboard .stats-container {
-	position: fixed;
-	top: 62px;
-	left: 20px;
 	z-index: 4;
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
 	pointer-events: none;
+	margin-top: -1px;
 }
 
 .balloon-dashboard .stat-box {
@@ -204,12 +220,8 @@
 }
 
 @media (max-width: 767px) {
-	.balloon-dashboard .ui-container {
+	.balloon-dashboard .top-left-container {
 		top: 10px;
-		left: 10px;
-	}
-	.balloon-dashboard .stats-container {
-		top: 52px;
 		left: 10px;
 	}
 	.balloon-dashboard .bottom-stats-container {

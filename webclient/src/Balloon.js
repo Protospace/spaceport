@@ -652,24 +652,66 @@ export function Balloon(props) {
 
 	return (
 		<div className="balloon-dashboard">
-			<div className="ui-container">
-				<div className="top-row">
-					<div className="title" style={getStyle('title')} ref={titleRef}>Protoballoon</div>
-					<button className="button" style={getStyle('about')} ref={aboutButtonRef} onClick={() => setShowAbout(true)}>About</button>
-					<button className="button" style={getStyle('faq')} ref={faqButtonRef} onClick={() => setShowFaq(true)}>FAQ</button>
+			<div className="top-left-container">
+				<div className="ui-container">
+					<div className="top-row">
+						<div className="title" style={getStyle('title')} ref={titleRef}>Protoballoon</div>
+						<button className="button" style={getStyle('about')} ref={aboutButtonRef} onClick={() => setShowAbout(true)}>About</button>
+						<button className="button" style={getStyle('faq')} ref={faqButtonRef} onClick={() => setShowFaq(true)}>FAQ</button>
+					</div>
+					<div
+						className={`show-wind-control stat-box ${uiVisibility.title ? 'visible' : ''}`}
+						style={{
+							pointerEvents: uiVisibility.title ? 'auto' : 'none',
+							cursor: 'pointer',
+						}}
+						onClick={() => setShowWind(!showWind)}
+					>
+						<div className={`checkbox ${showWind ? 'checked' : ''}`} />
+						<span>SHOW WIND</span>
+					</div>
 				</div>
-				<div
-					className="show-wind-control stat-box"
-					style={{
-						opacity: uiVisibility.title ? 1 : 0,
-						transition: 'opacity 0.3s ease',
-						pointerEvents: uiVisibility.title ? 'auto' : 'none',
-						cursor: 'pointer',
-					}}
-					onClick={() => setShowWind(!showWind)}
-				>
-					<div className={`checkbox ${showWind ? 'checked' : ''}`} />
-					<span>SHOW WIND</span>
+				<div className="stats-container">
+					<div className="stat-row">
+						<div className="stat-box" style={getStyle('lastSeen')} ref={lastSeenRef}>
+							<div className="stat-label">LAST UPDATE</div>
+							<div className="stat-value">{lastSeenTime}</div>
+							<TimeAgo time={balloon?.positions?.[0]?.time} />
+						</div>
+						<div className="stat-box" style={getStyle('missionDuration')} ref={missionDurationRef}>
+							<div className="stat-label">MISSION DURATION</div>
+							<MissionDuration startTime={balloon?.stats?.timeStart} />
+							<div className="time-ago">{sinceDate}</div>
+						</div>
+					</div>
+					{!isMobile &&
+						<>
+							<div className="stat-row">
+								<div className="stat-box" style={getStyle('lastPosition')} ref={lastPositionRef}>
+									<div className="stat-label">LAST POSITION</div>
+									<div className="stat-value">{lastPosition}</div>
+								</div>
+								<div className="stat-box" style={getStyle('altitude')} ref={altitudeRef}>
+									<div className="stat-label">ALTITUDE</div>
+									<div className="stat-value">{altitude}</div>
+								</div>
+							</div>
+							<div className="stat-row">
+								<div className="stat-box" style={getStyle('voltage')} ref={voltageRef}>
+									<div className="stat-label">VOLTAGE</div>
+									<div className="stat-value">{voltage}</div>
+								</div>
+								<div className="stat-box" style={getStyle('temperature')} ref={temperatureRef}>
+									<div className="stat-label">TEMPERATURE</div>
+									<div className="stat-value">{temperature}</div>
+								</div>
+								<div className="stat-box" style={getStyle('sunAngle')} ref={sunAngleRef}>
+									<div className="stat-label">SUN ANGLE</div>
+									<div className="stat-value">{sunAngle}</div>
+								</div>
+							</div>
+						</>
+					}
 				</div>
 			</div>
 			{!isMobile &&
@@ -689,48 +731,6 @@ export function Balloon(props) {
 					</div>
 				</div>
 			}
-			<div className="stats-container">
-				<div className="stat-row">
-					<div className="stat-box" style={getStyle('lastSeen')} ref={lastSeenRef}>
-						<div className="stat-label">LAST UPDATE</div>
-						<div className="stat-value">{lastSeenTime}</div>
-						<TimeAgo time={balloon?.positions?.[0]?.time} />
-					</div>
-					<div className="stat-box" style={getStyle('missionDuration')} ref={missionDurationRef}>
-						<div className="stat-label">MISSION DURATION</div>
-						<MissionDuration startTime={balloon?.stats?.timeStart} />
-						<div className="time-ago">{sinceDate}</div>
-					</div>
-				</div>
-				{!isMobile &&
-					<>
-						<div className="stat-row">
-							<div className="stat-box" style={getStyle('lastPosition')} ref={lastPositionRef}>
-								<div className="stat-label">LAST POSITION</div>
-								<div className="stat-value">{lastPosition}</div>
-							</div>
-							<div className="stat-box" style={getStyle('altitude')} ref={altitudeRef}>
-								<div className="stat-label">ALTITUDE</div>
-								<div className="stat-value">{altitude}</div>
-							</div>
-						</div>
-						<div className="stat-row">
-							<div className="stat-box" style={getStyle('voltage')} ref={voltageRef}>
-								<div className="stat-label">VOLTAGE</div>
-								<div className="stat-value">{voltage}</div>
-							</div>
-							<div className="stat-box" style={getStyle('temperature')} ref={temperatureRef}>
-								<div className="stat-label">TEMPERATURE</div>
-								<div className="stat-value">{temperature}</div>
-							</div>
-							<div className="stat-box" style={getStyle('sunAngle')} ref={sunAngleRef}>
-								<div className="stat-label">SUN ANGLE</div>
-								<div className="stat-value">{sunAngle}</div>
-							</div>
-						</div>
-					</>
-				}
-			</div>
 			<div className="bottom-stats-container">
 				{isMobile ?
 					<div className="stat-row">
