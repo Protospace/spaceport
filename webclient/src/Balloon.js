@@ -391,13 +391,14 @@ export function Balloon(props) {
 					// Add red dots and vectors for wind data points
 					const VECTOR_SCALE_FACTOR = 5000;
 					const dotsGeometry = new THREE.BufferGeometry();
-					const dotsPositions = new Float32Array(vectorField.cols * vectorField.rows * 3);
+					const dotsPositions = new Float32Array(vectorField.cols * (vectorField.rows - 4) * 3);
 					const linesGeometry = new THREE.BufferGeometry();
-					const linesPositions = new Float32Array(vectorField.cols * vectorField.rows * 3 * 2);
+					const linesPositions = new Float32Array(vectorField.cols * (vectorField.rows - 4) * 3 * 2);
 					let dotIndex = 0;
 					let lineIndex = 0;
 
-					for (let j = 0; j < vectorField.rows; j++) {
+					// Exclude 2 rows from each pole to avoid visual artifacts
+					for (let j = 2; j < vectorField.rows - 2; j++) {
 						for (let i = 0; i < vectorField.cols; i++) {
 							let lon = -180 + i * (360 / vectorField.cols);
 							const lat = 90 - j * (180 / (vectorField.rows - 1));
