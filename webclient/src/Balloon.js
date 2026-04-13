@@ -115,6 +115,7 @@ export function Balloon(props) {
 	const globeInstanceRef = useRef();
 	const globeMaterialRef = useRef();
 	const windParticlesRef = useRef();
+	const windDotsRef = useRef();
 	const isInitialLoad = useRef(true);
 	const titleRef = useRef();
 	const aboutButtonRef = useRef();
@@ -370,6 +371,27 @@ export function Balloon(props) {
 					};
 					runWindDataTests(vectorField);
 
+					// Add green dots for wind data points
+					const dotsGeometry = new THREE.BufferGeometry();
+					const dotsPositions = new Float32Array(vectorField.cols * vectorField.rows * 3);
+					let dotIndex = 0;
+					for (let j = 0; j < vectorField.rows; j++) {
+						for (let i = 0; i < vectorField.cols; i++) {
+							let lon = i * (360 / vectorField.cols);
+							if (lon > 180) lon -= 360;
+							const lat = 90 - j * (180 / (vectorField.rows - 1));
+							const pos = lonLatToVector3(lon, lat, globeRadius);
+							dotsPositions[dotIndex++] = pos.x;
+							dotsPositions[dotIndex++] = pos.y;
+							dotsPositions[dotIndex++] = pos.z;
+						}
+					}
+					dotsGeometry.setAttribute('position', new THREE.BufferAttribute(dotsPositions, 3));
+					const dotsMaterial = new THREE.PointsMaterial({ color: 0x00ff00, size: 0.2 });
+					const windDots = new THREE.Points(dotsGeometry, dotsMaterial);
+					windDotsRef.current = windDots;
+					globe.scene().add(windDots);
+
 					const particles = [];
 
 					const respawnParticle = (p, camera) => {
@@ -513,6 +535,12 @@ export function Balloon(props) {
 					windParticlesRef.current.geometry.dispose();
 					windParticlesRef.current.material.dispose();
 					windParticlesRef.current = null;
+				}
+				if (windDotsRef.current && globe.scene()) {
+					globe.scene().remove(windDotsRef.current);
+					windDotsRef.current.geometry.dispose();
+					windDotsRef.current.material.dispose();
+					windDotsRef.current = null;
 				}
 			};
 		}
