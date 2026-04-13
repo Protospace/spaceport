@@ -10,8 +10,7 @@
 	left: 20px;
 	z-index: 4;
 	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
+	align-items: center;
 	pointer-events: none;
 }
 
@@ -39,10 +38,12 @@
 }
 
 .balloon-dashboard .show-wind-control {
+	position: absolute;
 	display: flex;
 	align-items: center;
 	font-size: 1.2em;
 	padding: 10px 15px;
+	margin: 0;
 }
 
 .balloon-dashboard .show-wind-control .checkbox {
@@ -59,7 +60,7 @@
 
 .balloon-dashboard .stats-container {
 	position: fixed;
-	top: 80px;
+	top: 65px;
 	left: 20px;
 	z-index: 4;
 	display: flex;
