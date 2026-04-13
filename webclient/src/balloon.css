@@ -20,6 +20,7 @@
 	flex-direction: column;
 	align-items: flex-start;
 	pointer-events: none;
+	position: relative;
 }
 
 .balloon-dashboard .title {
@@ -46,20 +47,20 @@
 }
 
 .balloon-dashboard .show-wind-control {
+	position: absolute;
+	top: 100%;
+	left: 0;
 	display: flex;
 	align-items: center;
 	font-size: 1.2em;
 	padding: 0 15px;
 	margin: 0;
-	max-height: 0;
 	opacity: 0;
-	overflow: hidden;
-	transition: opacity .3s ease, max-height .3s ease, padding .3s ease, margin-top .3s ease;
+	transition: opacity .3s ease;
 }
 
 .balloon-dashboard .show-wind-control.visible {
 	opacity: 1;
-	max-height: 40px;
 	padding: 10px 15px;
 	margin-top: -1px;
 }
