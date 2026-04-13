@@ -70,16 +70,18 @@ function decodeVarInt(out, data) {
 function reverse2dDelta(e, t, r, n) {
     let o, i, a, s, c, l, u;
     for (a = 0; a < n; a++) {
-        for (l = a * t * r, o = 1; o < t; o++) s = l + o,
-        u = e[s - 1],
-        e[s] += u === u ? u : 0;
+        for (l = a * t * r, o = 1; o < t; o++) {
+            s = l + o;
+            u = e[s - 1];
+            e[s] += u === u ? u : 0;
+        }
         for (i = 1; i < r; i++) for (c = l + i * t, u = e[c - t], e[c] += u === u ? u : 0, o = 1; o < t; o++) {
             s = c + o;
             let f = e[s - 1],
                 p = e[s - t],
                 m = e[s - t - 1];
-            u = f + p - m,
-            e[s] += u === u ? u : f === f ? f : p === p ? p : m === m ? m : 0
+            u = f + p - m;
+            e[s] += u === u ? u : f === f ? f : p === p ? p : m === m ? m : 0;
         }
     }
     return e
