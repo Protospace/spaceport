@@ -371,7 +371,7 @@ export function Balloon(props) {
 					};
 					runWindDataTests(vectorField);
 
-					// Add green dots for wind data points
+					// Add red dots for wind data points
 					const dotsGeometry = new THREE.BufferGeometry();
 					const dotsPositions = new Float32Array(vectorField.cols * vectorField.rows * 3);
 					let dotIndex = 0;
@@ -387,7 +387,7 @@ export function Balloon(props) {
 						}
 					}
 					dotsGeometry.setAttribute('position', new THREE.BufferAttribute(dotsPositions, 3));
-					const dotsMaterial = new THREE.PointsMaterial({ color: 0x00ff00, size: 0.2 });
+					const dotsMaterial = new THREE.PointsMaterial({ color: 0xff0000, size: 0.2 });
 					const windDots = new THREE.Points(dotsGeometry, dotsMaterial);
 					windDotsRef.current = windDots;
 					globe.scene().add(windDots);
