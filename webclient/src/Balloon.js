@@ -332,33 +332,38 @@ export function Balloon(props) {
 
 					const particles = [];
 
+					const vector3ToLonLat = (vector) => {
+						const spherical = new THREE.Spherical().setFromVector3(vector);
+						const lat = 90 - THREE.MathUtils.radToDeg(spherical.phi);
+						let theta = spherical.theta;
+						if (theta < 0) theta += 2 * Math.PI;
+						const lon = THREE.MathUtils.radToDeg(theta) - 180;
+						return { lon, lat };
+					};
+
+					const globeSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), globeRadius);
+					const raycaster = new THREE.Raycaster();
+
 					const respawnParticle = (p, camera) => {
-						let lon, lat, particlePos, angle, screenPos;
-						let isBehind = true;
-						let isOffScreen = true;
+						let intersectionPoint = null;
 						let attempts = 0;
 						const MAX_ATTEMPTS = 20;
 
-						while ((isBehind || isOffScreen) && attempts < MAX_ATTEMPTS) {
-							lon = Math.random() * 360 - 180;
-							lat = Math.random() * 170 - 85; // -85 to 85 degrees
-							particlePos = lonLatToVector3(lon, lat, globeRadius);
-							angle = camera.position.angleTo(particlePos);
-							isBehind = angle > Math.PI / 2;
-
-							if (!isBehind) {
-								screenPos = particlePos.clone().project(camera);
-								isOffScreen = screenPos.x < -1.1 || screenPos.x > 1.1 || screenPos.y < -1.1 || screenPos.y > 1.1;
-							}
+						while (!intersectionPoint && attempts < MAX_ATTEMPTS) {
+							const screenX = Math.random() * 2 - 1;
+							const screenY = Math.random() * 2 - 1;
+							raycaster.setFromCamera({ x: screenX, y: screenY }, camera);
+							intersectionPoint = raycaster.ray.intersectSphere(globeSphere, new THREE.Vector3());
 							attempts++;
 						}
 
-						if (isBehind || isOffScreen) {
-							p.age = PARTICLE_MAX_AGE + 1; // Mark as "dead"
-						} else {
+						if (intersectionPoint) {
+							const { lon, lat } = vector3ToLonLat(intersectionPoint);
 							p.lon = lon;
 							p.lat = lat;
 							p.age = Math.floor(Math.random() * PARTICLE_MAX_AGE);
+						} else {
+							p.age = PARTICLE_MAX_AGE + 1; // Mark as "dead" if no spot found
 						}
 						return p;
 					};
