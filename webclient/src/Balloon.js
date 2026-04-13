@@ -340,43 +340,6 @@ export function Balloon(props) {
 				.then(arrayBuffer => {
 					const vectorField = buildVectorField(parseEpak(arrayBuffer));
 
-					const runWindDataTests = (vf) => {
-						console.log("--- Running wind data integrity tests ---");
-						const tests = [
-							{ lat: 39.96, lng: -120.71, expected_mag: 64, expected_dir: 265 },
-							{ lat: 33.84, lng: -120.82, expected_mag: 167, expected_dir: 250 },
-							{ lat: 24.85, lng: -34.91, expected_mag: 36, expected_dir: 85 },
-							{ lat: -27.30, lng: 160.02, expected_mag: 179, expected_dir: 270 },
-							{ lat: -43.57, lng: 171.34, expected_mag: 193, expected_dir: 350 },
-							{ lat: 40.39, lng: -8.57, expected_mag: 193, expected_dir: 350 },
-						];
-
-						const mag_tolerance = 10; // km/h
-						const dir_tolerance = 10; // degrees
-
-						tests.forEach(({ lat, lng, expected_mag, expected_dir }) => {
-							const [u, v] = vf.interpolate(lng, lat);
-							const magnitude_ms = Math.sqrt(u * u + v * v);
-							const magnitude_kmh = magnitude_ms * 3.6;
-
-							let direction_deg = (270 - (Math.atan2(v, u) * 180 / Math.PI));
-							direction_deg = (direction_deg % 360 + 360) % 360;
-
-							const mag_diff = Math.abs(magnitude_kmh - expected_mag);
-							const mag_result = mag_diff <= mag_tolerance ? "PASS" : "FAIL";
-
-							const dir_diff = Math.abs(direction_deg - expected_dir);
-							const angular_diff = Math.min(dir_diff, 360 - dir_diff);
-							const dir_result = angular_diff <= dir_tolerance ? "PASS" : "FAIL";
-
-							console.log(`Test at (lat: ${lat.toFixed(2)}, lng: ${lng.toFixed(2)})`);
-							console.log(`  Magnitude: Expected: ${expected_mag} km/h, Actual: ${magnitude_kmh.toFixed(2)} km/h. Diff: ${mag_diff.toFixed(2)}. Result: ${mag_result}`);
-							console.log(`  Direction: Expected: ${expected_dir}°, Actual: ${direction_deg.toFixed(2)}°. Diff: ${angular_diff.toFixed(2)}. Result: ${dir_result}`);
-						});
-						console.log("--- Wind data tests complete ---");
-					};
-					runWindDataTests(vectorField);
-
 					// Add red dots and vectors for wind data points
 					const VECTOR_SCALE_FACTOR = 5000;
 					const dotsGeometry = new THREE.BufferGeometry();
