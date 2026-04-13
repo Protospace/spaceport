@@ -406,9 +406,7 @@ export function Balloon(props) {
 							dotsPositions[dotIndex++] = pos.y;
 							dotsPositions[dotIndex++] = pos.z;
 
-							const index = j * vectorField.cols + i;
-							const u = vectorField.u[index];
-							const v = vectorField.v[index];
+							const [u, v] = vectorField.interpolate(lon, lat);
 							const dt = VECTOR_SCALE_FACTOR;
 							const dx = u * dt;
 							const dy = v * dt;
