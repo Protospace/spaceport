@@ -7,7 +7,7 @@ from .. import settings
 
 
 if settings.DEBUG:
-    WIKI_ENDPOINT = 'ps-wiki.dns.t0.vc'
+    WIKI_ENDPOINT = 'ps-wiki-dev.dns.t0.vc'
 else:
     WIKI_ENDPOINT = secrets.WIKI_ENDPOINT
 
@@ -23,23 +23,25 @@ def get_next_tool_id(site):
     '''Get the next available tool ID from the wiki'''
     # Tool IDs are managed on this page
     # https://wiki.protospace.ca/Protospace_Wiki:Wiki-ID_system#Next_available_wiki-ID_numbers
-    page_name = 'Protospace_Wiki:Wiki-ID_system'
-    # Section name: Next available wiki-ID numbers
-    section = 1
+    try:
+        page_name = 'Protospace_Wiki:Wiki-ID_system'
+        page = site.pages[page_name]
+        page.purge()  # make sure links are up to date
 
-    # grab page and section
-    page = site.pages[page_name]
-    text = page.text(section=section)
+        parsed = site.parse(page=page_name, prop='links')
 
-    # read through lines and look for the first page that doesn't exist
-    for line in text.split('\n'):
-        if line.startswith('* '):
-            candidate_id = line.replace('* [[', '').replace(']]', '')
-            if site.pages[candidate_id].text() == '':
-                logger.info('Found empty Wiki-ID: %s', candidate_id)
-                return candidate_id
-    
-    raise Exception('No next tool ID found. Please update the list: https://wiki.protospace.ca/Protospace_Wiki:Wiki-ID_system#Next_available_wiki-ID_numbers')
+        ids = [
+            int(link['*'])
+            for link in parsed['links']
+            if link['*'].isdigit() and 'exists' not in link
+        ]
+
+        next_available = min(ids)
+
+        logger.info('Found empty Wiki-ID: %s', next_available)
+        return str(next_available)
+    except ValueError:
+        raise Exception('No next tool ID found. Please update the list: https://wiki.protospace.ca/Protospace_Wiki:Wiki-ID_system#Next_available_wiki-ID_numbers')
 
 def create_tool_page(form_data, username=None):
     '''Create a new tool page on the wiki
