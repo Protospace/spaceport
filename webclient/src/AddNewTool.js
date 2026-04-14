@@ -92,17 +92,19 @@ export function AddNewTool(props) {
 		})
 		.catch(err => {
 			setLoading(false);
-			setError(true);
+			setError(err.data);
 			setToolUrl('');
 		});
 	};
 
 	return (
 		<Container>
-			{error && <>
+			{!!error && <>
 				<Header size='large'>Something went wrong!</Header>
 
 				<p>Please try again one more time. If it fails again, do not try again. There's probably something we need to fix.</p>
+
+				<p>Error message: {error.non_field_errors}</p>
 			</>}
 
 			{toolUrl != '' && !error && <>

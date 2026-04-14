@@ -2577,7 +2577,7 @@ class ToolsViewSet(Base, Create, Destroy):
         except Exception as e:
             logger.exception('Create Tool view - {} - {}'.format(e.__class__.__name__, str(e)))
             # TODO: alert via Telegram
-            return Response({'error': str(e)}, status=drfstatus.HTTP_500_INTERNAL_SERVER_ERROR)
+            raise exceptions.ValidationError(dict(non_field_errors=str(e)))
 
     def destroy(self, request, *args, **kwargs):
         pk = kwargs['pk']
@@ -2589,7 +2589,7 @@ class ToolsViewSet(Base, Create, Destroy):
             pass
         except Exception as e:
             logger.exception('Destroy Tool view - {} - {}'.format(e.__class__.__name__, str(e)))
-            return Response({'error': str(e)}, status=drfstatus.HTTP_500_INTERNAL_SERVER_ERROR)
+            raise exceptions.ValidationError(dict(non_field_errors=str(e)))
 
         return Response(status=drfstatus.HTTP_404_NOT_FOUND)
 
