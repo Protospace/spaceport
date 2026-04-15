@@ -29,7 +29,7 @@ def api_put_task(project_id, position, title):
     url = secrets.TODO_API_URL + 'projects/{}/tasks'.format(project_id)
 
     try:
-        r = requests.put(url=url, headers=headers, json=data, timeout=5)
+        r = requests.put(url=url, headers=headers, json=data, timeout=20)
         r.raise_for_status()
         return r.json()
     except KeyboardInterrupt:
@@ -45,7 +45,7 @@ def api_find_projects(project_name):
     params = {'s': project_name}
 
     try:
-        r = requests.get(url=url, headers=headers, timeout=5)
+        r = requests.get(url=url, headers=headers, timeout=20)
         r.raise_for_status()
         return r.json()
     except KeyboardInterrupt:
@@ -60,7 +60,7 @@ def api_get_project(project_id):
     url = secrets.TODO_API_URL + 'projects/{}'.format(project_id)
 
     try:
-        r = requests.get(url=url, headers=headers, timeout=5)
+        r = requests.get(url=url, headers=headers, timeout=20)
         r.raise_for_status()
         return r.json()
     except KeyboardInterrupt:
@@ -76,7 +76,7 @@ def api_get_tasks(project_id, view_id, search='', filter=''):
     url = secrets.TODO_API_URL + 'projects/{}/views/{}/tasks'.format(project_id, view_id)
 
     try:
-        r = requests.get(url=url, headers=headers, params=params, timeout=5)
+        r = requests.get(url=url, headers=headers, params=params, timeout=20)
         r.raise_for_status()
         return r.json()
     except KeyboardInterrupt:
@@ -92,7 +92,7 @@ def api_post_position(task_id, view_id, position):
     url = secrets.TODO_API_URL + 'tasks/{}/position'.format(task_id)
 
     try:
-        r = requests.post(url=url, headers=headers, json=data, timeout=5)
+        r = requests.post(url=url, headers=headers, json=data, timeout=20)
         r.raise_for_status()
         return r.json()
     except KeyboardInterrupt:

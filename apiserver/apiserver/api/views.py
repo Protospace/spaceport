@@ -2431,7 +2431,7 @@ class TodoViewSet(viewsets.ViewSet):
             return Response(tasks)
         except Exception as e:
             logger.exception('Problem getting tasks: {} - {}'.format(e.__class__.__name__, str(e)))
-            return Response({'error': str(e)}, status=drfstatus.HTTP_500_INTERNAL_SERVER_ERROR)
+            raise exceptions.ValidationError(dict(non_field_errors=str(e)))
 
     @action(detail=False, methods=['post'])
     def out_of_stock(self, request):
@@ -2445,7 +2445,7 @@ class TodoViewSet(viewsets.ViewSet):
             return Response(200)
         except Exception as e:
             logger.exception('Problem adding task: {} - {}'.format(e.__class__.__name__, str(e)))
-            return Response({'error': str(e)}, status=drfstatus.HTTP_500_INTERNAL_SERVER_ERROR)
+            raise exceptions.ValidationError(dict(non_field_errors=str(e)))
 
 
 
