@@ -23,7 +23,7 @@ export function AdminReportedTransactions(props) {
 			console.log(err);
 			setError(true);
 		});
-	}, []);
+	});
 
 	return (
 		<div>

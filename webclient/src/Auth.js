@@ -147,7 +147,7 @@ export function AuthDiscourse(props) {
 }
 
 export function AuthOIDC(props) {
-	const { token, user } = props;
+	const { token } = props;
 	const [error, setError] = useState(false);
 	const qs = decodeURIComponent(useLocation().search.replace('?next=/openid/authorize', ''));
 	const mountRef = useRef(null);
@@ -162,7 +162,7 @@ export function AuthOIDC(props) {
 			setError(err.data.error || err.data.non_field_errors);
 			console.log(err);
 		});
-	}, []);
+	});
 
 	useEffect(() => {
 		const mount = mountRef.current;
@@ -302,7 +302,7 @@ export function AuthOIDC(props) {
 }
 
 export function Auth(props) {
-	const { token, user } = props;
+	const { user } = props;
 
 	return (
 		<Container>

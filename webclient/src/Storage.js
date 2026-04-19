@@ -4,7 +4,7 @@ import './light.css';
 import moment from 'moment-timezone';
 import { MembersDropdown } from './Members.js';
 import { statusColor, isAdmin, BasicTable, requester, useIsMobile } from './utils.js';
-import { Button, Checkbox, Container, Form, Grid, Header, Icon, Input, Message, Segment, Table } from 'semantic-ui-react';
+import { Button, Checkbox, Container, Form, Grid, Header, Icon, Input, Segment, Table } from 'semantic-ui-react';
 
 export function StorageLinks(props) {
 	const { storage } = props;
@@ -55,7 +55,7 @@ export function StorageEditor(props) {
 };
 
 function EditStorage(props) {
-	const { storage, setStorage, token, refreshUser } = props;
+	const { storage, setStorage, token } = props;
 	const [input, setInput] = useState(storage);
 	const [error, setError] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -125,10 +125,9 @@ function EditStorage(props) {
 };
 
 export function ReleaseShelf(props) {
-	const { token, user, shelf_id, refreshUser, refreshStorage } = props;
-	const member = user.member;
+	const { token, shelf_id, refreshUser, refreshStorage } = props;
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(false);
+	const [setError] = useState(false);
 	const [yousure, setYousure] = useState(false);
 
 	const handleRelease = (e) => {
@@ -188,7 +187,7 @@ function StorageTable(props) {
 							<Link to={'/members/'+storage.member_id}>
 								{storage.member_name}
 							</Link>
-							{storage.member_id == user.member.id &&
+							{storage.member_id === user.member.id &&
 								<>
 									<p>This shelf belongs to you.</p>
 									<p><ReleaseShelf shelf_id={storage.shelf_id} {...props} /></p>
@@ -231,7 +230,7 @@ export function StorageTakeover(props) {
 		<>
 			<p>Shelf owner expired / paused on {storage.member_paused}.</p>
 			{storage.location === 'member_shelves' && (daysRemaining >= 1 ?
-				<p>Shelf can be taken over in {daysRemaining} more day{daysRemaining == 1 ? '' : 's'}.</p>
+				<p>Shelf can be taken over in {daysRemaining} more day{daysRemaining === 1 ? '' : 's'}.</p>
 			:
 				<p>Shelf can be <Link to={'/claimshelf/'+storage.shelf_id}>taken over</Link> now.</p>
 			)}
@@ -376,7 +375,7 @@ export function StorageList(props) {
 			console.log(err);
 			setError(true);
 		});
-	}, []);
+	});
 
 	const filterStorage = (x) => {
 		if (search.length && !x.shelf_id.startsWith(search)) {
@@ -501,8 +500,6 @@ export function StorageList(props) {
 };
 
 export function Storage(props) {
-	const { token, user } = props;
-
 	return (
 		<Container>
 			<Header size='large'>Storage Locations</Header>
@@ -516,7 +513,6 @@ export function Storage(props) {
 
 export function ClaimShelfForm(props) {
 	const { token, user, refreshUser } = props;
-	const member = user.member;
 	const { id } = useParams();
 	const [input, setInput] = useState({shelf_id: id});
 	const [error, setError] = useState({});
@@ -613,8 +609,6 @@ export function ClaimShelfForm(props) {
 };
 
 export function ClaimShelf(props) {
-	const { token, user } = props;
-
 	return (
 		<Container>
 			<Grid stackable columns={2}>

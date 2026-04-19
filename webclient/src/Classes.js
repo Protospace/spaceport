@@ -420,7 +420,7 @@ export function Classes(props) {
 		.catch(err => {
 			console.log(err);
 		});
-	}, []);
+	});
 
 	useEffect(() => {
 		requester('/sessions/', 'GET', token)
@@ -431,7 +431,7 @@ export function Classes(props) {
 		.catch(err => {
 			console.log(err);
 		});
-	}, []);
+	});
 
 	const loadAll = () => {
 		if (loading) return;
@@ -620,7 +620,6 @@ export function ICalButtons(props) {
 		{ key: 'google', icon: 'google', text: 'Add to Google Calendar', value: 'Google', action: addToGoogleCalendar },
 	];
 
-	// get default option from local storage or default to first item in options list
 	const calendarValue = localStorage.getItem('calendarPreference') || 'Email';
 	const defaultOption = options.find(x => x.value === calendarValue);
 
@@ -630,7 +629,6 @@ export function ICalButtons(props) {
 		const newOption = options.find(x => x.value === data.value);
 		setOption(newOption);
 
-		// set the option as users preference
 		localStorage.setItem('calendarPreference', newOption.value);
 	};
 
@@ -751,7 +749,7 @@ export function Class(props) {
 					<Table.Cell>Instructor:</Table.Cell>
 					<Table.Cell>
 						{getInstructor(clazz)}{' '}
-						{getInstructorDiscourseLink(clazz) && <>{'— '}<a href={getInstructorDiscourseLink(clazz)} target='_blank'>[message]</a></>}
+						{getInstructorDiscourseLink(clazz) && <>{'— '}<a href={getInstructorDiscourseLink(clazz)} target='_blank'rel="noopener noreferrer">[message]</a></>}
 					</Table.Cell>
 				</Table.Row>
 				<Table.Row>

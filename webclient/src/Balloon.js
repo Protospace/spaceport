@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import moment from 'moment-timezone';
 import * as THREE from 'three/build/three.module';
 import { requester, useIsMobile, useWindowSize } from './utils.js';

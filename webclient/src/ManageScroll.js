@@ -25,7 +25,7 @@ export function ManageScroll() {
 		return () => {
 			window.removeEventListener('scroll', scrollListener);
 		}
-	}, []);
+	});
 
 	useEffect(() => {
 		const key = history.location.key;

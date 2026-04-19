@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import './light.css';
 import { Container, Form, Grid, Header, Input } from 'semantic-ui-react';
 import { PayPalPayNow, PayPalSubscribe } from './PayPal.js';
@@ -53,7 +52,6 @@ export function SendProtocoin(props) {
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
-	const [memo, setMemo] = useState('');
 
 	const handleValues = (e, v) => setInput({ ...input, [v.name]: v.value });
 	const handleChange = (e) => handleValues(e, e.currentTarget);

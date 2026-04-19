@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useReducer, useRef } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import './light.css';
-import { Label, Button, Container, Dimmer, Dropdown, Form, FormField, Header, Icon, Loader, Input, Segment, Table, TextArea } from 'semantic-ui-react';
-import { apiUrl, isAdmin, getInstructor, getInstructorDiscourseLink, BasicTable, requester, useIsMobile } from './utils.js';
+import { Button, Container, Dimmer, Dropdown, Form, Header, Loader, Input, TextArea } from 'semantic-ui-react';
+import { requester } from './utils.js';
 
 export function AddNewTool(props) {
 	const { token } = props;
@@ -107,15 +106,15 @@ export function AddNewTool(props) {
 				<p>Error message: {error.non_field_errors}</p>
 			</>}
 
-			{toolUrl != '' && !error && <>
+			{toolUrl !== '' && !error && <>
 				<Header size='large'>Successfully created tool wiki page</Header>
 
-				<p>Go to it here: <a href={toolUrl} target='_blank'>{toolUrl}</a></p>
+				<p>Go to it here: <a href={toolUrl} target='_blank' rel="noopener noreferrer">{toolUrl}</a></p>
 
 				<Button onClick={() => window.location.reload(false)}>Make another tool page</Button>
 			</>}
 
-			{toolUrl == '' && !error && <>
+			{toolUrl === '' && !error && <>
 				<Header size='large'>Add a New Tool Page to the Wiki</Header>
 
 				<p>Fill out the following form for your tool:</p>
@@ -160,14 +159,13 @@ export function AddNewTool(props) {
 						<Input
 							placeholder='Owner'
 							name='owner'
-							value='Protospace'
 							required
 							onChange={handleChange}
-							value={formData.owner}
+							value={formData.owner ?? 'Protospace'}
 						/>
 					</Form.Field>
 
-					{formData.owner != 'Protospace' && <Form.Field required>
+					{formData.owner !== 'Protospace' && <Form.Field required>
 						<label>What is the loan status for this tool?</label>
 						<Dropdown
 							placeholder='Select Loan Status'
@@ -282,7 +280,7 @@ export function AddNewTool(props) {
 
 					<Form.Field>
 						<label>What category best describes this tool?</label>
-						<p>This determines where the tool appears in the <a href='https://wiki.protospace.ca/Tools_we_have' target='_blank'>Gallery</a></p>
+						<p>This determines where the tool appears in the <a href='https://wiki.protospace.ca/Tools_we_have' target='_blank' rel="noopener noreferrer">Gallery</a></p>
 						<Dropdown
 							placeholder=''
 							fluid

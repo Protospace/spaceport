@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Statistic, Button, Container, Header } from 'semantic-ui-react';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { requester, useIsMobile } from './utils.js';
 import moment from 'moment-timezone';
 

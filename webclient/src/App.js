@@ -48,7 +48,7 @@ function App() {
 	useEffect(() => {
 		document.body.className = isDark ? 'dark' : '';
 		console.log('theme to:', document.body.className || 'light');
-	}, []);
+	});
 
 	function setTokenCache(x) {
 		setToken(x);
@@ -141,7 +141,7 @@ function App() {
 					<Container>
 						<div className='hero'>
 							<Link to='/'>
-								<img src='/logo-long.svg' className='logo-long' />
+								<img alt="" src='/logo-long.svg' className='logo-long' />
 							</Link>
 						</div>
 

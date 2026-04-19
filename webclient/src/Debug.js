@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useParams, useHistory } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import './light.css';
-import { MembersDropdown } from './Members.js';
-import { isAdmin, BasicTable, requester } from './utils.js';
-import { Button, Container, Form, Grid, Header, Message, Segment, Table } from 'semantic-ui-react';
+import { Button, Container, Header } from 'semantic-ui-react';
 
 export function Debug(props) {
-	const { token } = props;
-
 	return (
 		<Container>
 			<Header size='large'>Debug</Header>

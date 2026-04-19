@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { Link } from 'react-router-dom';
 import './light.css';
-import { Button, Container, Checkbox, Form, Header, Icon, Input, Table } from 'semantic-ui-react';
-import * as Datetime from 'react-datetime';
+import { Button, Container, Checkbox, Header, Input, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
-import download from 'downloadjs';
-import { apiUrl, statusColor, requester, useIsMobile } from './utils.js';
+import { apiUrl, requester, useIsMobile } from './utils.js';
 
 let vettingCache = false;
 let historyCache = false;
@@ -209,7 +207,7 @@ export function AdminHistory(props) {
 
 										{focus === x.id &&
 											<tr><td colSpan={6}>
-												<p>Object ID: {x.object_id}, <a href={apiUrl+x.revert_url} target='_blank'>Database Revert</a></p>
+												<p>Object ID: {x.object_id}, <a href={apiUrl+x.revert_url} target='_blank' rel="noopener noreferrer">Database Revert</a></p>
 												{!!x.changes.length &&
 													<Table basic='very'>
 														{!isMobile && <Table.Header>

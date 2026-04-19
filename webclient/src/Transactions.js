@@ -69,21 +69,6 @@ export function TransactionEditor(props) {
 		{ key: '8', text: 'Protocoin', value: 'Protocoin' },
 	];
 
-	const sourceOptions = [
-		{ key: '0', text: 'Web (Spaceport)', value: 'Web' },
-		{ key: '1', text: 'Database Edit', value: 'DB Edit' },
-		{ key: '2', text: 'System', value: 'System' },
-		{ key: '3', text: 'Receipt or Statement', value: 'Receipt or Stmt' },
-		{ key: '4', text: 'Quicken Import', value: 'Quicken Import' },
-		{ key: '5', text: 'PayPal IPN', value: 'PayPal IPN' },
-		{ key: '6', text: 'Auto', value: 'Auto' },
-		{ key: '7', text: 'Nexus Database Bulk', value: 'Nexus DB Bulk' },
-		{ key: '8', text: 'IPN Trigger', value: 'IPN Trigger' },
-		{ key: '9', text: 'Intranet Receipt', value: 'Intranet Receipt' },
-		{ key: '10', text: 'Automatic', value: 'Automatic' },
-		{ key: '11', text: 'Manual', value: 'Manual' },
-	];
-
 	const categoryOptions = [
 		{ key: '0', text: 'Membership Dues', value: 'Membership' },
 		{ key: '1', text: 'Course Fee', value: 'OnAcct' },

@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useReducer, useRef } from 'react';
-import { Link, useParams, useHistory } from 'react-router-dom';
+import React, { useState, useEffect, useReducer } from 'react';
+import { Link } from 'react-router-dom';
 import moment from 'moment-timezone';
 import QRCode from 'react-qr-code';
 import './light.css';
-import { Button, Container, Divider, Grid, Header, Icon, Image, Message, Popup, Segment, Table } from 'semantic-ui-react';
+import { Container, Divider, Grid, Header, Icon, Image, Message, Popup, Segment, Table } from 'semantic-ui-react';
 import { statusColor, BasicTable, siteUrl, staticUrl, requester, isAdmin } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 import { AccountForm } from './Account.js';
@@ -15,7 +15,6 @@ import { StorageLinks } from './Storage.js';
 function MemberInfo(props) {
 	const user = props.user;
 	const member = user.member;
-	const history = useHistory();
 
 	const lastTrans = user.transactions?.slice(0,3);
 	const lastTrain = user.training?.sort((a, b) => a.session.datetime < b.session.datetime ? 1 : -1).slice(0,3);
@@ -195,7 +194,7 @@ function MemberInfo(props) {
 			</BasicTable>
 
 			{!!lastTrans.length && <p>
-				<a href={staticUrl + '/' + member.member_forms} target='_blank'>
+				<a href={staticUrl + '/' + member.member_forms} target='_blank' rel="noopener noreferrer">
 					View application forms
 				</a>
 			</p>}
@@ -224,7 +223,7 @@ export function Home(props) {
 		getStats();
 		const interval = setInterval(getStats, 30000);
 		return () => clearInterval(interval);
-	}, []);
+	});
 
 	useEffect(() => {
 		getStats();
@@ -247,9 +246,6 @@ export function Home(props) {
 			return 'Unknown';
 		}
 	};
-
-	const mcPlayers = stats && stats['minecraft_players'] ? stats['minecraft_players'] : [];
-	const mumbleUsers = stats && stats['mumble_users'] ? stats['mumble_users'] : [];
 
 	const getTrackStat = (x) => stats && stats.track && stats.track[x] ? moment().unix() - stats.track[x]['time'] > 60 ? 'Free' : 'In Use' : 'Unknown';
 	const getTrackLast = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').format('llll') : 'Unknown';
@@ -345,7 +341,7 @@ export function Home(props) {
 
 		const printer_state = info?.state || 'Unknown';
 
-		if (printer_state === 'Printing' && info?.progress == '0.0') {
+		if (printer_state === 'Printing' && info?.progress === '0.0') {
 			return 'Initializing';
 		} else if (printer_state === 'Printing') {
 			return 'Printing (' + info?.progress + '%)';
@@ -401,7 +397,7 @@ export function Home(props) {
 								{!user.transactions.length && <Message>
 									<Message.Header>Welcome, new member!</Message.Header>
 									<p>
-										<a href={staticUrl + '/' + user.member.member_forms} target='_blank'>
+										<a href={staticUrl + '/' + user.member.member_forms} target='_blank' rel="noopener noreferrer">
 											View your application forms.
 										</a>
 									</p>
@@ -442,7 +438,7 @@ export function Home(props) {
 							{!!user && isAdmin(user) && <p><a href='https://estancia.hippocmms.ca/' target='_blank' rel='noopener noreferrer'>Property Management Portal</a></p>}
 							<p>Spaceport theme: <a onClick={setLightMode}>Light</a> / <a onClick={setDarkMode}>Dark</a></p>
 
-							<img className='swordfish' src='/swordfish.png' onClick={() => refreshStats()} />
+							<img alt="" className='swordfish' src='/swordfish.png' onClick={() => refreshStats()} />
 
 							<div>
 								<Header size='medium'>Protospace Stats</Header>

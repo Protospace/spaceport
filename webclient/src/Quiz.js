@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useParams, useHistory } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './light.css';
-import { MembersDropdown } from './Members.js';
-import { isAdmin, BasicTable, requester } from './utils.js';
-import { Button, Container, Form, Grid, Header, Message, Segment, Table } from 'semantic-ui-react';
+import { requester } from './utils.js';
+import { Container, Form, Header, Segment } from 'semantic-ui-react';
 
 export function ScannerQuiz(props) {
 	const { token, user, refreshUser } = props;
@@ -497,15 +496,15 @@ export function SawstopQuiz(props) {
 
 			<Header size='small'>Bypass mode video</Header>
 
-			<p><a href="https://www.youtube.com/watch?v=FaA5GA61MH0" target="_blank">https://www.youtube.com/watch?v=FaA5GA61MH0</a></p>
+			<p><a href="https://www.youtube.com/watch?v=FaA5GA61MH0" target="_blank" rel="noopener noreferrer">https://www.youtube.com/watch?v=FaA5GA61MH0</a></p>
 
 			<Header size='small'>Blade brake spacing video</Header>
 
-			<p><a href="https://www.youtube.com/watch?v=fPFKcHhHY70" target="_blank">https://www.youtube.com/watch?v=fPFKcHhHY70</a></p>
+			<p><a href="https://www.youtube.com/watch?v=fPFKcHhHY70" target="_blank" rel="noopener noreferrer">https://www.youtube.com/watch?v=fPFKcHhHY70</a></p>
 
 			<Header size='small'>Dado stack video</Header>
 
-			<p><a href="https://www.youtube.com/watch?v=X41ds_PN4N8" target="_blank">https://www.youtube.com/watch?v=X41ds_PN4N8</a></p>
+			<p><a href="https://www.youtube.com/watch?v=X41ds_PN4N8" target="_blank" rel="noopener noreferrer">https://www.youtube.com/watch?v=X41ds_PN4N8</a></p>
 
 			<p>For dato stacks thicker than 3/8” remove the arbor washer.</p>
 
