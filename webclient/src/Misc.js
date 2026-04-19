@@ -13,7 +13,7 @@ export function PleaseLogin() {
 				<p>Visit our <Link to={'/?next=' + next}>login page</Link>, then try again.</p>
 			</Message>
 
-			<img className='photo-404' src='/404.jpg' />
+			<img alt="" className='photo-404' src='/404.jpg' />
 			<p style={{ textAlign: 'right' }}>
 				<i>Space shuttle Endeavour, NASA (2011)</i>
 			</p>
@@ -29,7 +29,7 @@ export function NotFound() {
 				<p>Visit our <Link to='/'>home page</Link> if you are lost.</p>
 			</Message>
 
-			<img className='photo-404' src='/404.jpg' />
+			<img alt="" className='photo-404' src='/404.jpg' />
 			<p style={{ textAlign: 'right' }}>
 				<i>Space shuttle Endeavour, NASA (2011)</i>
 			</p>

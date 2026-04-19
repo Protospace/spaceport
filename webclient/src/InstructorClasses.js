@@ -505,7 +505,7 @@ export function InstructorClassList(props) {
 		.catch(err => {
 			console.log(err);
 		});
-	}, []);
+	});
 
 	useEffect(() => {
 		setSameClasses(classes.filter(x =>

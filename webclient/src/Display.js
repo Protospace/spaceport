@@ -1,16 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 import moment from 'moment-timezone';
-import { Button, Container, Header, Icon } from 'semantic-ui-react';
+import { Button, Container, Header } from 'semantic-ui-react';
 import { requester } from './utils.js';
 import QRCode from 'react-qr-code';
 
-const deviceNames = {
-	'trotec': {title: 'Trotec', device: 'TROTECS300'},
-};
-
 export function LCARS1Display(props) {
-	const { token } = props;
 	const [fullElement, setFullElement] = useState(false);
 	const ref = useRef(null);
 
@@ -57,7 +51,6 @@ export function LCARS1Display(props) {
 };
 
 export function LCARS2Display(props) {
-	const { token } = props;
 	const [fullElement, setFullElement] = useState(false);
 	const ref = useRef(null);
 
@@ -104,7 +97,6 @@ export function LCARS2Display(props) {
 };
 
 export function LCARS3Display(props) {
-	const { token } = props;
 	const [fullElement, setFullElement] = useState(false);
 	const ref = useRef(null);
 
@@ -142,7 +134,6 @@ export function LCARS3Display(props) {
 };
 
 export function DisplayScores(props) {
-	const { token, name } = props;
 	const [scores, setScores] = useState(false);
 
 	const getScores = () => {
@@ -178,7 +169,6 @@ export function DisplayScores(props) {
 };
 
 export function DisplayMonthlyScores(props) {
-	const { token, name } = props;
 	const [scores, setScores] = useState(false);
 
 	const getScores = () => {
@@ -214,7 +204,6 @@ export function DisplayMonthlyScores(props) {
 };
 
 export function DisplayHosting(props) {
-	const { token, name } = props;
 	const [scores, setScores] = useState(false);
 
 	const getScores = () => {
@@ -240,7 +229,7 @@ export function DisplayHosting(props) {
 
 			{scores && scores.slice(0, 5).map((x, i) =>
 				<div key={i}>
-					<Header size='medium'>#{i+1} — {x.name}. {i === 0 ? <img className='toast' src='/toast.png' /> : ''}</Header>
+					<Header size='medium'>#{i+1} — {x.name}. {i === 0 ? <img alt="" className='toast' src='/toast.png' /> : ''}</Header>
 					<p>{x.hours.toFixed(2)} hours</p>
 				</div>
 			)}
@@ -250,7 +239,6 @@ export function DisplayHosting(props) {
 };
 
 export function DisplayMonthlyHosting(props) {
-	const { token, name } = props;
 	const [scores, setScores] = useState(false);
 
 	const getScores = () => {
@@ -286,7 +274,6 @@ export function DisplayMonthlyHosting(props) {
 };
 
 export function DisplaySignups(props) {
-	const { token, name } = props;
 	const [scores, setScores] = useState(false);
 
 	const getScores = () => {
@@ -322,7 +309,6 @@ export function DisplaySignups(props) {
 };
 
 export function DisplayAvailableShelves(props) {
-	const { token, name } = props;
 	const [shelves, setShelves] = useState(false);
 
 	const getShelves = () => {
@@ -374,8 +360,6 @@ export function DisplayClasses(props) {
 		return () => clearInterval(interval);
 	}, []);
 
-	const now = new Date().toISOString();
-
 	const isTodayOrFuture = (x) => moment.utc(x.datetime).tz('America/Edmonton') > moment().tz('America/Edmonton').startOf('day');
 	const isToday = (x) => moment().tz('America/Edmonton').isSame(moment.utc(x.datetime).tz('America/Edmonton'), 'day');
 
@@ -404,7 +388,7 @@ export function DisplayClasses(props) {
 };
 
 export function DisplayBambuCamera(props) {
-	const { token, name } = props;
+	const { name } = props;
 	const [pic, setPic] = useState(false);
 
 	const getPic = () => {

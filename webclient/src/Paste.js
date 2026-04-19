@@ -129,7 +129,7 @@ function LabelForm(props) {
 				Submit
 			</Form.Button>
 
-			{label && <img src={label} />}
+			{label && <img alt="" src={label} />}
 		</Form>
 	);
 };
@@ -158,7 +158,7 @@ export function Paste(props) {
 
 			<p>Use this to generate QR code labels for tools at Protospace.</p>
 
-			<p>Choose a tool from here: <a href='https://wiki.protospace.ca/Category:Tools' target='_blank'>https://wiki.protospace.ca/Category:Tools</a></p>
+			<p>Choose a tool from here: <a href='https://wiki.protospace.ca/Category:Tools' target='_blank' rel="noopener noreferrer">https://wiki.protospace.ca/Category:Tools</a></p>
 
 			<LabelForm />
 

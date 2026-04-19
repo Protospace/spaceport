@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Divider, Header, Container, Checkbox, Popup } from 'semantic-ui-react';
-import { requester, staticUrl, isAdmin } from './utils.js';
+import { requester, staticUrl } from './utils.js';
 
 const DRAWING_WIDTH = 384;
 const DRAWING_HEIGHT = 320;
@@ -315,7 +315,7 @@ export function DrawingCanvas(props) {
 					content={
 						<React.Fragment>
 							<p>
-								<img className='bash-register' src='/bash-register.jpg' width='1280' height='960' />
+								<img alt="" className='bash-register' src='/bash-register.jpg' width='1280' height='960' />
 							</p>
 						</React.Fragment>
 					}

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useHistory } from 'react-router-dom';
 import './light.css';
 import { Form, Header, Message } from 'semantic-ui-react';
-import { requester, randomString, siteUrl } from './utils.js';
+import { requester, randomString } from './utils.js';
 
 export function LoginForm(props) {
 	const [input, setInput] = useState({ username: '' });
@@ -279,7 +279,7 @@ export function SignupForm(props) {
 						Bay 108 <br />
 						Calgary, Alberta, Canada
 					</p>
-					<p><a href="https://goo.gl/maps/u1NeC71HzUEUhe7N9" target="_blank">Google Maps Link</a></p>
+					<p><a href="https://goo.gl/maps/u1NeC71HzUEUhe7N9" target="_blank" rel="noopener noreferrer">Google Maps Link</a></p>
 				</>
 			}
 		</Form>

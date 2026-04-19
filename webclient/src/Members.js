@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
+import { Switch, Route, Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Button, Container, Dropdown, Grid, Header, Icon, Image, Input, Item, Segment, Table } from 'semantic-ui-react';
 import { statusColor, getDiscourseLink, isAdmin, isInstructor, BasicTable, staticUrl, requester } from './utils.js';
@@ -15,9 +15,7 @@ const memberSorts = {
 	last_scanned: 'Last Scanned',
 	pinball_score: 'Pinball Score',
 	newest_active: 'Newest',
-	//newest_overall: 'Newest Overall',
 	oldest_active: 'Oldest',
-	//oldest_overall: 'Oldest Overall',
 	recently_inactive: 'Recently Inactive',
 	is_director: 'Directors',
 	is_admin: 'Portal Admin',
@@ -107,7 +105,6 @@ export function Members(props) {
 	const [search, setSearch] = useState(searchCache);
 	const [controller, setController] = useState(false);
 	const { token, user } = props;
-	const history = useHistory();
 
 	const makeRequest = ({loadPage, q, sort_key}) => {
 		let pageNum = 0;
@@ -178,7 +175,7 @@ export function Members(props) {
 		if (!responseCache) {
 			doSort('recently_vetted');
 		}
-	}, []);
+	});
 
 	return (
 		<Container>
@@ -323,7 +320,7 @@ export function MemberDetail(props) {
 					<div>
 						<Header size='large'>{member.preferred_name} {member.last_name}</Header>
 
-						{getDiscourseLink(member) && <p><a href={getDiscourseLink(member)} target='_blank'>[message]</a></p>}
+						{getDiscourseLink(member) && <p><a href={getDiscourseLink(member)} target='_blank' rel="noopener noreferrer">[message]</a></p>}
 
 						{isAdmin(user) &&
 							<p className='links-menu'>Admin: {' '}

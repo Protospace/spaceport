@@ -14,11 +14,9 @@ export const tags = {
 	Wood: 'brown',
 	CNC: 'orange',
 	Crafts: 'yellow',
-	//name: 'olive',
 	Electronics: 'green',
 	Software: 'teal',
 	Metal: 'blue',
-	//name: 'violet',
 	Event: 'purple',
 	Outing: 'pink',
 	Misc: 'grey',
@@ -43,7 +41,7 @@ export function Courses(props) {
 		.catch(err => {
 			console.log(err);
 		});
-	}, []);
+	});
 
 	const byTag = (x) => tagFilter ? x.tags.includes(tagFilter) : true;
 	const bySearch = (x) => search ? x.name.toLowerCase().includes(search.toLowerCase()) : true;

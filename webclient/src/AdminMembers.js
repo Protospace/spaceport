@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import './light.css';
-import { Button, Checkbox, Dimmer, Form, Message, Header, Icon, Image, Segment, Table, List, ListItem } from 'semantic-ui-react';
+import { Button, Checkbox, Dimmer, Form, Message, Header, Icon, Image, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
 import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
 import { TrainingList } from './Training.js';
@@ -425,7 +425,7 @@ export function AdminMemberPause(props) {
 							/>
 						</div>
 
-						<p>If the member is having trouble cancelling any PayPal subscriptions, follow <a href="https://forum.protospace.ca/t/how-to-cancel-a-paypal-subscription-from-our-side/6141" target="_blank">these steps</a>.</p>
+						<p>If the member is having trouble cancelling any PayPal subscriptions, follow <a href="https://forum.protospace.ca/t/how-to-cancel-a-paypal-subscription-from-our-side/6141" target="_blank" rel="noopener noreferrer">these steps</a>.</p>
 
 						<Button onClick={handlePause} loading={loading} disabled={!told1 || !told2}>
 							Pause
@@ -614,7 +614,7 @@ export function AdminMemberInfo(props) {
 						<Table.Cell>Discourse Username:</Table.Cell>
 						<Table.Cell>
 							{member.discourse_username ?
-								<a href={'https://forum.protospace.ca/u/' + member.discourse_username + '/summary'} target='_blank'>
+								<a href={'https://forum.protospace.ca/u/' + member.discourse_username + '/summary'} target='_blank' rel="noopener noreferrer">
 									{member.discourse_username}
 								</a>
 							:
@@ -635,7 +635,7 @@ export function AdminMemberInfo(props) {
 			</p>
 
 			{member.member_forms && <p>
-				<a href={staticUrl + '/' + member.member_forms} target='_blank'>
+				<a href={staticUrl + '/' + member.member_forms} target='_blank' rel="noopener noreferrer">
 					View application forms
 				</a>
 			</p>}
