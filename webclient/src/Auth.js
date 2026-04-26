@@ -92,33 +92,6 @@ export function AuthForm(props) {
 	);
 };
 
-export function AuthWiki(props) {
-	const { user } = props;
-
-	return (
-		<Segment compact padded>
-			<Header size='medium'>
-				<Image src={'/wikilogo.png'} />
-				Protospace Wiki
-			</Header>
-
-			<p>would like to request Spaceport authentication.</p>
-
-			<p>URL: <a href='https://wiki.protospace.ca/Welcome_to_Protospace' target='_blank' rel='noopener noreferrer'>wiki.protospace.ca</a></p>
-
-			<AuthForm user={user}>
-				<Header size='small'>Success!</Header>
-				<p>You can now log into the Wiki:</p>
-				{user && <p>
-					Username: {user.member.mediawiki_username || user.username}<br/>
-					Password: [this Spaceport password]
-				</p>}
-				<p><a href='https://wiki.protospace.ca/index.php?title=Special:UserLogin&returnto=Welcome+to+Protospace' rel='noopener noreferrer'>Protospace Wiki</a></p>
-			</AuthForm>
-		</Segment>
-	);
-}
-
 export function AuthDiscourse(props) {
 	const { user } = props;
 
@@ -314,10 +287,6 @@ export function Auth(props) {
 				<Message.Header>Only need to do this once</Message.Header>
 				<p>Note: you should only ever need to do this once if you are an old returning member. Otherwise, just sign into each app with your Spaceport login.</p>
 			</Message>
-
-			<Route path='/auth/wiki'>
-				<AuthWiki user={user} />
-			</Route>
 
 			<Route path='/auth/discourse'>
 				<AuthDiscourse user={user} />

@@ -321,7 +321,6 @@ class MemberSerializer(serializers.ModelSerializer):
             'eufymakeuv_cert_date',
             'scanner_cert_date',
             'is_allowed_entry',
-            'mediawiki_username',
             'signup_helper',
         ]
 
@@ -427,7 +426,6 @@ class AdminMemberSerializer(MemberSerializer):
             'old_email',
             'is_director',
             'is_staff',
-            'mediawiki_username',
             'storage',
         ]
 
@@ -1075,16 +1073,6 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
             first_name=self.user.member.preferred_name,
         )
 
-        data['username'] = self.user.member.mediawiki_username or self.user.username
-
-        if utils_auth.wiki_is_configured():
-            if request_id: utils_stats.set_progress(request_id, 'Changing Wiki password...')
-            if utils_auth.set_wiki_password(data) != 200:
-                msg = 'Problem connecting to Wiki Auth server: set.'
-                utils.alert_tanner(msg)
-                logger.info(msg)
-                raise ValidationError(dict(non_field_errors=msg))
-
         data['username'] = self.user.member.discourse_username or self.user.username
 
         if utils_auth.discourse_is_configured():
@@ -1139,16 +1127,6 @@ class MyPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
             email=self.user.email,
             first_name=self.user.member.preferred_name,
         )
-
-        data['username'] = self.user.member.mediawiki_username or self.user.username
-
-        if utils_auth.wiki_is_configured():
-            if request_id: utils_stats.set_progress(request_id, 'Changing Wiki password...')
-            if utils_auth.set_wiki_password(data) != 200:
-                msg = 'Problem connecting to Wiki Auth server: set.'
-                utils.alert_tanner(msg)
-                logger.info(msg)
-                raise ValidationError(dict(non_field_errors=msg))
 
         data['username'] = self.user.member.discourse_username or self.user.username
 
@@ -1236,9 +1214,6 @@ class SpaceportAuthSerializer(LoginSerializer):
             data = self.context['request'].data.copy()
             data['email'] = user.email
             data['first_name'] = user.member.preferred_name
-
-            data['username'] = user.member.mediawiki_username or user.username
-            utils_auth.set_wiki_password(data)
 
             data['username'] = user.member.discourse_username or user.username
             utils_auth.set_discourse_password(data)

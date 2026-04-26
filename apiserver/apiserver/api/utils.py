@@ -441,13 +441,6 @@ def register_user(data, user):
         first_name=data['preferred_name'],
     )
 
-    if utils_auth.wiki_is_configured():
-        if data['request_id']: utils_stats.set_progress(data['request_id'], 'Creating Wiki account...')
-        if utils_auth.set_wiki_password(auth_data) != 200:
-            msg = 'Problem connecting to Wiki Auth server: set.'
-            utils.alert_tanner(msg)
-            logger.info(msg)
-
     if utils_auth.discourse_is_configured():
         if data['request_id']: utils_stats.set_progress(data['request_id'], 'Creating Discourse account...')
         if utils_auth.set_discourse_password(auth_data) != 200:
