@@ -420,6 +420,10 @@ def calc_year_attendance():
         attendance_status='Attended',
         session__datetime__isnull=False,
         user__member__isnull=False,
+    ).exclude(
+        Q(session__course__tags__contains='Event') |
+        Q(session__course__tags__contains='Outing') |
+        Q(session__course__tags__contains='Protosapce')
     ).values(
         'session__datetime__year'
     ).annotate(
