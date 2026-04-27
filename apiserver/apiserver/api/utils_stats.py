@@ -403,8 +403,10 @@ def calc_year_distribution():
     results = list(models.Member.objects.values(
         'application_date__year'
     ).annotate(
+        total=Count('id'),
         count=Count('id', filter=Q(paused_date__isnull=True)),
-        total=Count('id')
+        active=Count('id', filter=Q(paused_date__isnull=True)),
+        inactive=Count('id', filter=Q(paused_date__isnull=False)),
     ).order_by(
         'application_date__year'
     ))
