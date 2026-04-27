@@ -400,7 +400,9 @@ def calc_dues_distribution():
     cache.set('dues_dist', results)
 
 def calc_year_distribution():
-    results = list(models.Member.objects.values(
+    results = list(models.Member.objects.filter(
+        application_date__isnull=False,
+    ).values(
         'application_date__year'
     ).annotate(
         total=Count('id'),
