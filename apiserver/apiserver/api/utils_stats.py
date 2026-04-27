@@ -50,6 +50,7 @@ EXTRAS = {
     'dues_dist': [],
     'year_dist': [],
     'cert_dist': [],
+    'year_attendance': [],
 }
 
 
@@ -413,6 +414,10 @@ def calc_year_distribution():
         'application_date__year'
     ))
     cache.set('year_dist', results)
+
+def calc_year_attendance():
+
+    cache.set('year_attendance', results)
 
 def calc_cert_distribution():
     cert_fields = [
