@@ -443,39 +443,46 @@ export function Charts(props) {
 
 			<p>
 				{!!extras?.year_dist?.length &&
-					(() => {
-						const total = extras.year_dist.reduce((acc, item) => acc + item.count, 0);
-						return (
-							<ResponsiveContainer width='100%' height={300}>
-								<BarChart data={extras.year_dist}>
-									<XAxis dataKey='application_date__year' />
-									<YAxis />
-									<CartesianGrid strokeDasharray='3 3'/>
-									<Tooltip formatter={(value) => `${value} (${(value / total * 100).toFixed(1)}%)`} />
+					<ResponsiveContainer width='100%' height={300}>
+						<BarChart data={extras.year_dist}>
+							<XAxis dataKey='application_date__year' />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip
+								formatter={(value, name, props) => {
+									const totalForYear = props.payload.total;
+									const percentage = totalForYear > 0 ? (value / totalForYear * 100).toFixed(1) : 0;
+									return `${value} (${percentage}%)`;
+								}}
+								labelFormatter={(label, payload) => {
+									if (payload && payload.length) {
+										return `${label} (Total: ${payload[0].payload.total})`;
+									}
+									return label;
+								}}
+							/>
 
-									<Bar
-										type='monotone'
-										dataKey='total'
-										name='Total'
-										fill='#000000'
-										maxBarSize={40}
-										animationDuration={250}
-										stackId='a'
-									/>
+							<Bar
+								type='monotone'
+								dataKey='inactive'
+								name='Inactive'
+								fill='#000000'
+								maxBarSize={40}
+								animationDuration={250}
+								stackId='a'
+							/>
 
-									<Bar
-										type='monotone'
-										dataKey='count'
-										name='Active'
-										fill='#2185d0'
-										maxBarSize={40}
-										animationDuration={250}
-										stackId='a'
-									/>
-								</BarChart>
-							</ResponsiveContainer>
-						);
-					})()
+							<Bar
+								type='monotone'
+								dataKey='active'
+								name='Active'
+								fill='#2185d0'
+								maxBarSize={40}
+								animationDuration={250}
+								stackId='a'
+							/>
+						</BarChart>
+					</ResponsiveContainer>
 				}
 			</p>
 
