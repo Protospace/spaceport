@@ -2,7 +2,7 @@ import React, { useState, useEffect, useReducer, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Label, Button, Container, Dimmer, Dropdown, Form, FormField, Header, Icon, Loader, Input, Segment, Table, TextArea } from 'semantic-ui-react';
-import { apiUrl, isAdmin, getInstructor, getInstructorDiscourseLink, BasicTable, requester, useIsMobile } from './utils.js';
+import { apiUrl, isAdmin, getInstructor, getInstructorDiscourseLink, BasicTable, randomString, requester, useIsMobile } from './utils.js';
 
 export function AddNewTool(props) {
 	const { token } = props;
@@ -30,6 +30,7 @@ export function AddNewTool(props) {
 		'photo': null
 	});
 	const [error, setError] = useState(false);
+	const [progress, setProgress] = useState([]);
 	const [toolUrl, setToolUrl] = useState('');
 	const [photoKey, setPhotoKey] = useState(Date.now());
 	const [photoProblem, setPhotoProblem] = useState(false)
@@ -84,13 +85,29 @@ export function AddNewTool(props) {
 	const postTool = () => {
 		if (loading) return;
 		setLoading(true);
-		requester('/tools/', 'POST', token, formData)
+
+		const request_id = randomString();
+		const getStatus = () => {
+			requester('/stats/progress/?request_id='+request_id, 'GET')
+			.then(res => {
+				setProgress(res);
+			})
+			.catch(err => {
+				console.log(err);
+			});
+		};
+		const interval = setInterval(getStatus, 500);
+
+		const data = { ...formData, request_id: request_id };
+		requester('/tools/', 'POST', token, data)
 		.then(res => {
+			clearInterval(interval);
 			setLoading(false);
 			setError(false);
 			setToolUrl(res.toolUrl);
 		})
 		.catch(err => {
+			clearInterval(interval);
 			setLoading(false);
 			setError(err.data);
 			setToolUrl('');
@@ -120,13 +137,7 @@ export function AddNewTool(props) {
 
 				<p>Fill out the following form for your tool:</p>
 
-				<Form>
-					{loading &&
-						<Dimmer active>
-							<Loader />
-						</Dimmer>
-					}
-
+				<Form onSubmit={postTool}>
 					<Form.Field required>
 						<label>What is this tool called in simple terms? (e.g. Laser cutter, table saw, hand planer, etc)</label>
 						<Input
@@ -295,17 +306,13 @@ export function AddNewTool(props) {
 						/>
 					</Form.Field>
 
-					<Button
-						// TODO: implement validation as per LoginSignup
-						// TODO: section for general/misc notes
-						type='submit'
-						onClick={postTool}
-						primary
-						loading={loading}
-						disabled={photoProblem}
-					>
+					<p>
+						{progress.map(x => <>{x}<br /></>)}
+					</p>
+
+					<Form.Button disabled={photoProblem} loading={loading} error={error.non_field_errors}>
 						Submit
-					</Button>
+					</Form.Button>
 				</Form>
 
 			</>}

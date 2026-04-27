@@ -2637,6 +2637,8 @@ class OIDCAuthView(views.APIView, AuthorizeView):
 
             if client_name == 'vikunja':
                 time.sleep(1)
+            elif client_name == 'wiki' and settings.DEBUG:
+                location = location.replace('wiki.protospace.ca', 'ps-wiki-dev.dns.t0.vc')
             elif client_name in ['wiki_dev', 'wiki', 'opswiki']:
                 pass
             else:
