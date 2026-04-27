@@ -558,7 +558,7 @@ a {
 	height: 2rem;
 }
 
-.signup-year-tooltip.recharts-default-tooltip {
+.stacked-bar-tooltip.recharts-default-tooltip {
 	margin: 0px;
 	padding: 10px;
 	background-color: white !important;
@@ -566,27 +566,29 @@ a {
 	white-space: nowrap;
 }
 
-.signup-year-tooltip .recharts-tooltip-label {
+.stacked-bar-tooltip .recharts-tooltip-label {
 	margin: 0px;
 }
 
-.signup-year-tooltip .recharts-tooltip-item-list {
+.stacked-bar-tooltip .recharts-tooltip-item-list {
 	padding: 0px;
 	margin: 0px;
 }
 
-.signup-year-tooltip .recharts-tooltip-item {
+.stacked-bar-tooltip .recharts-tooltip-item {
 	display: block;
 	padding-top: 4px;
 	padding-bottom: 4px;
 }
 
-.signup-year-tooltip .tooltip-item-active {
+.stacked-bar-tooltip .tooltip-item-active,
+.stacked-bar-tooltip .tooltip-item-attended-active {
 	color: #2185d0;
 }
 
-.signup-year-tooltip .tooltip-item-inactive,
-.signup-year-tooltip .recharts-tooltip-item:last-child {
+.stacked-bar-tooltip .tooltip-item-inactive,
+.stacked-bar-tooltip .tooltip-item-attended-inactive,
+.stacked-bar-tooltip .recharts-tooltip-item:last-child {
 	color: #000000;
 }
 

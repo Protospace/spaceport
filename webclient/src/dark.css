@@ -194,12 +194,13 @@
 	background-color: #000 !important;
 }
 
-.dark .signup-year-tooltip.recharts-default-tooltip {
+.dark .stacked-bar-tooltip.recharts-default-tooltip {
 	background-color: #222 !important;
 	border-color: #555 !important;
 }
 
-.dark .signup-year-tooltip .tooltip-item-inactive,
-.dark .signup-year-tooltip .recharts-tooltip-item:last-child {
+.dark .stacked-bar-tooltip .tooltip-item-inactive,
+.dark .stacked-bar-tooltip .tooltip-item-attended-inactive,
+.dark .stacked-bar-tooltip .recharts-tooltip-item:last-child {
 	color: white;
 }

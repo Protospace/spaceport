@@ -4,17 +4,17 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, L
 import { requester, useIsMobile } from './utils.js';
 import moment from 'moment-timezone';
 
-const SignupYearTooltip = ({ active, payload, label }) => {
+const StackedBarTooltip = ({ active, payload, label, totalKey }) => {
 	if (active && payload && payload.length) {
-		const total = payload[0].payload.total;
+		const total = payload[0].payload[totalKey];
 		return (
-			<div className="recharts-default-tooltip signup-year-tooltip">
+			<div className="recharts-default-tooltip stacked-bar-tooltip">
 				<p className="recharts-tooltip-label">{label}</p>
 				<ul className="recharts-tooltip-item-list">
 					{payload.slice().reverse().map((entry, index) => {
 						const percentage = total > 0 ? (entry.value / total * 100).toFixed(1) : 0;
 						return (
-							<li className={`recharts-tooltip-item tooltip-item-${entry.name.toLowerCase()}`} key={`tooltip-item-${index}`}>
+							<li className={`recharts-tooltip-item tooltip-item-${entry.name.toLowerCase().replace(/\s/g, '-')}`} key={`tooltip-item-${index}`}>
 								<span className="recharts-tooltip-item-name">{entry.name}</span>
 								<span className="recharts-tooltip-item-separator">: </span>
 								<span className="recharts-tooltip-item-value">{`${entry.value} (${percentage}%)`}</span>
@@ -468,7 +468,7 @@ export function Charts(props) {
 
 			<Header size='medium'>Signup Year Distribution</Header>
 
-			<p>Distribution of active members by their signup year.</p>
+			<p>Distribution of members by their signup year and current status.</p>
 
 			<p>
 				{!!extras?.year_dist?.length &&
@@ -477,7 +477,7 @@ export function Charts(props) {
 							<XAxis dataKey='application_date__year' />
 							<YAxis />
 							<CartesianGrid strokeDasharray='3 3'/>
-							<Tooltip content={<SignupYearTooltip />} />
+							<Tooltip content={<StackedBarTooltip totalKey='total' />} />
 
 							<Bar
 								type='monotone'
@@ -503,7 +503,46 @@ export function Charts(props) {
 				}
 			</p>
 
-			<p>Count: number of members who signed up in a given year who are still active.</p>
+			<p>Count: number of members who signed up in a given year, separated by active/inactive status.</p>
+
+			<Header size='medium'>Class Attendance Distribution</Header>
+
+			<p>Distribution of class attendance by year. Excludes events and outings.</p>
+
+			<p>
+				{!!extras?.year_attendance?.length &&
+					<ResponsiveContainer width='100%' height={300}>
+						<BarChart data={extras.year_attendance}>
+							<XAxis dataKey='session__datetime__year' />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip content={<StackedBarTooltip totalKey='attended_total' />} />
+
+							<Bar
+								type='monotone'
+								dataKey='attended_active'
+								name='Attended Active'
+								fill='#2185d0'
+								maxBarSize={40}
+								animationDuration={250}
+								stackId='a'
+							/>
+
+							<Bar
+								type='monotone'
+								dataKey='attended_inactive'
+								name='Attended Inactive'
+								fill='#aaa'
+								maxBarSize={40}
+								animationDuration={250}
+								stackId='a'
+							/>
+						</BarChart>
+					</ResponsiveContainer>
+				}
+			</p>
+
+			<p>Count: number of members who attended a class in a given year, separated by active/inactive status.</p>
 
 			<Header size='medium'>Certification Distribution</Header>
 
