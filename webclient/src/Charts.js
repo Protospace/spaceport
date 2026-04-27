@@ -473,8 +473,11 @@ export function Charts(props) {
 			<p>
 				{!!extras?.year_dist?.length &&
 					<ResponsiveContainer width='100%' height={300}>
-						<BarChart data={extras.year_dist}>
-							<XAxis dataKey='application_date__year' />
+						<BarChart
+							data={extras.year_dist}
+							margin={isMobile? {bottom: 13} : {}}
+						>
+							<XAxis dataKey='application_date__year' interval={isMobile ? 1 : 0} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
 							<YAxis />
 							<CartesianGrid strokeDasharray='3 3'/>
 							<Tooltip content={<StackedBarTooltip totalKey='total' />} />
@@ -512,8 +515,11 @@ export function Charts(props) {
 			<p>
 				{!!extras?.year_attendance?.length &&
 					<ResponsiveContainer width='100%' height={300}>
-						<BarChart data={extras.year_attendance}>
-							<XAxis dataKey='session__datetime__year' />
+						<BarChart
+							data={extras.year_attendance}
+							margin={isMobile? {bottom: 13} : {}}
+						>
+							<XAxis dataKey='session__datetime__year' interval={0} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
 							<YAxis />
 							<CartesianGrid strokeDasharray='3 3'/>
 							<Tooltip content={<StackedBarTooltip totalKey='attended_total' />} />
@@ -542,7 +548,7 @@ export function Charts(props) {
 				}
 			</p>
 
-			<p>Count: number of members who attended a class in a given year, separated by active/inactive status.</p>
+			<p>Count: number of members marked "Attended" for all classes in a given year, separated by students' current active/inactive status.</p>
 
 			<Header size='medium'>Certification Distribution</Header>
 

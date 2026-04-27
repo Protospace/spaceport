@@ -35,6 +35,7 @@ class Command(BaseCommand):
         utils_stats.calc_dues_distribution()
         utils_stats.calc_year_distribution()
         utils_stats.calc_cert_distribution()
+        utils_stats.calc_year_attendance()
         utils_stats.calc_forum_activity()
 
         utils.gen_search_strings()
