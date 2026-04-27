@@ -416,7 +416,19 @@ def calc_year_distribution():
     cache.set('year_dist', results)
 
 def calc_year_attendance():
-
+    results = list(models.Training.objects.filter(
+        attendance_status='Attended',
+        session__datetime__isnull=False,
+        user__member__isnull=False,
+    ).values(
+        'session__datetime__year'
+    ).annotate(
+        attended_total=Count('id'),
+        attended_active=Count('id', filter=Q(user__member__paused_date__isnull=True)),
+        attended_inactive=Count('id', filter=Q(user__member__paused_date__isnull=False)),
+    ).order_by(
+        'session__datetime__year'
+    ))
     cache.set('year_attendance', results)
 
 def calc_cert_distribution():
