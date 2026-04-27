@@ -464,9 +464,9 @@ export function Charts(props) {
 
 							<Bar
 								type='monotone'
-								dataKey='inactive'
-								name='Inactive'
-								fill='#000000'
+								dataKey='active'
+								name='Active'
+								fill='#2185d0'
 								maxBarSize={40}
 								animationDuration={250}
 								stackId='a'
@@ -474,9 +474,9 @@ export function Charts(props) {
 
 							<Bar
 								type='monotone'
-								dataKey='active'
-								name='Active'
-								fill='#2185d0'
+								dataKey='inactive'
+								name='Inactive'
+								fill='#000000'
 								maxBarSize={40}
 								animationDuration={250}
 								stackId='a'
