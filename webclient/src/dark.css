@@ -193,3 +193,13 @@
 .dark .polaroid {
 	background-color: #000 !important;
 }
+
+.dark .signup-year-tooltip.recharts-default-tooltip {
+	background-color: #222 !important;
+	border-color: #555 !important;
+}
+
+.dark .signup-year-tooltip .tooltip-item-inactive,
+.dark .signup-year-tooltip .recharts-tooltip-item:last-child {
+	color: white;
+}
