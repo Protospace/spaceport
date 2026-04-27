@@ -4,6 +4,41 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, L
 import { requester, useIsMobile } from './utils.js';
 import moment from 'moment-timezone';
 
+const SignupYearTooltip = ({ active, payload, label }) => {
+	if (active && payload && payload.length) {
+		const total = payload[0].payload.total;
+		return (
+			<div className="recharts-default-tooltip" style={{
+				margin: '0px',
+				padding: '10px',
+				backgroundColor: 'rgb(255, 255, 255)',
+				border: '1px solid rgb(204, 204, 204)',
+				whiteSpace: 'nowrap'
+			}}>
+				<p className="recharts-tooltip-label" style={{ margin: '0px' }}>{label}</p>
+				<ul className="recharts-tooltip-item-list" style={{ padding: '0px', margin: '0px' }}>
+					{payload.slice().reverse().map((entry, index) => {
+						const percentage = total > 0 ? (entry.value / total * 100).toFixed(1) : 0;
+						return (
+							<li className="recharts-tooltip-item" key={`tooltip-item-${index}`} style={{ display: 'block', paddingTop: '4px', paddingBottom: '4px', color: entry.color }}>
+								<span className="recharts-tooltip-item-name">{entry.name}</span>
+								<span className="recharts-tooltip-item-separator">: </span>
+								<span className="recharts-tooltip-item-value">{`${entry.value} (${percentage}%)`}</span>
+							</li>
+						);
+					})}
+					<li className="recharts-tooltip-item" style={{ display: 'block', paddingTop: '4px', paddingBottom: '4px', color: '#000000' }}>
+						<span className="recharts-tooltip-item-name">Total</span>
+						<span className="recharts-tooltip-item-separator">: </span>
+						<span className="recharts-tooltip-item-value">{total}</span>
+					</li>
+				</ul>
+			</div>
+		);
+	}
+	return null;
+};
+
 let memberCountCache = false;
 let signupCountCache = false;
 let spaceActivityCache = false;
@@ -448,19 +483,7 @@ export function Charts(props) {
 							<XAxis dataKey='application_date__year' />
 							<YAxis />
 							<CartesianGrid strokeDasharray='3 3'/>
-							<Tooltip
-								formatter={(value, name, props) => {
-									const totalForYear = props.payload.total;
-									const percentage = totalForYear > 0 ? (value / totalForYear * 100).toFixed(1) : 0;
-									return `${value} (${percentage}%)`;
-								}}
-								labelFormatter={(label, payload) => {
-									if (payload && payload.length) {
-										return `${label} (Total: ${payload[0].payload.total})`;
-									}
-									return label;
-								}}
-							/>
+							<Tooltip content={<SignupYearTooltip />} />
 
 							<Bar
 								type='monotone'
