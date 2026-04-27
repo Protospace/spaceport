@@ -455,11 +455,22 @@ export function Charts(props) {
 
 									<Bar
 										type='monotone'
+										dataKey='total'
+										name='Total'
+										fill='#000000'
+										maxBarSize={40}
+										animationDuration={250}
+										stackId='a'
+									/>
+
+									<Bar
+										type='monotone'
 										dataKey='count'
-										name='Members'
+										name='Active'
 										fill='#2185d0'
 										maxBarSize={40}
 										animationDuration={250}
+										stackId='a'
 									/>
 								</BarChart>
 							</ResponsiveContainer>
