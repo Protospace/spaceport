@@ -692,8 +692,8 @@ class AdminStorageSpaceSerializer(StorageSpaceSerializer):
                             'member_id': member.id,
                             'member_name': member.preferred_name + ' ' + member.last_name,
                             'member_status': member.status,
-                            'start_date': start_date.astimezone(utils.TIMEZONE_CALGARY).date().isoformat(),
-                            'end_date': record.history_date.astimezone(utils.TIMEZONE_CALGARY).date().isoformat(),
+                            'start_date': start_date.astimezone(utils.DISPLAY_TZ).date().isoformat(),
+                            'end_date': record.history_date.astimezone(utils.DISPLAY_TZ).date().isoformat(),
                         })
 
                 prev_user_id = record.user_id
@@ -707,7 +707,7 @@ class AdminStorageSpaceSerializer(StorageSpaceSerializer):
                     'member_id': member.id,
                     'member_name': member.preferred_name + ' ' + member.last_name,
                     'member_status': member.status,
-                    'start_date': start_date.astimezone(utils.TIMEZONE_CALGARY).date().isoformat(),
+                    'start_date': start_date.astimezone(utils.DISPLAY_TZ).date().isoformat(),
                     'end_date': None,
                 })
 
