@@ -52,6 +52,7 @@ export function AdminHistoricalTransactions(props) {
 	const [excludePayPal, setExcludePayPal] = useState(false);
 	const [excludeSnacks, setExcludeSnacks] = useState(true);
 	const [excludeDues, setExcludeDues] = useState(false);
+	const [onlyConsumables, setOnlyConsumables] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(false);
 	const isMobile = useIsMobile();
@@ -62,7 +63,7 @@ export function AdminHistoricalTransactions(props) {
 		if (loading) return;
 		setLoading(true);
 		const month = input.month.format('YYYY-MM');
-		requester('/transactions/?month=' + month + '&exclude_paypal=' + excludePayPal + '&exclude_snacks=' + excludeSnacks + '&exclude_dues=' + excludeDues, 'GET', token)
+		requester('/transactions/?month=' + month + '&exclude_paypal=' + excludePayPal + '&exclude_snacks=' + excludeSnacks + '&exclude_dues=' + excludeDues + '&only_consumables=' + onlyConsumables, 'GET', token)
 		.then(res => {
 			setLoading(false);
 			setError(false);
@@ -105,9 +106,13 @@ export function AdminHistoricalTransactions(props) {
 		setExcludeDues(v.checked);
 	};
 
+	const handleOnlyConsumables = (e, v) => {
+		setOnlyConsumables(v.checked);
+	};
+
 	useEffect(() => {
 		makeRequest();
-	}, [excludePayPal, excludeSnacks, excludeDues]);
+	}, [excludePayPal, excludeSnacks, excludeDues, onlyConsumables]);
 
 	return (
 		<div>
@@ -185,6 +190,13 @@ export function AdminHistoricalTransactions(props) {
 						label='Exclude Dues'
 						onChange={handleExcludeDues}
 						checked={excludeDues}
+					/>
+
+					<Checkbox
+						className='filter-option'
+						label='Only Consumables'
+						onChange={handleOnlyConsumables}
+						checked={onlyConsumables}
 					/>
 
 					<TransactionList transactions={transactions} />
