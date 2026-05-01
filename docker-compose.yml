@@ -1,0 +1,56 @@
+services:
+  memcached:
+    image: memcached:1.6-alpine
+
+  apiserver:
+    build: ./apiserver
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./apiserver:/app
+      - ./apiserver/data:/app/data
+    environment:
+      - DEBUG=true
+      - BINDALL=true
+      - MEMCACHED_LOCATION=memcached:11211
+    depends_on:
+      - memcached
+    command: >
+      sh -c "
+        test -f apiserver/secrets.py || cp apiserver/secrets.py.example apiserver/secrets.py &&
+        python manage.py migrate --run-syncdb &&
+        python manage.py runserver 0.0.0.0:8000
+      "
+
+  webclient:
+    build: ./webclient
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./webclient/src:/app/src
+      - ./webclient/public:/app/public
+    environment:
+      - HOST=0.0.0.0
+      - CHOKIDAR_USEPOLLING=true
+      - CI=false
+      - BROWSER=none
+    stdin_open: true
+    tty: true
+
+  authserver:
+    build: ./authserver
+    ports:
+      - "5050:5000"
+    volumes:
+      - ./authserver:/app
+    profiles:
+      - auth
+
+  ldapserver:
+    build: ./ldapserver
+    ports:
+      - "5051:5000"
+    volumes:
+      - ./ldapserver:/app
+    profiles:
+      - ldap
