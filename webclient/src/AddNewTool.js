@@ -160,7 +160,6 @@ export function AddNewTool(props) {
 						<Input
 							placeholder='Owner'
 							name='owner'
-							value='Protospace'
 							required
 							onChange={handleChange}
 							value={formData.owner}
