@@ -18,6 +18,8 @@ services:
     command: >
       sh -c "
         test -f apiserver/secrets.py || cp apiserver/secrets.py.example apiserver/secrets.py &&
+        python manage.py makemigrations &&
+        python manage.py makemigrations api &&
         python manage.py migrate --run-syncdb &&
         python manage.py runserver 0.0.0.0:8000
       "
