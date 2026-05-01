@@ -1,6 +1,24 @@
 import logging
 logger = logging.getLogger(__name__)
 
+def _sanitize(text, for_title=False):
+    """Sanitizes text for use in MediaWiki pages."""
+    if not isinstance(text, str):
+        return text
+
+    # General sanitization for template parameters.
+    # Pipe character breaks template parameter parsing.
+    text = text.replace('|', '-')
+    # Double closing braces can prematurely end the template.
+    text = text.replace('}}', '>>')
+
+    if for_title:
+        # Additional sanitization for page titles.
+        # These characters are invalid in MediaWiki titles.
+        for char in '#<>[]{}':
+            text = text.replace(char, '')
+    return text
+
 from mwclient import Site
 from apiserver import secrets
 from .. import settings
@@ -98,7 +116,7 @@ def create_tool_page(form_data, username=None):
         # Step 1. Create redirect page first
         # This is the fastest way to reserve the tool ID and derisk collisions
         if request_id: utils_stats.set_progress(request_id, 'Creating redirect page...')
-        name = f'{form_copy["toolname"]} ({form_copy.get("model", UNKNOWN_MODEL)}) ID:{tool_id}'
+        name = f'{_sanitize(form_copy["toolname"], for_title=True)} ({_sanitize(form_copy.get("model", UNKNOWN_MODEL), for_title=True)}) ID:{tool_id}'
         redirect = site.pages[tool_id]
         redirect.save('#REDIRECT [[' + name + ']]{{id/after-redirect}}', summary='Creating new tool redirect page' + credit)
         rollbacks.append((redirect.delete, {'memo': 'redirect page creation', 'reason': 'Failed to complete tool creation, initiating rollback'}))
@@ -119,18 +137,18 @@ def create_tool_page(form_data, username=None):
         # Step 3. Create tool page
         if request_id: utils_stats.set_progress(request_id, 'Creating tool page...')
         body = f'''{{{{Equipment page
-| toolname = {form_copy['toolname']}
-| model = {form_copy.get('model', UNKNOWN_MODEL)}
-| serial = {form_copy['serial'] or ''}
-| owner = {form_copy['owner']}
-| loanstatus = {form_copy['loanstatus']}
+| toolname = {_sanitize(form_copy['toolname'])}
+| model = {_sanitize(form_copy.get('model', UNKNOWN_MODEL))}
+| serial = {_sanitize(form_copy['serial'] or '')}
+| owner = {_sanitize(form_copy['owner'])}
+| loanstatus = {_sanitize(form_copy['loanstatus'])}
 | arrived = {form_copy['arrived']}
-| location = {form_copy['location']}
-| status = {form_copy['functionalstatus']}
-| permission = {form_copy['permission'] or 'All'}
-| certification = {form_copy['certification'] or 'None'}
+| location = {_sanitize(form_copy['location'])}
+| status = {_sanitize(form_copy['functionalstatus'])}
+| permission = {_sanitize(form_copy['permission'] or 'All')}
+| certification = {_sanitize(form_copy['certification'] or 'None')}
 | photo = {photo_name}
-| caption = {form_copy['caption'] or ''}
+| caption = {_sanitize(form_copy['caption'] or '')}
 | id = {tool_id}
 }}}}
 
@@ -147,7 +165,7 @@ TBD
 TBD
 
 ==Links==
-{ form_copy['links'] if 'links' in form_copy else 'TBD' }
+{ _sanitize(form_copy['links']) if 'links' in form_copy else 'TBD' }
 '''
         page = site.pages[name]
         summary = 'Creating new tool page'
