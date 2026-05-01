@@ -1,9 +1,28 @@
 import logging
 logger = logging.getLogger(__name__)
 
+def _sanitize(text, for_title=False):
+    """Sanitizes text for use in MediaWiki pages."""
+    if not isinstance(text, str):
+        return text
+
+    # General sanitization for template parameters.
+    # Pipe character breaks template parameter parsing.
+    text = text.replace('|', '-')
+    # Double closing braces can prematurely end the template.
+    text = text.replace('}}', '>>')
+
+    if for_title:
+        # Additional sanitization for page titles.
+        # These characters are invalid in MediaWiki titles.
+        for char in '#<>[]{}':
+            text = text.replace(char, '')
+    return text
+
 from mwclient import Site
 from apiserver import secrets
 from .. import settings
+from . import utils_stats
 
 
 if settings.DEBUG:
@@ -61,6 +80,9 @@ def create_tool_page(form_data, username=None):
     if not is_configured():
         raise Exception('Mediawiki integration not configured, edit secrets.py')
 
+    request_id = form_data.get('request_id', None)
+
+    if request_id: utils_stats.set_progress(request_id, 'Logging into wiki...')
     site = wiki_site_login()
 
     credit = ''
@@ -80,6 +102,7 @@ def create_tool_page(form_data, username=None):
         if field not in form_data:
             form_copy[field] = ''
 
+    if request_id: utils_stats.set_progress(request_id, 'Finding next tool ID...')
     tool_id = get_next_tool_id(site)
 
     # collect calls for rolling back this operation incase it fails partway
@@ -92,13 +115,15 @@ def create_tool_page(form_data, username=None):
 
         # Step 1. Create redirect page first
         # This is the fastest way to reserve the tool ID and derisk collisions
-        name = f'{form_copy["toolname"]} ({form_copy.get("model", UNKNOWN_MODEL)}) ID:{tool_id}'
+        if request_id: utils_stats.set_progress(request_id, 'Creating redirect page...')
+        name = f'{_sanitize(form_copy["toolname"], for_title=True)} ({_sanitize(form_copy.get("model", UNKNOWN_MODEL), for_title=True)}) ID:{tool_id}'
         redirect = site.pages[tool_id]
         redirect.save('#REDIRECT [[' + name + ']]{{id/after-redirect}}', summary='Creating new tool redirect page' + credit)
-        rollbacks.append((redirect.delete, {'reason': 'Failed to complete tool creation, initiating rollback'}))
+        rollbacks.append((redirect.delete, {'memo': 'redirect page creation', 'reason': 'Failed to complete tool creation, initiating rollback'}))
         logger.info('Created redirect page: %s', tool_id)
 
         # Step 2. Upload photo
+        if request_id: utils_stats.set_progress(request_id, 'Uploading photo...')
         photo_name = 'NoImage.png'
         if 'photo' in form_data and form_data['photo']:
             # upload photo
@@ -106,23 +131,24 @@ def create_tool_page(form_data, username=None):
             photo_extn = photo_data.content_type.replace('image/', '')
             photo_name = f'{tool_id}.{photo_extn}'
             site.upload(photo_data, photo_name, 1, f'Photo of tool {tool_id}', comment=f'Uploaded tool picture' + credit)
-            rollbacks.append((site.pages[f'File:{photo_name}'].delete, {}))
+            rollbacks.append((site.pages[f'File:{photo_name}'].delete, {'memo': 'photo upload'}))
             logger.info('Uploaded photo: %s', photo_name)
 
         # Step 3. Create tool page
+        if request_id: utils_stats.set_progress(request_id, 'Creating tool page...')
         body = f'''{{{{Equipment page
-| toolname = {form_copy['toolname']}
-| model = {form_copy.get('model', UNKNOWN_MODEL)}
-| serial = {form_copy['serial'] or ''}
-| owner = {form_copy['owner']}
-| loanstatus = {form_copy['loanstatus']}
+| toolname = {_sanitize(form_copy['toolname'])}
+| model = {_sanitize(form_copy.get('model', UNKNOWN_MODEL))}
+| serial = {_sanitize(form_copy['serial'] or '')}
+| owner = {_sanitize(form_copy['owner'])}
+| loanstatus = {_sanitize(form_copy['loanstatus'])}
 | arrived = {form_copy['arrived']}
-| location = {form_copy['location']}
-| status = {form_copy['functionalstatus']}
-| permission = {form_copy['permission'] or 'All'}
-| certification = {form_copy['certification'] or 'None'}
+| location = {_sanitize(form_copy['location'])}
+| status = {_sanitize(form_copy['functionalstatus'])}
+| permission = {_sanitize(form_copy['permission'] or 'All')}
+| certification = {_sanitize(form_copy['certification'] or 'None')}
 | photo = {photo_name}
-| caption = {form_copy['caption'] or ''}
+| caption = {_sanitize(form_copy['caption'] or '')}
 | id = {tool_id}
 }}}}
 
@@ -139,30 +165,38 @@ TBD
 TBD
 
 ==Links==
-{ form_copy['links'] if 'links' in form_copy else 'TBD' }
+{ _sanitize(form_copy['links']) if 'links' in form_copy else 'TBD' }
 '''
         page = site.pages[name]
         summary = 'Creating new tool page'
         page.save(body, summary=summary + credit)
-        rollbacks.append((page.delete, {'reason': 'Failed to complete tool creation'}))
+        rollbacks.append((page.delete, {'memo': 'tool page creation', 'reason': 'Failed to complete tool creation'}))
         logger.info('Created tool page: %s', name)
 
         # Step 4. Add tool to gallery
+        if request_id: utils_stats.set_progress(request_id, 'Adding to gallery...')
         add_to_gallery(tool_id, photo_name, name, credit=credit, new_tool_section=form_copy.get('category', None))
-        rollbacks.append((remove_tool_from_gallery, {'tool_id': tool_id}))
+        rollbacks.append((remove_tool_from_gallery, {'memo': 'tool gallery edit', 'tool_id': tool_id}))
 
         tool_url = 'https://' + WIKI_ENDPOINT + f'/{tool_id}'
         logger.info('tool page available at: %s', tool_url)
 
+        if request_id: utils_stats.set_progress(request_id, 'Done!')
         return tool_url
     except Exception as e:
         logger.error('Error ocurred, initating rollback: %s', e)
+        if request_id: utils_stats.set_progress(request_id, 'Error, initiating rollback...')
         for rollback, kwargs in rollbacks:
             try:
+                memo = kwargs.pop('memo', 'unknown change')
+                if request_id: utils_stats.set_progress(request_id, 'Rolling back {}...'.format(memo))
+
                 rollback(**kwargs)
                 logging.info('Rolled back %s, args: %s', rollback, kwargs)
             except Exception as rollback_error:
                 logger.error('Rollback failed: %s', rollback_error)
+
+        if request_id: utils_stats.set_progress(request_id, 'Done!')
         raise e
 
 def add_to_gallery(tool_id, photo_name, tool_name, page_name='Tools_we_have', new_tool_section=None, credit=''):
