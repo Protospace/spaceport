@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import moment from 'moment-timezone';
 import { Button, Container, Header, Icon } from 'semantic-ui-react';
-import { requester } from './utils.js';
+import { requester, DISPLAY_TIMEZONE } from './utils.js';
 import QRCode from 'react-qr-code';
 
 const deviceNames = {
@@ -376,8 +376,8 @@ export function DisplayClasses(props) {
 
 	const now = new Date().toISOString();
 
-	const isTodayOrFuture = (x) => moment.utc(x.datetime).tz('America/Edmonton') > moment().tz('America/Edmonton').startOf('day');
-	const isToday = (x) => moment().tz('America/Edmonton').isSame(moment.utc(x.datetime).tz('America/Edmonton'), 'day');
+	const isTodayOrFuture = (x) => moment.utc(x.datetime).tz(DISPLAY_TIMEZONE) > moment().tz(DISPLAY_TIMEZONE).startOf('day');
+	const isToday = (x) => moment().tz(DISPLAY_TIMEZONE).isSame(moment.utc(x.datetime).tz(DISPLAY_TIMEZONE), 'day');
 
 	return (
 		<>
@@ -388,9 +388,9 @@ export function DisplayClasses(props) {
 					<Header size='medium'>{x.course_data.name}</Header>
 					<p>
 						{isToday(x) ?
-							'Today' + moment.utc(x.datetime).tz('America/Edmonton').format(' @ LT')
+							'Today' + moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format(' @ LT')
 						:
-							moment.utc(x.datetime).tz('America/Edmonton').format('ddd, ll @ LT')
+							moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format('ddd, ll @ LT')
 						}
 
 					</p>

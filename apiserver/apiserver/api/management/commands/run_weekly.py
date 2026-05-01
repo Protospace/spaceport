@@ -20,7 +20,7 @@ class Command(BaseCommand):
             paused_date__isnull=True
         )
 
-        today = utils.today_alberta_tz()
+        today = utils.today_local_tz()
         _, this_week, _ = today.isocalendar()
 
         members_to_remind = active_subsidized_members.filter(application_date__week=this_week)

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import './light.css';
 import { Container, Header, Popup, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
-import { getInstructor, useIsMobile } from './utils.js';
+import { getInstructor, useIsMobile, DISPLAY_TIMEZONE } from './utils.js';
 
 export function CertList(props) {
 	const { member } = props;
@@ -120,7 +120,7 @@ export function TrainingList(props) {
 					<Table.Row key={x.id}>
 						<Table.Cell>{x.session.course_data.name}</Table.Cell>
 						<Table.Cell>
-							<Link style={{whiteSpace: 'nowrap'}} to={'/classes/'+x.session.id}>{moment(x.session.datetime).tz('America/Edmonton').format('ll')}</Link>
+							<Link style={{whiteSpace: 'nowrap'}} to={'/classes/'+x.session.id}>{moment(x.session.datetime).tz(DISPLAY_TIMEZONE).format('ll')}</Link>
 						</Table.Cell>
 						<Table.Cell>{isMobile && 'Attendance: '}{x.attendance_status}</Table.Cell>
 						<Table.Cell>{isMobile && 'Instructor: '}{getInstructor(x.session)}</Table.Cell>

@@ -14,6 +14,8 @@ export const staticUrl = window.location.port ?
 :
 	window.location.protocol + '//static.' + window.location.hostname;
 
+export const DISPLAY_TIMEZONE = process.env.REACT_APP_DISPLAY_TIMEZONE || 'America/Edmonton';
+
 export const isAdmin = (user) => user.is_staff || user.member.is_director || user.member.is_staff;
 export const isInstructor = (user) => isAdmin(user) || user.member.is_instructor;
 

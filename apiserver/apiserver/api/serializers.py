@@ -770,7 +770,7 @@ class CourseListSerializer(CourseSerializer):
         fields = ['id', 'name', 'is_old', 'description', 'tags', 'num_interested', 'recent_date', 'is_archived']
 
     def get_is_archived(self, obj):
-        fourteen_months_ago = utils.now_alberta_tz() - datetime.timedelta(days=425)
+        fourteen_months_ago = utils.now_local_tz() - datetime.timedelta(days=425)
         recent_date = getattr(obj, 'recent_date', None)
 
         if recent_date == None or recent_date < fourteen_months_ago:
@@ -859,7 +859,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 
     def get_suggestion(self, obj):
         def iter_dates():
-            start_of_month = utils.today_alberta_tz().replace(day=1)
+            start_of_month = utils.today_local_tz().replace(day=1)
             for i in range(90):
                 yield start_of_month + datetime.timedelta(days=i)
 
@@ -873,14 +873,14 @@ class CourseDetailSerializer(serializers.ModelSerializer):
                     yield date
 
         def next_date(weekday, week_num=False, fake_start=False):
-            start = fake_start or utils.today_alberta_tz()
+            start = fake_start or utils.today_local_tz()
             for date in iter_matching_dates(weekday, week_num):
                 if date > start:
                     return date
             raise
 
         def course_is_usually_monthly(course):
-            two_months_ago = utils.now_alberta_tz() - datetime.timedelta(days=61)
+            two_months_ago = utils.now_local_tz() - datetime.timedelta(days=61)
             recent_sessions = obj.sessions.filter(datetime__gte=two_months_ago)
             if recent_sessions.count() < 3:
                 return True
@@ -893,7 +893,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             date = next_date(calendar.SATURDAY, week_num=3)
             time = datetime.time(10, 0)
             dt = datetime.datetime.combine(date, time)
-            dt = utils.TIMEZONE_CALGARY.localize(dt)
+            dt = utils.DISPLAY_TZ.localize(dt)
             cost = 0
             max_students = None
         elif obj.id == 317:
@@ -901,7 +901,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             # but December's gets skipped
             next_month = next_date(calendar.WEDNESDAY, week_num=3).month
             if next_month == 12:
-                one_month_ahead = utils.today_alberta_tz() + datetime.timedelta(days=31)
+                one_month_ahead = utils.today_local_tz() + datetime.timedelta(days=31)
                 date = next_date(calendar.THURSDAY, week_num=3, fake_start=one_month_ahead)
             elif next_month % 2 == 0:
                 date = next_date(calendar.WEDNESDAY, week_num=3)
@@ -909,7 +909,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
                 date = next_date(calendar.THURSDAY, week_num=3)
             time = datetime.time(19, 0)
             dt = datetime.datetime.combine(date, time)
-            dt = utils.TIMEZONE_CALGARY.localize(dt)
+            dt = utils.DISPLAY_TZ.localize(dt)
             cost = 0
             max_students = None
         elif prev_session:
@@ -921,7 +921,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
                 offset_weeks = 1
             dt = dt + datetime.timedelta(weeks=offset_weeks)
 
-            five_days_from_now = utils.now_alberta_tz() + datetime.timedelta(days=5)
+            five_days_from_now = utils.now_local_tz() + datetime.timedelta(days=5)
             while dt < five_days_from_now:
                 dt = dt + datetime.timedelta(weeks=offset_weeks)
 

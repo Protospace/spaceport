@@ -179,6 +179,8 @@ LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
 
+DISPLAY_TIMEZONE = os.environ.get('DISPLAY_TIMEZONE', 'America/Edmonton')
+
 USE_I18N = True
 
 USE_L10N = True

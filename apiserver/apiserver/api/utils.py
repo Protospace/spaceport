@@ -29,13 +29,13 @@ from .. import settings, secrets
 
 STATIC_FOLDER = 'data/static/'
 
-TIMEZONE_CALGARY = pytz.timezone('America/Edmonton')
+DISPLAY_TZ = pytz.timezone(settings.DISPLAY_TIMEZONE)
 
-def today_alberta_tz():
-    return datetime.now(TIMEZONE_CALGARY).date()
+def today_local_tz():
+    return datetime.now(DISPLAY_TZ).date()
 
-def now_alberta_tz():
-    return datetime.now(TIMEZONE_CALGARY)
+def now_local_tz():
+    return datetime.now(DISPLAY_TZ)
 
 def alert_tanner(message):
     try:
@@ -108,7 +108,7 @@ def calc_member_status(expire_date, fake_date=None):
     '''
     Return: member status
     '''
-    today = fake_date or today_alberta_tz()
+    today = fake_date or today_local_tz()
 
     difference = num_months_difference(expire_date, today)
 
@@ -155,7 +155,7 @@ def tally_membership_months(member, fake_date=None):
         member.status = status
 
         if status == 'Expired Member':
-            member.paused_date = today_alberta_tz()
+            member.paused_date = today_local_tz()
             msg = 'Member has expired: {} {}'.format(member.preferred_name, member.last_name)
             alert_tanner(msg)
             logger.info(msg)
@@ -280,7 +280,7 @@ def process_garden_image(upload):
 
     draw = ImageDraw.Draw(pic)
 
-    timestamp = now_alberta_tz().strftime('%a %b %-d, %Y  %-I:%M %p')
+    timestamp = now_local_tz().strftime('%a %b %-d, %Y  %-I:%M %p')
 
     font = ImageFont.truetype('DejaVuSans.ttf', 60)
     draw.text((10, 10), timestamp, (0,0,0), font=font)
@@ -472,7 +472,7 @@ def register_user(data, user):
         user.is_superuser = True
         user.save()
 
-        user.member.vetted_date = today_alberta_tz()
+        user.member.vetted_date = today_local_tz()
         user.member.save()
 
 

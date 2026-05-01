@@ -26,7 +26,7 @@ for session in sessions:
         if student.attendance_status == 'Attended':
             member = get_member(student)
             if not member.orientation_date:
-                member.orientation_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
+                member.orientation_date = session.datetime.astimezone(utils.DISPLAY_TZ).date()
                 member.save()
 
 # Lathe
@@ -39,7 +39,7 @@ for session in sessions:
         if student.attendance_status == 'Attended':
             member = get_member(student)
             if not member.lathe_cert_date:
-                member.lathe_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
+                member.lathe_cert_date = session.datetime.astimezone(utils.DISPLAY_TZ).date()
                 member.save()
 
 # Manual Mill
@@ -52,7 +52,7 @@ for session in sessions:
         if student.attendance_status == 'Attended':
             member = get_member(student)
             if not member.mill_cert_date:
-                member.mill_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
+                member.mill_cert_date = session.datetime.astimezone(utils.DISPLAY_TZ).date()
                 member.save()
 
 
@@ -66,7 +66,7 @@ for session in sessions:
         if student.attendance_status == 'Attended':
             member = get_member(student)
             if not member.wood_cert_date:
-                member.wood_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
+                member.wood_cert_date = session.datetime.astimezone(utils.DISPLAY_TZ).date()
                 member.save()
 
 # Woodworking-2 tools
@@ -79,7 +79,7 @@ for session in sessions:
         if student.attendance_status == 'Attended':
             member = get_member(student)
             if not member.wood2_cert_date:
-                member.wood2_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
+                member.wood2_cert_date = session.datetime.astimezone(utils.DISPLAY_TZ).date()
                 member.save()
 
 # CNC tools
@@ -92,7 +92,7 @@ for session in sessions:
         if student.attendance_status == 'Attended':
             member = get_member(student)
             if not member.cnc_cert_date:
-                member.cnc_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
+                member.cnc_cert_date = session.datetime.astimezone(utils.DISPLAY_TZ).date()
                 member.save()
 
 print('Done.')
