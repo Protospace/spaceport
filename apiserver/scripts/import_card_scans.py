@@ -7,16 +7,12 @@ django.setup()
 
 import csv
 from datetime import datetime, timedelta
-from apiserver.api import models
-from django.utils.timezone import now, pytz
-
-def today_alberta_tz():
-    return datetime.now(pytz.timezone('America/Edmonton')).date()
+from apiserver.api import models, utils
 
 days = {}
 
 date = datetime(2020, 3, 7).date()
-while date <= today_alberta_tz():
+while date <= utils.today_local_tz():
     days[str(date)] = set()
     date += timedelta(days=1)
 
@@ -28,7 +24,7 @@ with open('scans.csv', newline='') as csvfile:
     for row in reader:
         datetime_obj = datetime.strptime(row['date'], "%Y-%m-%d %H:%M:%S")
         datetime_obj_utc = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
-        date = datetime_obj_utc.astimezone(pytz.timezone('America/Edmonton'))
+        date = datetime_obj_utc.astimezone(utils.DISPLAY_TZ)
 
         card = row['card_number']
 

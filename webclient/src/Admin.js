@@ -5,7 +5,7 @@ import { Button, Container, Checkbox, Form, Header, Icon, Input, Table } from 's
 import * as Datetime from 'react-datetime';
 import moment from 'moment-timezone';
 import download from 'downloadjs';
-import { apiUrl, statusColor, requester, useIsMobile } from './utils.js';
+import { apiUrl, statusColor, requester, useIsMobile, DISPLAY_TIMEZONE } from './utils.js';
 
 let vettingCache = false;
 let historyCache = false;
@@ -197,7 +197,7 @@ export function AdminHistory(props) {
 										<Table.Row>
 											<Table.Cell>
 												<a onClick={() => setFocus(x.id)}>
-													{moment.utc(x.history_date).tz('America/Edmonton').format('YYYY-MM-DD')}
+													{moment.utc(x.history_date).tz(DISPLAY_TIMEZONE).format('YYYY-MM-DD')}
 												</a>
 											</Table.Cell>
 											<Table.Cell>{isMobile && 'User: '}{x.is_system ? 'System' : (x.history_user || 'Deleted User')}</Table.Cell>
@@ -282,7 +282,7 @@ export function AdminBackups(props) {
 							{backups.filter(x => x.download_time).map(x =>
 								<Table.Row key={x.backup_user}>
 									<Table.Cell>{isMobile && 'User: '}{x.backup_user}</Table.Cell>
-									<Table.Cell>{isMobile && 'Last: '}{moment.utc(x.download_time).tz('America/Edmonton').format('LLLL')}</Table.Cell>
+									<Table.Cell>{isMobile && 'Last: '}{moment.utc(x.download_time).tz(DISPLAY_TIMEZONE).format('LLLL')}</Table.Cell>
 									<Table.Cell>{isMobile && '24h ago: '}{x.less_than_24h ? 'Yes' : 'No - please investigate'}</Table.Cell>
 								</Table.Row>
 							)}

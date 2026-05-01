@@ -6,15 +6,16 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.timezone import now, pytz
 from simple_history.models import HistoricalRecords
 from simple_history import register
+from .. import settings
 
-TIMEZONE_CALGARY = pytz.timezone('America/Edmonton')
+DISPLAY_TZ = pytz.timezone(settings.DISPLAY_TIMEZONE)
 
 register(User)
 
 IGNORE = '+'
 
-def today_alberta_tz():
-    return datetime.now(TIMEZONE_CALGARY).date()
+def today_local_tz():
+    return datetime.now(DISPLAY_TZ).date()
 
 class Member(models.Model):
     user = models.OneToOneField(User, related_name='member', blank=True, null=True, on_delete=models.SET_NULL)
@@ -44,9 +45,9 @@ class Member(models.Model):
     is_instructor = models.BooleanField(default=False)
     is_vetter = models.BooleanField(default=False)
     status = models.CharField(max_length=32, blank=True, null=True)
-    expire_date = models.DateField(default=today_alberta_tz, null=True)
-    current_start_date = models.DateField(default=today_alberta_tz, null=True)
-    application_date = models.DateField(default=today_alberta_tz, null=True)
+    expire_date = models.DateField(default=today_local_tz, null=True)
+    current_start_date = models.DateField(default=today_local_tz, null=True)
+    application_date = models.DateField(default=today_local_tz, null=True)
     vetted_date = models.DateField(blank=True, null=True)
     orientation_date = models.DateField(blank=True, null=True, default=None)
     lathe_cert_date = models.DateField(blank=True, null=True, default=None)
@@ -80,7 +81,7 @@ class Transaction(models.Model):
     recorder = models.ForeignKey(User, related_name=IGNORE, blank=True, null=True, on_delete=models.SET_NULL)
 
     member_id = models.IntegerField(blank=True, null=True)
-    date = models.DateField(default=today_alberta_tz)
+    date = models.DateField(default=today_local_tz)
     amount = models.DecimalField(max_digits=7, decimal_places=2)
     reference_number = models.CharField(max_length=64, blank=True, null=True)
     memo = models.TextField(blank=True, null=True)
@@ -176,7 +177,7 @@ class Session(models.Model):
     list_display = ['datetime', 'course', 'instructor']
     search_fields = ['datetime', 'course__name', 'instructor__username']
     def __str__(self):
-        return '%s @ %s' % (self.course.name, self.datetime.astimezone(TIMEZONE_CALGARY).strftime('%Y-%m-%d %-I:%M %p'))
+        return '%s @ %s' % (self.course.name, self.datetime.astimezone(DISPLAY_TZ).strftime('%Y-%m-%d %-I:%M %p'))
 
 class Training(models.Model):
     user = models.ForeignKey(User, related_name='training', blank=True, null=True, on_delete=models.SET_NULL)
@@ -184,7 +185,7 @@ class Training(models.Model):
 
     member_id = models.IntegerField(blank=True, null=True)
     attendance_status = models.TextField(blank=True, null=True)
-    sign_up_date = models.DateField(default=today_alberta_tz, blank=True, null=True)
+    sign_up_date = models.DateField(default=today_local_tz, blank=True, null=True)
     paid_date = models.DateField(blank=True, null=True)
 
     history = HistoricalRecords()
@@ -210,7 +211,7 @@ class MetaInfo(models.Model):
     backup_id = models.TextField()
 
 class StatsMemberCount(models.Model):
-    date = models.DateField(default=today_alberta_tz)
+    date = models.DateField(default=today_local_tz)
     member_count = models.IntegerField()
     green_count = models.IntegerField()
     six_month_plus_count = models.IntegerField()
@@ -230,7 +231,7 @@ class StatsSignupCount(models.Model):
     search_fields = ['month', 'signup_count', 'retain_count', 'vetted_count']
 
 class StatsSpaceActivity(models.Model):
-    date = models.DateField(default=today_alberta_tz)
+    date = models.DateField(default=today_local_tz)
     card_scans = models.IntegerField()
 
     list_display = ['date', 'card_scans']

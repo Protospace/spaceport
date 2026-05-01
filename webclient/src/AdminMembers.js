@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Button, Checkbox, Dimmer, Form, Message, Header, Icon, Image, Segment, Table, List, ListItem } from 'semantic-ui-react';
 import moment from 'moment-timezone';
-import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
+import { statusColor, BasicTable, staticUrl, requester, DISPLAY_TIMEZONE } from './utils.js';
 import { TrainingList } from './Training.js';
 
 function AdminCardDetail(props) {
@@ -75,9 +75,9 @@ function AdminCardDetail(props) {
 				Last Seen:{' '}
 				{input.last_seen ?
 					input.last_seen > '2021-11-14T02:01:35.415685Z' ?
-						moment.utc(input.last_seen).tz('America/Edmonton').format('lll')
+						moment.utc(input.last_seen).tz(DISPLAY_TIMEZONE).format('lll')
 					:
-						moment.utc(input.last_seen).tz('America/Edmonton').format('ll')
+						moment.utc(input.last_seen).tz(DISPLAY_TIMEZONE).format('ll')
 				:
 					'Unknown'
 				}
@@ -669,7 +669,7 @@ export function AdminCert(props) {
 		if (loading) return;
 		setLoading(true);
 		let data = Object();
-		data[field] = moment.utc().tz('America/Edmonton').format('YYYY-MM-DD');
+		data[field] = moment.utc().tz(DISPLAY_TIMEZONE).format('YYYY-MM-DD');
 		requester('/members/' + member.id + '/', 'PATCH', token, data)
 		.then(res => {
 			refreshResult();

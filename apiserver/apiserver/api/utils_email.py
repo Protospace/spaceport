@@ -43,7 +43,7 @@ def send_welcome_email(member):
 
 def send_ical_email(member, session, ical_file):
     def replace_fields(text):
-        date = session.datetime.astimezone(utils.TIMEZONE_CALGARY).strftime('%A, %B %d')
+        date = session.datetime.astimezone(utils.DISPLAY_TZ).strftime('%A, %B %d')
 
         return text.replace(
             '[name]', member.preferred_name,

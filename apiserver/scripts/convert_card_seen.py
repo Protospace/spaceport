@@ -8,7 +8,7 @@ import pytz
 
 from apiserver.api import models, utils
 
-tz = pytz.timezone('America/Edmonton')
+tz = utils.DISPLAY_TZ
 
 cards = models.Card.objects.order_by('last_seen_at')
 

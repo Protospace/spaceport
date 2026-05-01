@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
         # do this hourly in case an admin causes a change
         models.StatsMemberCount.objects.update_or_create(
-            date=utils.today_alberta_tz(),
+            date=utils.today_local_tz(),
             defaults=dict(
                 member_count=counts['member_count'],
                 green_count=counts['green_count'],
@@ -26,7 +26,7 @@ class Command(BaseCommand):
         )
 
         models.StatsSignupCount.objects.update_or_create(
-            month=utils.today_alberta_tz().replace(day=1),
+            month=utils.today_local_tz().replace(day=1),
             defaults=dict(signup_count=signup_count),
         )
 
@@ -45,7 +45,7 @@ class Command(BaseCommand):
         # within 6-7 hours from now
         count = 0
 
-        now = utils.now_alberta_tz()
+        now = utils.now_local_tz()
         current_hour_start = now.replace(minute=0, second=0, microsecond=0)
 
         in_six_hours = current_hour_start + timedelta(hours=6)
@@ -104,7 +104,7 @@ class Command(BaseCommand):
         # that happened 6-7 hours ago if they haven't already
         count = 0
 
-        now = utils.now_alberta_tz()
+        now = utils.now_local_tz()
         current_hour_start = now.replace(minute=0, second=0, microsecond=0)
 
         six_hours_ago = current_hour_start - timedelta(hours=6)

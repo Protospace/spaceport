@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import './light.css';
 import { Button, Label, Container, Header, Input, Segment, Table } from 'semantic-ui-react';
 import moment from 'moment-timezone';
-import { isInstructor, getInstructor, requester, useIsMobile } from './utils.js';
+import { isInstructor, getInstructor, requester, useIsMobile, DISPLAY_TIMEZONE } from './utils.js';
 import { NotFound } from './Misc.js';
 import { InstructorCourseList, InstructorCourseDetail } from './InstructorCourses.js';
 import { InstructorClassList } from './InstructorClasses.js';
@@ -291,10 +291,10 @@ export function CourseDetail(props) {
 										<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
 											<Table.Cell>
 												<Link to={'/classes/'+x.id}>
-													{!isMobile && <span>&nbsp;</span>}{moment.utc(x.datetime).tz('America/Edmonton').format('ll')}
+													{!isMobile && <span>&nbsp;</span>}{moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format('ll')}
 												</Link>
 											</Table.Cell>
-											<Table.Cell>{isMobile && 'Time: '}{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}</Table.Cell>
+											<Table.Cell>{isMobile && 'Time: '}{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format('LT')}</Table.Cell>
 											<Table.Cell>{isMobile && 'Instructor: '}{getInstructor(x)}</Table.Cell>
 											<Table.Cell>{isMobile && 'Cost: '}{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
 											<Table.Cell>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './light.css';
 import moment from 'moment-timezone';
 import { Button, Container, Header, Table } from 'semantic-ui-react';
-import { BasicTable, staticUrl, useIsMobile } from './utils.js';
+import { BasicTable, staticUrl, useIsMobile, DISPLAY_TIMEZONE } from './utils.js';
 
 export function Cards(props) {
 	const { user, token } = props;
@@ -48,9 +48,9 @@ export function Cards(props) {
 									<Table.Cell>
 										{isMobile && 'Last Scan: '}{x.last_seen ?
 											x.last_seen > '2021-11-14T02:01:35.415685Z' ?
-												moment.utc(x.last_seen).tz('America/Edmonton').format('lll')
+												moment.utc(x.last_seen).tz(DISPLAY_TIMEZONE).format('lll')
 											:
-												moment.utc(x.last_seen).tz('America/Edmonton').format('ll')
+												moment.utc(x.last_seen).tz(DISPLAY_TIMEZONE).format('ll')
 										:
 											'Unknown'
 										}
@@ -76,9 +76,9 @@ export function Cards(props) {
 								<Table.Cell>
 									{card.last_seen ?
 										card.last_seen > '2021-11-14T02:01:35.415685Z' ?
-											moment.utc(card.last_seen).tz('America/Edmonton').format('lll')
+											moment.utc(card.last_seen).tz(DISPLAY_TIMEZONE).format('lll')
 										:
-											moment.utc(card.last_seen).tz('America/Edmonton').format('ll')
+											moment.utc(card.last_seen).tz(DISPLAY_TIMEZONE).format('ll')
 									:
 										'Unknown'
 									}

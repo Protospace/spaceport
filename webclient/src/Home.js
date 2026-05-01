@@ -4,7 +4,7 @@ import moment from 'moment-timezone';
 import QRCode from 'react-qr-code';
 import './light.css';
 import { Button, Container, Divider, Grid, Header, Icon, Image, Message, Popup, Segment, Table } from 'semantic-ui-react';
-import { statusColor, BasicTable, siteUrl, staticUrl, requester, isAdmin } from './utils.js';
+import { statusColor, BasicTable, siteUrl, staticUrl, requester, isAdmin, DISPLAY_TIMEZONE } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 import { AccountForm } from './Account.js';
 import { VestaboardForm, SignForm } from './Sign.js';
@@ -118,7 +118,7 @@ function MemberInfo(props) {
 						lastTrain.map(x =>
 							<Table.Row key={x.id}>
 								<Table.Cell style={{ minWidth: '8rem' }}>
-									<Link to={'/classes/'+x.session.id}>{moment(x.session.datetime).tz('America/Edmonton').format('ll')}</Link>
+									<Link to={'/classes/'+x.session.id}>{moment(x.session.datetime).tz(DISPLAY_TIMEZONE).format('ll')}</Link>
 								</Table.Cell>
 								<Table.Cell>{x.session.course_data.name}</Table.Cell>
 							</Table.Row>
@@ -182,9 +182,9 @@ function MemberInfo(props) {
 						<Table.Cell>
 							{lastCard && lastCard.last_seen ?
 								lastCard.last_seen > '2021-11-14T02:01:35.415685Z' ?
-									moment.utc(lastCard.last_seen).tz('America/Edmonton').format('lll')
+									moment.utc(lastCard.last_seen).tz(DISPLAY_TIMEZONE).format('lll')
 								:
-									moment.utc(lastCard.last_seen).tz('America/Edmonton').format('ll')
+									moment.utc(lastCard.last_seen).tz(DISPLAY_TIMEZONE).format('ll')
 							:
 								'Unknown'
 							}
@@ -232,13 +232,13 @@ export function Home(props) {
 
 	const getStat = (x) => stats && stats[x] ? stats[x] : 'Unknown';
 	const getZeroStat = (x) => stats && stats[x] ? stats[x] : '0';
-	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz('America/Edmonton').format('MMM Do @ LT') : 'Unknown';
+	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz(DISPLAY_TIMEZONE).format('MMM Do @ LT') : 'Unknown';
 	const showMeetingLink = () => stats && stats['next_meeting'] && moment().add(30, 'minutes').isAfter(moment.utc(stats['next_meeting']));
 
 	const getNextStat = (x) => {
 		if (stats && stats[x]) {
-			const datetime = moment.utc(stats[x].datetime).tz('America/Edmonton');
-			if (datetime.isSame(moment().tz('America/Edmonton'), 'day') ) {
+			const datetime = moment.utc(stats[x].datetime).tz(DISPLAY_TIMEZONE);
+			if (datetime.isSame(moment().tz(DISPLAY_TIMEZONE), 'day') ) {
 				return <>{datetime.format('LT')} | <Link to={'/classes/' + stats[x].id}>{stats[x].name}</Link></>;
 			} else {
 				return <>{datetime.format('MMM Do')} | <Link to={'/classes/' + stats[x].id}>{stats[x].name}</Link></>;
@@ -252,13 +252,13 @@ export function Home(props) {
 	const mumbleUsers = stats && stats['mumble_users'] ? stats['mumble_users'] : [];
 
 	const getTrackStat = (x) => stats && stats.track && stats.track[x] ? moment().unix() - stats.track[x]['time'] > 60 ? 'Free' : 'In Use' : 'Unknown';
-	const getTrackLast = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').format('llll') : 'Unknown';
-	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').fromNow() : '';
+	const getTrackLast = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz(DISPLAY_TIMEZONE).format('llll') : 'Unknown';
+	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz(DISPLAY_TIMEZONE).fromNow() : '';
 	const getTrackName = (x) => stats && stats.track && stats.track[x] && stats.track[x]['first_name'] ? stats.track[x]['first_name'] : 'Unknown';
 
 	const getScannerStat = (name) => stats?.scanner3d?.[name]?.status || 'Unknown';
-	const getScannerLast = (name) => stats?.scanner3d?.[name] ? moment.unix(stats.scanner3d[name]['time']).tz('America/Edmonton').format('llll') : 'Unknown';
-	const getScannerAgo = (name) => stats?.scanner3d?.[name] ? moment.unix(stats.scanner3d[name]['time']).tz('America/Edmonton').fromNow() : '';
+	const getScannerLast = (name) => stats?.scanner3d?.[name] ? moment.unix(stats.scanner3d[name]['time']).tz(DISPLAY_TIMEZONE).format('llll') : 'Unknown';
+	const getScannerAgo = (name) => stats?.scanner3d?.[name] ? moment.unix(stats.scanner3d[name]['time']).tz(DISPLAY_TIMEZONE).fromNow() : '';
 	const getScannerName = (name) => stats?.scanner3d?.[name]?.['first_name'] ? stats.scanner3d[name]['first_name'] : 'Unknown';
 
 	const getBalloonStat = () => {
@@ -295,8 +295,8 @@ export function Home(props) {
 	};
 
 	const alarmStat = (x) => stats && stats.alarm && moment().unix() - stats.alarm.time < 60*60*24 ? stats.alarm.data : 'Unknown';
-	const alarmUpdateLast = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz('America/Edmonton').format('llll') : 'Unknown';
-	const alarmUpdateAgo = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz('America/Edmonton').fromNow() : 'Unknown';
+	const alarmUpdateLast = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz(DISPLAY_TIMEZONE).format('llll') : 'Unknown';
+	const alarmUpdateAgo = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz(DISPLAY_TIMEZONE).fromNow() : 'Unknown';
 
 	const closedStat = (x) => stats && stats.closing ? moment().unix() > stats.closing['time'] ? 'No host' : 'Open until ' + stats.closing['time_str'] + ' with ' + stats.closing['first_name'] : 'Unknown';
 
