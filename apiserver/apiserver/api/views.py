@@ -2458,7 +2458,7 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
     queryset = models.StorageSpace.objects.all().select_related('user__member').order_by('id')
 
     def get_serializer_class(self):
-        if is_admin_director(self.request.user) and self.action == 'retrieve':
+        if is_admin_director(self.request.user):
             return serializers.AdminStorageSpaceSerializer
         elif self.request.user.member.vetted_date:
             return serializers.StorageSpaceSerializer
