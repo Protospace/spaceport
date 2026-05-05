@@ -272,18 +272,24 @@ class StorageSpace(models.Model):
     user = models.ForeignKey(User, related_name='storage', blank=True, null=True, on_delete=models.SET_NULL)
 
     shelf_id = models.TextField(unique=True)
-    location = models.TextField(choices=[
-        ('member_shelves', 'Member Shelves'),
-        ('lockers', 'Lockers'),
-        ('large_project_storage', 'Large Project Storage'),
-        ('accessible_project_storage', 'Accessible Project Storage'),
-    ])
+    classification = models.TextField(choices=[
+        ('UNKNOWN',     'UNKNOWN'),
+        ('NON-SHELF',   'NON-SHELF'),
+        ('SHELF',       'SHELF'),
+        ('SHELF-PLUS',  'SHELF-PLUS'),
+        ('SHELF-MINUS', 'SHELF-MINUS'),
+        ('TOP-LIGHT',   'TOP-LIGHT'),
+        ('TOP',         'TOP'),
+        ('LOCKER',      'LOCKER'),
+        ('SATELLITE',   'SATELLITE'),
+        ('ACCESSIBLE',  'ACCESSIBLE'),
+    ], default='UNKNOWN')
     memo = models.TextField(blank=True)
 
     history = HistoricalRecords()
 
-    list_display = ['shelf_id', 'location', 'user', 'id']
-    search_fields = ['shelf_id', 'location', 'user__username', 'id']
+    list_display = ['shelf_id', 'classification', 'user', 'id']
+    search_fields = ['shelf_id', 'classification', 'user__username', 'id']
     def __str__(self):
         return self.shelf_id
 

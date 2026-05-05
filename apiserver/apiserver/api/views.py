@@ -2503,7 +2503,7 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
         except models.StorageSpace.DoesNotExist:
             raise exceptions.ValidationError(dict(shelf_id='Shelf ID not found.'))
 
-        if storage.location != 'member_shelves':
+        if storage.classification not in ['SHELF', 'SHELF-PLUS', 'SHELF-MINUS', 'TOP']:
             raise exceptions.ValidationError(dict(shelf_id='Not a regular member shelf. Please see a Director.'))
 
         if storage.user:

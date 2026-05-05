@@ -1,0 +1,1230 @@
+diff --git a/apiserver/apiserver/api/management/commands/run_hourly.py b/apiserver/apiserver/api/management/commands/run_hourly.py
+index 1a5cb29..8ccac91 100644
+--- a/apiserver/apiserver/api/management/commands/run_hourly.py
++++ b/apiserver/apiserver/api/management/commands/run_hourly.py
+@@ -15,7 +15,7 @@ class Command(BaseCommand):
+ 
+         # do this hourly in case an admin causes a change
+         models.StatsMemberCount.objects.update_or_create(
+-            date=utils.today_alberta_tz(),
++            date=utils.today_local_tz(),
+             defaults=dict(
+                 member_count=counts['member_count'],
+                 green_count=counts['green_count'],
+@@ -26,7 +26,7 @@ class Command(BaseCommand):
+         )
+ 
+         models.StatsSignupCount.objects.update_or_create(
+-            month=utils.today_alberta_tz().replace(day=1),
++            month=utils.today_local_tz().replace(day=1),
+             defaults=dict(signup_count=signup_count),
+         )
+ 
+@@ -45,7 +45,7 @@ class Command(BaseCommand):
+         # within 6-7 hours from now
+         count = 0
+ 
+-        now = utils.now_alberta_tz()
++        now = utils.now_local_tz()
+         current_hour_start = now.replace(minute=0, second=0, microsecond=0)
+ 
+         in_six_hours = current_hour_start + timedelta(hours=6)
+@@ -104,7 +104,7 @@ class Command(BaseCommand):
+         # that happened 6-7 hours ago if they haven't already
+         count = 0
+ 
+-        now = utils.now_alberta_tz()
++        now = utils.now_local_tz()
+         current_hour_start = now.replace(minute=0, second=0, microsecond=0)
+ 
+         six_hours_ago = current_hour_start - timedelta(hours=6)
+diff --git a/apiserver/apiserver/api/management/commands/run_weekly.py b/apiserver/apiserver/api/management/commands/run_weekly.py
+index 22b3a18..b73b127 100644
+--- a/apiserver/apiserver/api/management/commands/run_weekly.py
++++ b/apiserver/apiserver/api/management/commands/run_weekly.py
+@@ -20,7 +20,7 @@ class Command(BaseCommand):
+             paused_date__isnull=True
+         )
+ 
+-        today = utils.today_alberta_tz()
++        today = utils.today_local_tz()
+         _, this_week, _ = today.isocalendar()
+ 
+         members_to_remind = active_subsidized_members.filter(application_date__week=this_week)
+diff --git a/apiserver/apiserver/api/models.py b/apiserver/apiserver/api/models.py
+index 0f84c89..2da8f98 100644
+--- a/apiserver/apiserver/api/models.py
++++ b/apiserver/apiserver/api/models.py
+@@ -6,15 +6,16 @@ from django.contrib.contenttypes.models import ContentType
+ from django.utils.timezone import now, pytz
+ from simple_history.models import HistoricalRecords
+ from simple_history import register
++from .. import settings
+ 
+-TIMEZONE_CALGARY = pytz.timezone('America/Edmonton')
++DISPLAY_TZ = pytz.timezone(settings.DISPLAY_TIMEZONE)
+ 
+ register(User)
+ 
+ IGNORE = '+'
+ 
+-def today_alberta_tz():
+-    return datetime.now(TIMEZONE_CALGARY).date()
++def today_local_tz():
++    return datetime.now(DISPLAY_TZ).date()
+ 
+ class Member(models.Model):
+     user = models.OneToOneField(User, related_name='member', blank=True, null=True, on_delete=models.SET_NULL)
+@@ -44,9 +45,9 @@ class Member(models.Model):
+     is_instructor = models.BooleanField(default=False)
+     is_vetter = models.BooleanField(default=False)
+     status = models.CharField(max_length=32, blank=True, null=True)
+-    expire_date = models.DateField(default=today_alberta_tz, null=True)
+-    current_start_date = models.DateField(default=today_alberta_tz, null=True)
+-    application_date = models.DateField(default=today_alberta_tz, null=True)
++    expire_date = models.DateField(default=today_local_tz, null=True)
++    current_start_date = models.DateField(default=today_local_tz, null=True)
++    application_date = models.DateField(default=today_local_tz, null=True)
+     vetted_date = models.DateField(blank=True, null=True)
+     orientation_date = models.DateField(blank=True, null=True, default=None)
+     lathe_cert_date = models.DateField(blank=True, null=True, default=None)
+@@ -80,7 +81,7 @@ class Transaction(models.Model):
+     recorder = models.ForeignKey(User, related_name=IGNORE, blank=True, null=True, on_delete=models.SET_NULL)
+ 
+     member_id = models.IntegerField(blank=True, null=True)
+-    date = models.DateField(default=today_alberta_tz)
++    date = models.DateField(default=today_local_tz)
+     amount = models.DecimalField(max_digits=7, decimal_places=2)
+     reference_number = models.CharField(max_length=64, blank=True, null=True)
+     memo = models.TextField(blank=True, null=True)
+@@ -176,7 +177,7 @@ class Session(models.Model):
+     list_display = ['datetime', 'course', 'instructor']
+     search_fields = ['datetime', 'course__name', 'instructor__username']
+     def __str__(self):
+-        return '%s @ %s' % (self.course.name, self.datetime.astimezone(TIMEZONE_CALGARY).strftime('%Y-%m-%d %-I:%M %p'))
++        return '%s @ %s' % (self.course.name, self.datetime.astimezone(DISPLAY_TZ).strftime('%Y-%m-%d %-I:%M %p'))
+ 
+ class Training(models.Model):
+     user = models.ForeignKey(User, related_name='training', blank=True, null=True, on_delete=models.SET_NULL)
+@@ -184,7 +185,7 @@ class Training(models.Model):
+ 
+     member_id = models.IntegerField(blank=True, null=True)
+     attendance_status = models.TextField(blank=True, null=True)
+-    sign_up_date = models.DateField(default=today_alberta_tz, blank=True, null=True)
++    sign_up_date = models.DateField(default=today_local_tz, blank=True, null=True)
+     paid_date = models.DateField(blank=True, null=True)
+ 
+     history = HistoricalRecords()
+@@ -210,7 +211,7 @@ class MetaInfo(models.Model):
+     backup_id = models.TextField()
+ 
+ class StatsMemberCount(models.Model):
+-    date = models.DateField(default=today_alberta_tz)
++    date = models.DateField(default=today_local_tz)
+     member_count = models.IntegerField()
+     green_count = models.IntegerField()
+     six_month_plus_count = models.IntegerField()
+@@ -230,7 +231,7 @@ class StatsSignupCount(models.Model):
+     search_fields = ['month', 'signup_count', 'retain_count', 'vetted_count']
+ 
+ class StatsSpaceActivity(models.Model):
+-    date = models.DateField(default=today_alberta_tz)
++    date = models.DateField(default=today_local_tz)
+     card_scans = models.IntegerField()
+ 
+     list_display = ['date', 'card_scans']
+diff --git a/apiserver/apiserver/api/serializers.py b/apiserver/apiserver/api/serializers.py
+index 9c9180e..56d44c3 100644
+--- a/apiserver/apiserver/api/serializers.py
++++ b/apiserver/apiserver/api/serializers.py
+@@ -770,7 +770,7 @@ class CourseListSerializer(CourseSerializer):
+         fields = ['id', 'name', 'is_old', 'description', 'tags', 'num_interested', 'recent_date', 'is_archived']
+ 
+     def get_is_archived(self, obj):
+-        fourteen_months_ago = utils.now_alberta_tz() - datetime.timedelta(days=425)
++        fourteen_months_ago = utils.now_local_tz() - datetime.timedelta(days=425)
+         recent_date = getattr(obj, 'recent_date', None)
+ 
+         if recent_date == None or recent_date < fourteen_months_ago:
+@@ -859,7 +859,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
+ 
+     def get_suggestion(self, obj):
+         def iter_dates():
+-            start_of_month = utils.today_alberta_tz().replace(day=1)
++            start_of_month = utils.today_local_tz().replace(day=1)
+             for i in range(90):
+                 yield start_of_month + datetime.timedelta(days=i)
+ 
+@@ -873,14 +873,14 @@ class CourseDetailSerializer(serializers.ModelSerializer):
+                     yield date
+ 
+         def next_date(weekday, week_num=False, fake_start=False):
+-            start = fake_start or utils.today_alberta_tz()
++            start = fake_start or utils.today_local_tz()
+             for date in iter_matching_dates(weekday, week_num):
+                 if date > start:
+                     return date
+             raise
+ 
+         def course_is_usually_monthly(course):
+-            two_months_ago = utils.now_alberta_tz() - datetime.timedelta(days=61)
++            two_months_ago = utils.now_local_tz() - datetime.timedelta(days=61)
+             recent_sessions = obj.sessions.filter(datetime__gte=two_months_ago)
+             if recent_sessions.count() < 3:
+                 return True
+@@ -893,7 +893,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
+             date = next_date(calendar.SATURDAY, week_num=3)
+             time = datetime.time(10, 0)
+             dt = datetime.datetime.combine(date, time)
+-            dt = utils.TIMEZONE_CALGARY.localize(dt)
++            dt = utils.DISPLAY_TZ.localize(dt)
+             cost = 0
+             max_students = None
+         elif obj.id == 317:
+@@ -901,7 +901,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
+             # but December's gets skipped
+             next_month = next_date(calendar.WEDNESDAY, week_num=3).month
+             if next_month == 12:
+-                one_month_ahead = utils.today_alberta_tz() + datetime.timedelta(days=31)
++                one_month_ahead = utils.today_local_tz() + datetime.timedelta(days=31)
+                 date = next_date(calendar.THURSDAY, week_num=3, fake_start=one_month_ahead)
+             elif next_month % 2 == 0:
+                 date = next_date(calendar.WEDNESDAY, week_num=3)
+@@ -909,7 +909,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
+                 date = next_date(calendar.THURSDAY, week_num=3)
+             time = datetime.time(19, 0)
+             dt = datetime.datetime.combine(date, time)
+-            dt = utils.TIMEZONE_CALGARY.localize(dt)
++            dt = utils.DISPLAY_TZ.localize(dt)
+             cost = 0
+             max_students = None
+         elif prev_session:
+@@ -921,7 +921,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
+                 offset_weeks = 1
+             dt = dt + datetime.timedelta(weeks=offset_weeks)
+ 
+-            five_days_from_now = utils.now_alberta_tz() + datetime.timedelta(days=5)
++            five_days_from_now = utils.now_local_tz() + datetime.timedelta(days=5)
+             while dt < five_days_from_now:
+                 dt = dt + datetime.timedelta(weeks=offset_weeks)
+ 
+diff --git a/apiserver/apiserver/api/tests.py b/apiserver/apiserver/api/tests.py
+index a979a45..2bb5868 100644
+--- a/apiserver/apiserver/api/tests.py
++++ b/apiserver/apiserver/api/tests.py
+@@ -126,7 +126,7 @@ class TestAddMonths(TestCase):
+ 
+ class TestCalcStatus(TestCase):
+     def test_calc_member_status_14_days(self):
+-        expire_date = utils.today_alberta_tz() + datetime.timedelta(days=14)
++        expire_date = utils.today_local_tz() + datetime.timedelta(days=14)
+ 
+         status = utils.calc_member_status(expire_date)
+ 
+@@ -141,28 +141,28 @@ class TestCalcStatus(TestCase):
+         self.assertEqual(status, 'Current')
+ 
+     def test_calc_member_status_90_days(self):
+-        expire_date = utils.today_alberta_tz() + datetime.timedelta(days=90)
++        expire_date = utils.today_local_tz() + datetime.timedelta(days=90)
+ 
+         status = utils.calc_member_status(expire_date)
+ 
+         self.assertEqual(status, 'Prepaid')
+ 
+     def test_calc_member_status_tomorrow(self):
+-        expire_date = utils.today_alberta_tz() + datetime.timedelta(days=1)
++        expire_date = utils.today_local_tz() + datetime.timedelta(days=1)
+ 
+         status = utils.calc_member_status(expire_date)
+ 
+         self.assertEqual(status, 'Current')
+ 
+     def test_calc_member_status_today(self):
+-        expire_date = utils.today_alberta_tz()
++        expire_date = utils.today_local_tz()
+ 
+         status = utils.calc_member_status(expire_date)
+ 
+         self.assertEqual(status, 'Due')
+ 
+     def test_calc_member_status_yesterday(self):
+-        expire_date = utils.today_alberta_tz() - datetime.timedelta(days=1)
++        expire_date = utils.today_local_tz() - datetime.timedelta(days=1)
+ 
+         status = utils.calc_member_status(expire_date)
+ 
+@@ -177,14 +177,14 @@ class TestCalcStatus(TestCase):
+         self.assertEqual(status, 'Overdue')
+ 
+     def test_calc_member_status_85_days_ago(self):
+-        expire_date = utils.today_alberta_tz() - datetime.timedelta(days=85)
++        expire_date = utils.today_local_tz() - datetime.timedelta(days=85)
+ 
+         status = utils.calc_member_status(expire_date)
+ 
+         self.assertEqual(status, 'Overdue')
+ 
+     def test_calc_member_status_95_days_ago(self):
+-        expire_date = utils.today_alberta_tz() - datetime.timedelta(days=95)
++        expire_date = utils.today_local_tz() - datetime.timedelta(days=95)
+ 
+         status = utils.calc_member_status(expire_date)
+ 
+@@ -218,7 +218,7 @@ class TestTallyMembership(TestCase):
+     def test_tally_membership_months_prepaid(self):
+         member = self.get_member_clear_transactions()
+         test_num_months = 8
+-        start_date = utils.today_alberta_tz() - relativedelta.relativedelta(months=6, days=14)
++        start_date = utils.today_local_tz() - relativedelta.relativedelta(months=6, days=14)
+         end_date = start_date + relativedelta.relativedelta(months=test_num_months)
+ 
+         member.current_start_date = start_date
+@@ -240,7 +240,7 @@ class TestTallyMembership(TestCase):
+     def test_tally_membership_months_current(self):
+         member = self.get_member_clear_transactions()
+         test_num_months = 7
+-        start_date = utils.today_alberta_tz() - relativedelta.relativedelta(months=6, days=14)
++        start_date = utils.today_local_tz() - relativedelta.relativedelta(months=6, days=14)
+         end_date = start_date + relativedelta.relativedelta(months=test_num_months)
+ 
+         member.current_start_date = start_date
+@@ -262,7 +262,7 @@ class TestTallyMembership(TestCase):
+     def test_tally_membership_months_due(self):
+         member = self.get_member_clear_transactions()
+         test_num_months = 6
+-        start_date = utils.today_alberta_tz() - relativedelta.relativedelta(months=6, days=14)
++        start_date = utils.today_local_tz() - relativedelta.relativedelta(months=6, days=14)
+         end_date = start_date + relativedelta.relativedelta(months=test_num_months)
+ 
+         member.current_start_date = start_date
+@@ -284,7 +284,7 @@ class TestTallyMembership(TestCase):
+     def test_tally_membership_months_overdue(self):
+         member = self.get_member_clear_transactions()
+         test_num_months = 5
+-        start_date = utils.today_alberta_tz() - relativedelta.relativedelta(months=6, days=14)
++        start_date = utils.today_local_tz() - relativedelta.relativedelta(months=6, days=14)
+         end_date = start_date + relativedelta.relativedelta(months=test_num_months)
+ 
+         member.current_start_date = start_date
+@@ -306,7 +306,7 @@ class TestTallyMembership(TestCase):
+     def test_tally_membership_months_overdue_pause(self):
+         member = self.get_member_clear_transactions()
+         test_num_months = 1
+-        start_date = utils.today_alberta_tz() - relativedelta.relativedelta(months=6, days=14)
++        start_date = utils.today_local_tz() - relativedelta.relativedelta(months=6, days=14)
+         end_date = start_date + relativedelta.relativedelta(months=test_num_months)
+ 
+         member.current_start_date = start_date
+@@ -328,7 +328,7 @@ class TestTallyMembership(TestCase):
+ 
+     def test_tally_membership_months_dont_run(self):
+         member = self.get_member_clear_transactions()
+-        start_date = utils.today_alberta_tz()
++        start_date = utils.today_local_tz()
+ 
+         member.current_start_date = start_date
+         member.paused_date = start_date
+diff --git a/apiserver/apiserver/api/utils.py b/apiserver/apiserver/api/utils.py
+index 711b65d..09a35b2 100644
+--- a/apiserver/apiserver/api/utils.py
++++ b/apiserver/apiserver/api/utils.py
+@@ -29,13 +29,13 @@ from .. import settings, secrets
+ 
+ STATIC_FOLDER = 'data/static/'
+ 
+-TIMEZONE_CALGARY = pytz.timezone('America/Edmonton')
++DISPLAY_TZ = pytz.timezone(settings.DISPLAY_TIMEZONE)
+ 
+-def today_alberta_tz():
+-    return datetime.now(TIMEZONE_CALGARY).date()
++def today_local_tz():
++    return datetime.now(DISPLAY_TZ).date()
+ 
+-def now_alberta_tz():
+-    return datetime.now(TIMEZONE_CALGARY)
++def now_local_tz():
++    return datetime.now(DISPLAY_TZ)
+ 
+ def alert_tanner(message):
+     try:
+@@ -108,7 +108,7 @@ def calc_member_status(expire_date, fake_date=None):
+     '''
+     Return: member status
+     '''
+-    today = fake_date or today_alberta_tz()
++    today = fake_date or today_local_tz()
+ 
+     difference = num_months_difference(expire_date, today)
+ 
+@@ -155,7 +155,7 @@ def tally_membership_months(member, fake_date=None):
+         member.status = status
+ 
+         if status == 'Expired Member':
+-            member.paused_date = today_alberta_tz()
++            member.paused_date = today_local_tz()
+             msg = 'Member has expired: {} {}'.format(member.preferred_name, member.last_name)
+             alert_tanner(msg)
+             logger.info(msg)
+@@ -280,7 +280,7 @@ def process_garden_image(upload):
+ 
+     draw = ImageDraw.Draw(pic)
+ 
+-    timestamp = now_alberta_tz().strftime('%a %b %-d, %Y  %-I:%M %p')
++    timestamp = now_local_tz().strftime('%a %b %-d, %Y  %-I:%M %p')
+ 
+     font = ImageFont.truetype('DejaVuSans.ttf', 60)
+     draw.text((10, 10), timestamp, (0,0,0), font=font)
+@@ -472,7 +472,7 @@ def register_user(data, user):
+         user.is_superuser = True
+         user.save()
+ 
+-        user.member.vetted_date = today_alberta_tz()
++        user.member.vetted_date = today_local_tz()
+         user.member.save()
+ 
+ 
+diff --git a/apiserver/apiserver/api/utils_email.py b/apiserver/apiserver/api/utils_email.py
+index 75cb748..e33e469 100644
+--- a/apiserver/apiserver/api/utils_email.py
++++ b/apiserver/apiserver/api/utils_email.py
+@@ -43,7 +43,7 @@ def send_welcome_email(member):
+ 
+ def send_ical_email(member, session, ical_file):
+     def replace_fields(text):
+-        date = session.datetime.astimezone(utils.TIMEZONE_CALGARY).strftime('%A, %B %d')
++        date = session.datetime.astimezone(utils.DISPLAY_TZ).strftime('%A, %B %d')
+ 
+         return text.replace(
+             '[name]', member.preferred_name,
+diff --git a/apiserver/apiserver/api/utils_paypal.py b/apiserver/apiserver/api/utils_paypal.py
+index 1c2a731..af8ce6f 100644
+--- a/apiserver/apiserver/api/utils_paypal.py
++++ b/apiserver/apiserver/api/utils_paypal.py
+@@ -251,7 +251,7 @@ def check_training(data, training_id, amount):
+ 
+     if training.attendance_status == 'Waiting for payment':
+         training.attendance_status = 'Confirmed'
+-    training.paid_date = utils.today_alberta_tz()
++    training.paid_date = utils.today_local_tz()
+     training.save()
+ 
+     logger.info('IPN - Amount valid for training cost, id: ' + str(training.id))
+diff --git a/apiserver/apiserver/api/utils_stats.py b/apiserver/apiserver/api/utils_stats.py
+index ba18547..7fa4d8b 100644
+--- a/apiserver/apiserver/api/utils_stats.py
++++ b/apiserver/apiserver/api/utils_stats.py
+@@ -103,7 +103,7 @@ def calc_member_counts():
+     paused_count = members.count() - member_count
+     green_count = num_current + num_prepaid
+ 
+-    six_months_ago = utils.today_alberta_tz() - timedelta(days=183)
++    six_months_ago = utils.today_local_tz() - timedelta(days=183)
+     six_month_plus_count = not_paused.filter(application_date__lte=six_months_ago).count()
+ 
+     vetted_count = not_paused.filter(vetted_date__isnull=False).count()
+@@ -137,7 +137,7 @@ def calc_member_counts():
+     )
+ 
+ def calc_signup_counts():
+-    month_beginning = utils.today_alberta_tz().replace(day=1)
++    month_beginning = utils.today_local_tz().replace(day=1)
+ 
+     members = models.Member.objects
+     new_members = members.filter(application_date__gte=month_beginning)
+@@ -236,9 +236,9 @@ def check_maintenance_list():
+     return []
+ 
+ def calc_card_scans():
+-    date = utils.today_alberta_tz()
++    date = utils.today_local_tz()
+     dt = datetime.combine(date, datetime.min.time())
+-    midnight = utils.TIMEZONE_CALGARY.localize(dt)
++    midnight = utils.DISPLAY_TZ.localize(dt)
+ 
+     cards = models.Card.objects
+     count = cards.filter(last_seen__gte=midnight).count()
+@@ -251,7 +251,7 @@ def calc_card_scans():
+     )
+ 
+ def calc_drink_sales():
+-    six_months_ago = utils.today_alberta_tz() - timedelta(days=183)
++    six_months_ago = utils.today_local_tz() - timedelta(days=183)
+ 
+     drinks_since = {
+         '1970-01-01': {
+diff --git a/apiserver/apiserver/api/views.py b/apiserver/apiserver/api/views.py
+index f191e67..b3fab43 100644
+--- a/apiserver/apiserver/api/views.py
++++ b/apiserver/apiserver/api/views.py
+@@ -226,7 +226,7 @@ class MemberViewSet(Base, Retrieve, Update):
+             raise exceptions.PermissionDenied()
+         member = self.get_object()
+         member.status = 'Paused Member'
+-        member.paused_date = utils.today_alberta_tz()
++        member.paused_date = utils.today_local_tz()
+         member.save()
+ 
+         msg = 'Member has been paused: {} {}'.format(member.preferred_name, member.last_name)
+@@ -239,10 +239,10 @@ class MemberViewSet(Base, Retrieve, Update):
+         if not is_admin_director(self.request.user):
+             raise exceptions.PermissionDenied()
+ 
+-        today = utils.today_alberta_tz()
++        today = utils.today_local_tz()
+         member = self.get_object()
+ 
+-        difference = utils.today_alberta_tz() - member.paused_date
++        difference = utils.today_local_tz() - member.paused_date
+         if difference.days > 370:  # give some leeway
+             logging.info('Member has been away for %s days (since %s), unvetting...', difference.days, member.paused_date)
+             member.vetted_date = None
+@@ -287,7 +287,7 @@ class MemberViewSet(Base, Retrieve, Update):
+             logging.info('Auto-certifying precix...')
+             if utils_ldap.is_configured():
+                 utils_ldap.add_to_group(member, 'CNC-Precix-Users')
+-            member.precix_cnc_cert_date = utils.today_alberta_tz()
++            member.precix_cnc_cert_date = utils.today_local_tz()
+ 
+         RABBIT_COURSE = 247
+         attended_rabbit = models.Training.objects.filter(
+@@ -301,7 +301,7 @@ class MemberViewSet(Base, Retrieve, Update):
+             logging.info('Auto-certifying rabbit...')
+             if utils_ldap.is_configured():
+                 utils_ldap.add_to_group(member, 'Laser Users')
+-            member.rabbit_cert_date = utils.today_alberta_tz()
++            member.rabbit_cert_date = utils.today_local_tz()
+ 
+         TROTEC_COURSE = 321
+         attended_trotec = models.Training.objects.filter(
+@@ -315,7 +315,7 @@ class MemberViewSet(Base, Retrieve, Update):
+             logging.info('Auto-certifying trotec...')
+             if utils_ldap.is_configured():
+                 utils_ldap.add_to_group(member, 'Trotec Users')
+-            member.trotec_cert_date = utils.today_alberta_tz()
++            member.trotec_cert_date = utils.today_local_tz()
+ 
+         MOPA_COURSE = 519
+         attended_mopa = models.Training.objects.filter(
+@@ -329,7 +329,7 @@ class MemberViewSet(Base, Retrieve, Update):
+             logging.info('Auto-certifying MOPA...')
+             if utils_ldap.is_configured():
+                 utils_ldap.add_to_group(member, 'MOPA Users')
+-            member.mopa_cert_date = utils.today_alberta_tz()
++            member.mopa_cert_date = utils.today_local_tz()
+ 
+         EUFYMAKEUV_COURSE = 520
+         attended_eufymakeuv = models.Training.objects.filter(
+@@ -343,9 +343,9 @@ class MemberViewSet(Base, Retrieve, Update):
+             logging.info('Auto-certifying EUFYMAKEUV...')
+             if utils_ldap.is_configured():   
+                 utils_ldap.add_to_group(member, 'Eufymake Users')
+-            member.eufymakeuv_cert_date = utils.today_alberta_tz()
++            member.eufymakeuv_cert_date = utils.today_local_tz()
+ 
+-        member.vetted_date = utils.today_alberta_tz()
++        member.vetted_date = utils.today_local_tz()
+         member.save()
+         return Response(200)
+ 
+@@ -544,11 +544,11 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
+             if requires_vetted:
+                 if status == 'Attended' and member.vetted_date:
+                     logging.info('Granting certification: %s', session.course.name)
+-                    return utils.today_alberta_tz()
++                    return utils.today_local_tz()
+             else:
+                 if status == 'Attended':
+                     logging.info('Granting certification: %s', session.course.name)
+-                    return utils.today_alberta_tz()
++                    return utils.today_local_tz()
+ 
+             logging.info('Not granting certification: %s', session.course.name)
+             return None
+@@ -760,7 +760,7 @@ class QuizViewSet(Base):
+ 
+             logging.info('Granting quiz certification: %s', quiz)
+ 
+-            member.wood_cert_date = utils.today_alberta_tz()
++            member.wood_cert_date = utils.today_local_tz()
+             member.save()
+ 
+         elif quiz == 'scanner':
+@@ -778,7 +778,7 @@ class QuizViewSet(Base):
+ 
+             logging.info('Granting quiz certification: %s', quiz)
+ 
+-            member.scanner_cert_date = utils.today_alberta_tz()
++            member.scanner_cert_date = utils.today_local_tz()
+             member.save()
+ 
+         else:
+@@ -950,7 +950,7 @@ class DoorViewSet(viewsets.ViewSet, List):
+         card.save()
+ 
+         member = card.user.member
+-        t = utils.now_alberta_tz().strftime('%Y-%m-%d %H:%M:%S, %a %I:%M %p')
++        t = utils.now_local_tz().strftime('%Y-%m-%d %H:%M:%S, %a %I:%M %p')
+         logger.info('Scan - Time: {} | Name: {} {} ({})'.format(t, member.preferred_name, member.last_name, member.id))
+ 
+         last_scan = dict(
+@@ -1502,7 +1502,7 @@ class VettingViewSet(Base, List):
+     def get_queryset(self):
+         queryset = models.Member.objects
+ 
+-        four_weeks_ago = utils.today_alberta_tz() - datetime.timedelta(days=28)
++        four_weeks_ago = utils.today_local_tz() - datetime.timedelta(days=28)
+         queryset = queryset.filter(status__in=['Prepaid', 'Current', 'Due'])
+         queryset = queryset.filter(paused_date__isnull=True)
+         queryset = queryset.filter(vetted_date__isnull=True)
+@@ -1632,7 +1632,7 @@ class ProtocoinViewSet(Base):
+                 if training:
+                     if training.attendance_status == 'Waiting for payment':
+                         training.attendance_status = 'Confirmed'
+-                    training.paid_date = utils.today_alberta_tz()
++                    training.paid_date = utils.today_local_tz()
+                     training.save()
+ 
+                 return Response(200)
+@@ -2261,7 +2261,7 @@ class PinballViewSet(Base):
+ 
+     @action(detail=False, methods=['get'])
+     def monthly_high_scores(self, request):
+-        now = utils.now_alberta_tz()
++        now = utils.now_local_tz()
+         current_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+ 
+         members = models.Member.objects.all()
+@@ -2340,7 +2340,7 @@ class HostingViewSet(Base):
+                 message = '{} just offered to host for {} hours from now until {}!'.format(
+                     hosting_user.member.preferred_name,
+                     hours,
+-                    h.finished_at.astimezone(utils.TIMEZONE_CALGARY).strftime('%-I:%M %p, %b %d'),
++                    h.finished_at.astimezone(utils.DISPLAY_TZ).strftime('%-I:%M %p, %b %d'),
+                 )
+                 if hosting_user.member.discourse_username:
+                     message += ' Tag @{} here to get their attention.'.format(
+@@ -2354,7 +2354,7 @@ class HostingViewSet(Base):
+         hosting = models.Hosting.objects.order_by('-finished_at').first()
+         closing = dict(
+             time=hosting.finished_at.timestamp(),
+-            time_str=hosting.finished_at.astimezone(utils.TIMEZONE_CALGARY).strftime('%-I:%M %p'),
++            time_str=hosting.finished_at.astimezone(utils.DISPLAY_TZ).strftime('%-I:%M %p'),
+             first_name=hosting.user.member.preferred_name,
+         )
+         cache.set('closing', closing)
+@@ -2381,7 +2381,7 @@ class HostingViewSet(Base):
+ 
+     @action(detail=False, methods=['get'])
+     def monthly_high_scores(self, request):
+-        now = utils.now_alberta_tz()
++        now = utils.now_local_tz()
+         current_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+ 
+         members = models.Member.objects.all()
+@@ -2467,7 +2467,7 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
+ 
+     @action(detail=False, methods=['get'], permission_classes=[])
+     def available(self, request):
+-        three_months_ago = utils.today_alberta_tz() - datetime.timedelta(days=89)
++        three_months_ago = utils.today_local_tz() - datetime.timedelta(days=89)
+         queryset = models.StorageSpace.objects.filter(
+             location='member_shelves'
+         ).filter(
+@@ -2508,7 +2508,7 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
+ 
+         if storage.user:
+             owner_name = storage.user.member.preferred_name
+-            three_months_ago = utils.today_alberta_tz() - datetime.timedelta(days=89)  # 1 day slack from the UI
++            three_months_ago = utils.today_local_tz() - datetime.timedelta(days=89)  # 1 day slack from the UI
+             owner_paused_date = storage.user.member.paused_date
+             owner_long_expired = owner_paused_date and owner_paused_date <= three_months_ago
+ 
+diff --git a/apiserver/apiserver/settings.py b/apiserver/apiserver/settings.py
+index 7037f14..7f3b379 100644
+--- a/apiserver/apiserver/settings.py
++++ b/apiserver/apiserver/settings.py
+@@ -179,6 +179,8 @@ LANGUAGE_CODE = 'en-us'
+ 
+ TIME_ZONE = 'UTC'
+ 
++DISPLAY_TIMEZONE = os.environ.get('DISPLAY_TIMEZONE', 'America/Edmonton')
++
+ USE_I18N = True
+ 
+ USE_L10N = True
+diff --git a/apiserver/scripts/calc_subs_membership_length.py b/apiserver/scripts/calc_subs_membership_length.py
+index a49e017..a44200b 100755
+--- a/apiserver/scripts/calc_subs_membership_length.py
++++ b/apiserver/scripts/calc_subs_membership_length.py
+@@ -5,7 +5,7 @@ django.setup()
+ from django.db.models import Prefetch, Sum
+ from apiserver.api import models, utils
+ 
+-today = utils.today_alberta_tz()
++today = utils.today_local_tz()
+ 
+ members = models.Member.objects.filter(paused_date__isnull=True)
+ related_tx = Prefetch(
+diff --git a/apiserver/scripts/convert_card_seen.py b/apiserver/scripts/convert_card_seen.py
+index 8977d0f..0418eb9 100755
+--- a/apiserver/scripts/convert_card_seen.py
++++ b/apiserver/scripts/convert_card_seen.py
+@@ -8,7 +8,7 @@ import pytz
+ 
+ from apiserver.api import models, utils
+ 
+-tz = pytz.timezone('America/Edmonton')
++tz = utils.DISPLAY_TZ
+ 
+ cards = models.Card.objects.order_by('last_seen_at')
+ 
+diff --git a/apiserver/scripts/embroidery_auth_update.py b/apiserver/scripts/embroidery_auth_update.py
+index deb99a0..f27bf19 100755
+--- a/apiserver/scripts/embroidery_auth_update.py
++++ b/apiserver/scripts/embroidery_auth_update.py
+@@ -24,7 +24,7 @@ for session in sessions:
+         if student.attendance_status == 'Attended':
+             member = get_member(student)
+             if not member.embroidery_cert_date:
+-                member.embroidery_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
++                member.embroidery_cert_date = session.datetime.astimezone(utils.DISPLAY_TZ).date()
+                 member.save()
+ 
+ print('Done.')
+diff --git a/apiserver/scripts/import_card_scans.py b/apiserver/scripts/import_card_scans.py
+index a4323f7..4c70d64 100755
+--- a/apiserver/scripts/import_card_scans.py
++++ b/apiserver/scripts/import_card_scans.py
+@@ -7,16 +7,12 @@ django.setup()
+ 
+ import csv
+ from datetime import datetime, timedelta
+-from apiserver.api import models
+-from django.utils.timezone import now, pytz
+-
+-def today_alberta_tz():
+-    return datetime.now(pytz.timezone('America/Edmonton')).date()
++from apiserver.api import models, utils
+ 
+ days = {}
+ 
+ date = datetime(2020, 3, 7).date()
+-while date <= today_alberta_tz():
++while date <= utils.today_local_tz():
+     days[str(date)] = set()
+     date += timedelta(days=1)
+ 
+@@ -28,7 +24,7 @@ with open('scans.csv', newline='') as csvfile:
+     for row in reader:
+         datetime_obj = datetime.strptime(row['date'], "%Y-%m-%d %H:%M:%S")
+         datetime_obj_utc = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
+-        date = datetime_obj_utc.astimezone(pytz.timezone('America/Edmonton'))
++        date = datetime_obj_utc.astimezone(utils.DISPLAY_TZ)
+ 
+         card = row['card_number']
+ 
+diff --git a/apiserver/scripts/import_old_portal.py b/apiserver/scripts/import_old_portal.py
+index b7120d7..df9d499 100755
+--- a/apiserver/scripts/import_old_portal.py
++++ b/apiserver/scripts/import_old_portal.py
+@@ -230,7 +230,7 @@ for o in old:
+     new['course'] = models.Course.objects.get(id=o.course_id)
+     new['old_instructor'] = o.instructor
+     dt = o.datetime.replace(tzinfo=None)
+-    dt = timezone.pytz.timezone('America/Edmonton').localize(dt)
++    dt = utils.DISPLAY_TZ.localize(dt)
+     new['datetime'] = dt.astimezone(timezone.pytz.UTC)
+ 
+     models.Session.objects.create(**new)
+diff --git a/apiserver/scripts/import_rabbit_group.py b/apiserver/scripts/import_rabbit_group.py
+index ca02f87..204c973 100755
+--- a/apiserver/scripts/import_rabbit_group.py
++++ b/apiserver/scripts/import_rabbit_group.py
+@@ -52,7 +52,7 @@ print()
+ 
+ for m in good_members.values():
+     if not m.rabbit_cert_date:
+-        m.rabbit_cert_date = utils.today_alberta_tz()
++        m.rabbit_cert_date = utils.today_local_tz()
+         print('certified', m.first_name, m.last_name)
+         m.save()
+     else:
+diff --git a/apiserver/scripts/import_trotec_group.py b/apiserver/scripts/import_trotec_group.py
+index eb63235..2db8306 100755
+--- a/apiserver/scripts/import_trotec_group.py
++++ b/apiserver/scripts/import_trotec_group.py
+@@ -52,7 +52,7 @@ print()
+ 
+ for m in good_members.values():
+     if not m.trotec_cert_date:
+-        m.trotec_cert_date = utils.today_alberta_tz()
++        m.trotec_cert_date = utils.today_local_tz()
+         print('certified', m.first_name, m.last_name)
+         m.save()
+     else:
+diff --git a/apiserver/scripts/lockout_auth_update.py b/apiserver/scripts/lockout_auth_update.py
+index bc6d618..2b91732 100755
+--- a/apiserver/scripts/lockout_auth_update.py
++++ b/apiserver/scripts/lockout_auth_update.py
+@@ -26,7 +26,7 @@ for session in sessions:
+         if student.attendance_status == 'Attended':
+             member = get_member(student)
+             if not member.orientation_date:
+-                member.orientation_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
++                member.orientation_date = session.datetime.astimezone(utils.DISPLAY_TZ).date()
+                 member.save()
+ 
+ # Lathe
+@@ -39,7 +39,7 @@ for session in sessions:
+         if student.attendance_status == 'Attended':
+             member = get_member(student)
+             if not member.lathe_cert_date:
+-                member.lathe_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
++                member.lathe_cert_date = session.datetime.astimezone(utils.DISPLAY_TZ).date()
+                 member.save()
+ 
+ # Manual Mill
+@@ -52,7 +52,7 @@ for session in sessions:
+         if student.attendance_status == 'Attended':
+             member = get_member(student)
+             if not member.mill_cert_date:
+-                member.mill_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
++                member.mill_cert_date = session.datetime.astimezone(utils.DISPLAY_TZ).date()
+                 member.save()
+ 
+ 
+@@ -66,7 +66,7 @@ for session in sessions:
+         if student.attendance_status == 'Attended':
+             member = get_member(student)
+             if not member.wood_cert_date:
+-                member.wood_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
++                member.wood_cert_date = session.datetime.astimezone(utils.DISPLAY_TZ).date()
+                 member.save()
+ 
+ # Woodworking-2 tools
+@@ -79,7 +79,7 @@ for session in sessions:
+         if student.attendance_status == 'Attended':
+             member = get_member(student)
+             if not member.wood2_cert_date:
+-                member.wood2_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
++                member.wood2_cert_date = session.datetime.astimezone(utils.DISPLAY_TZ).date()
+                 member.save()
+ 
+ # CNC tools
+@@ -92,7 +92,7 @@ for session in sessions:
+         if student.attendance_status == 'Attended':
+             member = get_member(student)
+             if not member.cnc_cert_date:
+-                member.cnc_cert_date = session.datetime.astimezone(pytz.timezone('America/Edmonton')).date()
++                member.cnc_cert_date = session.datetime.astimezone(utils.DISPLAY_TZ).date()
+                 member.save()
+ 
+ print('Done.')
+diff --git a/webclient/src/Admin.js b/webclient/src/Admin.js
+index 4d9ceb8..94b159b 100644
+--- a/webclient/src/Admin.js
++++ b/webclient/src/Admin.js
+@@ -5,7 +5,7 @@ import { Button, Container, Checkbox, Form, Header, Icon, Input, Table } from 's
+ import * as Datetime from 'react-datetime';
+ import moment from 'moment-timezone';
+ import download from 'downloadjs';
+-import { apiUrl, statusColor, requester, useIsMobile } from './utils.js';
++import { apiUrl, statusColor, requester, useIsMobile, DISPLAY_TIMEZONE } from './utils.js';
+ 
+ let vettingCache = false;
+ let historyCache = false;
+@@ -197,7 +197,7 @@ export function AdminHistory(props) {
+ 										<Table.Row>
+ 											<Table.Cell>
+ 												<a onClick={() => setFocus(x.id)}>
+-													{moment.utc(x.history_date).tz('America/Edmonton').format('YYYY-MM-DD')}
++													{moment.utc(x.history_date).tz(DISPLAY_TIMEZONE).format('YYYY-MM-DD')}
+ 												</a>
+ 											</Table.Cell>
+ 											<Table.Cell>{isMobile && 'User: '}{x.is_system ? 'System' : (x.history_user || 'Deleted User')}</Table.Cell>
+@@ -282,7 +282,7 @@ export function AdminBackups(props) {
+ 							{backups.filter(x => x.download_time).map(x =>
+ 								<Table.Row key={x.backup_user}>
+ 									<Table.Cell>{isMobile && 'User: '}{x.backup_user}</Table.Cell>
+-									<Table.Cell>{isMobile && 'Last: '}{moment.utc(x.download_time).tz('America/Edmonton').format('LLLL')}</Table.Cell>
++									<Table.Cell>{isMobile && 'Last: '}{moment.utc(x.download_time).tz(DISPLAY_TIMEZONE).format('LLLL')}</Table.Cell>
+ 									<Table.Cell>{isMobile && '24h ago: '}{x.less_than_24h ? 'Yes' : 'No - please investigate'}</Table.Cell>
+ 								</Table.Row>
+ 							)}
+diff --git a/webclient/src/AdminMembers.js b/webclient/src/AdminMembers.js
+index 5773db7..2901ad2 100644
+--- a/webclient/src/AdminMembers.js
++++ b/webclient/src/AdminMembers.js
+@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
+ import './light.css';
+ import { Button, Checkbox, Dimmer, Form, Message, Header, Icon, Image, Segment, Table, List, ListItem } from 'semantic-ui-react';
+ import moment from 'moment-timezone';
+-import { statusColor, BasicTable, staticUrl, requester } from './utils.js';
++import { statusColor, BasicTable, staticUrl, requester, DISPLAY_TIMEZONE } from './utils.js';
+ import { TrainingList } from './Training.js';
+ 
+ function AdminCardDetail(props) {
+@@ -75,9 +75,9 @@ function AdminCardDetail(props) {
+ 				Last Seen:{' '}
+ 				{input.last_seen ?
+ 					input.last_seen > '2021-11-14T02:01:35.415685Z' ?
+-						moment.utc(input.last_seen).tz('America/Edmonton').format('lll')
++						moment.utc(input.last_seen).tz(DISPLAY_TIMEZONE).format('lll')
+ 					:
+-						moment.utc(input.last_seen).tz('America/Edmonton').format('ll')
++						moment.utc(input.last_seen).tz(DISPLAY_TIMEZONE).format('ll')
+ 				:
+ 					'Unknown'
+ 				}
+@@ -669,7 +669,7 @@ export function AdminCert(props) {
+ 		if (loading) return;
+ 		setLoading(true);
+ 		let data = Object();
+-		data[field] = moment.utc().tz('America/Edmonton').format('YYYY-MM-DD');
++		data[field] = moment.utc().tz(DISPLAY_TIMEZONE).format('YYYY-MM-DD');
+ 		requester('/members/' + member.id + '/', 'PATCH', token, data)
+ 		.then(res => {
+ 			refreshResult();
+diff --git a/webclient/src/Cards.js b/webclient/src/Cards.js
+index 0427833..62d8e50 100644
+--- a/webclient/src/Cards.js
++++ b/webclient/src/Cards.js
+@@ -2,7 +2,7 @@ import React, { useState } from 'react';
+ import './light.css';
+ import moment from 'moment-timezone';
+ import { Button, Container, Header, Table } from 'semantic-ui-react';
+-import { BasicTable, staticUrl, useIsMobile } from './utils.js';
++import { BasicTable, staticUrl, useIsMobile, DISPLAY_TIMEZONE } from './utils.js';
+ 
+ export function Cards(props) {
+ 	const { user, token } = props;
+@@ -48,9 +48,9 @@ export function Cards(props) {
+ 									<Table.Cell>
+ 										{isMobile && 'Last Scan: '}{x.last_seen ?
+ 											x.last_seen > '2021-11-14T02:01:35.415685Z' ?
+-												moment.utc(x.last_seen).tz('America/Edmonton').format('lll')
++												moment.utc(x.last_seen).tz(DISPLAY_TIMEZONE).format('lll')
+ 											:
+-												moment.utc(x.last_seen).tz('America/Edmonton').format('ll')
++												moment.utc(x.last_seen).tz(DISPLAY_TIMEZONE).format('ll')
+ 										:
+ 											'Unknown'
+ 										}
+@@ -76,9 +76,9 @@ export function Cards(props) {
+ 								<Table.Cell>
+ 									{card.last_seen ?
+ 										card.last_seen > '2021-11-14T02:01:35.415685Z' ?
+-											moment.utc(card.last_seen).tz('America/Edmonton').format('lll')
++											moment.utc(card.last_seen).tz(DISPLAY_TIMEZONE).format('lll')
+ 										:
+-											moment.utc(card.last_seen).tz('America/Edmonton').format('ll')
++											moment.utc(card.last_seen).tz(DISPLAY_TIMEZONE).format('ll')
+ 									:
+ 										'Unknown'
+ 									}
+diff --git a/webclient/src/Classes.js b/webclient/src/Classes.js
+index 3881252..09378c8 100644
+--- a/webclient/src/Classes.js
++++ b/webclient/src/Classes.js
+@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
+ import './light.css';
+ import { Label, Button, Container, Dropdown, Form, FormField, Header, Icon, Input, Segment, Table } from 'semantic-ui-react';
+ import moment from 'moment-timezone';
+-import { apiUrl, isAdmin, getInstructor, getInstructorDiscourseLink, BasicTable, requester, useIsMobile } from './utils.js';
++import { apiUrl, isAdmin, getInstructor, getInstructorDiscourseLink, BasicTable, requester, useIsMobile, DISPLAY_TIMEZONE } from './utils.js';
+ import { NotFound } from './Misc.js';
+ import { InstructorClassDetail, InstructorClassAttendance } from './InstructorClasses.js';
+ import { PayPalPayNow } from './PayPal.js';
+@@ -29,10 +29,10 @@ function ClassTable(props) {
+ 							<Table.Cell>{x.course_data.name}</Table.Cell>
+ 							<Table.Cell>
+ 								<Link to={'/classes/'+x.id}>
+-									{moment.utc(x.datetime).tz('America/Edmonton').format('ddd, ll')}
++									{moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format('ddd, ll')}
+ 								</Link>
+ 								<span style={{float: 'right'}}>
+-									Time: {x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}
++									Time: {x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format('LT')}
+ 								</span>
+ 							</Table.Cell>
+ 							<Table.Cell>
+@@ -76,10 +76,10 @@ function ClassTable(props) {
+ 							<Table.Cell>&nbsp;{x.course_data.name}</Table.Cell>
+ 							<Table.Cell>
+ 								<Link to={'/classes/'+x.id}>
+-									{moment.utc(x.datetime).tz('America/Edmonton').format('ddd, ll')}
++									{moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format('ddd, ll')}
+ 								</Link>
+ 							</Table.Cell>
+-							<Table.Cell>{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}</Table.Cell>
++							<Table.Cell>{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format('LT')}</Table.Cell>
+ 							<Table.Cell>{getInstructor(x)}</Table.Cell>
+ 							<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
+ 							<Table.Cell>
+@@ -269,9 +269,9 @@ function NewClassTableCourse(props) {
+ 								<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
+ 									<Table.Cell>
+ 										<Link to={'/classes/'+x.id}>
+-											{moment.utc(x.datetime).tz('America/Edmonton').format(' MMM Do')}
++											{moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format(' MMM Do')}
+ 										</Link>
+-										{' - '}{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}
++										{' - '}{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format('LT')}
+ 									</Table.Cell>
+ 
+ 									<Table.Cell>{x.cost === '0.00' ? 'Free' : '$'+x.cost.slice(0,-3)}</Table.Cell>
+@@ -738,13 +738,13 @@ export function Class(props) {
+ 				<Table.Row>
+ 					<Table.Cell>Date:</Table.Cell>
+ 					<Table.Cell>
+-						{moment.utc(clazz.datetime).tz('America/Edmonton').format('ll')}
++						{moment.utc(clazz.datetime).tz(DISPLAY_TIMEZONE).format('ll')}
+ 					</Table.Cell>
+ 				</Table.Row>
+ 				<Table.Row>
+ 					<Table.Cell>Time:</Table.Cell>
+ 					<Table.Cell>
+-						{clazz.is_cancelled ? 'Cancelled' : moment.utc(clazz.datetime).tz('America/Edmonton').format('LT')}
++						{clazz.is_cancelled ? 'Cancelled' : moment.utc(clazz.datetime).tz(DISPLAY_TIMEZONE).format('LT')}
+ 					</Table.Cell>
+ 				</Table.Row>
+ 				<Table.Row>
+diff --git a/webclient/src/Courses.js b/webclient/src/Courses.js
+index 2db94b7..e705366 100644
+--- a/webclient/src/Courses.js
++++ b/webclient/src/Courses.js
+@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
+ import './light.css';
+ import { Button, Label, Container, Header, Input, Segment, Table } from 'semantic-ui-react';
+ import moment from 'moment-timezone';
+-import { isInstructor, getInstructor, requester, useIsMobile } from './utils.js';
++import { isInstructor, getInstructor, requester, useIsMobile, DISPLAY_TIMEZONE } from './utils.js';
+ import { NotFound } from './Misc.js';
+ import { InstructorCourseList, InstructorCourseDetail } from './InstructorCourses.js';
+ import { InstructorClassList } from './InstructorClasses.js';
+@@ -291,10 +291,10 @@ export function CourseDetail(props) {
+ 										<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
+ 											<Table.Cell>
+ 												<Link to={'/classes/'+x.id}>
+-													{!isMobile && <span>&nbsp;</span>}{moment.utc(x.datetime).tz('America/Edmonton').format('ll')}
++													{!isMobile && <span>&nbsp;</span>}{moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format('ll')}
+ 												</Link>
+ 											</Table.Cell>
+-											<Table.Cell>{isMobile && 'Time: '}{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz('America/Edmonton').format('LT')}</Table.Cell>
++											<Table.Cell>{isMobile && 'Time: '}{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format('LT')}</Table.Cell>
+ 											<Table.Cell>{isMobile && 'Instructor: '}{getInstructor(x)}</Table.Cell>
+ 											<Table.Cell>{isMobile && 'Cost: '}{x.cost === '0.00' ? 'Free' : '$'+x.cost}</Table.Cell>
+ 											<Table.Cell>
+diff --git a/webclient/src/Display.js b/webclient/src/Display.js
+index 2d3be08..00e4489 100644
+--- a/webclient/src/Display.js
++++ b/webclient/src/Display.js
+@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
+ import { useParams } from 'react-router-dom';
+ import moment from 'moment-timezone';
+ import { Button, Container, Header, Icon } from 'semantic-ui-react';
+-import { requester } from './utils.js';
++import { requester, DISPLAY_TIMEZONE } from './utils.js';
+ import QRCode from 'react-qr-code';
+ 
+ const deviceNames = {
+@@ -376,8 +376,8 @@ export function DisplayClasses(props) {
+ 
+ 	const now = new Date().toISOString();
+ 
+-	const isTodayOrFuture = (x) => moment.utc(x.datetime).tz('America/Edmonton') > moment().tz('America/Edmonton').startOf('day');
+-	const isToday = (x) => moment().tz('America/Edmonton').isSame(moment.utc(x.datetime).tz('America/Edmonton'), 'day');
++	const isTodayOrFuture = (x) => moment.utc(x.datetime).tz(DISPLAY_TIMEZONE) > moment().tz(DISPLAY_TIMEZONE).startOf('day');
++	const isToday = (x) => moment().tz(DISPLAY_TIMEZONE).isSame(moment.utc(x.datetime).tz(DISPLAY_TIMEZONE), 'day');
+ 
+ 	return (
+ 		<>
+@@ -388,9 +388,9 @@ export function DisplayClasses(props) {
+ 					<Header size='medium'>{x.course_data.name}</Header>
+ 					<p>
+ 						{isToday(x) ?
+-							'Today' + moment.utc(x.datetime).tz('America/Edmonton').format(' @ LT')
++							'Today' + moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format(' @ LT')
+ 						:
+-							moment.utc(x.datetime).tz('America/Edmonton').format('ddd, ll @ LT')
++							moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format('ddd, ll @ LT')
+ 						}
+ 
+ 					</p>
+diff --git a/webclient/src/Home.js b/webclient/src/Home.js
+index 4d9ee4b..cde74a1 100644
+--- a/webclient/src/Home.js
++++ b/webclient/src/Home.js
+@@ -4,7 +4,7 @@ import moment from 'moment-timezone';
+ import QRCode from 'react-qr-code';
+ import './light.css';
+ import { Button, Container, Divider, Grid, Header, Icon, Image, Message, Popup, Segment, Table } from 'semantic-ui-react';
+-import { statusColor, BasicTable, siteUrl, staticUrl, requester, isAdmin } from './utils.js';
++import { statusColor, BasicTable, siteUrl, staticUrl, requester, isAdmin, DISPLAY_TIMEZONE } from './utils.js';
+ import { LoginForm, SignupForm } from './LoginSignup.js';
+ import { AccountForm } from './Account.js';
+ import { VestaboardForm, SignForm } from './Sign.js';
+@@ -118,7 +118,7 @@ function MemberInfo(props) {
+ 						lastTrain.map(x =>
+ 							<Table.Row key={x.id}>
+ 								<Table.Cell style={{ minWidth: '8rem' }}>
+-									<Link to={'/classes/'+x.session.id}>{moment(x.session.datetime).tz('America/Edmonton').format('ll')}</Link>
++									<Link to={'/classes/'+x.session.id}>{moment(x.session.datetime).tz(DISPLAY_TIMEZONE).format('ll')}</Link>
+ 								</Table.Cell>
+ 								<Table.Cell>{x.session.course_data.name}</Table.Cell>
+ 							</Table.Row>
+@@ -182,9 +182,9 @@ function MemberInfo(props) {
+ 						<Table.Cell>
+ 							{lastCard && lastCard.last_seen ?
+ 								lastCard.last_seen > '2021-11-14T02:01:35.415685Z' ?
+-									moment.utc(lastCard.last_seen).tz('America/Edmonton').format('lll')
++									moment.utc(lastCard.last_seen).tz(DISPLAY_TIMEZONE).format('lll')
+ 								:
+-									moment.utc(lastCard.last_seen).tz('America/Edmonton').format('ll')
++									moment.utc(lastCard.last_seen).tz(DISPLAY_TIMEZONE).format('ll')
+ 							:
+ 								'Unknown'
+ 							}
+@@ -232,13 +232,13 @@ export function Home(props) {
+ 
+ 	const getStat = (x) => stats && stats[x] ? stats[x] : 'Unknown';
+ 	const getZeroStat = (x) => stats && stats[x] ? stats[x] : '0';
+-	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz('America/Edmonton').format('MMM Do @ LT') : 'Unknown';
++	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz(DISPLAY_TIMEZONE).format('MMM Do @ LT') : 'Unknown';
+ 	const showMeetingLink = () => stats && stats['next_meeting'] && moment().add(30, 'minutes').isAfter(moment.utc(stats['next_meeting']));
+ 
+ 	const getNextStat = (x) => {
+ 		if (stats && stats[x]) {
+-			const datetime = moment.utc(stats[x].datetime).tz('America/Edmonton');
+-			if (datetime.isSame(moment().tz('America/Edmonton'), 'day') ) {
++			const datetime = moment.utc(stats[x].datetime).tz(DISPLAY_TIMEZONE);
++			if (datetime.isSame(moment().tz(DISPLAY_TIMEZONE), 'day') ) {
+ 				return <>{datetime.format('LT')} | <Link to={'/classes/' + stats[x].id}>{stats[x].name}</Link></>;
+ 			} else {
+ 				return <>{datetime.format('MMM Do')} | <Link to={'/classes/' + stats[x].id}>{stats[x].name}</Link></>;
+@@ -252,13 +252,13 @@ export function Home(props) {
+ 	const mumbleUsers = stats && stats['mumble_users'] ? stats['mumble_users'] : [];
+ 
+ 	const getTrackStat = (x) => stats && stats.track && stats.track[x] ? moment().unix() - stats.track[x]['time'] > 60 ? 'Free' : 'In Use' : 'Unknown';
+-	const getTrackLast = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').format('llll') : 'Unknown';
+-	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz('America/Edmonton').fromNow() : '';
++	const getTrackLast = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz(DISPLAY_TIMEZONE).format('llll') : 'Unknown';
++	const getTrackAgo = (x) => stats && stats.track && stats.track[x] ? moment.unix(stats.track[x]['time']).tz(DISPLAY_TIMEZONE).fromNow() : '';
+ 	const getTrackName = (x) => stats && stats.track && stats.track[x] && stats.track[x]['first_name'] ? stats.track[x]['first_name'] : 'Unknown';
+ 
+ 	const getScannerStat = (name) => stats?.scanner3d?.[name]?.status || 'Unknown';
+-	const getScannerLast = (name) => stats?.scanner3d?.[name] ? moment.unix(stats.scanner3d[name]['time']).tz('America/Edmonton').format('llll') : 'Unknown';
+-	const getScannerAgo = (name) => stats?.scanner3d?.[name] ? moment.unix(stats.scanner3d[name]['time']).tz('America/Edmonton').fromNow() : '';
++	const getScannerLast = (name) => stats?.scanner3d?.[name] ? moment.unix(stats.scanner3d[name]['time']).tz(DISPLAY_TIMEZONE).format('llll') : 'Unknown';
++	const getScannerAgo = (name) => stats?.scanner3d?.[name] ? moment.unix(stats.scanner3d[name]['time']).tz(DISPLAY_TIMEZONE).fromNow() : '';
+ 	const getScannerName = (name) => stats?.scanner3d?.[name]?.['first_name'] ? stats.scanner3d[name]['first_name'] : 'Unknown';
+ 
+ 	const getBalloonStat = () => {
+@@ -295,8 +295,8 @@ export function Home(props) {
+ 	};
+ 
+ 	const alarmStat = (x) => stats && stats.alarm && moment().unix() - stats.alarm.time < 60*60*24 ? stats.alarm.data : 'Unknown';
+-	const alarmUpdateLast = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz('America/Edmonton').format('llll') : 'Unknown';
+-	const alarmUpdateAgo = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz('America/Edmonton').fromNow() : 'Unknown';
++	const alarmUpdateLast = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz(DISPLAY_TIMEZONE).format('llll') : 'Unknown';
++	const alarmUpdateAgo = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz(DISPLAY_TIMEZONE).fromNow() : 'Unknown';
+ 
+ 	const closedStat = (x) => stats && stats.closing ? moment().unix() > stats.closing['time'] ? 'No host' : 'Open until ' + stats.closing['time_str'] + ' with ' + stats.closing['first_name'] : 'Unknown';
+ 
+diff --git a/webclient/src/InstructorClasses.js b/webclient/src/InstructorClasses.js
+index ec3a526..8db451b 100644
+--- a/webclient/src/InstructorClasses.js
++++ b/webclient/src/InstructorClasses.js
+@@ -6,7 +6,7 @@ import 'react-datetime/css/react-datetime.css';
+ import moment from 'moment-timezone';
+ import './light.css';
+ import { Button, Checkbox, Form, Grid, Header, Icon, Label, Message, Table } from 'semantic-ui-react';
+-import { requester, randomString } from './utils.js';
++import { requester, randomString, DISPLAY_TIMEZONE } from './utils.js';
+ import { MembersDropdown } from './Members.js';
+ 
+ class AttendanceSheet extends React.Component {
+@@ -18,7 +18,7 @@ class AttendanceSheet extends React.Component {
+ 			<div style={{ padding: '3rem', background: 'white', width: '100%', height: '100%' }}>
+ 				<Header size='medium'>{clazz.course_data.name} Attendance</Header>
+ 				<p>
+-					{moment.utc(clazz.datetime).tz('America/Edmonton').format('llll')}
++					{moment.utc(clazz.datetime).tz(DISPLAY_TIMEZONE).format('llll')}
+ 					{num >= 2 ? ', '+num+' students sorted by registration time.' : '.'}
+ 				</p>
+ 
+@@ -298,7 +298,7 @@ function InstructorClassEditor(props) {
+ 		error: error[name],
+ 	});
+ 
+-	const classDate = moment.utc(input.datetime).tz('America/Edmonton');
++	const classDate = moment.utc(input.datetime).tz(DISPLAY_TIMEZONE);
+ 
+ 	useEffect(() => {
+ 		setInput({ ...input, date_confirmed: null, no_conflicts: null });
+@@ -353,9 +353,9 @@ function InstructorClassEditor(props) {
+ 				<Datetime
+ 					timeConstraints={{ minutes: { step: 15 } }}
+ 					value={ input.datetime ?
+-						moment.utc(input.datetime).tz('America/Edmonton')
++						moment.utc(input.datetime).tz(DISPLAY_TIMEZONE)
+ 					:
+-						moment().tz('America/Edmonton').set({ minute: 0 })
++						moment().tz(DISPLAY_TIMEZONE).set({ minute: 0 })
+ 					}
+ 					onChange={handleDatetime}
+ 					input={false}
+@@ -509,7 +509,7 @@ export function InstructorClassList(props) {
+ 
+ 	useEffect(() => {
+ 		setSameClasses(classes.filter(x =>
+-			moment.utc(x.datetime).tz('America/Edmonton').isSame(input.datetime, 'day')
++			moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).isSame(input.datetime, 'day')
+ 		).sort((a, b) => a.datetime > b.datetime ? 1 : -1));
+ 	}, [input.datetime]);
+ 
+@@ -556,7 +556,7 @@ export function InstructorClassList(props) {
+ 									{sameClasses.length ?
+ 										sameClasses.map(x =>
+ 											<p>
+-												{moment.utc(x.datetime).tz('America/Edmonton').format('LT')} — {x.course_data.name}
++												{moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format('LT')} — {x.course_data.name}
+ 											</p>
+ 										)
+ 									:
+diff --git a/webclient/src/Training.js b/webclient/src/Training.js
+index 9a77a60..e0395d9 100644
+--- a/webclient/src/Training.js
++++ b/webclient/src/Training.js
+@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
+ import './light.css';
+ import { Container, Header, Popup, Table } from 'semantic-ui-react';
+ import moment from 'moment-timezone';
+-import { getInstructor, useIsMobile } from './utils.js';
++import { getInstructor, useIsMobile, DISPLAY_TIMEZONE } from './utils.js';
+ 
+ export function CertList(props) {
+ 	const { member } = props;
+@@ -120,7 +120,7 @@ export function TrainingList(props) {
+ 					<Table.Row key={x.id}>
+ 						<Table.Cell>{x.session.course_data.name}</Table.Cell>
+ 						<Table.Cell>
+-							<Link style={{whiteSpace: 'nowrap'}} to={'/classes/'+x.session.id}>{moment(x.session.datetime).tz('America/Edmonton').format('ll')}</Link>
++							<Link style={{whiteSpace: 'nowrap'}} to={'/classes/'+x.session.id}>{moment(x.session.datetime).tz(DISPLAY_TIMEZONE).format('ll')}</Link>
+ 						</Table.Cell>
+ 						<Table.Cell>{isMobile && 'Attendance: '}{x.attendance_status}</Table.Cell>
+ 						<Table.Cell>{isMobile && 'Instructor: '}{getInstructor(x.session)}</Table.Cell>
+diff --git a/webclient/src/utils.js b/webclient/src/utils.js
+index 2b181c3..f06241f 100644
+--- a/webclient/src/utils.js
++++ b/webclient/src/utils.js
+@@ -14,6 +14,8 @@ export const staticUrl = window.location.port ?
+ :
+ 	window.location.protocol + '//static.' + window.location.hostname;
+ 
++export const DISPLAY_TIMEZONE = process.env.REACT_APP_DISPLAY_TIMEZONE || 'America/Edmonton';
++
+ export const isAdmin = (user) => user.is_staff || user.member.is_director || user.member.is_staff;
+ export const isInstructor = (user) => isAdmin(user) || user.member.is_instructor;
+ 
