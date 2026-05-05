@@ -6,6 +6,19 @@ import { MembersDropdown } from './Members.js';
 import { statusColor, isAdmin, BasicTable, requester, useIsMobile } from './utils.js';
 import { Button, Checkbox, Container, Form, Grid, Header, Icon, Input, Message, Segment, Table } from 'semantic-ui-react';
 
+const classifications = {
+	'UNKNOWN': 'Unknown',
+	'NON-SHELF': 'Non-shelf',
+	'SHELF': 'Shelf',
+	'SHELF-PLUS': 'Shelf-plus',
+	'SHELF-MINUS': 'Shelf-minus',
+	'TOP-LIGHT': 'Top-light',
+	'TOP': 'Top',
+	'LOCKER': 'Locker',
+	'SATELLITE': 'Satellite',
+	'ACCESSIBLE': 'Accessible',
+};
+
 export function StorageLinks(props) {
 	const { storage } = props;
 
@@ -166,13 +179,6 @@ export function ReleaseShelf(props) {
 function StorageTable(props) {
 	const { storage, user } = props;
 
-	const locations = {
-		member_shelves: 'Member Shelves',
-		lockers: 'Lockers',
-		large_project_storage: 'Large Project Storage',
-		accessible_project_storage: 'Accessible Project Storage',
-	};
-
 	return (
 		<BasicTable>
 			<Table.Body>
@@ -200,15 +206,15 @@ function StorageTable(props) {
 					}
 				</Table.Row>
 				<Table.Row>
-					<Table.Cell>Location:</Table.Cell>
+					<Table.Cell>Classification:</Table.Cell>
 					<Table.Cell>
-						{locations[storage.location]}
-						{(storage.location === 'member_shelves' || storage.location === 'lockers') && <p>
+						{classifications[storage.classification]}
+						{(storage.classification === 'SHELF' || storage.classification === 'LOCKER') && <p>
 							Aisle {storage.shelf_id[0]} <br/>
 							Column {storage.shelf_id[1]} <br/>
 							Row {storage.shelf_id[2]}
 						</p>}
-						{storage.location === 'accessible_project_storage' && <p>
+						{storage.classification === 'ACCESSIBLE' && <p>
 							By the pinball machine
 						</p>}
 					</Table.Cell>
@@ -358,13 +364,6 @@ export function StorageList(props) {
 	const [error, setError] = useState(false);
 	const isMobile = useIsMobile();
 
-	const storageTypes = {
-		member_shelves: 'Shelf',
-		lockers: 'Locker',
-		large_project_storage: 'Large',
-		accessible_project_storage: 'Accessible',
-	};
-
 	useEffect(() => {
 		requester('/storage/', 'GET', token)
 		.then(res => {
@@ -478,7 +477,7 @@ export function StorageList(props) {
 							<Table.Body>
 								{storageList.filter(filterStorage).sort(sortStorage).map(x =>
 									<Table.Row key={x.id}>
-										<Table.Cell><Link to={'/storage/'+x.id}>{x.shelf_id}</Link> ({storageTypes[x.location]})</Table.Cell>
+										<Table.Cell><Link to={'/storage/'+x.id}>{x.shelf_id}</Link> ({classifications[x.classification]})</Table.Cell>
 										<Table.Cell>
 											{isMobile && 'Owner: '}
 											{x.member_name && <Icon name='circle' color={statusColor[x.member_status]} />}
