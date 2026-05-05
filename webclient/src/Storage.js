@@ -20,14 +20,14 @@ const classifications = {
 };
 
 const notes = {
-	'NON-SHELF': 'Unclaimable/obstruction',
-	'SHELF': 'Standard member shelf 300lbs MAX.',
-	'SHELF-PLUS': 'Front and back shelves have 150lbs MAX each. There is an obstruction up the middle which is structural and CAN NOT be removed. However, as it is considered a TOP shelf you may stack totes or boxes NO higher then 24 inches from the shelf.',
-	'SHELF-MINUS': 'Less space then a standard member shelf 300lbs MAX.',
-	'TOP-LIGHT': 'Limited weight 50 lbs MAX. NOT a member shelf. ALL items must be requested and approved through the forum.',
-	'TOP': 'High elevation shelf 300lbs MAX. ALL contents must be contained within a tote or box to prevent falling hazards. NO higher then 24 inches from the shelf. ANY unsafe items could be subject to eviction. A platform ladder will be dedicated to the storage area, please use it.',
-	'LOCKER': 'Lockers of various sizes 300lbs MAX',
-	'SATELLITE': 'Drawer and door shelf. 200lbs(door open) or 100lbs(drawer out) MAX to prevent tipping.',
+	'NON-SHELF': 'Unclaimable / obstruction.',
+	'SHELF': 'Standard member shelf, 300 lbs max.',
+	'SHELF-PLUS': 'Front and back shelves have 150 lbs max each. There is an obstruction up the middle which is structural and CAN NOT be removed. However, as it is considered a top shelf you may stack totes or boxes no higher then 24" from the shelf.',
+	'SHELF-MINUS': 'Less space then a standard member shelf, 300 lbs max.',
+	'TOP-LIGHT': 'Limited weight, 50 lbs max. Not a member shelf. All items must be requested and approved through the forum.',
+	'TOP': 'High elevation shelf, 300 lbs max. All contents must be contained within a tote or box to prevent falling hazards. No higher then 24" from the shelf. Any unsafe items could be subject to eviction. A platform ladder will be dedicated to the storage area, please use it.',
+	'LOCKER': 'Lockers of various sizes, 300 lbs max.',
+	'SATELLITE': 'Drawer and door shelf. 200 lbs (door open) or 100 lbs (drawer out) max to prevent tipping.',
 };
 
 export function StorageLinks(props) {
@@ -220,14 +220,6 @@ function StorageTable(props) {
 					<Table.Cell>Classification:</Table.Cell>
 					<Table.Cell>
 						{classifications[storage.classification]}
-						{(storage.classification === 'SHELF' || storage.classification === 'LOCKER') && <p>
-							Aisle {storage.shelf_id[0]} <br/>
-							Column {storage.shelf_id[1]} <br/>
-							Row {storage.shelf_id[2]}
-						</p>}
-						{storage.classification === 'ACCESSIBLE' && <p>
-							By the pinball machine
-						</p>}
 					</Table.Cell>
 				</Table.Row>
 				<Table.Row>
