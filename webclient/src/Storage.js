@@ -362,7 +362,7 @@ export function StorageSearch(props) {
 };
 
 let storageListCache = false;
-let showEmptyCache = false;
+let showAvailableCache = false;
 let showMemodCache = false;
 let showServedCache = false;
 let showExpiredCache = false;
@@ -371,7 +371,7 @@ export function StorageList(props) {
 	const { token } = props;
 	const [storageList, setStorageList] = useState(storageListCache);
 	const [search, setSearch] = useState(storageSearchCache);
-	const [showEmpty, setShowEmpty] = useState(showEmptyCache);
+	const [showAvailable, setShowAvailable] = useState(showAvailableCache);
 	const [showMemod, setShowMemod] = useState(showMemodCache);
 	const [showServed, setShowServed] = useState(showServedCache);
 	const [showExpired, setShowExpired] = useState(showExpiredCache);
@@ -394,7 +394,7 @@ export function StorageList(props) {
 	const filterStorage = (x) => {
 		if (search.length && !x.shelf_id.startsWith(search)) {
 			return false;
-		} else if (showEmpty && x.member_name) {
+		} else if (showAvailable && (x.member_name || !['SHELF', 'SHELF-PLUS', 'SHELF-MINUS', 'TOP'].includes(x.classification))) {
 			return false;
 		} else if (showMemod && !x.memo) {
 			return false;
@@ -415,9 +415,9 @@ export function StorageList(props) {
 		}
 	};
 
-	const handleShowEmpty = (e, v) => {
-		setShowEmpty(v.checked);
-		showEmptyCache = v.checked;
+	const handleShowAvailable = (e, v) => {
+		setShowAvailable(v.checked);
+		showAvailableCache = v.checked;
 	};
 
 	const handleShowMemod = (e, v) => {
@@ -446,9 +446,9 @@ export function StorageList(props) {
 			<p>
 				<Checkbox
 					className='filter-option'
-					label='Show Empty'
-					onChange={handleShowEmpty}
-					checked={showEmpty}
+					label='Show Available'
+					onChange={handleShowAvailable}
+					checked={showAvailable}
 				/>
 
 				<Checkbox
