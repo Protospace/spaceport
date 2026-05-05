@@ -213,7 +213,12 @@ function StorageTable(props) {
 							}
 						</Table.Cell>
 					:
-						<Table.Cell>None <Link to={'/claimshelf/'+storage.shelf_id}>[claim]</Link></Table.Cell>
+						<Table.Cell>
+							None
+							{['SHELF', 'SHELF-PLUS', 'SHELF-MINUS', 'TOP'].includes(storage.classification) &&
+								<> <Link to={'/claimshelf/'+storage.shelf_id}>[claim]</Link></>
+							}
+						</Table.Cell>
 					}
 				</Table.Row>
 				<Table.Row>
