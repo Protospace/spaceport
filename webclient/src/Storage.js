@@ -183,7 +183,7 @@ function StorageTable(props) {
 		<BasicTable>
 			<Table.Body>
 				<Table.Row>
-					<Table.Cell>Shelf ID:</Table.Cell>
+					<Table.Cell>Storage ID:</Table.Cell>
 					<Table.Cell>{storage.shelf_id}</Table.Cell>
 				</Table.Row>
 				<Table.Row>
@@ -217,6 +217,12 @@ function StorageTable(props) {
 						{storage.classification === 'ACCESSIBLE' && <p>
 							By the pinball machine
 						</p>}
+					</Table.Cell>
+				</Table.Row>
+				<Table.Row>
+					<Table.Cell>Notes:</Table.Cell>
+					<Table.Cell>
+						{notes[storage.classification]}
 					</Table.Cell>
 				</Table.Row>
 				<Table.Row>
@@ -467,7 +473,7 @@ export function StorageList(props) {
 						<Table basic='very'>
 							{!isMobile && <Table.Header>
 								<Table.Row>
-									<Table.HeaderCell>Shelf ID</Table.HeaderCell>
+									<Table.HeaderCell>Storage ID</Table.HeaderCell>
 									<Table.HeaderCell>Owner</Table.HeaderCell>
 									<Table.HeaderCell>Expired</Table.HeaderCell>
 									<Table.HeaderCell>Memo</Table.HeaderCell>
@@ -557,7 +563,7 @@ export function ClaimShelfForm(props) {
 			</div>
 
 			<Form.Input
-				label='Shelf ID'
+				label='Storage ID'
 				autoComplete='off'
 				required
 				{...makeProps('shelf_id')}
@@ -626,7 +632,7 @@ export function ClaimShelf(props) {
 
 					<p>Please make sure your name and contact info are visible on the shelf.</p>
 
-					<p>Use the Shelf ID visible on the corner label (A1A, A2B, etc.)</p>
+					<p>Use the Storage ID visible on the corner label (A1A, A2B, etc.)</p>
 
 					<ClaimShelfForm {...props} />
 				</Grid.Column>
