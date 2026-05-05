@@ -19,6 +19,17 @@ const classifications = {
 	'ACCESSIBLE': 'Accessible',
 };
 
+const notes = {
+	'NON-SHELF': 'Unclaimable/obstruction',
+	'SHELF': 'Standard member shelf 300lbs MAX.',
+	'SHELF-PLUS': 'Front and back shelves have 150lbs MAX each. There is an obstruction up the middle which is structural and CAN NOT be removed. However, as it is considered a TOP shelf you may stack totes or boxes NO higher then 24 inches from the shelf.',
+	'SHELF-MINUS': 'Less space then a standard member shelf 300lbs MAX.',
+	'TOP-LIGHT': 'Limited weight 50 lbs MAX. NOT a member shelf. ALL items must be requested and approved through the forum.',
+	'TOP': 'High elevation shelf 300lbs MAX. ALL contents must be contained within a tote or box to prevent falling hazards. NO higher then 24 inches from the shelf. ANY unsafe items could be subject to eviction. A platform ladder will be dedicated to the storage area, please use it.',
+	'LOCKER': 'Lockers of various sizes 300lbs MAX',
+	'SATELLITE': 'Drawer and door shelf. 200lbs(door open) or 100lbs(drawer out) MAX to prevent tipping.',
+};
+
 export function StorageLinks(props) {
 	const { storage } = props;
 
