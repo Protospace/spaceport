@@ -91,10 +91,6 @@ export function LCARS2Display(props) {
 					<DisplayMonthlyHosting />
 				</div>
 
-				<div className='display-shelves'>
-					<DisplayAvailableShelves />
-				</div>
-
 				<div className='display-scores'>
 					<DisplaySignups />
 				</div>
@@ -317,40 +313,6 @@ export function DisplaySignups(props) {
 				</div>
 			)}
 
-		</>
-	);
-};
-
-export function DisplayAvailableShelves(props) {
-	const { token, name } = props;
-	const [shelves, setShelves] = useState(false);
-
-	const getShelves = () => {
-		requester('/storage/available/', 'GET')
-		.then(res => {
-			setShelves(res);
-		})
-		.catch(err => {
-			console.log(err);
-			setShelves(false);
-		});
-	};
-
-	useEffect(() => {
-		getShelves();
-		const interval = setInterval(getShelves, 60000);
-		return () => clearInterval(interval);
-	}, []);
-
-	return (
-		<>
-			<Header size='large'>Available Shelves</Header>
-
-			{shelves && shelves.slice(0, 10).map((x, i) =>
-				<div key={i} className={x.member_paused ? 'shelf expired' : 'shelf'}>
-					<Header size='large'>{x.shelf_id}</Header>
-				</div>
-			)}
 		</>
 	);
 };
