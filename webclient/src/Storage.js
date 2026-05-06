@@ -28,6 +28,7 @@ const notes = {
 	'TOP': 'High elevation shelf, 300 lbs max. All contents must be contained within a tote or box to prevent falling hazards. No higher then 24" from the shelf. Any unsafe items could be subject to eviction. A platform ladder will be dedicated to the storage area, please use it.',
 	'LOCKER': 'Lockers of various sizes, 300 lbs max.',
 	'SATELLITE': 'Drawer and door shelf. 200 lbs (door open) or 100 lbs (drawer out) max to prevent tipping.',
+	'ACCESSIBLE': 'Accessible storage on the main floor near the pinball machine.',
 };
 
 export function StorageLinks(props) {
