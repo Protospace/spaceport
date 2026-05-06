@@ -2467,24 +2467,7 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
 
     @action(detail=False, methods=['get'], permission_classes=[])
     def available(self, request):
-        three_months_ago = utils.today_local_tz() - datetime.timedelta(days=89)
-        queryset = models.StorageSpace.objects.filter(
-            location='member_shelves'
-        ).filter(
-            Q(user__isnull=True) | Q(user__member__paused_date__isnull=False, user__member__paused_date__lte=three_months_ago)
-        ).select_related('user__member').order_by('id')
-
-        data = []
-        for storage in queryset:
-            data.append({
-                'id': storage.id,
-                'shelf_id': storage.shelf_id,
-                'member_paused': storage.user.member.paused_date.isoformat() if storage.user else None,
-            })
-
-        data.sort(key=lambda x: (x['member_paused'] is not None, x['member_paused'] or '', x['shelf_id']))
-
-        return Response(data)
+        return Response([])
 
     @action(detail=False, methods=['post'], permission_classes=[AllowMetadata | IsAuthenticated])
     def claim(self, request):
