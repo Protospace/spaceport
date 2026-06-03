@@ -100,6 +100,14 @@ def get_discourse_group_id(group_name):
     response = response.json()
     return response['group']['id']
 
+def get_discourse_user_id(username):
+    logger.info('Getting the ID of user %s', username)
+
+    url = 'https://forum.protospace.ca/u/{}.json'.format(username)
+    response = discourse_api_get(url)
+    response = response.json()
+    return response['user']['id']
+
 def get_discourse_usernames():
     usernames = []
 
@@ -333,9 +341,39 @@ def change_discourse_username(username, new_username):
     discourse_api_put(url, data)
     return True
 
+def delete_discourse_test_user(username):
+    if not username:
+        logger.error('Empty username, aborting')
+        abort(400)
+
+    if 'test' not in username.lower():
+        logger.error('Username must contain "test"')
+        abort(400)
+
+    logger.info('Deleting test user with username %s' , username)
+
+    user_id = get_discourse_user_id(username)
+
+    url = 'https://forum.protospace.ca/admin/users/{}.json'.format(user_id)
+    data = {
+        'delete_posts': False,
+        'block_email': False,
+        'block_urls': False,
+        'block_ip': False,
+    }
+    response = discourse_api_delete(url, data)
+    response = response.json()
+    logger.info('Response: %s', response)
+
+    logger.info('User deleted.')
+    return True
+
+
 if __name__ == '__main__':
     #set_wiki_password('tanner.collin', 'protospace1')
-    set_discourse_password('test.auth.user2', 'protospace1', 'Test', 'test325258@example.com')
+    #set_discourse_password('test.auth.user4', 'protospace1', 'Test', 'test323245259@example.com')
+    #delete_discourse_test_user('test.auth.user4')
     #for u in get_discourse_usernames():
     #    print(u)
-    #pass
+
+    pass

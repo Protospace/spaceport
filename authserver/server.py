@@ -78,5 +78,14 @@ def change_discourse_username():
     auth_functions.change_discourse_username(username, new_username)
     return ''
 
+@app.route('/delete-discourse-test-user', methods=['POST'])
+def delete_discourse_test_user():
+    check_auth()
+
+    username = request.form['username']
+
+    auth_functions.delete_discourse_test_user(username)
+    return ''
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
