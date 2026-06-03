@@ -525,6 +525,13 @@ export function AdminMemberForm(props) {
 					{...makeProps('monthly_fees')}
 				/>
 
+				{result.member.monthly_fees && result.member.monthly_fees !== input.monthly_fees &&
+					<Message info>
+						<Message.Header>Membership fee change</Message.Header>
+						<p>Note: if the member has a PayPal subscription, they must cancel it and re-subscribe at the new rate. Be sure to tell them.</p>
+					</Message>
+				}
+
 				<Form.Field>
 					<label>Is the member an instructor?</label>
 					<Checkbox
