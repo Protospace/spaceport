@@ -215,7 +215,7 @@ def set_discourse_password(username, password, first_name, email):
             'active': True,
             'approved': True,
             'user_fields[10]': 'Spaceport auth',
-            'user_fields[11]': 'other',
+            'user_fields[11]': 'non-member (you are in the right place!)',
         }
         response = discourse_api_post('https://forum.protospace.ca/users.json', data)
         response = response.json()
@@ -335,7 +335,7 @@ def change_discourse_username(username, new_username):
 
 if __name__ == '__main__':
     #set_wiki_password('tanner.collin', 'protospace1')
-    set_discourse_password('test8a', 'protospace1', 'testie', 'test8@example.com')
+    set_discourse_password('test.auth.user2', 'protospace1', 'Test', 'test325258@example.com')
     #for u in get_discourse_usernames():
     #    print(u)
     #pass
