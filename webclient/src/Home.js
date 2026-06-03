@@ -4,7 +4,7 @@ import moment from 'moment-timezone';
 import QRCode from 'react-qr-code';
 import './light.css';
 import { Button, Container, Divider, Grid, Header, Icon, Image, Message, Popup, Segment, Table } from 'semantic-ui-react';
-import { statusColor, BasicTable, siteUrl, staticUrl, requester, isAdmin, DISPLAY_TIMEZONE } from './utils.js';
+import { statusColor, BasicTable, staticUrl, requester, isAdmin, DISPLAY_TIMEZONE } from './utils.js';
 import { LoginForm, SignupForm } from './LoginSignup.js';
 import { AccountForm } from './Account.js';
 import { VestaboardForm, SignForm } from './Sign.js';
@@ -96,7 +96,7 @@ function MemberInfo(props) {
 
 				<p>Click "Checkout as Guest" if you don't have a PayPal account.</p>
 
-				<QRCode value={siteUrl + 'subscribe?monthly_fees=' + user.member.monthly_fees + '&id=' + user.member.id} />
+				<QRCode value={window.location.origin + '/subscribe?monthly_fees=' + user.member.monthly_fees + '&id=' + user.member.id} />
 			</React.Fragment>}
 
 			{unpaidTraining.map(x =>
