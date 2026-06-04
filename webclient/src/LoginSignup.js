@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useHistory } from 'react-router-dom';
 import './light.css';
 import { Form, Header, Message } from 'semantic-ui-react';
-import { requester, randomString, siteUrl } from './utils.js';
+import { requester, randomString } from './utils.js';
 
 export function LoginForm(props) {
 	const [input, setInput] = useState({ username: '' });

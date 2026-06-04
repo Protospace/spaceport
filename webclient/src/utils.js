@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 
 export const randomString = () => Math.random().toString(36).substr(2, 10);
 
-export const siteUrl = window.location.toString();
 export const apiUrl = window.location.port ?
 	'http://' + window.location.hostname + ':8000'
 :
