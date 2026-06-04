@@ -2,6 +2,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 import requests
+import random
+import string
 from requests.exceptions import Timeout
 
 from apiserver import secrets
@@ -55,3 +57,66 @@ def change_discourse_username(username, new_username):
         new_username=new_username,
     )
     return auth_api(secrets.DISCOURSE_AUTH_API_URL + 'change-discourse-username', data=data)
+
+def delete_discourse_test_user(username):
+    data = dict(
+        username=username,
+    )
+    return auth_api(secrets.DISCOURSE_AUTH_API_URL + 'delete-discourse-test-user', data=data)
+
+
+def test_discourse_integration():
+    if not discourse_is_configured():
+        logger.info('Discourse not configured, skipping integration test.')
+        return False
+
+    rand = lambda: ''.join(random.choices(string.digits, k=10))
+
+    data = {
+        'username': 'test.auth' + rand(),
+        'password': 'protospace' + rand(),
+        'first_name': 'SpaceportTest',
+        'email': 'test' + rand() + '@example.com',
+    }
+
+    logger.info('Creating test user: %s, email: %s', data['username'], data['email'])
+
+    if set_discourse_password(data) != 200:
+        utils.alert_tanner('Discourse integration test: problem creating user!')
+        return False
+
+    data['password'] = 'protospace' + rand()
+
+    logger.info('Changing test user\'s password...')
+
+    if set_discourse_password(data) != 200:
+        utils.alert_tanner('Discourse integration test: problem changing password!')
+        return False
+
+    new_username = 'test.auth' + rand()
+    logger.info('Changing test user\'s username to %s...', new_username)
+
+    if change_discourse_username(data['username'], new_username) != 200:
+        utils.alert_tanner('Discourse integration test: problem changing username!')
+        return False
+
+    logger.info('Adding test user to group...')
+
+    if add_discourse_group_members('protospace_members', [new_username]) != 200:
+        utils.alert_tanner('Discourse integration test: problem adding to group!')
+        return False
+
+    logger.info('Removing test user to group...')
+
+    if remove_discourse_group_members('protospace_members', [new_username]) != 200:
+        utils.alert_tanner('Discourse integration test: problem removing from group!')
+        return False
+
+    logger.info('Deleting test user...')
+
+    if delete_discourse_test_user(new_username) != 200:
+        utils.alert_tanner('Discourse integration test: problem deleting test user!')
+        return False
+
+    logger.info('Discourse integration test complete.')
+    return True
