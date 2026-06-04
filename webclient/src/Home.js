@@ -276,7 +276,7 @@ export function Home(props) {
 			return 'seen 0m ago';
 		}
 
-		const days = duration.days();
+		const days = Math.floor(duration.asDays());
 		const hours = duration.hours();
 		const minutes = duration.minutes();
 
