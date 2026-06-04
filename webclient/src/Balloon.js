@@ -63,12 +63,12 @@ function TimeAgo(props) {
 		const timer = setInterval(() => {
 			const now = moment();
 			const duration = moment.duration(now.diff(lastPositionTime));
-			const hours = String(Math.floor(duration.asHours())).padStart(2, '0');
+			const days = Math.floor(duration.asDays());
+			const hours = String(duration.hours()).padStart(2, '0');
 			const minutes = String(duration.minutes()).padStart(2, '0');
-			const secondsWithDecimal = (duration.seconds() + duration.milliseconds() / 1000).toFixed(1);
-			const paddedSeconds = secondsWithDecimal.padStart(4, '0');
-			setTimeAgo(`${hours}h ${minutes}m ${paddedSeconds}s ago`);
-		}, 100);
+			const seconds = String(duration.seconds()).padStart(2, '0');
+			setTimeAgo(`${days}d ${hours}h ${minutes}m ${seconds}s ago`);
+		}, 1000);
 		return () => clearInterval(timer);
 	}, [time]);
 
@@ -76,7 +76,7 @@ function TimeAgo(props) {
 }
 
 function MissionDuration(props) {
-	const { startTime } = props;
+	const { startTime, last } = props;
 	const [missionDuration, setMissionDuration] = useState('...');
 
 	useEffect(() => {
@@ -85,16 +85,16 @@ function MissionDuration(props) {
 			return;
 		}
 		const startTimeMoment = moment.utc(startTime);
+		const lastPositionTime = moment.utc(last);
 		const timer = setInterval(() => {
-			const now = moment();
-			const duration = moment.duration(now.diff(startTimeMoment));
+			//const now = moment();
+			const duration = moment.duration(lastPositionTime.diff(startTimeMoment));
 			const days = Math.floor(duration.asDays());
 			const hours = String(duration.hours()).padStart(2, '0');
 			const minutes = String(duration.minutes()).padStart(2, '0');
-			const secondsWithDecimal = (duration.seconds() + duration.milliseconds() / 1000).toFixed(1);
-			const paddedSeconds = secondsWithDecimal.padStart(4, '0');
-			setMissionDuration(`L+${days}d ${hours}:${minutes}:${paddedSeconds}`);
-		}, 100);
+			const seconds = String(duration.seconds()).padStart(2, '0');
+			setMissionDuration(`L+${days}d ${hours}:${minutes}:${seconds}`);
+		}, 1000);
 		return () => clearInterval(timer);
 	}, [startTime]);
 
@@ -610,7 +610,7 @@ export function Balloon(props) {
 		: '...';
 
 	const sinceDate = balloon && balloon.stats && balloon.stats.timeStart
-		? `since ${balloon.stats.timeStart.substring(0, 10)}`
+		? `from ${balloon.stats.timeStart.substring(0, 10)}`
 		: '';
 
 	const lastPosition = balloon && balloon.positions && balloon.positions.length > 0
@@ -680,7 +680,7 @@ export function Balloon(props) {
 						</div>
 						<div className="stat-box" style={getStyle('missionDuration')} ref={missionDurationRef}>
 							<div className="stat-label">MISSION DURATION</div>
-							<MissionDuration startTime={balloon?.stats?.timeStart} />
+							<MissionDuration startTime={balloon?.stats?.timeStart} last={balloon?.positions?.[0]?.time} />
 							<div className="time-ago">{sinceDate}</div>
 						</div>
 					</div>
