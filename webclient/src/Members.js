@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
+import moment from 'moment-timezone';
 import './light.css';
 import { Button, Container, Dropdown, Grid, Header, Icon, Image, Input, Item, Segment, Table } from 'semantic-ui-react';
 import { statusColor, getDiscourseLink, isAdmin, isInstructor, BasicTable, staticUrl, requester } from './utils.js';
@@ -9,6 +10,33 @@ import { AdminMemberTransactions } from './AdminTransactions.js';
 import { AdminHistory } from './Admin.js';
 import { StorageLinks } from './Storage.js';
 import AbortController from 'abort-controller';
+
+const isAnniversary = (applicationDate) => {
+	if (!applicationDate) {
+		return false;
+	}
+
+	const today = moment();
+	const appDate = moment(applicationDate);
+
+	// Don't show cake on the first day.
+	if (today.isSame(appDate, 'day')) {
+		return false;
+	}
+
+	let appMonth = appDate.month();
+	let appDay = appDate.date();
+
+	const todayMonth = today.month();
+	const todayDay = today.date();
+
+	// Handle Feb 29 on non-leap years
+	if (appMonth === 1 && appDay === 29 && !today.isLeapYear()) {
+		appDay = 28;
+	}
+
+	return todayMonth === appMonth && todayDay === appDay;
+};
 
 const memberSorts = {
 	recently_vetted: 'Recently Vetted',
@@ -248,7 +276,7 @@ export function Members(props) {
 									<Item.Content verticalAlign='top'>
 										<Item.Header>
 											<Icon name='circle' color={statusColor[x.member.status]} />
-											{x.member.preferred_name} {x.member.last_name}
+											{x.member.preferred_name} {x.member.last_name}{isAnniversary(x.member.application_date) && ' 🎂'}
 										</Item.Header>
 										{sort === 'pinball_score' ?
 											<>
@@ -332,7 +360,7 @@ export function MemberDetail(props) {
 			{!error ?
 				member && member.id === id ?
 					<div>
-						<Header size='large'>{member.preferred_name} {member.last_name}</Header>
+						<Header size='large'>{member.preferred_name} {member.last_name}{isAnniversary(member.application_date) && ' 🎂'}</Header>
 
 						{getDiscourseLink(member) && <p><a href={getDiscourseLink(member)} target='_blank'>[message]</a></p>}
 
