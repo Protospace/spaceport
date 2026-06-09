@@ -38,3 +38,4 @@ This guide book is meant to be read serially in the order listed below, but each
 6. [[Restocking Supplies]]
 7. [[Protocoin]]
 8. [[Proto Places]]
+9. [[Pause or Cancel Membership]]

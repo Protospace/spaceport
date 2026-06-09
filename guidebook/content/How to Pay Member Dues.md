@@ -3,6 +3,8 @@ Date: 2000-05-01
 
 There are several ways to pay your member dues. The best way is to log into the Portal > Member > [Paymaster](https://my.protospace.ca/paymaster) and scroll down to the "Member Dues".
 
+Related: How to [[Pause or Cancel Membership]].
+
 ## Payment Methods 
 
 Here are the various ways you can pay your member dues. We recommend the first one since all other methods require manual recording by a volunteer.
@@ -16,8 +18,6 @@ As mentioned above, go to the [Paymaster](https://my.protospace.ca/paymaster) se
 We use PayPal here to process the credit card and debit card transactions. If you have an issue with your PayPal account click the "Pay with Debit or Credit Card" button below to try check out as a guest. You may need to use an alternative email so it doesn't get linked to your broken PayPal account.
 
 I want to re-iterate the importance of trying to make PayPal work since the transactions are processed automatically. All other types of transactions require manual entry by a Protospace Director. Doing that monthly for hundreds of members really adds up!
-
-Related: How to [[Pause or Cancel Membership]].
 
 ### Online with Interac e-Transfer
 

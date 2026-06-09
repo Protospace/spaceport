@@ -1,3 +1,6 @@
+Category: recommended
+Date: 2001-05-01
+
 To stop your membership, simply email <directors@protospace.ca> and ask to have your membership stopped. It would be great if you explained why, but this is completely optional. It may help us grow better as a community.
 
 If you have an ongoing PayPal subscription, you'll need to log into your PayPal account and cancel it. If you have a member shelf, please make sure to clear it. You are always welcome to come hang out during a [[Tuesday Open House]].
