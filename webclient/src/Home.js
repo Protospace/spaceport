@@ -17,6 +17,33 @@ function MemberInfo(props) {
 	const member = user.member;
 	const history = useHistory();
 
+	const isAnniversary = (applicationDate) => {
+		if (!applicationDate) {
+			return false;
+		}
+
+		const today = moment();
+		const appDate = moment(applicationDate);
+
+		// Don't show cake on the first day.
+		if (today.isSame(appDate, 'day')) {
+			return false;
+		}
+
+		let appMonth = appDate.month();
+		let appDay = appDate.date();
+
+		const todayMonth = today.month();
+		const todayDay = today.date();
+
+		// Handle Feb 29 on non-leap years
+		if (appMonth === 1 && appDay === 29 && !today.isLeapYear()) {
+			appDay = 28;
+		}
+
+		return todayMonth === appMonth && todayDay === appDay;
+	};
+
 	const lastTrans = user.transactions?.slice(0,3);
 	const lastTrain = user.training?.sort((a, b) => a.session.datetime < b.session.datetime ? 1 : -1).slice(0,3);
 	const lastCard = user.cards?.filter(x => x.last_seen).sort((a, b) => a.last_seen < b.last_seen ? 1 : -1)[0];
@@ -40,7 +67,7 @@ function MemberInfo(props) {
 				</Grid.Column>
 
 				<Grid.Column width={11}>
-					<Header size='large'>{member.preferred_name} {member.last_name}</Header>
+					<Header size='large'>{member.preferred_name} {member.last_name}{isAnniversary(member.application_date) && ' 🎂'}</Header>
 
 					{member.is_allowed_entry ?
 						<></>
