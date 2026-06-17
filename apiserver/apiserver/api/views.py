@@ -842,11 +842,6 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
         else:
             return queryset.all()
 
-    def retally_membership(self):
-        member_id = self.request.data['member_id']
-        member = get_object_or_404(models.Member, id=member_id)
-        utils.tally_membership_months(member)
-
     def train_paypal_hint(self, tx):
         if tx.paypal_subscr_id:
             models.PayPalHint.objects.update_or_create(
@@ -863,12 +858,26 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
     def perform_create(self, serializer):
         tx = serializer.save(recorder=self.request.user)
         utils.log_transaction(tx)
-        self.retally_membership()
+
+        member_id = self.request.data['member_id']
+        member = get_object_or_404(models.Member, id=member_id)
+        utils.tally_membership_months(member)
 
     def perform_update(self, serializer):
+        old_member = None
+        if serializer.instance and serializer.instance.user:
+            old_member = getattr(serializer.instance.user, 'member', None)
+
         tx = serializer.save()
         utils.log_transaction(tx)
-        self.retally_membership()
+
+        member_id = self.request.data['member_id']
+        member = get_object_or_404(models.Member, id=member_id)
+        utils.tally_membership_months(member)
+
+        if old_member and old_member.id != member.id:
+            utils.tally_membership_months(old_member)
+
         self.train_paypal_hint(tx)
 
     def list(self, request):
