@@ -100,10 +100,15 @@ def send_interest_email(interest):
 
 def send_overdue_email(member):
     def replace_fields(text):
+        expire_date_str = member.expire_date.strftime('%B %d, %Y') if member.expire_date else 'unknown'
         return text.replace(
-            '[name]', member.preferred_name,
+            '[name]', member.preferred_name or 'Member',
         ).replace(
-            '[date]', member.expire_date.strftime('%B %d, %Y'),
+            '[date]', expire_date_str,
+        ).replace(
+            '[dues]', str(int(member.monthly_fees)),
+        ).replace(
+            '[amount]', str(int(member.monthly_fees * 2)),
         )
 
     with open(EMAIL_DIR + 'overdue.txt', 'r') as f:
