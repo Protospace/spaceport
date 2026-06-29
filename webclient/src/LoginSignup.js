@@ -246,12 +246,22 @@ export function SignupForm(props) {
 					/>
 
 					<div className='field'>
-						<label>Please note that payment of your first dues is required with this application</label>
+						<label>Please note that payment of your first dues is required with this application.</label>
 						<Form.Checkbox
 							label='I am ready to pay'
 							name='ready_to_pay'
 							onChange={handleCheck}
 							checked={input.ready_to_pay}
+						/>
+					</div>
+
+					<div className='field'>
+						<label>In order to become a full member, you'll need to upload an identifiable photo to this portal. It will only be viewable by other full members. <a href="https://wiki.protospace.ca/Approved_policies/Identifiable_Photo_Policy" target="_blank">Read the policy here.</a></label>
+						<Form.Checkbox
+							label='I am okay with sharing a photo'
+							name='photo_consent'
+							onChange={handleCheck}
+							checked={input.photo_consent}
 						/>
 					</div>
 
@@ -262,7 +272,7 @@ export function SignupForm(props) {
 					<Form.Button
 						loading={loading}
 						error={error.non_field_errors}
-						disabled={input.existing_member !== false || !input.ready_to_pay}
+						disabled={input.existing_member !== false || !input.ready_to_pay || !input.photo_consent}
 					>
 						Sign Up
 					</Form.Button>
