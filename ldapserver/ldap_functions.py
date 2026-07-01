@@ -121,6 +121,58 @@ def create_user(first, last, username, email, password):
     finally:
         ldap_conn.unbind()
 
+def rename_user(old_username, first, last, new_username, email):
+
+   Rename a User; updates the DN (CN), logon names, and name attributes.
+   Requires the old username to find the existing user's DN.
+
+   ldap_conn = init_ldap()
+   try:
+       logger.info('Renaming user: ' + old_username)
+       ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
+
+       # 1. Locate the existing user's Distinguished Name (DN)
+       search_filter = f'(sAMAccountName={old_username})'
+       search_result = ldap_conn.search_s(secrets.BASE_MEMBERS, ldap.SCOPE_SUBTREE, search_filter, ['distinguishedName'])
+
+       if not search_result:
+           logger.error(f'User {old_username} not found.')
+           return False
+
+       old_dn = search_result[0][0]
+
+       # 2. Define the new naming values
+       new_rdn = 'CN={} {}'.format(first, last)
+       full_name = '{} {}'.format(first, last)
+
+       # 3. Rename the object itself (Changes CN and DN)
+       # rename_s parameters: (old_dn, new_rdn, new_parent=None, deleteoldrdn=1)
+       logger.info(f'Moving DN to: {new_rdn}')
+       ldap_conn.rename_s(old_dn, new_rdn)
+
+       # Calculate the new DN to apply further modifications
+       new_dn = '{},{}'.format(new_rdn, secrets.BASE_MEMBERS)
+
+       # 4. Modify the remaining attributes on the new DN
+       ldif_changes = [
+           (ldap.MOD_REPLACE, 'userPrincipalName', [new_username.encode()]),
+           (ldap.MOD_REPLACE, 'sAMAccountName', [new_username.encode()[:20]]),
+           (ldap.MOD_REPLACE, 'givenName', [first.encode()]),
+           (ldap.MOD_REPLACE, 'sn', [last.encode()]),
+           (ldap.MOD_REPLACE, 'DisplayName', [full_name.encode()]),
+           (ldap.MOD_REPLACE, 'mail', [email.encode()]),
+       ]
+
+       result = ldap_conn.modify_s(new_dn, ldif_changes)
+       logger.info('  Rename and modification result: ' + str(result))
+       return True
+
+   except ldap.LDAPError as e:
+       logger.error('LDAP Error during rename: ' + str(e))
+       return False
+   finally:
+       ldap_conn.unbind()
+
 def set_password(username, password):
     ldap_conn = init_ldap()
     try:
