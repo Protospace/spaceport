@@ -66,6 +66,11 @@ a {
 	height: auto;
 }
 
+.photo-404-container {
+	display: flex;
+	justify-content: center;
+}
+
 .swordfish {
 	width: 100%;
 	margin-top: -1rem;
