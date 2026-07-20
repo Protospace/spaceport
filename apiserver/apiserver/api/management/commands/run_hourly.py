@@ -77,7 +77,7 @@ class Command(BaseCommand):
                 self.stdout.write('    Is cancelled, skipping.')
                 continue
 
-            if session.course.id in [317, 273, 413]:
+            if session.course.id in [317, 273, 413, 478]:
                 self.stdout.write('    Is members meeting or cleanup, skipping.')
                 continue
 

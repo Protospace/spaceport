@@ -65,10 +65,10 @@ def calc_next_events():
     sessions = models.Session.objects
 
     # TODO, go by tag?
-    member_meeting = sessions.filter(is_cancelled=False, course__in=[317, 413], datetime__gte=now()).order_by('datetime').first()
+    member_meeting = sessions.filter(is_cancelled=False, course__in=[317, 413, 478], datetime__gte=now()).order_by('datetime').first()
     monthly_clean = sessions.filter(is_cancelled=False, course=273, datetime__gte=now()).first()
-    next_class = sessions.exclude(course__in=[317, 413, 273]).filter(is_cancelled=False, datetime__gte=now()).order_by('datetime').first()
-    prev_class = sessions.exclude(course__in=[317, 413, 273]).filter(is_cancelled=False, datetime__lte=now()).order_by('datetime').last()
+    next_class = sessions.exclude(course__in=[317, 413, 273, 478]).filter(is_cancelled=False, datetime__gte=now()).order_by('datetime').first()
+    prev_class = sessions.exclude(course__in=[317, 413, 273, 478]).filter(is_cancelled=False, datetime__lte=now()).order_by('datetime').last()
 
     if member_meeting:
         cache.set('next_meeting', member_meeting.datetime)
