@@ -15,7 +15,7 @@ export function PleaseLogin() {
 
 			<img className='photo-404' src='/404.jpg' />
 			<p style={{ textAlign: 'right' }}>
-				<i>Space shuttle Endeavour, NASA (2011)</i>
+				<i>Test Rocket Launch, Matthew Patrick &amp; Protospace, (2026)</i>
 			</p>
 		</Container>
 	);
@@ -31,7 +31,7 @@ export function NotFound() {
 
 			<img className='photo-404' src='/404.jpg' />
 			<p style={{ textAlign: 'right' }}>
-				<i>Space shuttle Endeavour, NASA (2011)</i>
+				<i>Test Rocket Launch, Matthew Patrick &amp; Protospace, (2026)</i>
 			</p>
 		</Container>
 	);
