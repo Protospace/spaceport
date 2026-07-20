@@ -16,6 +16,7 @@ export function PleaseLogin() {
 			<img className='photo-404' src='/404.jpg' />
 			<p style={{ textAlign: 'right' }}>
 				<i>Test Rocket Launch, Matthew Patrick &amp; Protospace, (2026)</i>
+				<br/><i>Image Credit: Jordan Loehr</i>
 			</p>
 		</Container>
 	);
@@ -32,6 +33,7 @@ export function NotFound() {
 			<img className='photo-404' src='/404.jpg' />
 			<p style={{ textAlign: 'right' }}>
 				<i>Test Rocket Launch, Matthew Patrick &amp; Protospace, (2026)</i>
+				<br/><i>Image Credit: Jordan Loehr</i>
 			</p>
 		</Container>
 	);
