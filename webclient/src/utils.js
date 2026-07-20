@@ -19,7 +19,7 @@ export const isAdmin = (user) => user.is_staff || user.member.is_director || use
 export const isInstructor = (user) => isAdmin(user) || user.member.is_instructor;
 
 export const getInstructor = (x) => {
-	if (x.course === 413 || x.course === 317 || x.course === 273) {
+	if (x.course === 413 || x.course === 317 || x.course === 273 || x.course === 478) {
 		return 'Protospace';
 	} else {
 		return <Link to={'/members/'+x.instructor_id}>{x.instructor_name}</Link>;
@@ -27,7 +27,7 @@ export const getInstructor = (x) => {
 };
 
 export const getInstructorDiscourseLink = (x) => {
-	if (x.course === 413 || x.course === 317 || x.course === 273) {
+	if (x.course === 413 || x.course === 317 || x.course === 273 || x.course === 478) {
 		return false;
 	} else if (!x.instructor_discourse) {
 		return false;
