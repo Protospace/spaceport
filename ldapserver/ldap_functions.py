@@ -151,7 +151,8 @@ def rename_user(old_username, first, last, new_username, email):
        ldap_conn.rename_s(old_dn, new_rdn)
 
        # Calculate the new DN to apply further modifications
-       new_dn = '{},{}'.format(new_rdn, secrets.BASE_MEMBERS)
+       parent_dn = old_dn.split(',', 1)[1]
+       new_dn = '{},{}'.format(new_rdn, parent_dn)
 
        # 4. Modify the remaining attributes on the new DN
        ldif_changes = [
