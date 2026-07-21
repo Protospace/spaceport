@@ -13,7 +13,7 @@ export function PleaseLogin() {
 				<p>Visit our <Link to={'/?next=' + next}>login page</Link>, then try again.</p>
 			</Message>
 
-			<div class="photo-404-container"><img className='photo-404' src='/404.jpg' /></div>
+			<div className="photo-404-container"><img className='photo-404' src='/404.jpg' /></div>
 			<p style={{ textAlign: 'right' }}>
 				<i>Test Rocket Launch, Matthew Patrick &amp; Protospace (2026)</i>
 				<br/><i>Image Credit: Jordan Loehr</i>
@@ -30,7 +30,7 @@ export function NotFound() {
 				<p>Visit our <Link to='/'>home page</Link> if you are lost.</p>
 			</Message>
 
-			<div class="photo-404-container"><img className='photo-404' src='/404.jpg' /></div>
+			<div className="photo-404-container"><img className='photo-404' src='/404.jpg' /></div>
 			<p style={{ textAlign: 'right' }}>
 				<i>Test Rocket Launch, Matthew Patrick &amp; Protospace (2026)</i>
 				<br/><i>Image Credit: Jordan Loehr</i>
