@@ -123,8 +123,8 @@ def create_user(first, last, username, email, password):
 
 def rename_user(old_username, first, last, new_username, email):
 
-   Rename a User; updates the DN (CN), logon names, and name attributes.
-   Requires the old username to find the existing user's DN.
+   # Rename a User; updates the DN (CN), logon names, and name attributes.
+   # Requires the old username to find the existing user's DN.
 
    ldap_conn = init_ldap()
    try:
