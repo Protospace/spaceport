@@ -131,6 +131,13 @@ def rename_user(old_username, first, last, new_username, email):
        logger.info('Renaming user: ' + old_username)
        ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
 
+       # 0. Check if new username is already taken
+       collision_filter = f'(sAMAccountName={new_username})'
+       collision_result = ldap_conn.search_s(secrets.BASE_MEMBERS, ldap.SCOPE_SUBTREE, collision_filter, ['distinguishedName'])
+       if collision_result:
+           logger.error(f'New username {new_username} is already taken.')
+           return False
+
        # 1. Locate the existing user's Distinguished Name (DN)
        search_filter = f'(sAMAccountName={old_username})'
        search_result = ldap_conn.search_s(secrets.BASE_MEMBERS, ldap.SCOPE_SUBTREE, search_filter, ['distinguishedName'])
