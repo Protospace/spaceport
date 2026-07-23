@@ -8,10 +8,10 @@ Public Messaging Inputs Should Be Visible
 
 Submit Sign And Vestaboard Message
     [Arguments]    ${text}
-    Fill Text Safely    input >> nth=7    ${text}
-    Click When Ready    text=Submit >> nth=0
+    Fill Text Safely    [data-testid="sign-and-vestaboard-input"]    ${text}
+    Click When Ready    [data-testid="sign-and-vestaboard-submit"]
 
 Submit Vestaboard Only Message
     [Arguments]    ${text}
-    Fill Text Safely    input >> nth=8    ${text}
-    Click When Ready    text=Submit >> nth=1
+    Fill Text Safely    [data-testid="vestaboard-only-input"]    ${text}
+    Click When Ready    [data-testid="vestaboard-only-submit"]
