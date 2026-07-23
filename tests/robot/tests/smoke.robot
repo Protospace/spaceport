@@ -5,7 +5,7 @@ Resource    ../resources/Common.resource
 Suite Setup    Open Spaceport Browser
 Suite Teardown    Close Spaceport Browser
 Test Tags    smoke    public    stable
-Test Teardown    Capture Debug Artifact    smoke
+Test Teardown    Run Keyword If Test Failed    Capture Debug Artifact    ${TEST NAME}
 
 *** Test Cases ***
 Public Landing Page Renders Core Sections
