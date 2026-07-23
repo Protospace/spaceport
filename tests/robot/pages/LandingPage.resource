@@ -29,7 +29,7 @@ Guide Link Should Navigate
     Wait For Url Contains    /guide/
 
 Charts Link Should Navigate
-    Click When Ready    text=[charts]
+    Click When Ready    a:has-text("[charts]")
     Wait For Url Contains    /charts
 
 Gallery Requires Login Message Should Be Visible

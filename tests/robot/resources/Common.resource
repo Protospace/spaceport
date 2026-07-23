@@ -19,8 +19,7 @@ Go To Home Page
 
 Wait Until Spaceport Page Ready
     Wait For Load State    domcontentloaded
-    Wait For Elements State    text=Quick Links    visible
-    Wait For Elements State    text=Protospace Stats    visible
+    Wait For Elements State    [data-testid="home-stats-section"]    visible
 
 Wait For Url Contains
     [Arguments]    ${partial}
@@ -40,8 +39,7 @@ Fill Text Safely
 
 Page Should Contain Text
     [Arguments]    ${text}
-    ${content}=    Get Text    body
-    Should Contain    ${content}    ${text}
+    Wait For Elements State    text=${text}    visible
 
 Capture Debug Artifact
     [Arguments]    ${name}=debug
