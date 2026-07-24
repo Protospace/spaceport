@@ -1,9 +1,9 @@
 *** Variables ***
 ${BASE_URL}                 http://localhost:3000
 ${BROWSER}                  chromium
-${HEADLESS}                 ${True}
+${HEADLESS}                 ${False}
 ${DEFAULT_TIMEOUT}          10s
-${VALID_PASSWORD}           %{TEST_PASSWORD=TestPass123!}
+${VALID_PASSWORD}           TestPass123!
 ${SHORT_PASSWORD}           short1!
 ${MESSAGE_TEXT}             Automated public portal smoke message
 ${VESTABOARD_TEXT}          Hello from Robot Framework
