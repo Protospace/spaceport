@@ -41,10 +41,9 @@ export function SignForm(props) {
 					onChange={handleChange}
 					value={sign}
 					error={error.sign}
-					data-testid='sign-and-vestaboard-input'
 				/>
 
-				<Form.Button loading={loading} error={error.non_field_errors} data-testid='sign-and-vestaboard-submit'>
+				<Form.Button loading={loading} error={error.non_field_errors}>
 					Submit
 				</Form.Button>
 			</Form.Group>
@@ -94,10 +93,9 @@ export function VestaboardForm(props) {
 					error={error.sign}
 					onFocus={() => setIsFocused(true)}
 					onBlur={() => setIsFocused(false)}
-					data-testid='vestaboard-only-input'
 				/>
 
-				<Form.Button loading={loading} error={error.non_field_errors} data-testid='vestaboard-only-submit'>
+				<Form.Button loading={loading} error={error.non_field_errors}>
 					Submit
 				</Form.Button>
 
