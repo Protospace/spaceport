@@ -171,7 +171,7 @@ function MemberInfo(props) {
 									<Link to={'/transactions/'+x.id}>{moment(x.date).format('ll')}</Link>
 								</Table.Cell>
 								<Table.Cell>{x.account_type}</Table.Cell>
-								<Table.Cell>{x.protocoin !== '0.00' ? '₱ ' + x.protocoin : '$ ' + x.amount}</Table.Cell>
+								<Table.Cell>{x.protocoin !== '0.00' ? '₱ ' + x.protocoin : '$ ' + x.amount}</Table.Cell>
 							</Table.Row>
 						)
 					:
@@ -341,7 +341,7 @@ export function Home(props) {
 		const printer_state = gcode_states?.[info?.gcode_state] || info?.gcode_state || 'Unknown';
 
 		if (printer_state === 'Running' && info?.current_layer === 0) {
-			return 'Initializing';  // because it has non-zero percentage which may be confusing
+			return 'Initializing';
 		} else if (printer_state === 'Running') {
 			let time_str = '';
 			const mins = parseInt(info?.remaining_time, 10);
@@ -471,7 +471,7 @@ export function Home(props) {
 
 							<img className='swordfish' src='/swordfish.png' onClick={() => refreshStats()} />
 
-							<div>
+							<div data-testid='home-stats-section'>
 								<Header size='medium'>Protospace Stats</Header>
 								<p>Shopping list: {stats?.shopping_list?.length ? <b>{renderShoppingListItems(stats.shopping_list)}</b> : 'Empty'} <a href='https://todo.protospace.ca/projects/4' target='_blank' rel='noopener noreferrer'>[list]</a></p>
 								<p>Maintenance list: {stats?.maintenance_list?.length ? <b>{renderMaintenanceListItems(stats.maintenance_list)}</b> : 'Empty'} <a href='https://todo.protospace.ca/projects/76' target='_blank' rel='noopener noreferrer'>[list]</a></p>
