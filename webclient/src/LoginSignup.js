@@ -256,7 +256,7 @@ export function SignupForm(props) {
 					</div>
 
 					<div className='field'>
-						<label>In order to become a full member, you'll need to upload an identifiable photo to this portal. It will only be viewable by other full members. <a href="https://wiki.protospace.ca/Approved_policies/Identifiable_Photo_Policy" target="_blank">Read the policy here.</a></label>
+						<label>In order to become a full member, you'll need to upload an identifiable photo to this portal. It will only be viewable by other members. <a href="https://wiki.protospace.ca/Approved_policies/Identifiable_Photo_Policy" target="_blank">Read the policy here.</a></label>
 						<Form.Checkbox
 							label='I am okay with sharing a photo'
 							name='photo_consent'
