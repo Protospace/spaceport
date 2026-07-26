@@ -932,7 +932,7 @@ class DoorViewSet(viewsets.ViewSet, List):
         if secrets.DOOR_API_TOKEN and auth_token != 'Bearer ' + secrets.DOOR_API_TOKEN:
             raise exceptions.PermissionDenied()
 
-        cards = models.Card.objects.filter(active_status='card_active')
+        cards = models.Card.objects.filter(active_status='card_active').select_related('user__member')
         active_member_cards = {}
 
         for card in cards:
