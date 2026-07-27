@@ -171,7 +171,7 @@ function MemberInfo(props) {
 									<Link to={'/transactions/'+x.id}>{moment(x.date).format('ll')}</Link>
 								</Table.Cell>
 								<Table.Cell>{x.account_type}</Table.Cell>
-								<Table.Cell>{x.protocoin !== '0.00' ? '₱ ' + x.protocoin : '$ ' + x.amount}</Table.Cell>
+								<Table.Cell>{x.protocoin !== '0.00' ? '₱ ' + x.protocoin : '$ ' + x.amount}</Table.Cell>
 							</Table.Row>
 						)
 					:
@@ -341,7 +341,7 @@ export function Home(props) {
 		const printer_state = gcode_states?.[info?.gcode_state] || info?.gcode_state || 'Unknown';
 
 		if (printer_state === 'Running' && info?.current_layer === 0) {
-			return 'Initializing';
+			return 'Initializing';  // because it has non-zero percentage which may be confusing
 		} else if (printer_state === 'Running') {
 			let time_str = '';
 			const mins = parseInt(info?.remaining_time, 10);
