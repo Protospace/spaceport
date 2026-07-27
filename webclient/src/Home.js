@@ -471,7 +471,7 @@ export function Home(props) {
 
 							<img className='swordfish' src='/swordfish.png' onClick={() => refreshStats()} />
 
-							<div>
+							<div data-testid='home-stats-section'>
 								<Header size='medium'>Protospace Stats</Header>
 								<p>Shopping list: {stats?.shopping_list?.length ? <b>{renderShoppingListItems(stats.shopping_list)}</b> : 'Empty'} <a href='https://todo.protospace.ca/projects/4' target='_blank' rel='noopener noreferrer'>[list]</a></p>
 								<p>Maintenance list: {stats?.maintenance_list?.length ? <b>{renderMaintenanceListItems(stats.maintenance_list)}</b> : 'Empty'} <a href='https://todo.protospace.ca/projects/76' target='_blank' rel='noopener noreferrer'>[list]</a></p>
