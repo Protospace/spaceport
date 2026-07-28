@@ -93,10 +93,13 @@ function MemberInfo(props) {
 								<Table.Cell>₱&thinsp;{member.protocoin.toFixed(2)} <Link to='/paymaster'>[buy]</Link></Table.Cell>
 							</Table.Row>
 							<Table.Row>
-								<Table.Cell>Shelf:</Table.Cell>
+								<Table.Cell>Storage:</Table.Cell>
 								<Table.Cell>
 									{user.storage.length ?
-										<StorageLinks storage={user.storage} />
+										<>
+											<StorageLinks storage={user.storage} />
+											{user.storage.length === 1 ? '(1/2)' : ''}
+										</>
 									:
 										<>None <Link to='/claimshelf'>[claim]</Link></>
 									}

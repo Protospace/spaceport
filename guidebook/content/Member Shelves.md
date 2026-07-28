@@ -1,9 +1,9 @@
 Category: recommended
 Date: 2000-09-15
 
-Active vetted Protospace members can have a personal shelf where they can store their own materials and supplies.
+Active vetted Protospace members can have personal storage where they can store their own materials and supplies.
 
-Unfortunately there are only ~230 shelves for 500+ members, so not everyone can have one. Shelves are claimed on a first-come, first-served basis as they become available.
+Shelves are claimed on a first-come, first-served basis as they become available. For now, each member can claim up to two shelves.
 
 ## How to claim an empty shelf
 
@@ -34,3 +34,4 @@ Tip: You can filter for expired shelves on the Portal > Space > [Storage](https:
 ## References
 
 - <https://www.youtube.com/watch?v=cCVIgT71BMQ>
+- <https://forum.protospace.ca/t/member-storage-upgrade/12371>

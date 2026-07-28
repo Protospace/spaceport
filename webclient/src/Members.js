@@ -223,7 +223,7 @@ export function Members(props) {
 		<Container>
 			<Header size='large'>Member List</Header>
 
-			<p>Search by name, email, Spacebar username, member ID, or member shelf:</p>
+			<p>Search by name, email, Spacebar username, member ID, or member storage:</p>
 
 			<Input focus icon='search'
 				placeholder='Search...'
@@ -300,7 +300,7 @@ export function Members(props) {
 														<Item.Description>Status: Eternal Member</Item.Description>
 													:
 														<Item.Description>
-															Shelf: {x.member.storage.length ?
+															Storage: {x.member.storage.length ?
 																<StorageLinks storage={x.member.storage} />
 															:
 																'None'
@@ -445,7 +445,7 @@ export function MemberDetail(props) {
 														</Table.Cell>
 													</Table.Row>
 													<Table.Row>
-														<Table.Cell>Shelf:</Table.Cell>
+														<Table.Cell>Storage:</Table.Cell>
 														<Table.Cell>
 															{member.storage.length ?
 																<StorageLinks storage={member.storage} />

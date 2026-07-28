@@ -2482,8 +2482,8 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
     def claim(self, request):
         user = self.request.user
 
-        if user.storage.count():
-            raise exceptions.ValidationError(dict(shelf_id='You already have a shelf.'))
+        if user.storage.count() >= 2:
+            raise exceptions.ValidationError(dict(shelf_id='Can only claim up to two shelves.'))
 
         try:
             shelf_id = str(request.data['shelf_id']).upper()

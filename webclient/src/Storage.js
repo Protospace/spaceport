@@ -635,7 +635,7 @@ export function ClaimShelf(props) {
 				<Grid.Column>
 					<Header size='large'>Claim Member Shelf</Header>
 
-					<p>Use this form to claim a member shelf.</p>
+					<p>Use this form to claim a member shelf. Vetted Protospace members can claim up to two shelves for now.</p>
 
 					<p>Documentation: <a href='https://my.protospace.ca/guide/member-shelves/' target='_blank' rel='noopener noreferrer'>Member Shelves | Protospace Guide Book</a></p>
 
