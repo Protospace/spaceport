@@ -418,8 +418,16 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
     def get_serializer_class(self):
         if self.action == 'list':
             return serializers.SessionListSerializer
-        else:
+
+        if self.action == 'create':
             return serializers.SessionSerializer
+
+        if self.detail: # True for retrieve, update, etc.
+            session = self.get_object()
+            if is_admin_director(self.request.user) or session.instructor == self.request.user:
+                return serializers.SessionSerializer
+
+        return serializers.SessionStudentSerializer
 
     def perform_create(self, serializer):
         data = self.request.data

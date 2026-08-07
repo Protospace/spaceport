@@ -850,6 +850,17 @@ class SessionListSerializer(SessionSerializer):
 class SessionStudentSerializer(SessionSerializer):
     students = serializers.SerializerMethodField()
 
+    def get_students(self, obj):
+        # Hack: this is for a regular student viewing a session they want to attend.
+        # Unfortunately the UI expects a list of Training in order to find the ID
+        # to use in requests. This filters the list to only that students training
+        # (if it exists) in order to maintain other students' privacy.
+        request = self.context.get('request')
+        if request and request.user and request.user.is_authenticated:
+            user_training = [t for t in obj.students.all() if t.user_id == request.user.id]
+            return TrainingSerializer(user_training, many=True, context=self.context).data
+        return []
+
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     sessions = SessionListSerializer(many=True, read_only=True)
