@@ -375,7 +375,7 @@ class CourseViewSet(Base, List, Retrieve, Create, Update):
 
 
 class SessionViewSet(Base, List, Retrieve, Create, Update):
-    permission_classes = [AllowMetadata | IsAuthenticated, IsAdminOrReadOnly | IsInstructorOrReadOnly]
+    permission_classes = [AllowMetadata | IsAuthenticatedOrReadOnly, IsAdminOrReadOnly | IsInstructorOrReadOnly]
 
     def get_queryset(self):
         if self.action == 'list':
