@@ -2486,7 +2486,7 @@ class StorageSpaceViewSet(Base, List, Retrieve, Update):
         except models.StorageSpace.DoesNotExist:
             raise exceptions.ValidationError(dict(shelf_id='Shelf ID not found.'))
 
-        if storage.user.id != user.id:
+        if not storage.user or storage.user.id != user.id:
             raise exceptions.ValidationError(dict(shelf_id='Shelf does not belong to you.'))
 
         storage.user = None
