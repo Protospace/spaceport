@@ -1016,47 +1016,6 @@ class LockoutViewSet(viewsets.ViewSet, List):
 
         return Response(active_member_cards)
 
-    @action(detail=True, methods=['post'])
-    def authorize(self, request, pk=None):
-        #auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-        #if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.DOOR_API_TOKEN:
-        #    raise exceptions.PermissionDenied()
-
-        card = get_object_or_404(models.Card, card_number=pk)
-        user = card.user
-        member = user.member
-        name = member.preferred_name + ' ' + member.last_name
-
-        if 'cert' not in request.data:
-            raise exceptions.ValidationError(dict(cert='This field is required.'))
-
-        cert = request.data['cert']
-
-        logging.info('Lockout authorization requested by: %s (%s), cert: %s', name, member.id, cert)
-
-        if member.paused_date:
-            logging.info('    Denying, member not active.')
-            raise exceptions.PermissionDenied()
-
-        if not member.is_allowed_entry:
-            logging.info('    Denying, member not allowed entry.')
-            raise exceptions.PermissionDenied()
-
-        if not member.orientation_date:
-            logging.info('    Denying, member hasn\'t done NMO.')
-            raise exceptions.PermissionDenied()
-
-        if cert == 'scanner':
-            if not member.scanner_cert_date:
-                logging.info('    Denying, member not certified.')
-                raise exceptions.PermissionDenied()
-        else:
-            logging.info('    Denying, certificate not found.')
-            raise Http404
-
-        logging.info('    Approving authorization.')
-        return Response(200)
-
 
 class IpnView(views.APIView):
     def post(self, request):
