@@ -27,7 +27,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG_ENV = os.environ.get('DEBUG', '').lower() in ('1', 'true', 'yes')
-BINDALL_ENV = os.environ.get('BINDALL', False)
+BINDALL_ENV = os.environ.get('BINDALL', '').lower() in ('1', 'true', 'yes')
 DEBUG = DEBUG_ENV or False
 
 # SECURITY WARNING: keep the secret key used in production secret!
