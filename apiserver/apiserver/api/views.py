@@ -2068,9 +2068,9 @@ class ProtocoinViewSet(Base):
     def cups_printer_report(self, request, pk=None):
         try:
             with transaction.atomic():
-                #auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-                #if secrets.PRINTER_API_TOKEN and auth_token != 'Bearer ' + secrets.PRINTER_API_TOKEN:
-                #    raise exceptions.PermissionDenied()
+                auth_token = request.META.get('HTTP_AUTHORIZATION', '')
+                if secrets.PRINTER_API_TOKEN and auth_token != 'Bearer ' + secrets.PRINTER_API_TOKEN:
+                    raise exceptions.PermissionDenied()
 
                 # {'job_id': '17', 'user': 'Tanner.Collin', 'title': 'test', 'printer': 'EpsonRAW', 'copies': '1'}
 
