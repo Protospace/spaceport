@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 import logging.config
+from django.core.exceptions import ImproperlyConfigured
 logger = logging.getLogger(__name__)
 
 
@@ -24,14 +25,20 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = secrets.DJANGO_SECRET_KEY or 'OaOBN2E+brpoRyDMlTD9eTE5PgBtkkl+L7Bzt6pQ5Qr3GS82SH'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG_ENV = os.environ.get('DEBUG', False)
 BINDALL_ENV = os.environ.get('BINDALL', False)
 DEBUG = DEBUG_ENV or False
 
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = getattr(secrets, 'DJANGO_SECRET_KEY', None) or os.environ.get('DJANGO_SECRET_KEY')
+
+if not SECRET_KEY:
+    if DEBUG:
+        print('\n===========\nUsing hard-coded secret key. You should set this in secrets.py or the DJANGO_SECRET_KEY env var.\n===========\n')
+        SECRET_KEY = 'OaOBN2E+brpoRyDMlTD9eTE5PgBtkkl+L7Bzt6pQ5Qr3GS82SH'
+    else:
+        raise ImproperlyConfigured("The SECRET_KEY setting must not be empty in production.")
 
 PRODUCTION_HOST = 'my.protospace.ca'
 
