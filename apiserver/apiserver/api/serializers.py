@@ -847,6 +847,9 @@ class SessionSerializer(serializers.ModelSerializer):
 class SessionListSerializer(SessionSerializer):
     students = None
 
+class SessionStudentSerializer(SessionSerializer):
+    students = serializers.SerializerMethodField()
+
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     sessions = SessionListSerializer(many=True, read_only=True)
