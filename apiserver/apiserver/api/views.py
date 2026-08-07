@@ -2583,20 +2583,6 @@ class ToolsViewSet(Base, Create, Destroy):
             # TODO: alert via Telegram
             raise exceptions.ValidationError(dict(non_field_errors=str(e)))
 
-    def destroy(self, request, *args, **kwargs):
-        pk = kwargs['pk']
-        try:
-            utils_mediawiki.delete_tool_page(pk)
-            return Response(status=drfstatus.HTTP_204_NO_CONTENT)
-        except FileNotFoundError:
-            # tool page doesnt exist, thats fine
-            pass
-        except Exception as e:
-            logger.exception('Destroy Tool view - {} - {}'.format(e.__class__.__name__, str(e)))
-            raise exceptions.ValidationError(dict(non_field_errors=str(e)))
-
-        return Response(status=drfstatus.HTTP_404_NOT_FOUND)
-
     @action(detail=False, methods=['get'], url_path='categories')
     def categories(self, request):
         categories = [

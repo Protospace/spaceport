@@ -237,35 +237,6 @@ def add_to_gallery(tool_id, photo_name, tool_name, page_name='Tools_we_have', ne
     logger.info('Added tool ID: %s to gallery', tool_id)
 
 
-def delete_tool_page(tool_id):
-    '''Delete a tool page and its redirect page. Use when tool page has been created in error'''
-
-    if not is_configured():
-        raise Exception('Mediawiki integration not configured, edit secrets.py')
-
-    site = wiki_site_login()
-
-    redirect_page = site.pages[tool_id]
-    if redirect_page.text() == '':
-        # BUG: what about cases where redirect page doesnt exist, but tool_page and image do?
-        raise FileNotFoundError(f'Tool ID {tool_id} does not exist')
-
-    # delete the tool page
-    tool_page = redirect_page.resolve_redirect()
-    for image in tool_page.images():
-        # if tool_id is in image title, there's a good chance its the tool picture
-        # and we should get rid of it too
-        if tool_id in image.page_title:
-            image.delete('Requested deletion')
-    tool_page.delete(reason='Requested deletion')
-
-    redirect_page.delete(reason='Requested deletion')
-    remove_tool_from_gallery(tool_id)
-
-    logger.info('Deleted tool page ID: %s', tool_id)
-
-    return tool_id
-
 def remove_tool_from_gallery(tool_id, page_name='Tools_we_have', credit=''):
     '''Remove a tool from the gallery page'''
 
