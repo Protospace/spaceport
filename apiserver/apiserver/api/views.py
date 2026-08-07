@@ -536,7 +536,7 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
 
 
 class TrainingViewSet(Base, Retrieve, Create, Update):
-    permission_classes = [AllowMetadata | IsAuthenticated, IsObjOwnerOrAdmin | IsSessionInstructorOrAdmin | ReadOnly]
+    permission_classes = [AllowMetadata | IsAuthenticated, IsObjOwnerOrAdmin | IsSessionInstructorOrAdmin]
     serializer_class = serializers.TrainingSerializer
     queryset = models.Training.objects.all()
 
