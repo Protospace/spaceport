@@ -357,7 +357,8 @@ def process_paypal_ipn(data):
 
     user = False
 
-    # trust custom json the most since it comes from webclient
+    # custom json is sent via PayPal from the web client
+    # if someone tampers with this, they are giving money to someone else
     if 'member' in custom_json:
         try:
             user = members.get(id=custom_json['member']).user
