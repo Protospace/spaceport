@@ -26,7 +26,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG_ENV = os.environ.get('DEBUG', False)
+DEBUG_ENV = os.environ.get('DEBUG', '').lower() in ('1', 'true', 'yes')
 BINDALL_ENV = os.environ.get('BINDALL', False)
 DEBUG = DEBUG_ENV or False
 
