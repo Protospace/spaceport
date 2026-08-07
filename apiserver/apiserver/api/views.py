@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.db import transaction
 from django.db.models import Max, F, Count, Q, Sum
 from django.db.utils import OperationalError
+from django.utils.crypto import constant_time_compare
 from django.http import HttpResponse, Http404, FileResponse, HttpResponseServerError
 from django.core.files.base import File
 from django.core.cache import cache
@@ -920,7 +921,7 @@ class PingView(views.APIView):
 class DoorViewSet(viewsets.ViewSet, List):
     def list(self, request):
         auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-        if secrets.DOOR_API_TOKEN and auth_token != 'Bearer ' + secrets.DOOR_API_TOKEN:
+        if secrets.DOOR_API_TOKEN and not constant_time_compare(auth_token, 'Bearer ' + secrets.DOOR_API_TOKEN):
             raise exceptions.PermissionDenied()
 
         cards = models.Card.objects.filter(active_status='card_active').select_related('user__member')
@@ -942,7 +943,7 @@ class DoorViewSet(viewsets.ViewSet, List):
     @action(detail=True, methods=['post'])
     def seen(self, request, pk=None):
         auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-        if secrets.DOOR_API_TOKEN and auth_token != 'Bearer ' + secrets.DOOR_API_TOKEN:
+        if secrets.DOOR_API_TOKEN and not constant_time_compare(auth_token, 'Bearer ' + secrets.DOOR_API_TOKEN):
             raise exceptions.PermissionDenied()
 
         card = get_object_or_404(models.Card, card_number=pk)
@@ -970,7 +971,7 @@ class DoorViewSet(viewsets.ViewSet, List):
 class LockoutViewSet(viewsets.ViewSet, List):
     def list(self, request):
         auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-        if secrets.DOOR_API_TOKEN and auth_token != 'Bearer ' + secrets.DOOR_API_TOKEN:
+        if secrets.DOOR_API_TOKEN and not constant_time_compare(auth_token, 'Bearer ' + secrets.DOOR_API_TOKEN):
             raise exceptions.PermissionDenied()
 
         cards = models.Card.objects.filter(active_status='card_active')
@@ -1096,7 +1097,7 @@ class StatsViewSet(viewsets.ViewSet, List):
         # {'data': 'Disarmed: Partition 2'}
 
         auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-        if secrets.ALARM_API_TOKEN and auth_token != 'Bearer ' + secrets.ALARM_API_TOKEN:
+        if secrets.ALARM_API_TOKEN and not constant_time_compare(auth_token, 'Bearer ' + secrets.ALARM_API_TOKEN):
             raise exceptions.PermissionDenied()
 
         try:
@@ -1713,7 +1714,7 @@ class ProtocoinViewSet(Base):
     @action(detail=True, methods=['get'])
     def card_vend_balance(self, request, pk=None):
         auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-        if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.VEND_API_TOKEN:
+        if secrets.VEND_API_TOKEN and not constant_time_compare(auth_token, 'Bearer ' + secrets.VEND_API_TOKEN):
             raise exceptions.PermissionDenied()
 
         source_card = get_object_or_404(models.Card, card_number=pk)
@@ -1775,7 +1776,7 @@ class ProtocoinViewSet(Base):
         try:
             with transaction.atomic():
                 auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-                if secrets.VEND_API_TOKEN and auth_token != 'Bearer ' + secrets.VEND_API_TOKEN:
+                if secrets.VEND_API_TOKEN and not constant_time_compare(auth_token, 'Bearer ' + secrets.VEND_API_TOKEN):
                     raise exceptions.PermissionDenied()
 
                 source_card = get_object_or_404(models.Card, card_number=pk)
@@ -1881,7 +1882,7 @@ class ProtocoinViewSet(Base):
         try:
             with transaction.atomic():
                 auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-                if secrets.PRINTER_API_TOKEN and auth_token != 'Bearer ' + secrets.PRINTER_API_TOKEN:
+                if secrets.PRINTER_API_TOKEN and not constant_time_compare(auth_token, 'Bearer ' + secrets.PRINTER_API_TOKEN):
                     raise exceptions.PermissionDenied()
 
                 # {'job_name': 'download.png', 'uuid': '6abbad4d-dda3-4954-b4f1-ac77933a0562', 'timestamp': '20230211173624',
@@ -2019,7 +2020,7 @@ class ProtocoinViewSet(Base):
         try:
             with transaction.atomic():
                 auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-                if secrets.PRINTER_API_TOKEN and auth_token != 'Bearer ' + secrets.PRINTER_API_TOKEN:
+                if secrets.PRINTER_API_TOKEN and not constant_time_compare(auth_token, 'Bearer ' + secrets.PRINTER_API_TOKEN):
                     raise exceptions.PermissionDenied()
 
                 # {'job_id': '17', 'user': 'Tanner.Collin', 'title': 'test', 'printer': 'EpsonRAW', 'copies': '1'}
@@ -2111,7 +2112,7 @@ class PinballViewSet(Base):
     @action(detail=False, methods=['post'])
     def score(self, request):
         auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-        if secrets.PINBALL_API_TOKEN and auth_token != 'Bearer ' + secrets.PINBALL_API_TOKEN:
+        if secrets.PINBALL_API_TOKEN and not constant_time_compare(auth_token, 'Bearer ' + secrets.PINBALL_API_TOKEN):
             raise exceptions.PermissionDenied()
 
         card_number = request.data.get('card_number', None)
@@ -2161,7 +2162,7 @@ class PinballViewSet(Base):
     @action(detail=True, methods=['get'])
     def get_name(self, request, pk=None):
         auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-        if secrets.PINBALL_API_TOKEN and auth_token != 'Bearer ' + secrets.PINBALL_API_TOKEN:
+        if secrets.PINBALL_API_TOKEN and not constant_time_compare(auth_token, 'Bearer ' + secrets.PINBALL_API_TOKEN):
             raise exceptions.PermissionDenied()
 
         def get_favourite_drink(member):
@@ -2244,7 +2245,7 @@ class HostingViewSet(Base):
     @action(detail=False, methods=['post'])
     def offer(self, request):
         auth_token = request.META.get('HTTP_AUTHORIZATION', '')
-        if secrets.VANGUARD_API_TOKEN and auth_token != 'Bearer ' + secrets.VANGUARD_API_TOKEN:
+        if secrets.VANGUARD_API_TOKEN and not constant_time_compare(auth_token, 'Bearer ' + secrets.VANGUARD_API_TOKEN):
             raise exceptions.PermissionDenied()
 
         try:
