@@ -1,6 +1,6 @@
-# Noiseport (Spaceport)
+# Spaceport
 
-Member portal for Noisebridge hackerspace. Tracks membership, courses, training, access cards, storage, and community resources. Originally built for Calgary Protospace.
+Member portal for Protospace hackerspace. Tracks membership, courses, training, access cards, storage, and community resources.
 
 ## Tech Stack
 
