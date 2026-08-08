@@ -784,6 +784,11 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
     permission_classes = [AllowMetadata | IsAuthenticated, IsObjOwnerOrAdmin]
     serializer_class = serializers.TransactionSerializer
 
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsAuthenticated(), IsAdmin()]
+        return super().get_permissions()
+
     def get_queryset(self):
         queryset = models.Transaction.objects
         month = self.request.query_params.get('month', '')
