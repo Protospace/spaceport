@@ -104,7 +104,7 @@ class Transaction(models.Model):
     list_display = ['date', 'user', 'amount', 'protocoin', 'account_type', 'category']
     search_fields = ['date', 'user__username', 'account_type', 'category']
     def __str__(self):
-        return '%s tx %s' % (user.username, date)
+        return '%s tx %s' % (getattr(self.user, 'username', 'None'), self.date)
 
 class PayPalHint(models.Model):
     user = models.ForeignKey(User, related_name='paypal_hints', blank=True, null=True, on_delete=models.SET_NULL)
