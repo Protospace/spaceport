@@ -129,7 +129,7 @@ class IPN(models.Model):
     list_display = ['datetime', 'status']
     search_fields = ['datetime', 'status']
     def __str__(self):
-        return self.datetime
+        return str(self.datetime)
 
 class Card(models.Model):
     user = models.ForeignKey(User, related_name='cards', blank=True, null=True, on_delete=models.SET_NULL)
@@ -177,7 +177,9 @@ class Session(models.Model):
     list_display = ['datetime', 'course', 'instructor']
     search_fields = ['datetime', 'course__name', 'instructor__username']
     def __str__(self):
-        return '%s @ %s' % (self.course.name, self.datetime.astimezone(DISPLAY_TZ).strftime('%Y-%m-%d %-I:%M %p'))
+        course_name = self.course.name if self.course else 'Unknown Course'
+        dt = self.datetime.astimezone(DISPLAY_TZ).strftime('%Y-%m-%d %-I:%M %p') if self.datetime else 'Unknown Time'
+        return '%s @ %s' % (course_name, dt)
 
 class Training(models.Model):
     user = models.ForeignKey(User, related_name='training', blank=True, null=True, on_delete=models.SET_NULL)
@@ -193,7 +195,9 @@ class Training(models.Model):
     list_display = ['session', 'user']
     search_fields = ['session__course__name', 'user__username']
     def __str__(self):
-        return '%s taking %s @ %s' % (self.user, self.session.course.name, self.session.datetime)
+        course_name = self.session.course.name if self.session and self.session.course else 'Unknown Course'
+        dt = self.session.datetime if self.session else 'Unknown Time'
+        return '%s taking %s @ %s' % (self.user, course_name, dt)
 
 class Interest(models.Model):
     user = models.ForeignKey(User, related_name='interests', null=True, on_delete=models.SET_NULL)
