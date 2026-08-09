@@ -19,6 +19,7 @@ DEFAULTS = {
     'next_clean': None,
     'next_class': None,
     'prev_class': None,
+    'upcoming_classes_count': 0,
     'member_count': None,
     'paused_count': None,
     'green_count': None,
@@ -72,6 +73,15 @@ def calc_next_events():
     next_class = sessions.exclude(course__in=[317, 413, 273, 478]).filter(is_cancelled=False, datetime__gte=now()).order_by('datetime').first()
     prev_class = sessions.exclude(course__in=[317, 413, 273, 478]).filter(is_cancelled=False, datetime__lte=now()).order_by('datetime').last()
 
+    upcoming_classes_count = sessions.filter(
+        is_cancelled=False,
+        datetime__gte=now()
+    ).exclude(
+        Q(course__tags__contains='Event') |
+        Q(course__tags__contains='Outing') |
+        Q(course__tags__contains='Protospace')
+    ).count()
+
     if member_meeting:
         cache.set('next_meeting', member_meeting.datetime)
     else:
@@ -91,6 +101,8 @@ def calc_next_events():
         cache.set('prev_class', dict(datetime=prev_class.datetime, id=prev_class.id, name=prev_class.course.name))
     else:
         cache.set('prev_class', None)
+
+    cache.set('upcoming_classes_count', upcoming_classes_count)
 
 def calc_member_counts():
     members = models.Member.objects
