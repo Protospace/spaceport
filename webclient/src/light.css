@@ -570,11 +570,13 @@ a {
 }
 
 .stacked-bar-tooltip .tooltip-item-active,
+.stacked-bar-tooltip .tooltip-item-classes,
 .stacked-bar-tooltip .tooltip-item-attended-active {
 	color: #2185d0;
 }
 
 .stacked-bar-tooltip .tooltip-item-inactive,
+.stacked-bar-tooltip .tooltip-item-events,
 .stacked-bar-tooltip .tooltip-item-attended-inactive,
 .stacked-bar-tooltip .recharts-tooltip-item:last-child {
 	color: #000000;
