@@ -941,6 +941,8 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 
             cost = prev_session.cost
             max_students = prev_session.max_students
+            if max_students is not None and max_students <= 1:
+                max_students = 6
         else:
             return None
 
