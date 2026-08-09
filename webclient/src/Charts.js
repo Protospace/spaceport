@@ -411,14 +411,16 @@ export function Charts(props) {
 				</p>
 			}
 
+			<p>Events are classes tagged with "Event", "Outing", or "Protospace".</p>
+
 			<p>
 				{!!extras?.classes_week?.length &&
 					<ResponsiveContainer width='100%' height={300}>
 						<BarChart
+							margin={{left: -20}}
 							data={fullClassesWeek ? extras.classes_week : extras.classes_week.slice(-52)}
-							margin={isMobile? {bottom: 13} : {}}
 						>
-							<XAxis dataKey='week' tickFormatter={t => moment(t).format('YYYY-MM-DD')} interval={isMobile ? 1 : 'preserveStartEnd'} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
+							<XAxis dataKey='week' tickFormatter={t => moment(t).format('YYYY-MM-DD')} minTickGap={10} />
 							<YAxis />
 							<CartesianGrid strokeDasharray='3 3'/>
 							<Tooltip content={<StackedBarTooltip totalKey='total' labelFormatter={t => moment(t).format('YYYY-MM-DD')} />} />
