@@ -5,6 +5,7 @@ import time
 from datetime import date, datetime, timedelta
 import requests
 from django.db.models import Prefetch, Count, Q
+from django.db.models.functions import TruncWeek
 from django.core.cache import cache
 from django.utils.timezone import now, pytz
 from apiserver.api import models, utils
@@ -388,6 +389,22 @@ def calc_num_interested():
         course_list.append(course)
 
     models.Course.objects.bulk_update(course_list, ['num_interested'])
+
+def calc_classes_week():
+    results = list(models.Session.objects.filter(
+        datetime__isnull=False,
+    ).annotate(
+        week=TruncWeek('datetime')
+    ).values(
+        'week'
+    ).annotate(
+        total=Count('id'),
+        events=Count('id', filter=Q(course__tags__contains='Event') | Q(course__tags__contains='Outing') | Q(course__tags__contains='Protospace')),
+        classes=Count('id', filter=~Q(course__tags__contains='Event') & ~Q(course__tags__contains='Outing') & ~Q(course__tags__contains='Protospace')),
+    ).order_by(
+        'week'
+    ))
+    cache.set('classes_week', results)
 
 def calc_dues_distribution():
     results = list(models.Member.objects.filter(
