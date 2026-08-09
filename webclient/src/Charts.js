@@ -437,7 +437,7 @@ export function Charts(props) {
 								type='monotone'
 								dataKey='events'
 								name='Events'
-								fill='#82ca9d'
+								fill='#aaa'
 								maxBarSize={40}
 								animationDuration={250}
 								stackId='a'
