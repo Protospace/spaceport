@@ -399,6 +399,48 @@ export function Charts(props) {
 
 			<p>Retained Count: number of those signups who are still a member currently.</p>
 
+			<Header size='medium'>Classes Per Week</Header>
+
+			<p>Number of classes scheduled per calendar week.</p>
+
+			<p>
+				{!!extras?.classes_week?.length &&
+					<ResponsiveContainer width='100%' height={300}>
+						<BarChart
+							data={extras.classes_week}
+							margin={isMobile? {bottom: 13} : {}}
+						>
+							<XAxis dataKey='week' tickFormatter={t => moment(t).format('YYYY-MM-DD')} interval={isMobile ? 1 : 'preserveStartEnd'} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
+							<YAxis />
+							<CartesianGrid strokeDasharray='3 3'/>
+							<Tooltip content={<StackedBarTooltip totalKey='total' />} labelFormatter={t => moment(t).format('YYYY-MM-DD')} />
+
+							<Bar
+								type='monotone'
+								dataKey='classes'
+								name='Classes'
+								fill='#2185d0'
+								maxBarSize={40}
+								animationDuration={250}
+								stackId='a'
+							/>
+
+							<Bar
+								type='monotone'
+								dataKey='events'
+								name='Events'
+								fill='#82ca9d'
+								maxBarSize={40}
+								animationDuration={250}
+								stackId='a'
+							/>
+						</BarChart>
+					</ResponsiveContainer>
+				}
+			</p>
+
+			<p>Count: number of classes and events scheduled per week.</p>
+
 			<Header size='medium'>Drink Sales</Header>
 
 			<p>Drinks sold over the last six months via Protocoin. Excludes instructor comped vends and cash.</p>
