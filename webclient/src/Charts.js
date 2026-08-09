@@ -4,20 +4,20 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, L
 import { requester, useIsMobile } from './utils.js';
 import moment from 'moment-timezone';
 
-const StackedBarTooltip = ({ active, payload, label, totalKey }) => {
+const StackedBarTooltip = ({ active, payload, label, totalKey, labelFormatter }) => {
 	if (active && payload && payload.length) {
 		const total = payload[0].payload[totalKey];
+		const displayLabel = labelFormatter ? labelFormatter(label) : (typeof label === 'string' ? label.split('T')[0] : label);
 		return (
 			<div className="recharts-default-tooltip stacked-bar-tooltip">
-				<p className="recharts-tooltip-label">{label}</p>
+				<p className="recharts-tooltip-label">{displayLabel}</p>
 				<ul className="recharts-tooltip-item-list">
 					{payload.slice().reverse().map((entry, index) => {
-						const percentage = total > 0 ? (entry.value / total * 100).toFixed(1) : 0;
 						return (
 							<li className={`recharts-tooltip-item tooltip-item-${entry.name.toLowerCase().replace(/\s/g, '-')}`} key={`tooltip-item-${index}`}>
 								<span className="recharts-tooltip-item-name">{entry.name}</span>
 								<span className="recharts-tooltip-item-separator">: </span>
-								<span className="recharts-tooltip-item-value">{`${entry.value} (${percentage}%)`}</span>
+								<span className="recharts-tooltip-item-value">{entry.value}</span>
 							</li>
 						);
 					})}
@@ -44,6 +44,7 @@ export function Charts(props) {
 	const [spaceActivity, setSpaceActivity] = useState(spaceActivityCache);
 	const [fullActivity, setFullActivity] = useState(false);
 	const [fullSignups, setFullSignups] = useState(false);
+	const [fullClassesWeek, setFullClassesWeek] = useState(false);
 	const [extras, setExtras] = useState(extrasCache);
 	const isMobile = useIsMobile();
 
@@ -401,19 +402,26 @@ export function Charts(props) {
 
 			<Header size='medium'>Classes Per Week</Header>
 
-			<p>Number of classes scheduled per calendar week.</p>
+			{fullClassesWeek ?
+				<p>Number of classes scheduled per calendar week.</p>
+			:
+				<p>
+					Number of classes scheduled per calendar week for the last year.
+					{' '}<Button size='tiny' onClick={() => setFullClassesWeek(true)} >View All</Button>
+				</p>
+			}
 
 			<p>
 				{!!extras?.classes_week?.length &&
 					<ResponsiveContainer width='100%' height={300}>
 						<BarChart
-							data={extras.classes_week}
+							data={fullClassesWeek ? extras.classes_week : extras.classes_week.slice(-52)}
 							margin={isMobile? {bottom: 13} : {}}
 						>
 							<XAxis dataKey='week' tickFormatter={t => moment(t).format('YYYY-MM-DD')} interval={isMobile ? 1 : 'preserveStartEnd'} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
 							<YAxis />
 							<CartesianGrid strokeDasharray='3 3'/>
-							<Tooltip content={<StackedBarTooltip totalKey='total' />} labelFormatter={t => moment(t).format('YYYY-MM-DD')} />
+							<Tooltip content={<StackedBarTooltip totalKey='total' labelFormatter={t => moment(t).format('YYYY-MM-DD')} />} />
 
 							<Bar
 								type='monotone'
