@@ -19,7 +19,7 @@ DEFAULTS = {
     'next_clean': None,
     'next_class': None,
     'prev_class': None,
-    'upcoming_classes_count': 0,
+    'upcoming_classes': None,
     'member_count': None,
     'paused_count': None,
     'green_count': None,
