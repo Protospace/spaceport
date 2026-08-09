@@ -102,7 +102,7 @@ def calc_next_events():
     else:
         cache.set('prev_class', None)
 
-    cache.set('upcoming_classes_count', upcoming_classes_count)
+    cache.set('upcoming_classes', upcoming_classes_count)
 
 def calc_member_counts():
     members = models.Member.objects
@@ -405,6 +405,7 @@ def calc_num_interested():
 def calc_classes_week():
     results = list(models.Session.objects.filter(
         datetime__isnull=False,
+        is_cancelled=False,
     ).annotate(
         week=TruncWeek('datetime')
     ).values(
