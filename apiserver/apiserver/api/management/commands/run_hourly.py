@@ -37,6 +37,7 @@ class Command(BaseCommand):
         utils_stats.calc_cert_distribution()
         utils_stats.calc_year_attendance()
         utils_stats.calc_forum_activity()
+        utils_stats.calc_classes_week()
 
         utils.gen_search_strings()
 

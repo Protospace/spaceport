@@ -463,6 +463,7 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
         msg = 'Recounting interests...'
         if data['request_id']: utils_stats.set_progress(data['request_id'], msg)
         utils_stats.calc_num_interested()
+        utils_stats.calc_next_events()
 
         logging.info('Satisfied %s interests.', num_satisfied)
 
