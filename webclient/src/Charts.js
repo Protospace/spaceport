@@ -312,7 +312,7 @@ export function Charts(props) {
 				<p>Daily since March 7th 2020, updates hourly.</p>
 			:
 				<p>
-					Last four weeks, updates hourly.
+					Daily for the last four weeks, updates hourly.
 					{' '}<Button size='tiny' onClick={() => setFullActivity(true)} >View All</Button>
 				</p>
 			}
@@ -401,7 +401,7 @@ export function Charts(props) {
 
 			<Header size='medium'>Drink Sales</Header>
 
-			<p>Drinks sold over the last six months via Protocoin. Excludes instructor comped vends.</p>
+			<p>Drinks sold over the last six months via Protocoin. Excludes instructor comped vends and cash.</p>
 
 			<p>
 				{!!extras?.drinks_6mo?.length &&
