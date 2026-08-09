@@ -164,7 +164,7 @@ export function Charts(props) {
 					<ResponsiveContainer width='100%' height={300}>
 						<LineChart syncId={1} data={memberCount}>
 							<XAxis dataKey='date' minTickGap={10} />
-							<YAxis />
+							<YAxis width={35} />
 							<CartesianGrid strokeDasharray='3 3'/>
 							<Tooltip />
 							<Legend />
@@ -199,7 +199,7 @@ export function Charts(props) {
 					<ResponsiveContainer width='100%' height={300}>
 						<LineChart syncId={1} data={memberCount}>
 							<XAxis dataKey='date' minTickGap={10} />
-							<YAxis />
+							<YAxis width={35} />
 							<CartesianGrid strokeDasharray='3 3'/>
 							<Tooltip />
 							<Legend />
@@ -234,7 +234,7 @@ export function Charts(props) {
 					<ResponsiveContainer width='100%' height={300}>
 						<LineChart syncId={1} data={memberCount}>
 							<XAxis dataKey='date' minTickGap={10} />
-							<YAxis />
+							<YAxis width={35} />
 							<CartesianGrid strokeDasharray='3 3'/>
 							<Tooltip />
 							<Legend />
@@ -269,7 +269,7 @@ export function Charts(props) {
 					<ResponsiveContainer width='100%' height={300}>
 						<LineChart syncId={1} data={memberCount}>
 							<XAxis dataKey='date' minTickGap={10} />
-							<YAxis />
+							<YAxis width={35} />
 							<CartesianGrid strokeDasharray='3 3'/>
 							<Tooltip />
 							<Legend />
@@ -323,7 +323,7 @@ export function Charts(props) {
 					<ResponsiveContainer width='100%' height={300}>
 						<BarChart data={fullActivity ? spaceActivity : spaceActivity.slice(-28)}>
 							<XAxis dataKey='date' minTickGap={10} />
-							<YAxis />
+							<YAxis width={35} />
 							<CartesianGrid strokeDasharray='3 3'/>
 							<Tooltip labelFormatter={t => moment(t).format('YYYY-MM-DD ddd')} />
 							<Legend />
@@ -360,7 +360,7 @@ export function Charts(props) {
 					<ResponsiveContainer width='100%' height={300}>
 						<BarChart data={fullSignups ? signupCount : signupCount.slice(-16)}>
 							<XAxis dataKey='month' minTickGap={10} />
-							<YAxis />
+							<YAxis width={35} />
 							<CartesianGrid strokeDasharray='3 3'/>
 							<Tooltip />
 							<Legend />
@@ -417,11 +417,11 @@ export function Charts(props) {
 				{!!extras?.classes_week?.length &&
 					<ResponsiveContainer width='100%' height={300}>
 						<BarChart
-							margin={{left: -20}}
+							margin={isMobile? {bottom: 13} : {}}
 							data={fullClassesWeek ? extras.classes_week : extras.classes_week.slice(-52)}
 						>
 							<XAxis dataKey='week' tickFormatter={t => moment(t).format('YYYY-MM-DD')} minTickGap={10} />
-							<YAxis />
+							<YAxis width={35} />
 							<CartesianGrid strokeDasharray='3 3'/>
 							<Tooltip content={<StackedBarTooltip totalKey='total' labelFormatter={t => moment(t).format('YYYY-MM-DD')} />} />
 
@@ -463,7 +463,7 @@ export function Charts(props) {
 							data={extras.drinks_6mo}
 						>
 							<XAxis dataKey='name' interval={0} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
-							<YAxis />
+							<YAxis width={35} />
 							<CartesianGrid strokeDasharray='3 3'/>
 							<Tooltip />
 
@@ -494,7 +494,7 @@ export function Charts(props) {
 							<ResponsiveContainer width='100%' height={300}>
 								<BarChart data={extras.dues_dist}>
 									<XAxis dataKey='monthly_fees' tickFormatter={val => `$${val}`} />
-									<YAxis />
+									<YAxis width={35} />
 									<CartesianGrid strokeDasharray='3 3'/>
 									<Tooltip
 										formatter={(value) => `${value} (${(value / total * 100).toFixed(1)}%)`}
@@ -530,7 +530,7 @@ export function Charts(props) {
 							margin={isMobile? {bottom: 13} : {}}
 						>
 							<XAxis dataKey='application_date__year' interval={isMobile ? 1 : 0} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
-							<YAxis />
+							<YAxis width={35} />
 							<CartesianGrid strokeDasharray='3 3'/>
 							<Tooltip content={<StackedBarTooltip totalKey='total' />} />
 
@@ -572,7 +572,7 @@ export function Charts(props) {
 							margin={isMobile? {bottom: 13} : {}}
 						>
 							<XAxis dataKey='session__datetime__year' interval={0} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
-							<YAxis />
+							<YAxis width={35} />
 							<CartesianGrid strokeDasharray='3 3'/>
 							<Tooltip content={<StackedBarTooltip totalKey='attended_total' />} />
 
@@ -617,7 +617,7 @@ export function Charts(props) {
 									data={extras.cert_dist}
 								>
 									<XAxis dataKey='name' interval={0} angle={isMobile ? -45 : 0} textAnchor={isMobile ? 'end' : 'middle'} />
-									<YAxis />
+									<YAxis width={35} />
 									<CartesianGrid strokeDasharray='3 3'/>
 									<Tooltip formatter={(value) => {
 										const percentage = total > 0 ? (value / total * 100).toFixed(1) : 0;
@@ -650,7 +650,7 @@ export function Charts(props) {
 					<ResponsiveContainer width='100%' height={300}>
 						<BarChart data={extras.forums_visit_1mo}>
 							<XAxis dataKey='member' tick={false} />
-							<YAxis />
+							<YAxis width={35} />
 							<CartesianGrid strokeDasharray='3 3'/>
 							<Tooltip labelFormatter={label => `Member ${label} (${(label / extras.forums_visit_1mo.length * 100).toFixed(0)}%)`} />
 							<Bar
