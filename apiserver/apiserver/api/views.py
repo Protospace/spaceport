@@ -417,6 +417,9 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
         data = self.request.data
         session = serializer.save(instructor=self.request.user)
 
+        # update next class and upcoming count
+        utils_stats.calc_next_events()
+
         # ensure session datetime is at least 1 day in the future
         # before sending interest emails
         if session.datetime < now() + datetime.timedelta(days=1):
@@ -463,7 +466,6 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
         msg = 'Recounting interests...'
         if data['request_id']: utils_stats.set_progress(data['request_id'], msg)
         utils_stats.calc_num_interested()
-        utils_stats.calc_next_events()
 
         logging.info('Satisfied %s interests.', num_satisfied)
 
