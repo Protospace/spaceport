@@ -45,6 +45,7 @@ if secrets.MUMBLE:
     DEFAULTS['mumble_users'] = []
 
 EXTRAS = {
+    'classes_week': [],
     'drinks_6mo': [],
     'forums_visit_1mo': [],
     'dues_dist': [],
