@@ -1,6 +1,7 @@
 from log import logger
 import time
 import ldap
+import ldap.filter
 import ldap.modlist as modlist
 from ldap.controls import SimplePagedResultsControl
 import secrets
@@ -47,7 +48,8 @@ def find_user(query):
     try:
         logger.info('Looking up user ' + query)
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
-        criteria = '(&(objectClass=user)(|(mail={})(sAMAccountName={})(userPrincipalName={}*))(!(objectClass=computer)))'.format(query, query, query)
+        escaped_query = ldap.filter.escape_filter_chars(query)
+        criteria = '(&(objectClass=user)(|(mail={})(sAMAccountName={})(userPrincipalName={}*))(!(objectClass=computer)))'.format(escaped_query, escaped_query, escaped_query)
         results = ldap_conn.search_s(secrets.BASE_MEMBERS, ldap.SCOPE_SUBTREE, criteria, ['displayName','sAMAccountName','email'])
 
         logger.info('  Results: ' + str(results))
@@ -132,14 +134,16 @@ def rename_user(old_username, first, last, new_username, email):
        ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
 
        # 0. Check if new username is already taken
-       collision_filter = f'(sAMAccountName={new_username})'
+       escaped_new_username = ldap.filter.escape_filter_chars(new_username)
+       collision_filter = f'(sAMAccountName={escaped_new_username})'
        collision_result = ldap_conn.search_s(secrets.BASE_MEMBERS, ldap.SCOPE_SUBTREE, collision_filter, ['distinguishedName'])
        if collision_result:
            logger.error(f'New username {new_username} is already taken.')
            return False
 
        # 1. Locate the existing user's Distinguished Name (DN)
-       search_filter = f'(sAMAccountName={old_username})'
+       escaped_old_username = ldap.filter.escape_filter_chars(old_username)
+       search_filter = f'(sAMAccountName={escaped_old_username})'
        search_result = ldap_conn.search_s(secrets.BASE_MEMBERS, ldap.SCOPE_SUBTREE, search_filter, ['distinguishedName'])
 
        if not search_result:
@@ -208,7 +212,8 @@ def find_group(groupname):
     try:
         logger.info('Looking up group ' + groupname)
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
-        criteria = '(&(objectClass=group)(sAMAccountName={}))'.format(groupname)
+        escaped_groupname = ldap.filter.escape_filter_chars(groupname)
+        criteria = '(&(objectClass=group)(sAMAccountName={}))'.format(escaped_groupname)
         results = ldap_conn.search_s(secrets.BASE_GROUPS, ldap.SCOPE_SUBTREE, criteria, ['name','groupType'] )
 
         logger.info('  Results: ' + str(results))
@@ -296,7 +301,8 @@ def list_group(groupname):
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
         group_dn = find_group(groupname)
 
-        criteria = '(&(objectClass=group)(sAMAccountName={}))'.format(groupname)
+        escaped_groupname = ldap.filter.escape_filter_chars(groupname)
+        criteria = '(&(objectClass=group)(sAMAccountName={}))'.format(escaped_groupname)
         results = ldap_conn.search_s(secrets.BASE_GROUPS, ldap.SCOPE_SUBTREE, criteria, ['member'])
         members_tmp = results[0][1]
         members = members_tmp.get('member', [])
@@ -334,7 +340,8 @@ def is_member(groupname, username):
         group_dn = find_group(groupname)
         user_dn = find_user(username).encode()
         memflag = False
-        criteria = '(&(objectClass=group)(sAMAccountName={}))'.format(groupname)
+        escaped_groupname = ldap.filter.escape_filter_chars(groupname)
+        criteria = '(&(objectClass=group)(sAMAccountName={}))'.format(escaped_groupname)
         results = ldap_conn.search_s(secrets.BASE_GROUPS, ldap.SCOPE_SUBTREE, criteria, ['member'] )
         members_tmp = results[0][1]
         members = members_tmp.get('member', [])
@@ -403,7 +410,8 @@ def set_account_enabled(username, is_enabled):
     try:
         logger.info('Setting account enabled for: ' + username)
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
-        criteria = '(&(objectClass=user)(sAMAccountName={})(!(objectClass=computer)))'.format(username)
+        escaped_username = ldap.filter.escape_filter_chars(username)
+        criteria = '(&(objectClass=user)(sAMAccountName={})(!(objectClass=computer)))'.format(escaped_username)
         results = ldap_conn.search_s(
             secrets.BASE_MEMBERS,
             ldap.SCOPE_SUBTREE,
