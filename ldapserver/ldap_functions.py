@@ -2,6 +2,7 @@ from log import logger
 import time
 import ldap
 import ldap.filter
+import ldap.dn
 import ldap.modlist as modlist
 from ldap.controls import SimplePagedResultsControl
 import secrets
@@ -87,7 +88,9 @@ def create_user(first, last, username, email, password):
     try:
         logger.info('Creating user: ' + username)
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
-        dn = 'CN={} {},{}'.format(first, last, secrets.BASE_MEMBERS)
+        escaped_first = ldap.dn.escape_dn_chars(first)
+        escaped_last = ldap.dn.escape_dn_chars(last)
+        dn = 'CN={} {},{}'.format(escaped_first, escaped_last, secrets.BASE_MEMBERS)
         full_name = '{} {}'.format(first, last)
 
         ldif = [
@@ -153,7 +156,9 @@ def rename_user(old_username, first, last, new_username, email):
        old_dn = search_result[0][0]
 
        # 2. Define the new naming values
-       new_rdn = 'CN={} {}'.format(first, last)
+       escaped_first = ldap.dn.escape_dn_chars(first)
+       escaped_last = ldap.dn.escape_dn_chars(last)
+       new_rdn = 'CN={} {}'.format(escaped_first, escaped_last)
        full_name = '{} {}'.format(first, last)
 
        # 3. Rename the object itself (Changes CN and DN)
@@ -232,7 +237,8 @@ def create_group(groupname, description):
     ldap_conn = init_ldap()
     try:
         ldap_conn.simple_bind_s(secrets.LDAP_USERNAME, secrets.LDAP_PASSWORD)
-        dn = 'CN={},{}'.format(groupname, secrets.BASE_GROUPS)
+        escaped_groupname = ldap.dn.escape_dn_chars(groupname)
+        dn = 'CN={},{}'.format(escaped_groupname, secrets.BASE_GROUPS)
 
         ldif = [
             ('objectClass', [b'top', b'group']),
