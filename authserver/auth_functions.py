@@ -3,6 +3,8 @@ import time
 import secrets
 import subprocess
 import requests
+import json
+import urllib.parse
 from uuid import uuid4
 
 from flask import abort
@@ -92,10 +94,15 @@ def discourse_rails_script(script):
     output = output.strip() or 'No complaints'
     return result, output
 
+def sanitize(val):
+    # json.dumps escapes quotes and control characters.
+    # replacing '#' with '\#' prevents Ruby string interpolation injection.
+    return json.dumps(val).replace('#', '\\#')
+
 def get_discourse_group_id(group_name):
     logger.info('Getting the ID of group %s', group_name)
 
-    url = 'https://forum.protospace.ca/groups/{}.json'.format(group_name)
+    url = 'https://forum.protospace.ca/groups/{}.json'.format(urllib.parse.quote(group_name))
     response = discourse_api_get(url)
     response = response.json()
     return response['group']['id']
@@ -103,7 +110,7 @@ def get_discourse_group_id(group_name):
 def get_discourse_user_id(username):
     logger.info('Getting the ID of user %s', username)
 
-    url = 'https://forum.protospace.ca/u/{}.json'.format(username)
+    url = 'https://forum.protospace.ca/u/{}.json'.format(urllib.parse.quote(username))
     response = discourse_api_get(url)
     response = response.json()
     return response['user']['id']
@@ -200,7 +207,7 @@ def set_discourse_password(username, password, first_name, email):
             new_email = random_email()
             logger.info('Email found on different user %s, changing to: %s', user['username'], new_email)
 
-            script = 'UserEmail.find_by(email: "{}").update!(email: "{}")'.format(email, new_email)
+            script = 'UserEmail.find_by(email: {}).update!(email: {})'.format(sanitize(email), sanitize(new_email))
             result, output = discourse_rails_script(script)
 
             logger.info('Confirming email change...')
@@ -235,7 +242,7 @@ def set_discourse_password(username, password, first_name, email):
     else:
         logger.info('User exists, setting Discourse password for: ' + username)
 
-        script = 'User.find_by(username: "{}").update!(password: "{}")'.format(username, password)
+        script = 'User.find_by(username: {}).update!(password: {})'.format(sanitize(username), sanitize(password))
         result, output = discourse_rails_script(script)
 
         if 'Password is the same' in result.stderr:
@@ -269,7 +276,7 @@ def add_discourse_group_members(group_name, usernames):
 
     logger.info('Filtering out usernames that are already group members...')
 
-    url = 'https://forum.protospace.ca/groups/{}/members.json?limit=1000'.format(group_name)
+    url = 'https://forum.protospace.ca/groups/{}/members.json?limit=1000'.format(urllib.parse.quote(group_name))
     response = discourse_api_get(url)
     response = response.json()
 
@@ -334,7 +341,7 @@ def change_discourse_username(username, new_username):
 
     logger.info('Changing username %s to %s...', username, new_username)
 
-    url = 'https://forum.protospace.ca/users/{}/preferences/username'.format(username)
+    url = 'https://forum.protospace.ca/users/{}/preferences/username'.format(urllib.parse.quote(username))
     data = {
         'new_username': new_username,
     }
