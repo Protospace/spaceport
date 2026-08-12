@@ -189,7 +189,7 @@ class TestCalcStatus(TestCase):
 
         status = utils.calc_member_status(expire_date)
 
-        self.assertEqual(status, 'Former Member')
+        self.assertEqual(status, 'Expired Member')
 
 
 class TestTallyMembership(TestCase):
@@ -324,8 +324,8 @@ class TestTallyMembership(TestCase):
         result = utils.tally_membership_months(member)
 
         self.assertEqual(member.expire_date, end_date)
-        self.assertEqual(member.paused_date, end_date)
-        self.assertEqual(member.status, 'Former Member')
+        self.assertEqual(member.paused_date, utils.today_local_tz())
+        self.assertEqual(member.status, 'Expired Member')
 
     def test_tally_membership_months_dont_run(self):
         member = self.get_member_clear_transactions()
