@@ -77,20 +77,16 @@ class RoleBasedTests(APITestCase):
             user = User.objects.get(username=username)
             member = Member.objects.get(user=user)
 
-            is_admin = False
             if i == 0:
                 user.is_staff = True
                 user.is_superuser = True
                 first_member = member
-                is_admin = True
 
             if 'director' in combo:
                 member.is_director = True
-                is_admin = True
             if 'staff' in combo:
                 user.is_staff = True
                 member.is_staff = True
-                is_admin = True
             if 'instructor' in combo:
                 member.is_instructor = True
             if 'vetter' in combo:
@@ -110,7 +106,7 @@ class RoleBasedTests(APITestCase):
             assert details_response.status_code == status.HTTP_200_OK
             client.force_authenticate(user=None)
             
-            cls.users.append({'user': user, 'is_admin': is_admin, 'member': member})
+            cls.users.append({'user': user, 'member': member})
 
         cls.transactions = []
         for u in cls.users:
@@ -146,26 +142,26 @@ class RoleBasedTests(APITestCase):
         
         for u in self.users:
             user = u['user']
-            is_admin = u['is_admin']
+            member = u['member']
             self.client.force_authenticate(user=user)
             
             # Test List
             response = self.client.get(list_url)
-            if is_admin:
+            if user.is_staff or member.is_director:
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
             else:
                 self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
                 
             # Test Create
             data = {
-                'member_id': u['member'].id,
+                'member_id': member.id,
                 'date': timezone.now().date().isoformat(),
                 'account_type': 'Cash',
                 'category': 'Donation',
                 'amount': 15.00
             }
             response = self.client.post(list_url, data, format='json')
-            if is_admin:
+            if user.is_staff or member.is_director:
                 self.assertEqual(response.status_code, status.HTTP_201_CREATED)
             else:
                 self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -179,15 +175,15 @@ class RoleBasedTests(APITestCase):
             other_tx = models.Transaction.objects.exclude(user=user).first()
             if other_tx:
                 response = self.client.get(f'/transactions/{other_tx.id}/')
-                if is_admin:
+                if user.is_staff or member.is_director:
                     self.assertEqual(response.status_code, status.HTTP_200_OK)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
                     
             # Test Update
             response = self.client.patch(f'/transactions/{own_tx.id}/',
-                    {'category': 'Donation', 'account_type': 'Cash', 'amount': 20.00, 'member_id': u['member'].id}, format='json')
-            if is_admin:
+                    {'category': 'Donation', 'account_type': 'Cash', 'amount': 20.00, 'member_id': member.id}, format='json')
+            if user.is_staff or member.is_director:
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
             else:
                 self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
