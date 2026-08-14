@@ -145,6 +145,16 @@ class RoleBasedTests(APITestCase):
     def test_transaction_permissions(self):
         list_url = '/transactions/'
         
+        # Test Unauthenticated
+        self.client.force_authenticate(user=None)
+        self.assertEqual(self.client.get(list_url).status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(self.client.post(list_url, {}, format='json').status_code, status.HTTP_401_UNAUTHORIZED)
+        if self.transactions:
+            tx_id = self.transactions[0].id
+            self.assertEqual(self.client.get(f'/transactions/{tx_id}/').status_code, status.HTTP_401_UNAUTHORIZED)
+            self.assertEqual(self.client.patch(f'/transactions/{tx_id}/', {}, format='json').status_code, status.HTTP_401_UNAUTHORIZED)
+            self.assertEqual(self.client.put(f'/transactions/{tx_id}/', {}, format='json').status_code, status.HTTP_401_UNAUTHORIZED)
+
         for u in self.users:
             user = u['user']
             member = u['member']
@@ -187,9 +197,23 @@ class RoleBasedTests(APITestCase):
                     else:
                         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
                         
-                # Test Update
+                # Test Update (PATCH)
                 response = self.client.patch(f'/transactions/{own_tx.id}/',
                         {'category': 'Donation', 'account_type': 'Cash', 'amount': 20.00, 'member_id': member.id}, format='json')
+                if user.is_staff or member.is_staff or member.is_director:
+                    self.assertEqual(response.status_code, status.HTTP_200_OK)
+                else:
+                    self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                    
+                # Test Update (PUT)
+                put_data = {
+                    'member_id': member.id,
+                    'date': timezone.now().date().isoformat(),
+                    'account_type': 'Cash',
+                    'category': 'Donation',
+                    'amount': 25.00
+                }
+                response = self.client.put(f'/transactions/{own_tx.id}/', put_data, format='json')
                 if user.is_staff or member.is_staff or member.is_director:
                     self.assertEqual(response.status_code, status.HTTP_200_OK)
                 else:
