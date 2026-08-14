@@ -185,3 +185,107 @@ class RoleBasedTests(APITestCase):
                 self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
                 
             self.client.force_authenticate(user=None)
+
+    def test_transaction_serializer_logic(self):
+        # Find dir.vet.user
+        user_dict = next(u for u in self.users if u['user'].username == 'dir.vet.user')
+        user = user_dict['user']
+        member = user_dict['member']
+        self.client.force_authenticate(user=user)
+
+        list_url = '/transactions/'
+        base_data = {
+            'member_id': member.id,
+            'date': timezone.now().date().isoformat(),
+            'account_type': 'Cash',
+            'category': 'Donation',
+            'amount': 10.00
+        }
+
+        # Missing member_id
+        data = base_data.copy()
+        del data['member_id']
+        response = self.client.post(list_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Membership without months
+        data = base_data.copy()
+        data['category'] = 'Membership'
+        response = self.client.post(list_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Protocoin Exchange
+        data = base_data.copy()
+        data['account_type'] = 'Protocoin'
+        data['category'] = 'Exchange'
+        response = self.client.post(list_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Exchange with 0 amount
+        data = base_data.copy()
+        data['category'] = 'Exchange'
+        data['amount'] = 0
+        response = self.client.post(list_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Protocoin with 0 protocoin
+        data = base_data.copy()
+        data['account_type'] = 'Protocoin'
+        data['protocoin'] = 0
+        response = self.client.post(list_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Cash with 0 amount
+        data = base_data.copy()
+        data['account_type'] = 'Cash'
+        data['amount'] = 0
+        response = self.client.post(list_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Interac without reference_number
+        data = base_data.copy()
+        data['account_type'] = 'Interac'
+        response = self.client.post(list_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Negative protocoin without sufficient funds
+        data = base_data.copy()
+        data['account_type'] = 'Protocoin'
+        data['category'] = 'Snacks'
+        data['protocoin'] = -1000.00
+        response = self.client.post(list_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Valid Exchange
+        data = base_data.copy()
+        data['category'] = 'Exchange'
+        data['amount'] = 50.00
+        response = self.client.post(list_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(float(response.data['protocoin']), 50.00)
+
+        # Valid Protocoin spend
+        data = base_data.copy()
+        data['account_type'] = 'Protocoin'
+        data['category'] = 'Snacks'
+        data['protocoin'] = -5.00
+        response = self.client.post(list_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Valid Membership transaction
+        data = base_data.copy()
+        data['category'] = 'Membership'
+        data['number_of_membership_months'] = 1
+        response = self.client.post(list_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Test Update logic (subtracting out the transaction being edited)
+        tx_id = response.data['id']
+        update_data = data.copy()
+        update_data['account_type'] = 'Protocoin'
+        update_data['category'] = 'Snacks'
+        update_data['protocoin'] = -1000.00 # Should fail, insufficient funds
+        response = self.client.patch(f'/transactions/{tx_id}/', update_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.client.force_authenticate(user=None)
