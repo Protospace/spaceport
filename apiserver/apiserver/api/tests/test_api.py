@@ -149,11 +149,12 @@ class RoleBasedTests(APITestCase):
         self.client.force_authenticate(user=None)
         self.assertEqual(self.client.get(list_url).status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(self.client.post(list_url, {}, format='json').status_code, status.HTTP_401_UNAUTHORIZED)
-        if self.transactions:
-            tx_id = self.transactions[0].id
-            self.assertEqual(self.client.get(f'/transactions/{tx_id}/').status_code, status.HTTP_401_UNAUTHORIZED)
-            self.assertEqual(self.client.patch(f'/transactions/{tx_id}/', {}, format='json').status_code, status.HTTP_401_UNAUTHORIZED)
-            self.assertEqual(self.client.put(f'/transactions/{tx_id}/', {}, format='json').status_code, status.HTTP_401_UNAUTHORIZED)
+        
+        self.assertTrue(self.transactions, "No transactions available to test")
+        tx_id = self.transactions[0].id
+        self.assertEqual(self.client.get(f'/transactions/{tx_id}/').status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(self.client.patch(f'/transactions/{tx_id}/', {}, format='json').status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(self.client.put(f'/transactions/{tx_id}/', {}, format='json').status_code, status.HTTP_401_UNAUTHORIZED)
 
         for u in self.users:
             user = u['user']
