@@ -7,6 +7,8 @@ import itertools
 from django.utils import timezone
 from parameterized import parameterized
 
+from apiserver.api import utils, utils_paypal, models
+
 data = {
     'username': 'registrationtc',
     'email': 'unittest@email.com',
@@ -80,7 +82,7 @@ class RegistrationTests(APITestCase):
             if 'vetter' in combo:
                 member.is_vetter = True
             if 'vetted' in combo:
-                member.vetted_date = timezone.now()
+                member.vetted_date = utils.today_local_tz()
 
             user.save()
             member.save()
