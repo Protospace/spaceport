@@ -6,6 +6,7 @@ import json
 import itertools
 from django.utils import timezone
 from parameterized import parameterized
+from django.test import override_settings
 
 from apiserver.api import utils, utils_paypal, models
 
@@ -22,6 +23,7 @@ data = {
     'request_id': 'lol'
 }
 
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.MD5PasswordHasher'])
 class RoleBasedTests(APITestCase):
     @classmethod
     def setUpTestData(cls):
