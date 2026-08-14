@@ -110,3 +110,96 @@ class RegistrationTests(APITestCase):
             format='json',
         )
         self.assertEqual(response.status_code, expected)
+
+
+class TransactionTests(APITestCase):
+    def setUp(self):
+        roles = ['director', 'staff', 'instructor', 'vetter', 'vetted']
+        combinations = [()] # nothing
+        for r in range(1, len(roles) + 1):
+            combinations.extend(itertools.combinations(roles, r))
+
+        self.users = []
+        self.transactions = []
+        for i, combo in enumerate(combinations):
+            username = f'tx_user_{i}'
+            user = User.objects.create(username=username)
+            member = Member.objects.create(user=user)
+            
+            is_admin = False
+            if i == 0:
+                user.is_staff = True
+                user.is_superuser = True
+                is_admin = True
+            if 'director' in combo:
+                member.is_director = True
+                is_admin = True
+            if 'staff' in combo:
+                user.is_staff = True
+                member.is_staff = True
+                is_admin = True
+            
+            user.save()
+            member.save()
+            self.users.append({'user': user, 'is_admin': is_admin, 'member': member})
+            
+            tx = models.Transaction.objects.create(
+                user=user,
+                amount=10,
+                account_type='Cash',
+                category='Donation',
+                date=timezone.now().date()
+            )
+            self.transactions.append(tx)
+
+    def test_transaction_permissions(self):
+        list_url = '/transactions/'
+        
+        for u in self.users:
+            user = u['user']
+            is_admin = u['is_admin']
+            self.client.force_authenticate(user=user)
+            
+            # Test List
+            response = self.client.get(list_url)
+            if is_admin:
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+            else:
+                self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                
+            # Test Create
+            data = {
+                'member_id': u['member'].id,
+                'date': timezone.now().date().isoformat(),
+                'account_type': 'Cash',
+                'category': 'Donation',
+                'amount': 15.00
+            }
+            response = self.client.post(list_url, data, format='json')
+            if is_admin:
+                self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            else:
+                self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                
+            # Test Retrieve (Own)
+            own_tx = models.Transaction.objects.filter(user=user).first()
+            response = self.client.get(f'/transactions/{own_tx.id}/')
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            
+            # Test Retrieve (Other)
+            other_tx = models.Transaction.objects.exclude(user=user).first()
+            if other_tx:
+                response = self.client.get(f'/transactions/{other_tx.id}/')
+                if is_admin:
+                    self.assertEqual(response.status_code, status.HTTP_200_OK)
+                else:
+                    self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                    
+            # Test Update
+            response = self.client.patch(f'/transactions/{own_tx.id}/', {'amount': 20.00, 'member_id': u['member'].id}, format='json')
+            if is_admin:
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+            else:
+                self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                
+            self.client.force_authenticate(user=None)
