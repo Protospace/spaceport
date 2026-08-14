@@ -33,11 +33,19 @@ class RegistrationTests(APITestCase):
         for r in range(1, len(roles) + 1):
             combinations.extend(itertools.combinations(roles, r))
 
+        role_abbr = {
+            'director': 'Dir',
+            'staff': 'Staff',
+            'instructor': 'Inst',
+            'vetter': 'Vet',
+            'vetted': 'Vtd'
+        }
+
         for i, combo in enumerate(combinations):
             if not combo:
                 name_parts = ['Nothing']
             else:
-                name_parts = [c.capitalize() for c in combo]
+                name_parts = [role_abbr[c] for c in combo]
 
             first_name = ' '.join(name_parts)
             username = '.'.join(name_parts).lower() + '.user'
