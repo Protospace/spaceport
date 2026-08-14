@@ -148,52 +148,54 @@ class RoleBasedTests(APITestCase):
         for u in self.users:
             user = u['user']
             member = u['member']
-            self.client.force_authenticate(user=user)
             
-            # Test List
-            response = self.client.get(list_url)
-            if member.is_staff or member.is_director:
-                self.assertEqual(response.status_code, status.HTTP_200_OK)
-            else:
-                self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+            with self.subTest(user=user.username):
+                self.client.force_authenticate(user=user)
                 
-            # Test Create
-            data = {
-                'member_id': member.id,
-                'date': timezone.now().date().isoformat(),
-                'account_type': 'Cash',
-                'category': 'Donation',
-                'amount': 15.00
-            }
-            response = self.client.post(list_url, data, format='json')
-            if member.is_staff or member.is_director:
-                self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-            else:
-                self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-                
-            # Test Retrieve (Own)
-            own_tx = models.Transaction.objects.filter(user=user).first()
-            response = self.client.get(f'/transactions/{own_tx.id}/')
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            
-            # Test Retrieve (Other)
-            other_tx = models.Transaction.objects.exclude(user=user).first()
-            if other_tx:
-                response = self.client.get(f'/transactions/{other_tx.id}/')
+                # Test List
+                response = self.client.get(list_url)
                 if member.is_staff or member.is_director:
                     self.assertEqual(response.status_code, status.HTTP_200_OK)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
                     
-            # Test Update
-            response = self.client.patch(f'/transactions/{own_tx.id}/',
-                    {'category': 'Donation', 'account_type': 'Cash', 'amount': 20.00, 'member_id': member.id}, format='json')
-            if member.is_staff or member.is_director:
+                # Test Create
+                data = {
+                    'member_id': member.id,
+                    'date': timezone.now().date().isoformat(),
+                    'account_type': 'Cash',
+                    'category': 'Donation',
+                    'amount': 15.00
+                }
+                response = self.client.post(list_url, data, format='json')
+                if member.is_staff or member.is_director:
+                    self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+                else:
+                    self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                    
+                # Test Retrieve (Own)
+                own_tx = models.Transaction.objects.filter(user=user).first()
+                response = self.client.get(f'/transactions/{own_tx.id}/')
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
-            else:
-                self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
                 
-            self.client.force_authenticate(user=None)
+                # Test Retrieve (Other)
+                other_tx = models.Transaction.objects.exclude(user=user).first()
+                if other_tx:
+                    response = self.client.get(f'/transactions/{other_tx.id}/')
+                    if member.is_staff or member.is_director:
+                        self.assertEqual(response.status_code, status.HTTP_200_OK)
+                    else:
+                        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                        
+                # Test Update
+                response = self.client.patch(f'/transactions/{own_tx.id}/',
+                        {'category': 'Donation', 'account_type': 'Cash', 'amount': 20.00, 'member_id': member.id}, format='json')
+                if member.is_staff or member.is_director:
+                    self.assertEqual(response.status_code, status.HTTP_200_OK)
+                else:
+                    self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                    
+                self.client.force_authenticate(user=None)
 
     def test_transaction_serializer_logic(self):
         # Find dir.vet.user
