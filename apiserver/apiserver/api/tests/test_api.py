@@ -154,7 +154,7 @@ class RoleBasedTests(APITestCase):
                 
                 # Test List
                 response = self.client.get(list_url)
-                if member.is_staff or member.is_director:
+                if user.is_staff or member.is_staff or member.is_director:
                     self.assertEqual(response.status_code, status.HTTP_200_OK)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -168,7 +168,7 @@ class RoleBasedTests(APITestCase):
                     'amount': 15.00
                 }
                 response = self.client.post(list_url, data, format='json')
-                if member.is_staff or member.is_director:
+                if user.is_staff or member.is_staff or member.is_director:
                     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -182,7 +182,7 @@ class RoleBasedTests(APITestCase):
                 other_tx = models.Transaction.objects.exclude(user=user).first()
                 if other_tx:
                     response = self.client.get(f'/transactions/{other_tx.id}/')
-                    if member.is_staff or member.is_director:
+                    if user.is_staff or member.is_staff or member.is_director:
                         self.assertEqual(response.status_code, status.HTTP_200_OK)
                     else:
                         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -190,7 +190,7 @@ class RoleBasedTests(APITestCase):
                 # Test Update
                 response = self.client.patch(f'/transactions/{own_tx.id}/',
                         {'category': 'Donation', 'account_type': 'Cash', 'amount': 20.00, 'member_id': member.id}, format='json')
-                if member.is_staff or member.is_director:
+                if user.is_staff or member.is_staff or member.is_director:
                     self.assertEqual(response.status_code, status.HTTP_200_OK)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
