@@ -220,6 +220,10 @@ class RoleBasedTests(APITestCase):
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
                     
+                # Test Delete (should fail for everyone)
+                response = self.client.delete(f'/transactions/{own_tx.id}/')
+                self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+                    
                 self.client.force_authenticate(user=None)
 
     def test_transaction_serializer_logic(self):
