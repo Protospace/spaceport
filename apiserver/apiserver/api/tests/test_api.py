@@ -185,7 +185,8 @@ class TransactionTests(BaseRoleTests):
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
                     
             # Test Update
-            response = self.client.patch(f'/transactions/{own_tx.id}/', {'amount': 20.00, 'member_id': u['member'].id}, format='json')
+            response = self.client.patch(f'/transactions/{own_tx.id}/',
+                    {'account_type:': 'Cash', 'amount': 20.00, 'member_id': u['member'].id}, format='json')
             if is_admin:
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
             else:
