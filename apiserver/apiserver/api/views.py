@@ -99,7 +99,12 @@ class SearchViewSet(Base, Retrieve):
             results = list(OrderedDict.fromkeys(results))[:20]
 
             result_ids = [search_strings[x] for x in results]
-            result_objects = [queryset.get(id=x) for x in result_ids]
+            try:
+                result_objects = [queryset.get(id=x) for x in result_ids]
+            except models.Member.DoesNotExist as e:
+                raise models.Member.DoesNotExist(
+                    f"{e}\n**** You may need to regenerate search strings with python manage.py run_hourly ****"
+                ) from e
 
             queryset = result_objects
             logging.info('Search for: {}, results: {}'.format(search, len(queryset)))
