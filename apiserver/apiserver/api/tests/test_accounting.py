@@ -321,7 +321,11 @@ class TestTallyMembership(TestCase):
                 number_of_membership_months=1,
             )
 
-        result = utils.tally_membership_months(member)
+        from unittest.mock import patch
+        with patch('apiserver.api.utils.alert_tanner') as mock_alert:
+            result = utils.tally_membership_months(member)
+            self.assertTrue(mock_alert.called)
+            self.assertIn('Member has expired', mock_alert.call_args[0][0])
 
         self.assertEqual(member.expire_date, end_date)
         self.assertEqual(member.paused_date, utils.today_local_tz())
