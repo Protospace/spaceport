@@ -284,8 +284,13 @@ class RoleBasedTests(APITestCase):
         update_data = data.copy()
         update_data['account_type'] = 'Protocoin'
         update_data['category'] = 'Snacks'
-        update_data['protocoin'] = -1000.00 # Should fail, insufficient funds
-        response = self.client.patch(f'/transactions/{tx_id}/', update_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        update_data['protocoin'] = -1000.00 # Allowed, but triggers alert
+        
+        from unittest.mock import patch
+        with patch('apiserver.api.utils.alert_tanner') as mock_alert:
+            response = self.client.patch(f'/transactions/{tx_id}/', update_data, format='json')
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertTrue(mock_alert.called)
+            self.assertIn('Negative Protocoin transaction updated', mock_alert.call_args[0][0])
 
         self.client.force_authenticate(user=None)
