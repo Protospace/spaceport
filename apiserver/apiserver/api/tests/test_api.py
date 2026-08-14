@@ -3,6 +3,8 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from apiserver.api.models import Member, User
 import json
+import itertools
+from django.utils import timezone
 from parameterized import parameterized
 
 data = {
@@ -26,15 +28,54 @@ class RegistrationTests(APITestCase):
 
     def test_success(self):
         """Ensure we can create a new account object."""
-        response = self.client.post(
-            self.url,
-            self.data,
-            format='json',
-        )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        user = User.objects.get(username=self.data['username'])
-        assert user is not None
-        assert Member.objects.get(user=user) is not None
+        roles = ['director', 'staff', 'instructor', 'vetter', 'vetted']
+        combinations = [()] # nothing
+        for r in range(1, len(roles) + 1):
+            combinations.extend(itertools.combinations(roles, r))
+
+        for i, combo in enumerate(combinations):
+            if not combo:
+                name_parts = ['Nothing']
+            else:
+                name_parts = [c.capitalize() for c in combo]
+
+            first_name = ' '.join(name_parts)
+            username = '.'.join(name_parts).lower() + '.user'
+
+            user_data = self.data.copy()
+            user_data['username'] = username
+            user_data['email'] = f'{username}@email.com'
+            user_data['first_name'] = first_name
+            user_data['preferred_name'] = first_name
+            user_data['last_name'] = 'User'
+
+            response = self.client.post(
+                self.url,
+                user_data,
+                format='json',
+            )
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            user = User.objects.get(username=username)
+            member = Member.objects.get(user=user)
+
+            if i == 0:
+                self.assertTrue(user.is_staff)
+                self.assertTrue(user.is_superuser)
+
+            if 'director' in combo:
+                member.is_director = True
+            if 'staff' in combo:
+                user.is_staff = True
+                member.is_staff = True
+            if 'instructor' in combo:
+                member.is_instructor = True
+            if 'vetter' in combo:
+                member.is_vetter = True
+            if 'vetted' in combo:
+                member.vetted_date = timezone.now()
+
+            user.save()
+            member.save()
 
     @parameterized.expand([(f'{key} is missing', key, status.HTTP_400_BAD_REQUEST) for key in data.keys() if key != 'request_id'])
     def test_malformed_data(self, name, inp, expected):
