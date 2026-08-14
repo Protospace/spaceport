@@ -277,8 +277,13 @@ class RoleBasedTests(APITestCase):
         data['account_type'] = 'Protocoin'
         data['category'] = 'Snacks'
         data['protocoin'] = -5.00
-        response = self.client.post(list_url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+        from unittest.mock import patch
+        with patch('apiserver.api.utils.alert_tanner') as mock_alert:
+            response = self.client.post(list_url, data, format='json')
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            self.assertTrue(mock_alert.called)
+            self.assertIn('Manual Protocoin transaction added', mock_alert.call_args[0][0])
 
         # Valid Membership transaction
         data = base_data.copy()
