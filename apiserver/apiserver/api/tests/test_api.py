@@ -48,6 +48,10 @@ class RoleBasedTests(APITestCase):
         first_member = None
         cls.users = []
 
+        from unittest.mock import patch
+        patcher = patch('apiserver.api.utils.gen_member_forms')
+        patcher.start()
+
         for i, combo in enumerate(combinations):
             if not combo:
                 name_parts = ['Nothing']
@@ -118,6 +122,8 @@ class RoleBasedTests(APITestCase):
                 date=timezone.now().date()
             )
             cls.transactions.append(tx)
+
+        patcher.stop()
 
     def test_success(self):
         """Ensure we can create a new account object."""
