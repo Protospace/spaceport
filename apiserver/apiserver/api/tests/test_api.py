@@ -334,4 +334,17 @@ class RoleBasedTests(APITestCase):
             self.assertTrue(mock_alert.called)
             self.assertIn('Negative Protocoin transaction updated', mock_alert.call_args[0][0])
 
+        # Valid PayPal transaction
+        data = base_data.copy()
+        data['account_type'] = 'PayPal'
+        data['category'] = 'Donation'
+        data['amount'] = 10.00
+        data['reference_number'] = 'PAYPAL123'
+        
+        with patch('apiserver.api.utils.alert_tanner') as mock_alert:
+            response = self.client.post(list_url, data, format='json')
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            self.assertTrue(mock_alert.called)
+            self.assertIn('Manual PayPal transaction added', mock_alert.call_args[0][0])
+
         self.client.force_authenticate(user=None)
