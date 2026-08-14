@@ -43,6 +43,9 @@ class RegistrationTests(APITestCase):
             'vetted': 'Vtd'
         }
 
+        helper_user = User.objects.create(username='helper.user')
+        helper_member = Member.objects.create(user=helper_user)
+
         for i, combo in enumerate(combinations):
             if not combo:
                 name_parts = ['Nothing']
@@ -86,6 +89,15 @@ class RegistrationTests(APITestCase):
 
             user.save()
             member.save()
+
+            self.client.force_authenticate(user=user)
+            details_response = self.client.patch(
+                reverse('member-detail', kwargs={'pk': member.id}),
+                {'phone': '1234567890', 'helper_id': helper_member.id},
+                format='json'
+            )
+            self.assertEqual(details_response.status_code, status.HTTP_200_OK)
+            self.client.force_authenticate(user=None)
 
     @parameterized.expand([(f'{key} is missing', key, status.HTTP_400_BAD_REQUEST) for key in data.keys() if key != 'request_id'])
     def test_malformed_data(self, name, inp, expected):
