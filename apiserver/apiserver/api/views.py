@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404, redirect
 from django.db import transaction
-from django.db.models import Max, F, Count, Q, Sum
+from django.db.models import Max, F, Count, Q, Sum, Subquery, OuterRef
 from django.db.utils import OperationalError
 from django.utils.crypto import constant_time_compare
 from django.http import HttpResponse, Http404, FileResponse, HttpResponseServerError
@@ -443,11 +443,18 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
         if unlimited_students:
             num_emails_to_send = 20
 
+        recent_attendance = models.Training.objects.filter(
+            user=OuterRef('user'),
+            attendance_status='Attended'
+        ).order_by('-session__datetime').values('session__datetime')[:1]
+
         interests = models.Interest.objects.filter(
             course=session.course,
             satisfied_by__isnull=True,
             user__member__paused_date__isnull=True
-        )[:num_emails_to_send]
+        ).annotate(
+            last_attended=Subquery(recent_attendance)
+        ).order_by(F('last_attended').desc(nulls_last=True))[:num_emails_to_send]
 
         for num, interest in enumerate(interests):
             msg = 'Sending email {} / {}...'.format(num+1, len(interests))
