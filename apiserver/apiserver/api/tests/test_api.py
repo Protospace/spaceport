@@ -231,8 +231,8 @@ class RoleBasedTests(APITestCase):
 
         list_url = '/transactions/'
         base_data = {
-            'member_id': member.id,
-            'date': timezone.now().date().isoformat(),
+            'member_id': 2,  # the Probationary User
+            'date': utils.today_local_tz(),
             'account_type': 'Cash',
             'category': 'Donation',
             'amount': 10.00
