@@ -92,7 +92,7 @@ class RegistrationTests(APITestCase):
 
             self.client.force_authenticate(user=user)
             details_response = self.client.patch(
-                reverse('member-detail', kwargs={'pk': member.id}),
+                f'/members/{member.id}/',
                 {'phone': '1234567890', 'helper_id': first_member.id},
                 format='json'
             )
