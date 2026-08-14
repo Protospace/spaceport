@@ -22,13 +22,14 @@ data = {
     'request_id': 'lol'
 }
 
-class BaseRoleTests(APITestCase):
-    def setUp(self):
-        self.url = reverse('rest_name_register')
-        # TODO: expose data to be used for E2E testing from a webclient
-        self.data = data
+class RoleBasedTests(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        from rest_framework.test import APIClient
+        client = APIClient()
+        cls.url = reverse('rest_name_register')
+        cls.data = data
 
-    def create_users(self):
         roles = ['director', 'staff', 'instructor', 'vetter', 'vetted']
         combinations = [()] # nothing
         for r in range(1, len(roles) + 1):
@@ -43,7 +44,7 @@ class BaseRoleTests(APITestCase):
         }
 
         first_member = None
-        users = []
+        cls.users = []
 
         for i, combo in enumerate(combinations):
             if not combo:
@@ -54,26 +55,26 @@ class BaseRoleTests(APITestCase):
             first_name = ' '.join(name_parts)
             username = '.'.join(name_parts).lower() + '.user'
 
-            user_data = self.data.copy()
+            user_data = cls.data.copy()
             user_data['username'] = username
             user_data['email'] = f'{username}@email.com'
             user_data['first_name'] = first_name
             user_data['preferred_name'] = first_name
             user_data['last_name'] = 'User'
 
-            response = self.client.post(
-                self.url,
+            response = client.post(
+                cls.url,
                 user_data,
                 format='json',
             )
-            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            assert response.status_code == status.HTTP_201_CREATED
             user = User.objects.get(username=username)
             member = Member.objects.get(user=user)
 
             is_admin = False
             if i == 0:
-                self.assertTrue(user.is_staff)
-                self.assertTrue(user.is_superuser)
+                user.is_staff = True
+                user.is_superuser = True
                 first_member = member
                 is_admin = True
 
@@ -94,24 +95,31 @@ class BaseRoleTests(APITestCase):
             user.save()
             member.save()
 
-            self.client.force_authenticate(user=user)
-            details_response = self.client.patch(
+            client.force_authenticate(user=user)
+            details_response = client.patch(
                 f'/members/{member.id}/',
                 {'phone': '1234567890', 'helper_id': first_member.id},
                 format='json'
             )
-            self.assertEqual(details_response.status_code, status.HTTP_200_OK)
-            self.client.force_authenticate(user=None)
+            assert details_response.status_code == status.HTTP_200_OK
+            client.force_authenticate(user=None)
             
-            users.append({'user': user, 'is_admin': is_admin, 'member': member})
-        
-        return users
+            cls.users.append({'user': user, 'is_admin': is_admin, 'member': member})
 
+        cls.transactions = []
+        for u in cls.users:
+            tx = models.Transaction.objects.create(
+                user=u['user'],
+                amount=10,
+                account_type='Cash',
+                category='Donation',
+                date=timezone.now().date()
+            )
+            cls.transactions.append(tx)
 
-class RegistrationTests(BaseRoleTests):
     def test_success(self):
         """Ensure we can create a new account object."""
-        self.create_users()
+        self.assertTrue(len(self.users) > 0)
 
     @parameterized.expand([(f'{key} is missing', key, status.HTTP_400_BAD_REQUEST) for key in data.keys() if key != 'request_id'])
     def test_malformed_data(self, name, inp, expected):
@@ -124,22 +132,6 @@ class RegistrationTests(BaseRoleTests):
             format='json',
         )
         self.assertEqual(response.status_code, expected)
-
-
-class TransactionTests(BaseRoleTests):
-    def setUp(self):
-        super().setUp()
-        self.users = self.create_users()
-        self.transactions = []
-        for u in self.users:
-            tx = models.Transaction.objects.create(
-                user=u['user'],
-                amount=10,
-                account_type='Cash',
-                category='Donation',
-                date=timezone.now().date()
-            )
-            self.transactions.append(tx)
 
     def test_transaction_permissions(self):
         list_url = '/transactions/'
