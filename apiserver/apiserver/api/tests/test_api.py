@@ -43,8 +43,7 @@ class RegistrationTests(APITestCase):
             'vetted': 'Vtd'
         }
 
-        helper_user = User.objects.create(username='helper.user')
-        helper_member = Member.objects.create(user=helper_user)
+        first_member = None
 
         for i, combo in enumerate(combinations):
             if not combo:
@@ -74,6 +73,7 @@ class RegistrationTests(APITestCase):
             if i == 0:
                 self.assertTrue(user.is_staff)
                 self.assertTrue(user.is_superuser)
+                first_member = member
 
             if 'director' in combo:
                 member.is_director = True
@@ -93,7 +93,7 @@ class RegistrationTests(APITestCase):
             self.client.force_authenticate(user=user)
             details_response = self.client.patch(
                 reverse('member-detail', kwargs={'pk': member.id}),
-                {'phone': '1234567890', 'helper_id': helper_member.id},
+                {'phone': '1234567890', 'helper_id': first_member.id},
                 format='json'
             )
             self.assertEqual(details_response.status_code, status.HTTP_200_OK)
