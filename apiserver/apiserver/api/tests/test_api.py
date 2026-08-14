@@ -33,7 +33,7 @@ class RoleBasedTests(APITestCase):
         cls.data = data
 
         roles = ['director', 'staff', 'instructor', 'vetter', 'vetted']
-        combinations = [()] # nothing
+        combinations = [(), ()] # start with first user (superuser) and a probationary
         for r in range(1, len(roles) + 1):
             combinations.extend(itertools.combinations(roles, r))
 
@@ -53,8 +53,10 @@ class RoleBasedTests(APITestCase):
         patcher.start()
 
         for i, combo in enumerate(combinations):
-            if not combo:
-                name_parts = ['Nothing']
+            if i == 0:
+                name_parts = ['Super']
+            elif i == 1:
+                name_parts = ['Probationary']
             else:
                 name_parts = [role_abbr[c] for c in combo]
 
@@ -77,15 +79,18 @@ class RoleBasedTests(APITestCase):
             user = User.objects.get(username=username)
             member = Member.objects.get(user=user)
 
+            # Note: user.is_staff is a Django permission that grants access to
+            # the admin web panel. member.is_staff is a Spaceport permission
+            # that gives a member the same powers as a Director.
+            # The first user is automatically granted user.is_staff and
+            # user.is_superuser.
+
             if i == 0:
-                user.is_staff = True
-                user.is_superuser = True
                 first_member = member
 
             if 'director' in combo:
                 member.is_director = True
             if 'staff' in combo:
-                user.is_staff = True
                 member.is_staff = True
             if 'instructor' in combo:
                 member.is_instructor = True
@@ -147,7 +152,7 @@ class RoleBasedTests(APITestCase):
             
             # Test List
             response = self.client.get(list_url)
-            if user.is_staff or member.is_director:
+            if member.is_staff or member.is_director:
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
             else:
                 self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -161,7 +166,7 @@ class RoleBasedTests(APITestCase):
                 'amount': 15.00
             }
             response = self.client.post(list_url, data, format='json')
-            if user.is_staff or member.is_director:
+            if member.is_staff or member.is_director:
                 self.assertEqual(response.status_code, status.HTTP_201_CREATED)
             else:
                 self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -175,7 +180,7 @@ class RoleBasedTests(APITestCase):
             other_tx = models.Transaction.objects.exclude(user=user).first()
             if other_tx:
                 response = self.client.get(f'/transactions/{other_tx.id}/')
-                if user.is_staff or member.is_director:
+                if member.is_staff or member.is_director:
                     self.assertEqual(response.status_code, status.HTTP_200_OK)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -183,7 +188,7 @@ class RoleBasedTests(APITestCase):
             # Test Update
             response = self.client.patch(f'/transactions/{own_tx.id}/',
                     {'category': 'Donation', 'account_type': 'Cash', 'amount': 20.00, 'member_id': member.id}, format='json')
-            if user.is_staff or member.is_director:
+            if member.is_staff or member.is_director:
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
             else:
                 self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
