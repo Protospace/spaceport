@@ -352,3 +352,66 @@ class RoleBasedTests(APITestCase):
             self.assertIn('Manual PayPal transaction added', mock_alert.call_args[0][0])
 
         self.client.force_authenticate(user=None)
+
+    def test_protocoin_spend_request(self):
+        user_dict = next(u for u in self.users if u['user'].username == 'vet.user')
+        user = user_dict['user']
+        self.client.force_authenticate(user=user)
+
+        # Give user some protocoin
+        models.Transaction.objects.create(
+            user=user,
+            protocoin=100.00,
+            amount=0,
+            account_type='Protocoin',
+            category='Exchange',
+            date=timezone.now().date()
+        )
+
+        url = '/protocoin/spend_request/'
+        base_data = {
+            'balance': 100.00,
+            'amount': 10.00,
+            'category': 'Consumables'
+        }
+
+        # Missing balance
+        data = base_data.copy()
+        del data['balance']
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Invalid balance
+        data = base_data.copy()
+        data['balance'] = 'abc'
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Missing amount
+        data = base_data.copy()
+        del data['amount']
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Invalid category
+        data = base_data.copy()
+        data['category'] = 'Invalid'
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Amount too small
+        data = base_data.copy()
+        data['amount'] = 0.01
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Incorrect balance
+        data = base_data.copy()
+        data['balance'] = 90.00
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Insufficient funds
+        data = base_data.copy()
+        data['amount'] = 200.00
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Valid spend
+        response = self.client.post(url, base_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.client.force_authenticate(user=None)
