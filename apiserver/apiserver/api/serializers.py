@@ -832,7 +832,8 @@ class SessionSerializer(serializers.ModelSerializer):
         if not self.initial_data.get('instructor_id', None):
             raise ValidationError(dict(instructor_id='This field is required.'))
 
-        if validated_data['datetime'] < now() - datetime.timedelta(days=7):
+        session_datetime = validated_data.get('datetime', instance.datetime)
+        if session_datetime < now() - datetime.timedelta(days=7):
             msg = 'Past class modification detected:\n' + str(validated_data)
             utils.alert_tanner(msg)
             raise ValidationError(dict(non_field_errors='Can\'t modify past class > 1 week.'))
