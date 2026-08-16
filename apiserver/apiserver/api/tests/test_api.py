@@ -280,9 +280,103 @@ class RoleBasedTests(APITestCase):
                     
                 # Test Delete (should fail for everyone since Destroy is not in CourseViewSet)
                 response = self.client.delete(f'/courses/{course.id}/')
-                self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+                if user.is_staff or member.is_staff or member.is_director or member.is_instructor:
+                    self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+                else:
+                    self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
                     
                 self.client.force_authenticate(user=None)
+
+    def test_session_permissions(self):
+        list_url = '/sessions/'
+        course = models.Course.objects.create(name='Session Test Course', description='Desc')
+        
+        # Create an initial session to test updates
+        session = models.Session.objects.create(
+            course=course,
+            instructor=self.users[0]['user'],
+            datetime=timezone.now() + timezone.timedelta(days=2),
+            cost=10
+        )
+        
+        # Test Unauthenticated
+        self.client.force_authenticate(user=None)
+        self.assertEqual(self.client.get(list_url).status_code, status.HTTP_200_OK)
+        self.assertEqual(self.client.get(f'/sessions/{session.id}/').status_code, status.HTTP_200_OK)
+        self.assertEqual(self.client.post(list_url, {}, format='json').status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(self.client.patch(f'/sessions/{session.id}/', {}, format='json').status_code, status.HTTP_401_UNAUTHORIZED)
+
+        from unittest.mock import patch
+
+        for u in self.users:
+            user = u['user']
+            member = u['member']
+            
+            with self.subTest(user=user.username):
+                self.client.force_authenticate(user=user)
+                
+                # Test List & Retrieve
+                self.assertEqual(self.client.get(list_url).status_code, status.HTTP_200_OK)
+                self.assertEqual(self.client.get(f'/sessions/{session.id}/').status_code, status.HTTP_200_OK)
+                    
+                # Test Create
+                data = {
+                    'course': course.id,
+                    'instructor_id': member.id,
+                    'datetime': (timezone.now() + timezone.timedelta(days=5)).isoformat(),
+                    'cost': 15.00,
+                    'max_students': 5
+                }
+                response = self.client.post(list_url, data, format='json')
+                if user.is_staff or member.is_staff or member.is_director or member.is_instructor:
+                    self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+                else:
+                    self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                    
+                # Test Update (PATCH)
+                response = self.client.patch(f'/sessions/{session.id}/', {'cost': 20.00, 'instructor_id': member.id}, format='json')
+                if user.is_staff or member.is_staff or member.is_director or member.is_instructor:
+                    self.assertEqual(response.status_code, status.HTTP_200_OK)
+                else:
+                    self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                    
+                # Test Delete (should fail for everyone since Destroy is not in SessionViewSet)
+                response = self.client.delete(f'/sessions/{session.id}/')
+                if user.is_staff or member.is_staff or member.is_director or member.is_instructor:
+                    self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+                else:
+                    self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                    
+                self.client.force_authenticate(user=None)
+
+        # Test invalid creation/modification (past class > 1 week)
+        privileged_user = next(u for u in self.users if u['member'].is_instructor)['user']
+        privileged_member = privileged_user.member
+        self.client.force_authenticate(user=privileged_user)
+
+        past_date = (timezone.now() - timezone.timedelta(days=8)).isoformat()
+        
+        with patch('apiserver.api.utils.alert_tanner') as mock_alert:
+            # Invalid Create
+            data = {
+                'course': course.id,
+                'instructor_id': privileged_member.id,
+                'datetime': past_date,
+                'cost': 15.00
+            }
+            response = self.client.post(list_url, data, format='json')
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            self.assertTrue(mock_alert.called)
+            self.assertIn('Past class creation detected', mock_alert.call_args[0][0])
+
+        with patch('apiserver.api.utils.alert_tanner') as mock_alert:
+            # Invalid Update
+            response = self.client.patch(f'/sessions/{session.id}/', {'datetime': past_date, 'instructor_id': privileged_member.id}, format='json')
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            self.assertTrue(mock_alert.called)
+            self.assertIn('Past class modification detected', mock_alert.call_args[0][0])
+
+        self.client.force_authenticate(user=None)
 
     def test_transaction_serializer_logic(self):
         # Find dir.vet.user
