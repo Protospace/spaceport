@@ -296,7 +296,8 @@ class RoleBasedTests(APITestCase):
             course=course,
             instructor=self.users[0]['user'],
             datetime=timezone.now() + timezone.timedelta(days=2),
-            cost=10
+            cost=10,
+            max_students=5
         )
         
         # Test Unauthenticated
@@ -364,6 +365,7 @@ class RoleBasedTests(APITestCase):
                 'instructor_id': privileged_member.id,
                 'datetime': past_date,
                 'cost': 15.00,
+                'max_students': 5,
                 'request_id': 'test_req_id'
             }
             response = self.client.post(list_url, data, format='json')
@@ -373,7 +375,7 @@ class RoleBasedTests(APITestCase):
 
         with patch('apiserver.api.utils.alert_tanner') as mock_alert:
             # Invalid Update
-            response = self.client.patch(f'/sessions/{session.id}/', {'datetime': past_date, 'instructor_id': privileged_member.id}, format='json')
+            response = self.client.patch(f'/sessions/{session.id}/', {'datetime': past_date, 'instructor_id': privileged_member.id, 'max_students': 5}, format='json')
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
             self.assertTrue(mock_alert.called)
             self.assertIn('Past class modification detected', mock_alert.call_args[0][0])
