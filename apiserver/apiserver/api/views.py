@@ -800,6 +800,8 @@ class TransactionViewSet(Base, List, Create, Retrieve, Update):
     serializer_class = serializers.TransactionSerializer
 
     def get_permissions(self):
+        if self.action == 'destroy':
+            raise exceptions.PermissionDenied()
         if self.action in ['create', 'update', 'partial_update']:
             return [IsAuthenticated(), IsAdmin()]
         return super().get_permissions()
