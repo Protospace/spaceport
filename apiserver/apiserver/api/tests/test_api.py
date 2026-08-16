@@ -499,3 +499,100 @@ class RoleBasedTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.client.force_authenticate(user=None)
+
+    def test_protocoin_card_vend_request(self):
+        user_dict = next(u for u in self.users if u['user'].username == 'vet.user')
+        user = user_dict['user']
+        
+        card = models.Card.objects.create(
+            user=user,
+            card_number='VENDCARD123',
+            active_status='card_active'
+        )
+
+        # Give user some protocoin
+        models.Transaction.objects.create(
+            user=user,
+            protocoin=100.00,
+            amount=0,
+            account_type='Protocoin',
+            category='Exchange',
+            date=timezone.now().date()
+        )
+
+        url = f'/protocoin/{card.card_number}/card_vend_request/'
+        base_data = {
+            'machine': 'Snack',
+            'number': 'A1',
+            'balance': 100.00,
+            'amount': 2.50
+        }
+
+        from unittest.mock import patch
+        with patch('apiserver.api.views.secrets.VEND_API_TOKEN', 'testtoken'):
+            # Missing auth
+            self.assertEqual(self.client.post(url, base_data, format='json').status_code, status.HTTP_403_FORBIDDEN)
+
+            auth_headers = {'HTTP_AUTHORIZATION': 'Bearer testtoken'}
+
+            # Missing number
+            data = base_data.copy()
+            del data['number']
+            self.assertEqual(self.client.post(url, data, format='json', **auth_headers).status_code, status.HTTP_400_BAD_REQUEST)
+
+            # Missing balance
+            data = base_data.copy()
+            del data['balance']
+            self.assertEqual(self.client.post(url, data, format='json', **auth_headers).status_code, status.HTTP_400_BAD_REQUEST)
+
+            # Invalid balance
+            data = base_data.copy()
+            data['balance'] = 'abc'
+            self.assertEqual(self.client.post(url, data, format='json', **auth_headers).status_code, status.HTTP_400_BAD_REQUEST)
+
+            # Missing amount
+            data = base_data.copy()
+            del data['amount']
+            self.assertEqual(self.client.post(url, data, format='json', **auth_headers).status_code, status.HTTP_400_BAD_REQUEST)
+
+            # Invalid amount
+            data = base_data.copy()
+            data['amount'] = 'abc'
+            self.assertEqual(self.client.post(url, data, format='json', **auth_headers).status_code, status.HTTP_400_BAD_REQUEST)
+
+            # Amount too small
+            data = base_data.copy()
+            data['amount'] = 0.01
+            self.assertEqual(self.client.post(url, data, format='json', **auth_headers).status_code, status.HTTP_400_BAD_REQUEST)
+
+            # Incorrect balance
+            data = base_data.copy()
+            data['balance'] = 90.00
+            self.assertEqual(self.client.post(url, data, format='json', **auth_headers).status_code, status.HTTP_400_BAD_REQUEST)
+
+            # Insufficient funds
+            data = base_data.copy()
+            data['amount'] = 200.00
+            self.assertEqual(self.client.post(url, data, format='json', **auth_headers).status_code, status.HTTP_400_BAD_REQUEST)
+
+            # Valid vend
+            response = self.client.post(url, base_data, format='json', **auth_headers)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+            # Instructor comp
+            course = models.Course.objects.create(name='Test Course')
+            session = models.Session.objects.create(
+                course=course,
+                instructor=user,
+                datetime=timezone.now(),
+                cost=3
+            )
+            
+            comp_data = base_data.copy()
+            comp_data['balance'] = 97.50
+            
+            with patch('apiserver.api.utils.alert_tanner') as mock_alert:
+                response = self.client.post(url, comp_data, format='json', **auth_headers)
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertTrue(mock_alert.called)
+                self.assertIn('Instructor', mock_alert.call_args[0][0])
