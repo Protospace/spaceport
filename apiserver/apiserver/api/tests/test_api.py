@@ -415,3 +415,87 @@ class RoleBasedTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.client.force_authenticate(user=None)
+
+    def test_protocoin_send_to_member(self):
+        user_dict = next(u for u in self.users if u['user'].username == 'vet.user')
+        user = user_dict['user']
+        member = user_dict['member']
+        
+        target_dict = next(u for u in self.users if u['user'].username == 'vtd.user')
+        target_member = target_dict['member']
+
+        self.client.force_authenticate(user=user)
+
+        # Give user some protocoin
+        models.Transaction.objects.create(
+            user=user,
+            protocoin=100.00,
+            amount=0,
+            account_type='Protocoin',
+            category='Exchange',
+            date=timezone.now().date()
+        )
+
+        url = '/protocoin/send_to_member/'
+        base_data = {
+            'member_id': target_member.id,
+            'balance': 100.00,
+            'amount': 10.00,
+            'memo': 'Thanks for the help!'
+        }
+
+        # Missing member_id
+        data = base_data.copy()
+        del data['member_id']
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Invalid member_id
+        data = base_data.copy()
+        data['member_id'] = 'abc'
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Missing balance
+        data = base_data.copy()
+        del data['balance']
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Invalid balance
+        data = base_data.copy()
+        data['balance'] = 'abc'
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Missing amount
+        data = base_data.copy()
+        del data['amount']
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Invalid amount
+        data = base_data.copy()
+        data['amount'] = 'abc'
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Amount too small
+        data = base_data.copy()
+        data['amount'] = 0.50
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Send to self
+        data = base_data.copy()
+        data['member_id'] = member.id
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Incorrect balance
+        data = base_data.copy()
+        data['balance'] = 90.00
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Insufficient funds
+        data = base_data.copy()
+        data['amount'] = 200.00
+        self.assertEqual(self.client.post(url, data, format='json').status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Valid send
+        response = self.client.post(url, base_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.client.force_authenticate(user=None)
