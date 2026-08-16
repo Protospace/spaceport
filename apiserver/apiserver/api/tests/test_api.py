@@ -752,3 +752,64 @@ class RoleBasedTests(APITestCase):
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                 self.assertTrue(mock_alert.called)
                 self.assertIn('Instructor', mock_alert.call_args[0][0])
+
+
+    class AuthTests(APITestCase):
+        def setUp(self):
+            self.user = User.objects.create_user(username='test.user', email='test@example.com', password='oldpassword')
+            self.member = models.Member.objects.create(user=self.user, preferred_name='Test', last_name='User')
+
+        def test_login_serializer(self):
+            from apiserver.api.serializers import MyLoginSerializer
+        
+            invalid_usernames = [
+                ('firstlast', 'Username should have a period. Try "first.last" or "first.middle.last".'),
+                ('first-last', 'Username shouldn\'t have dashes. Try "first.last" or "first.last.name".'),
+                ('first last', 'Username shouldn\'t have spaces. Try "first.last" or "first.middle.last".'),
+                ('first.last', 'Don\'t literally try "first.last", use your own name.'),
+                ('first.middle.last', 'Don\'t literally try "first.middle.last", use your own name.'),
+                ('does.not.exist', 'Username not found. Try "first.last" or "first.middle.last".'),
+            ]
+        
+            for username, expected_error in invalid_usernames:
+                serializer = MyLoginSerializer(data={'username': username, 'password': 'password'})
+                self.assertFalse(serializer.is_valid())
+                self.assertEqual(serializer.errors['username'][0], expected_error)
+
+            # Test wrong password
+            serializer = MyLoginSerializer(data={'username': 'test.user', 'password': 'wrongpassword'})
+            self.assertFalse(serializer.is_valid())
+            self.assertEqual(serializer.errors['password'][0], 'Incorrect password. Check caps lock.')
+
+            # Test correct login
+            serializer = MyLoginSerializer(data={'username': 'test.user', 'password': 'oldpassword'})
+            self.assertTrue(serializer.is_valid())
+
+        @patch('apiserver.api.utils_ldap.is_configured', return_value=False)
+        @patch('apiserver.api.utils_auth.discourse_is_configured', return_value=False)
+        def test_password_change_serializer(self, mock_discourse, mock_ldap):
+            from apiserver.api.serializers import MyPasswordChangeSerializer
+        
+            request = type('Request', (), {'data': {'new_password1': 'newpassword', 'request_id': '123'}, 'user': self.user})()
+            serializer = MyPasswordChangeSerializer(
+                data={'old_password': 'oldpassword', 'new_password1': 'newpassword', 'new_password2': 'newpassword'},
+                context={'request': request}
+            )
+        
+            self.assertTrue(serializer.is_valid())
+            serializer.save()
+        
+            self.user.refresh_from_db()
+            self.assertTrue(self.user.check_password('newpassword'))
+
+        def test_password_reset_serializer(self):
+            from apiserver.api.serializers import MyPasswordResetSerializer
+        
+            # Test valid email
+            serializer = MyPasswordResetSerializer(data={'email': 'test@example.com'}, context={'request': None})
+            self.assertTrue(serializer.is_valid())
+        
+            # Test invalid email
+            invalid_serializer = MyPasswordResetSerializer(data={'email': 'wrong@example.com'}, context={'request': None})
+            self.assertFalse(invalid_serializer.is_valid())
+            self.assertEqual(invalid_serializer.errors['email'][0], 'Not found.')
