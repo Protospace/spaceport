@@ -325,7 +325,8 @@ class RoleBasedTests(APITestCase):
                     'instructor_id': member.id,
                     'datetime': (timezone.now() + timezone.timedelta(days=5)).isoformat(),
                     'cost': 15.00,
-                    'max_students': 5
+                    'max_students': 5,
+                    'request_id': 'test_req_id'
                 }
                 response = self.client.post(list_url, data, format='json')
                 if user.is_staff or member.is_staff or member.is_director or member.is_instructor:
@@ -362,7 +363,8 @@ class RoleBasedTests(APITestCase):
                 'course': course.id,
                 'instructor_id': privileged_member.id,
                 'datetime': past_date,
-                'cost': 15.00
+                'cost': 15.00,
+                'request_id': 'test_req_id'
             }
             response = self.client.post(list_url, data, format='json')
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

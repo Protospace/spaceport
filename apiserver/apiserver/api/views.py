@@ -463,7 +463,7 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
 
         for num, interest in enumerate(interests):
             msg = 'Sending email {} / {}...'.format(num+1, len(interests))
-            if data['request_id']: utils_stats.set_progress(data['request_id'], msg, replace=True)
+            if data.get('request_id'): utils_stats.set_progress(data['request_id'], msg, replace=True)
 
             try:
                 utils_email.send_interest_email(interest)
@@ -476,7 +476,7 @@ class SessionViewSet(Base, List, Retrieve, Create, Update):
         num_satisfied = models.Interest.objects.filter(id__in=interest_ids).update(satisfied_by=session)
 
         msg = 'Recounting interests...'
-        if data['request_id']: utils_stats.set_progress(data['request_id'], msg)
+        if data.get('request_id'): utils_stats.set_progress(data['request_id'], msg)
         utils_stats.calc_num_interested()
 
         logging.info('Satisfied %s interests.', num_satisfied)
