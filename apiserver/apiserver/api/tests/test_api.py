@@ -226,6 +226,64 @@ class RoleBasedTests(APITestCase):
                     
                 self.client.force_authenticate(user=None)
 
+    def test_course_permissions(self):
+        list_url = '/courses/'
+        course = models.Course.objects.create(name='Initial Course', description='Desc')
+        
+        # Test Unauthenticated
+        self.client.force_authenticate(user=None)
+        self.assertEqual(self.client.get(list_url).status_code, status.HTTP_200_OK)
+        self.assertEqual(self.client.get(f'/courses/{course.id}/').status_code, status.HTTP_200_OK)
+        self.assertEqual(self.client.post(list_url, {'name': 'New'}, format='json').status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(self.client.patch(f'/courses/{course.id}/', {'name': 'Updated'}, format='json').status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(self.client.put(f'/courses/{course.id}/', {'name': 'Updated', 'description': 'Desc'}, format='json').status_code, status.HTTP_401_UNAUTHORIZED)
+
+        for u in self.users:
+            user = u['user']
+            member = u['member']
+            
+            with self.subTest(user=user.username):
+                self.client.force_authenticate(user=user)
+                
+                # Test List & Retrieve
+                self.assertEqual(self.client.get(list_url).status_code, status.HTTP_200_OK)
+                self.assertEqual(self.client.get(f'/courses/{course.id}/').status_code, status.HTTP_200_OK)
+                    
+                # Test Create
+                data = {
+                    'name': f'New Course {user.username}',
+                    'description': 'A new course'
+                }
+                response = self.client.post(list_url, data, format='json')
+                if user.is_staff or member.is_staff or member.is_director or member.is_instructor:
+                    self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+                else:
+                    self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                    
+                # Test Update (PATCH)
+                response = self.client.patch(f'/courses/{course.id}/', {'name': f'Updated {user.username}'}, format='json')
+                if user.is_staff or member.is_staff or member.is_director or member.is_instructor:
+                    self.assertEqual(response.status_code, status.HTTP_200_OK)
+                else:
+                    self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                    
+                # Test Update (PUT)
+                put_data = {
+                    'name': f'Put Updated {user.username}',
+                    'description': 'Put description'
+                }
+                response = self.client.put(f'/courses/{course.id}/', put_data, format='json')
+                if user.is_staff or member.is_staff or member.is_director or member.is_instructor:
+                    self.assertEqual(response.status_code, status.HTTP_200_OK)
+                else:
+                    self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                    
+                # Test Delete (should fail for everyone since Destroy is not in CourseViewSet)
+                response = self.client.delete(f'/courses/{course.id}/')
+                self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+                    
+                self.client.force_authenticate(user=None)
+
     def test_transaction_serializer_logic(self):
         # Find dir.vet.user
         user_dict = next(u for u in self.users if u['user'].username == 'dir.vet.user')
