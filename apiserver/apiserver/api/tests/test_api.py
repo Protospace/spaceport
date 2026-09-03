@@ -792,7 +792,11 @@ class AuthTests(APITestCase):
     def test_password_change_serializer(self, mock_discourse, mock_ldap):
         from apiserver.api.serializers import MyPasswordChangeSerializer
     
-        mock_session = type('Session', (), {'cycle_key': lambda self: None})()
+        class MockSession(dict):
+            def cycle_key(self):
+                pass
+        
+        mock_session = MockSession()
         request = type('Request', (), {'data': {'new_password1': 'ComplexPass123!', 'request_id': '123'}, 'user': self.user, 'session': mock_session})()
         serializer = MyPasswordChangeSerializer(
             data={'old_password': 'oldpassword', 'new_password1': 'ComplexPass123!', 'new_password2': 'ComplexPass123!'},
