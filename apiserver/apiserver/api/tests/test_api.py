@@ -111,7 +111,7 @@ class RoleBasedTests(APITestCase):
             )
             assert details_response.status_code == status.HTTP_200_OK
             client.force_authenticate(user=None)
-            
+
             cls.users.append({'user': user, 'member': member})
 
         cls.transactions = []
@@ -145,12 +145,12 @@ class RoleBasedTests(APITestCase):
 
     def test_transaction_permissions(self):
         list_url = '/transactions/'
-        
+
         # Test Unauthenticated
         self.client.force_authenticate(user=None)
         self.assertEqual(self.client.get(list_url).status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(self.client.post(list_url, {}, format='json').status_code, status.HTTP_401_UNAUTHORIZED)
-        
+
         self.assertTrue(self.transactions, "No transactions available to test")
         tx_id = self.transactions[0].id
         self.assertEqual(self.client.get(f'/transactions/{tx_id}/').status_code, status.HTTP_401_UNAUTHORIZED)
@@ -160,17 +160,17 @@ class RoleBasedTests(APITestCase):
         for u in self.users:
             user = u['user']
             member = u['member']
-            
+
             with self.subTest(user=user.username):
                 self.client.force_authenticate(user=user)
-                
+
                 # Test List
                 response = self.client.get(list_url)
                 if user.is_staff or member.is_staff or member.is_director:
                     self.assertEqual(response.status_code, status.HTTP_200_OK)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-                    
+
                 # Test Create
                 data = {
                     'member_id': member.id,
@@ -184,12 +184,12 @@ class RoleBasedTests(APITestCase):
                     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-                    
+
                 # Test Retrieve (Own)
                 own_tx = models.Transaction.objects.filter(user=user).first()
                 response = self.client.get(f'/transactions/{own_tx.id}/')
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
-                
+
                 # Test Retrieve (Other)
                 other_tx = models.Transaction.objects.exclude(user=user).first()
                 if other_tx:
@@ -198,7 +198,7 @@ class RoleBasedTests(APITestCase):
                         self.assertEqual(response.status_code, status.HTTP_200_OK)
                     else:
                         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-                        
+
                 # Test Update (PATCH)
                 response = self.client.patch(f'/transactions/{own_tx.id}/',
                         {'category': 'Donation', 'account_type': 'Cash', 'amount': 20.00, 'member_id': member.id}, format='json')
@@ -206,7 +206,7 @@ class RoleBasedTests(APITestCase):
                     self.assertEqual(response.status_code, status.HTTP_200_OK)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-                    
+
                 # Test Update (PUT)
                 put_data = {
                     'member_id': member.id,
@@ -220,17 +220,17 @@ class RoleBasedTests(APITestCase):
                     self.assertEqual(response.status_code, status.HTTP_200_OK)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-                    
+
                 # Test Delete (should fail for everyone)
                 response = self.client.delete(f'/transactions/{own_tx.id}/')
                 self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-                    
+
                 self.client.force_authenticate(user=None)
 
     def test_course_permissions(self):
         list_url = '/courses/'
         course = models.Course.objects.create(name='Initial Course', description='Desc')
-        
+
         # Test Unauthenticated
         self.client.force_authenticate(user=None)
         self.assertEqual(self.client.get(list_url).status_code, status.HTTP_200_OK)
@@ -242,14 +242,14 @@ class RoleBasedTests(APITestCase):
         for u in self.users:
             user = u['user']
             member = u['member']
-            
+
             with self.subTest(user=user.username):
                 self.client.force_authenticate(user=user)
-                
+
                 # Test List & Retrieve
                 self.assertEqual(self.client.get(list_url).status_code, status.HTTP_200_OK)
                 self.assertEqual(self.client.get(f'/courses/{course.id}/').status_code, status.HTTP_200_OK)
-                    
+
                 # Test Create
                 data = {
                     'name': f'New Course {user.username}',
@@ -260,14 +260,14 @@ class RoleBasedTests(APITestCase):
                     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-                    
+
                 # Test Update (PATCH)
                 response = self.client.patch(f'/courses/{course.id}/', {'name': f'Updated {user.username}'}, format='json')
                 if user.is_staff or member.is_staff or member.is_director or member.is_instructor:
                     self.assertEqual(response.status_code, status.HTTP_200_OK)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-                    
+
                 # Test Update (PUT)
                 put_data = {
                     'name': f'Put Updated {user.username}',
@@ -278,20 +278,20 @@ class RoleBasedTests(APITestCase):
                     self.assertEqual(response.status_code, status.HTTP_200_OK)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-                    
+
                 # Test Delete (should fail for everyone since Destroy is not in CourseViewSet)
                 response = self.client.delete(f'/courses/{course.id}/')
                 if user.is_staff or member.is_staff or member.is_director or member.is_instructor:
                     self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-                    
+
                 self.client.force_authenticate(user=None)
 
     def test_session_permissions(self):
         list_url = '/sessions/'
         course = models.Course.objects.create(name='Session Test Course', description='Desc')
-        
+
         # Create an initial session to test updates
         session = models.Session.objects.create(
             course=course,
@@ -300,7 +300,7 @@ class RoleBasedTests(APITestCase):
             cost=10,
             max_students=5
         )
-        
+
         # Test Unauthenticated
         self.client.force_authenticate(user=None)
         self.assertEqual(self.client.get(list_url).status_code, status.HTTP_200_OK)
@@ -313,14 +313,14 @@ class RoleBasedTests(APITestCase):
         for u in self.users:
             user = u['user']
             member = u['member']
-            
+
             with self.subTest(user=user.username):
                 self.client.force_authenticate(user=user)
-                
+
                 # Test List & Retrieve
                 self.assertEqual(self.client.get(list_url).status_code, status.HTTP_200_OK)
                 self.assertEqual(self.client.get(f'/sessions/{session.id}/').status_code, status.HTTP_200_OK)
-                    
+
                 # Test Create
                 data = {
                     'course': course.id,
@@ -335,21 +335,21 @@ class RoleBasedTests(APITestCase):
                     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-                    
+
                 # Test Update (PATCH)
                 response = self.client.patch(f'/sessions/{session.id}/', {'cost': 20.00, 'instructor_id': member.id}, format='json')
                 if user.is_staff or member.is_staff or member.is_director or member.is_instructor:
                     self.assertEqual(response.status_code, status.HTTP_200_OK)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-                    
+
                 # Test Delete (should fail for everyone since Destroy is not in SessionViewSet)
                 response = self.client.delete(f'/sessions/{session.id}/')
                 if user.is_staff or member.is_staff or member.is_director or member.is_instructor:
                     self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
                 else:
                     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-                    
+
                 self.client.force_authenticate(user=None)
 
         # Test invalid creation/modification (past class > 1 week)
@@ -358,7 +358,7 @@ class RoleBasedTests(APITestCase):
         self.client.force_authenticate(user=privileged_user)
 
         past_date = (timezone.now() - timezone.timedelta(days=8)).isoformat()
-        
+
         with patch('apiserver.api.utils.alert_tanner') as mock_alert:
             # Invalid Create
             data = {
@@ -466,7 +466,7 @@ class RoleBasedTests(APITestCase):
         data['account_type'] = 'Protocoin'
         data['category'] = 'Snacks'
         data['protocoin'] = -5.00
-        
+
         from unittest.mock import patch
         with patch('apiserver.api.utils.alert_tanner') as mock_alert:
             response = self.client.post(list_url, data, format='json')
@@ -487,7 +487,7 @@ class RoleBasedTests(APITestCase):
         update_data['account_type'] = 'Protocoin'
         update_data['category'] = 'Snacks'
         update_data['protocoin'] = -1000.00 # Allowed, but triggers alert
-        
+
         from unittest.mock import patch
         with patch('apiserver.api.utils.alert_tanner') as mock_alert:
             response = self.client.patch(f'/transactions/{tx_id}/', update_data, format='json')
@@ -501,7 +501,7 @@ class RoleBasedTests(APITestCase):
         data['category'] = 'Donation'
         data['amount'] = 10.00
         data['reference_number'] = 'PAYPAL123'
-        
+
         with patch('apiserver.api.utils.alert_tanner') as mock_alert:
             response = self.client.post(list_url, data, format='json')
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -577,7 +577,7 @@ class RoleBasedTests(APITestCase):
         user_dict = next(u for u in self.users if u['user'].username == 'vet.user')
         user = user_dict['user']
         member = user_dict['member']
-        
+
         target_dict = next(u for u in self.users if u['user'].username == 'vtd.user')
         target_member = target_dict['member']
 
@@ -660,7 +660,7 @@ class RoleBasedTests(APITestCase):
     def test_protocoin_card_vend_request(self):
         user_dict = next(u for u in self.users if u['user'].username == 'vet.user')
         user = user_dict['user']
-        
+
         card = models.Card.objects.create(
             user=user,
             card_number='VENDCARD123',
@@ -744,10 +744,10 @@ class RoleBasedTests(APITestCase):
                 datetime=timezone.now(),
                 cost=3
             )
-            
+
             comp_data = base_data.copy()
             comp_data['balance'] = 97.50
-            
+
             with patch('apiserver.api.utils.alert_tanner') as mock_alert:
                 response = self.client.post(url, comp_data, format='json', **auth_headers)
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -762,7 +762,7 @@ class AuthTests(APITestCase):
 
     def test_login_serializer(self):
         from apiserver.api.serializers import MyLoginSerializer
-    
+
         invalid_usernames = [
             ('firstlast', 'Username should have a period. Try "first.last" or "first.middle.last".'),
             ('first-last', 'Username shouldn\'t have dashes. Try "first.last" or "first.last.name".'),
@@ -771,7 +771,7 @@ class AuthTests(APITestCase):
             ('first.middle.last', 'Don\'t literally try "first.middle.last", use your own name.'),
             ('does.not.exist', 'Username not found. Try "first.last" or "first.middle.last".'),
         ]
-    
+
         mock_request = type('Request', (), {})()
         for username, expected_error in invalid_usernames:
             serializer = MyLoginSerializer(data={'username': username, 'password': 'password'}, context={'request': mock_request})
@@ -791,31 +791,31 @@ class AuthTests(APITestCase):
     @patch('apiserver.api.utils_auth.discourse_is_configured', return_value=False)
     def test_password_change_serializer(self, mock_discourse, mock_ldap):
         from apiserver.api.serializers import MyPasswordChangeSerializer
-    
+
         class MockSession(dict):
             def cycle_key(self):
                 pass
-        
+
         mock_session = MockSession()
         request = type('Request', (), {'data': {'new_password1': 'ComplexPass123!', 'request_id': '123'}, 'user': self.user, 'session': mock_session})()
         serializer = MyPasswordChangeSerializer(
             data={'old_password': 'oldpassword', 'new_password1': 'ComplexPass123!', 'new_password2': 'ComplexPass123!'},
             context={'request': request}
         )
-    
+
         self.assertTrue(serializer.is_valid())
         serializer.save()
-    
+
         self.user.refresh_from_db()
         self.assertTrue(self.user.check_password('ComplexPass123!'))
 
     def test_password_reset_serializer(self):
         from apiserver.api.serializers import MyPasswordResetSerializer
-    
+
         # Test valid email
         serializer = MyPasswordResetSerializer(data={'email': 'test@example.com'}, context={'request': None})
         self.assertTrue(serializer.is_valid())
-    
+
         # Test invalid email
         invalid_serializer = MyPasswordResetSerializer(data={'email': 'wrong@example.com'}, context={'request': None})
         self.assertFalse(invalid_serializer.is_valid())
@@ -823,7 +823,7 @@ class AuthTests(APITestCase):
 
     def test_duplicate_email_registration(self):
         User.objects.create_user(username='existing.user', email='taken@example.com', password='password')
-        
+
         data = {
             'username': 'new.user',
             'email': 'taken@example.com',
@@ -834,14 +834,14 @@ class AuthTests(APITestCase):
             'last_name': 'User',
             'request_id': '123'
         }
-        
+
         response = self.client.post(reverse('rest_name_register'), data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('email', response.data)
 
     def test_duplicate_email_update(self):
         User.objects.create_user(username='other.user', email='taken@example.com', password='password')
-        
+
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(f'/members/{self.member.id}/', {'email': 'taken@example.com'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -850,7 +850,7 @@ class AuthTests(APITestCase):
 
     def test_member_update_own_details(self):
         self.client.force_authenticate(user=self.user)
-        
+
         # Try to update allowed and read-only fields
         data = {
             'phone': '555-1234',
@@ -859,20 +859,20 @@ class AuthTests(APITestCase):
             'monthly_fees': 50,
             'precix_cnc_cert_date': '2023-01-01'
         }
-        
+
         response = self.client.patch(f'/members/{self.member.id}/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         self.member.refresh_from_db()
         # Allowed fields should be updated
         self.assertEqual(self.member.phone, '555-1234')
         self.assertEqual(self.member.public_bio, 'Hello world')
-        
+
         # Read-only fields should NOT be updated
         self.assertFalse(self.member.is_director)
         self.assertNotEqual(self.member.monthly_fees, 50)
         self.assertIsNone(self.member.precix_cnc_cert_date)
-        
+
         self.client.force_authenticate(user=None)
 
     @patch('apiserver.api.utils_ldap.add_to_group')
@@ -880,38 +880,38 @@ class AuthTests(APITestCase):
     def test_admin_update_member_details(self, mock_remove, mock_add):
         admin_user = User.objects.create_user(username='admin.user', email='admin@example.com', password='password')
         admin_member = models.Member.objects.create(user=admin_user, preferred_name='Admin', last_name='User', is_staff=True)
-        
+
         self.client.force_authenticate(user=admin_user)
-        
+
         # Update admin-only fields on the regular member
         data = {
             'monthly_fees': 50,
             'precix_cnc_cert_date': '2023-01-01',
             'is_allowed_entry': False
         }
-        
+
         with patch('apiserver.api.utils_stats.changed_card') as mock_changed_card:
             response = self.client.patch(f'/members/{self.member.id}/', data, format='json')
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            
+
             self.member.refresh_from_db()
             self.assertEqual(self.member.monthly_fees, 50)
             self.assertEqual(str(self.member.precix_cnc_cert_date), '2023-01-01')
             self.assertFalse(self.member.is_allowed_entry)
-            
+
             # Verify side effects
             mock_add.assert_called_with(self.member, 'CNC-Precix-Users')
             self.assertTrue(mock_changed_card.called)
-            
+
         # Test removing cert
         data = {
             'precix_cnc_cert_date': None
         }
         response = self.client.patch(f'/members/{self.member.id}/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         self.member.refresh_from_db()
         self.assertIsNone(self.member.precix_cnc_cert_date)
         mock_remove.assert_called_with(self.member, 'CNC-Precix-Users')
-        
+
         self.client.force_authenticate(user=None)
