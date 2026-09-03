@@ -340,6 +340,14 @@ class MemberSerializer(serializers.ModelSerializer):
         total = transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
         return total
 
+    def validate_email(self, value):
+        qs = User.objects.filter(email__iexact=value)
+        if self.instance and self.instance.user:
+            qs = qs.exclude(id=self.instance.user.id)
+        if qs.exists():
+            raise ValidationError('This email address is already in use by another member.')
+        return value
+
     def get_signup_helper(self, obj):
         if not obj.signup_helper: return None
         member = obj.signup_helper.member
