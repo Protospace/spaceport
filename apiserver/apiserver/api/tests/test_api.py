@@ -758,7 +758,7 @@ class RoleBasedTests(APITestCase):
 class AuthTests(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='test.user', email='test@example.com', password='oldpassword')
-        self.member = models.Member.objects.create(user=self.user, preferred_name='Test', last_name='User')
+        self.member = models.Member.objects.create(user=self.user, preferred_name='Test', last_name='User', set_details=True)
 
     def test_login_serializer(self):
         from apiserver.api.serializers import MyLoginSerializer
@@ -820,3 +820,98 @@ class AuthTests(APITestCase):
         invalid_serializer = MyPasswordResetSerializer(data={'email': 'wrong@example.com'}, context={'request': None})
         self.assertFalse(invalid_serializer.is_valid())
         self.assertEqual(invalid_serializer.errors['email'][0], 'Not found.')
+
+    def test_duplicate_email_registration(self):
+        User.objects.create_user(username='existing.user', email='taken@example.com', password='password')
+        
+        data = {
+            'username': 'new.user',
+            'email': 'taken@example.com',
+            'password1': 'password',
+            'password2': 'password',
+            'preferred_name': 'New',
+            'first_name': 'New',
+            'last_name': 'User',
+            'request_id': '123'
+        }
+        
+        response = self.client.post(reverse('rest_name_register'), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('email', response.data)
+
+    def test_duplicate_email_update(self):
+        User.objects.create_user(username='other.user', email='taken@example.com', password='password')
+        
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(f'/members/{self.member.id}/', {'email': 'taken@example.com'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('email', response.data)
+        self.client.force_authenticate(user=None)
+
+    def test_member_update_own_details(self):
+        self.client.force_authenticate(user=self.user)
+        
+        # Try to update allowed and read-only fields
+        data = {
+            'phone': '555-1234',
+            'public_bio': 'Hello world',
+            'is_director': True,
+            'monthly_fees': 50,
+            'precix_cnc_cert_date': '2023-01-01'
+        }
+        
+        response = self.client.patch(f'/members/{self.member.id}/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        self.member.refresh_from_db()
+        # Allowed fields should be updated
+        self.assertEqual(self.member.phone, '555-1234')
+        self.assertEqual(self.member.public_bio, 'Hello world')
+        
+        # Read-only fields should NOT be updated
+        self.assertFalse(self.member.is_director)
+        self.assertNotEqual(self.member.monthly_fees, 50)
+        self.assertIsNone(self.member.precix_cnc_cert_date)
+        
+        self.client.force_authenticate(user=None)
+
+    @patch('apiserver.api.utils_ldap.add_to_group')
+    @patch('apiserver.api.utils_ldap.remove_from_group')
+    def test_admin_update_member_details(self, mock_remove, mock_add):
+        admin_user = User.objects.create_user(username='admin.user', email='admin@example.com', password='password')
+        admin_member = models.Member.objects.create(user=admin_user, preferred_name='Admin', last_name='User', is_staff=True)
+        
+        self.client.force_authenticate(user=admin_user)
+        
+        # Update admin-only fields on the regular member
+        data = {
+            'monthly_fees': 50,
+            'precix_cnc_cert_date': '2023-01-01',
+            'is_allowed_entry': False
+        }
+        
+        with patch('apiserver.api.utils_stats.changed_card') as mock_changed_card:
+            response = self.client.patch(f'/members/{self.member.id}/', data, format='json')
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            
+            self.member.refresh_from_db()
+            self.assertEqual(self.member.monthly_fees, 50)
+            self.assertEqual(str(self.member.precix_cnc_cert_date), '2023-01-01')
+            self.assertFalse(self.member.is_allowed_entry)
+            
+            # Verify side effects
+            mock_add.assert_called_with(self.member, 'CNC-Precix-Users')
+            self.assertTrue(mock_changed_card.called)
+            
+        # Test removing cert
+        data = {
+            'precix_cnc_cert_date': None
+        }
+        response = self.client.patch(f'/members/{self.member.id}/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        self.member.refresh_from_db()
+        self.assertIsNone(self.member.precix_cnc_cert_date)
+        mock_remove.assert_called_with(self.member, 'CNC-Precix-Users')
+        
+        self.client.force_authenticate(user=None)
