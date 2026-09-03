@@ -1117,7 +1117,15 @@ class MyPasswordResetSerializer(PasswordResetSerializer):
 
     def save(self):
         email = self.data['email']
-        member = User.objects.get(email__iexact=email).member
+
+        try:
+            member = User.objects.get(email__iexact=email).member
+        except User.MultipleObjectsReturned:
+            msg = 'Error: two accounts with the same email found'
+            utils.alert_tanner('Password reset ' + msg)
+            logger.info(msg)
+            raise ValidationError(dict(email=msg))
+
         logging.info('Password reset requested for: {} - {} {} ({})'.format(email, member.preferred_name, member.last_name, member.id))
         super().save()
 
