@@ -1251,14 +1251,14 @@ class MyLoginSerializer(LoginSerializer):
         if 'your' in username and 'own' in username and 'name' in username:
             raise ValidationError(dict(username='*server explodes*'))
 
-        if '.' not in username:
-            raise ValidationError(dict(username='Username should have a period. Try "first.last" or "first.middle.last".'))
-
         if '-' in username:
             raise ValidationError(dict(username='Username shouldn\'t have dashes. Try "first.last" or "first.last.name".'))
 
         if ' ' in username:
             raise ValidationError(dict(username='Username shouldn\'t have spaces. Try "first.last" or "first.middle.last".'))
+
+        if '.' not in username:
+            raise ValidationError(dict(username='Username should have a period. Try "first.last" or "first.middle.last".'))
 
         if 'first.last' in username:
             raise ValidationError(dict(username='Don\'t literally try "first.last", use your own name.'))

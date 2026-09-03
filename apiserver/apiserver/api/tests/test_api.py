@@ -791,9 +791,9 @@ class AuthTests(APITestCase):
     def test_password_change_serializer(self, mock_discourse, mock_ldap):
         from apiserver.api.serializers import MyPasswordChangeSerializer
     
-        request = type('Request', (), {'data': {'new_password1': 'newpassword', 'request_id': '123'}, 'user': self.user})()
+        request = type('Request', (), {'data': {'new_password1': 'ComplexPass123!', 'request_id': '123'}, 'user': self.user})()
         serializer = MyPasswordChangeSerializer(
-            data={'old_password': 'oldpassword', 'new_password1': 'newpassword', 'new_password2': 'newpassword'},
+            data={'old_password': 'oldpassword', 'new_password1': 'ComplexPass123!', 'new_password2': 'ComplexPass123!'},
             context={'request': request}
         )
     
@@ -801,7 +801,7 @@ class AuthTests(APITestCase):
         serializer.save()
     
         self.user.refresh_from_db()
-        self.assertTrue(self.user.check_password('newpassword'))
+        self.assertTrue(self.user.check_password('ComplexPass123!'))
 
     def test_password_reset_serializer(self):
         from apiserver.api.serializers import MyPasswordResetSerializer
