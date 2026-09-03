@@ -772,18 +772,19 @@ class AuthTests(APITestCase):
             ('does.not.exist', 'Username not found. Try "first.last" or "first.middle.last".'),
         ]
     
+        mock_request = type('Request', (), {})()
         for username, expected_error in invalid_usernames:
-            serializer = MyLoginSerializer(data={'username': username, 'password': 'password'})
+            serializer = MyLoginSerializer(data={'username': username, 'password': 'password'}, context={'request': mock_request})
             self.assertFalse(serializer.is_valid())
             self.assertEqual(serializer.errors['username'][0], expected_error)
 
         # Test wrong password
-        serializer = MyLoginSerializer(data={'username': 'test.user', 'password': 'wrongpassword'})
+        serializer = MyLoginSerializer(data={'username': 'test.user', 'password': 'wrongpassword'}, context={'request': mock_request})
         self.assertFalse(serializer.is_valid())
         self.assertEqual(serializer.errors['password'][0], 'Incorrect password. Check caps lock.')
 
         # Test correct login
-        serializer = MyLoginSerializer(data={'username': 'test.user', 'password': 'oldpassword'})
+        serializer = MyLoginSerializer(data={'username': 'test.user', 'password': 'oldpassword'}, context={'request': mock_request})
         self.assertTrue(serializer.is_valid())
 
     @patch('apiserver.api.utils_ldap.is_configured', return_value=False)
@@ -791,7 +792,8 @@ class AuthTests(APITestCase):
     def test_password_change_serializer(self, mock_discourse, mock_ldap):
         from apiserver.api.serializers import MyPasswordChangeSerializer
     
-        request = type('Request', (), {'data': {'new_password1': 'ComplexPass123!', 'request_id': '123'}, 'user': self.user})()
+        mock_session = type('Session', (), {'cycle_key': lambda self: None})()
+        request = type('Request', (), {'data': {'new_password1': 'ComplexPass123!', 'request_id': '123'}, 'user': self.user, 'session': mock_session})()
         serializer = MyPasswordChangeSerializer(
             data={'old_password': 'oldpassword', 'new_password1': 'ComplexPass123!', 'new_password2': 'ComplexPass123!'},
             context={'request': request}
