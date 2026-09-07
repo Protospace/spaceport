@@ -155,7 +155,7 @@ export function SignupForm(props) {
 				<>
 					<Form.Group widths='equal'>
 						<Form.Input
-							label='First Name (Legal)'
+							label='Given Name (Legal)'
 							name='first_name'
 							autoComplete='off'
 							fluid
@@ -163,7 +163,7 @@ export function SignupForm(props) {
 							error={error.first_name}
 						/>
 						<Form.Input
-							label='Last Name (Legal)'
+							label='Family Name (Legal)'
 							name='last_name'
 							autoComplete='off'
 							fluid
@@ -174,7 +174,7 @@ export function SignupForm(props) {
 
 					<Form.Group widths='equal'>
 						<Form.Input
-							label='Preferred First Name'
+							label='Preferred Given Name'
 							name='preferred_name'
 							autoComplete='off'
 							fluid
