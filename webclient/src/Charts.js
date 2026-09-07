@@ -641,31 +641,6 @@ export function Charts(props) {
 
 			<p>Count: number of active members with the given certification.</p>
 
-			<Header size='medium'>Forum Activity</Header>
-
-			<p>Distribution of forum visit days by active members in the last month. Taken from <a href="https://forum.protospace.ca/u?group=protospace_members&order=days_visited&period=monthly">here</a>.</p>
-
-			<p>
-				{!!extras?.forums_visit_1mo?.length &&
-					<ResponsiveContainer width='100%' height={300}>
-						<BarChart data={extras.forums_visit_1mo}>
-							<XAxis dataKey='member' tick={false} />
-							<YAxis width={35} />
-							<CartesianGrid strokeDasharray='3 3'/>
-							<Tooltip labelFormatter={label => `Member ${label} (${(label / extras.forums_visit_1mo.length * 100).toFixed(0)}%)`} />
-							<Bar
-								dataKey='days_visited'
-								name='Days Visited'
-								fill='#2185d0'
-								animationDuration={250}
-							/>
-						</BarChart>
-					</ResponsiveContainer>
-				}
-			</p>
-
-			<p>Each bar represents an active member's visit count to the forum in the last month, sorted by activity.</p>
-
 		</Container>
 	);
 };
