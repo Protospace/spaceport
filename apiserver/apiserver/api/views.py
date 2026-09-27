@@ -1129,6 +1129,10 @@ class StatsViewSet(viewsets.ViewSet, List):
 
         logging.info('Alarm data: %s', data)
 
+        if 'Partition 2' in data:
+            logging.info('Ignoring Partition 2')
+            return Response(200)
+
         state = None
         if data.startswith('Armed'):
             state = 'Armed'
