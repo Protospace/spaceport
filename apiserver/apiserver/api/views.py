@@ -2007,6 +2007,12 @@ class ProtocoinViewSet(Base):
                     logger.error(msg)
                     return Response(200)
 
+                if user.username == 'tanner.collin' and 'debug' in request.data['job_name'].lower():
+                    msg = 'Job {}: test print for {}, aborting. Cost: {}'.format(job_uuid, username, str(total_cost))
+                    utils.alert_tanner(msg)
+                    logger.info(msg)
+                    return Response(200)
+
                 memo = 'Protocoin - Purchase spent ₱ {} printing {}'.format(
                     total_cost,
                     request.data['job_name'][:100],
