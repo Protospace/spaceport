@@ -31,6 +31,7 @@ import { Gallery } from './Draw.js';
 import { Storage, StorageDetail, ClaimShelf } from './Storage.js';
 import { Garden } from './Garden.js';
 import { Balloon } from './Balloon.js';
+import { Minecraft } from './Minecraft.js';
 import { Footer } from './Footer.js';
 import { ScannerQuiz, SawstopQuiz } from './Quiz.js';
 import { LCARS1Display, LCARS2Display, LCARS3Display } from './Display.js';
@@ -335,6 +336,13 @@ function App() {
 
 									<Route path='/storage'>
 										<Storage token={token} user={user} />
+									</Route>
+
+									<Route path='/minecraft/:id'>
+										<Minecraft token={token} user={user} />
+									</Route>
+									<Route path='/Minecraft'>
+										<Minecraft token={token} user={user} />
 									</Route>
 
 									<Route path='/claimshelf/:id'>

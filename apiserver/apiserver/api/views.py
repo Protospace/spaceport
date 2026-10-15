@@ -31,6 +31,7 @@ import xmltodict
 import json
 import base64
 import binascii
+import requests
 
 from . import models, serializers, utils, utils_paypal, utils_stats, utils_ldap, utils_email, utils_mediawiki, utils_todo
 from .permissions import (
@@ -2443,6 +2444,83 @@ class TodoViewSet(viewsets.ViewSet):
             logger.exception('Problem adding task: {} - {}'.format(e.__class__.__name__, str(e)))
             raise exceptions.ValidationError(dict(non_field_errors=str(e)))
 
+
+class MinecraftViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=False, methods=['post'])
+    def whitelist(self, request):
+        try:
+            name = request.data['name']
+        except KeyError:
+            raise exceptions.ValidationError(dict(name='This field is required.'))
+
+        if not isinstance(name, str) or not name.strip():
+            raise exceptions.ValidationError(dict(name='Enter a valid Minecraft player name.'))
+
+        if not secrets.PROTOCRAFT_URL:
+            return Response(
+                {'non_field_errors': ['Minecraft integration is not configured.']},
+                status=drfstatus.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        url = secrets.PROTOCRAFT_URL.rstrip('/') + '/whitelist'
+        headers = {}
+        if secrets.PROTOCRAFT_KEY:
+            headers['Authorization'] = 'Bearer ' + secrets.PROTOCRAFT_KEY
+
+        logger.info('Protocraft whitelist request: POST %s with name=%s', url, name.strip())
+        try:
+            proto_response = requests.post(
+                url,
+                data={'name': name.strip()},
+                headers=headers,
+                timeout=10,
+            )
+        except requests.RequestException as e:
+            logger.exception('Problem calling Protocraft: {} - {}'.format(e.__class__.__name__, str(e)))
+            return Response(
+                {'non_field_errors': ['Could not contact the Minecraft server.']},
+                status=drfstatus.HTTP_502_BAD_GATEWAY,
+            )
+
+        try:
+            result = proto_response.json()
+        except ValueError:
+            result = {'detail': proto_response.text or 'Minecraft server returned an invalid response.'}
+
+        logger.info(
+            'Protocraft whitelist response: status=%s body=%s',
+            proto_response.status_code,
+            result,
+        )
+        response_status = proto_response.status_code
+        command_result = result.get('result') if isinstance(result, dict) else None
+
+        if isinstance(command_result, str):
+            if command_result == '':
+                logger.warning('Protocraft returned an empty result for player %s', name.strip())
+                raise exceptions.ValidationError(dict(name='Player already whitelisted'))
+            if 'no player was found' in command_result.lower():
+                logger.warning('Protocraft could not find the Minecraft player: %s', command_result)
+                raise exceptions.ValidationError(dict(name=command_result))
+
+        if response_status >= 500:
+            response_status = drfstatus.HTTP_502_BAD_GATEWAY
+        if response_status >= 400:
+            if isinstance(result, dict):
+                error_message = (
+                    result.get('error')
+                    or result.get('detail')
+                    or result.get('non_field_errors')
+                    or 'Minecraft server request failed.'
+                )
+            else:
+                error_message = result or 'Minecraft server request failed.'
+            if not isinstance(error_message, list):
+                error_message = [error_message]
+            raise exceptions.ValidationError(dict(non_field_errors=error_message))
+        return Response(result, status=response_status)
 
 
 class StorageSpaceViewSet(Base, List, Retrieve, Update):
