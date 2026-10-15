@@ -2446,7 +2446,7 @@ class TodoViewSet(viewsets.ViewSet):
 
 
 class MinecraftViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowMetadata | IsAuthenticated]
 
     @action(detail=False, methods=['post'])
     def whitelist(self, request):
