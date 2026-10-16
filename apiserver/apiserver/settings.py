@@ -250,11 +250,14 @@ LOGGING = {
         'ignore_lockout': {
             '()': 'apiserver.filters.IgnoreLockout',
         },
+        'ignore_unauthenticated_user': {
+            '()': 'apiserver.filters.IgnoreUnauthenticatedUser',
+        },
     },
     'handlers': {
         'console': {
             'level': 'DEBUG',
-            'filters': ['ignore_stats', 'ignore_lockout'],
+            'filters': ['ignore_stats', 'ignore_lockout', 'ignore_unauthenticated_user'],
             'class': 'logging.StreamHandler',
             'formatter': 'medium'
         },

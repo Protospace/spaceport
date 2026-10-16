@@ -6,7 +6,7 @@ import json
 import requests
 import time
 from datetime import datetime, timedelta
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import NotAuthenticated, ValidationError
 from rest_framework.views import exception_handler
 from dateutil import relativedelta
 from uuid import uuid4
@@ -536,10 +536,17 @@ def gen_member_forms(member):
 def custom_exception_handler(exc, context):
     response = exception_handler(exc, context)
     if response is not None:
-        if hasattr(exc, 'detail'):
-            logging.warning('Response: %s', json.dumps(exc.detail))
-        else:
-            logging.warning('Response: %s', exc)
+        request = context.get('request')
+        is_unauthenticated_user_request = (
+            isinstance(exc, NotAuthenticated)
+            and request is not None
+            and request.path_info.rstrip('/') == '/user'
+        )
+        if not is_unauthenticated_user_request:
+            if hasattr(exc, 'detail'):
+                logging.warning('Response: %s', json.dumps(exc.detail))
+            else:
+                logging.warning('Response: %s', exc)
     return response
 
 def log_transaction(tx):

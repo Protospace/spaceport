@@ -15,3 +15,7 @@ class IgnoreLockout(logging.Filter):
             return False
         else:
             return True
+
+class IgnoreUnauthenticatedUser(logging.Filter):
+    def filter(self, record):
+        return record.getMessage() != 'Unauthorized: /user/'
