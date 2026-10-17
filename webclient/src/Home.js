@@ -487,6 +487,20 @@ export function Home(props) {
 								<p>Card scans today: {getZeroStat('card_scans')}</p>
 
 								<p>
+									Minecraft players: {mcPlayers.length} {mcPlayers.length > 5 && '🔥'} <Popup content={
+										<React.Fragment>
+											<p>
+												Players:<br />
+												<ul style={{ margin: '0 1em', padding: 0 }}>
+													{mcPlayers.length ? mcPlayers.map(x => <li>{x}</li>) : 'None'}
+												</ul>
+											</p>
+										</React.Fragment>
+									} trigger={<a>[list]</a>} />
+								{' '}<a href='https://wiki.protospace.ca/Minecraft_Server' target='_blank' rel='noopener noreferrer'>[wiki]</a>
+								</p>
+
+								<p>
 									Trotec availability: {getTrackStat('TROTECS300')} <Popup content={
 										<React.Fragment>
 											<p>
