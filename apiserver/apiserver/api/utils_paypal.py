@@ -8,8 +8,8 @@ from rest_framework.exceptions import ValidationError
 from uuid import uuid4
 
 from django.db.models import Sum
-from django.utils import timezone
 from django.utils.timezone import now
+import pytz
 
 from . import models, serializers, utils
 from .. import settings
@@ -58,8 +58,8 @@ def parse_paypal_date(string):
 
     if zone_part in ['PDT', 'PST']:
         # PST/PDT is 'US/Pacific' and ignored, localize only cares about date
-        dt = timezone.pytz.timezone('US/Pacific').localize(dt)
-        dt = dt.astimezone(timezone.pytz.UTC)
+        dt = pytz.timezone('US/Pacific').localize(dt)
+        dt = dt.astimezone(pytz.UTC)
     else:
         raise ValidationError('Bad timezone: ' + zone_part)
     return dt

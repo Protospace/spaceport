@@ -8,11 +8,12 @@ from django.utils.timezone import now
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
-from rest_auth.registration.serializers import RegisterSerializer
-from rest_auth.serializers import PasswordChangeSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer, LoginSerializer
-from rest_auth.serializers import UserDetailsSerializer
+from dj_rest_auth.registration.serializers import RegisterSerializer
+from dj_rest_auth.serializers import PasswordChangeSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer, LoginSerializer
+from dj_rest_auth.serializers import UserDetailsSerializer
 import re
 import datetime, time, calendar
+from decimal import Decimal
 
 from . import models, fields, utils, utils_ldap, utils_auth, utils_stats
 from .. import settings, secrets
@@ -796,7 +797,7 @@ class SessionSerializer(serializers.ModelSerializer):
     course = serializers.PrimaryKeyRelatedField(queryset=models.Course.objects.all())
     students = TrainingSerializer(many=True, read_only=True)
     max_students = serializers.IntegerField(min_value=1, max_value=50, allow_null=True)
-    cost = serializers.DecimalField(max_digits=None, decimal_places=2, min_value=0, max_value=200)
+    cost = serializers.DecimalField(max_digits=None, decimal_places=2, min_value=Decimal('0'), max_value=Decimal('200'))
 
     class Meta:
         model = models.Session
@@ -1052,6 +1053,11 @@ class MyRegisterSerializer(RegisterSerializer):
     last_name = serializers.CharField(max_length=32)
     preferred_name = serializers.CharField(max_length=32)
     request_id = serializers.CharField(required=False)
+
+    def validate_email(self, email):
+        if User.objects.filter(email__iexact=email).exists():
+            raise ValidationError('A user with that email already exists.')
+        return super().validate_email(email)
 
     def validate_username(self, username):
         if re.search(r'[^a-z.]', username):

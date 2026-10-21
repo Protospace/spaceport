@@ -15,8 +15,8 @@ from rest_framework import viewsets, views, mixins, generics, exceptions, status
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_auth.views import PasswordChangeView, PasswordResetView, PasswordResetConfirmView, LoginView
-from rest_auth.registration.views import RegisterView
+from dj_rest_auth.views import PasswordChangeView, PasswordResetView, PasswordResetConfirmView, LoginView
+from dj_rest_auth.registration.views import RegisterView
 from oidc_provider.views import AuthorizeView
 from oidc_provider.models import Client as OIDCClient
 from fuzzywuzzy import fuzz, process
@@ -2676,7 +2676,7 @@ class OIDCAuthView(views.APIView, AuthorizeView):
             try:
                 location = r.headers['location']
             except (AttributeError, KeyError):
-                location = r._headers['location'][1]
+                location = r.headers['Location']
 
             if client_name == 'vikunja':
                 time.sleep(1)

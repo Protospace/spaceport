@@ -7,7 +7,8 @@ import requests
 from django.db.models import Prefetch, Count, Q
 from django.db.models.functions import TruncWeek
 from django.core.cache import cache
-from django.utils.timezone import now, pytz
+from django.utils.timezone import now
+import pytz
 from apiserver.api import models, utils
 from apiserver import secrets
 

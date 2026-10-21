@@ -68,6 +68,8 @@ SECURE_REFERRER_POLICY = 'same-origin'
 
 # Application definition
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -81,11 +83,11 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'apiserver.api',
     'oidc_provider',
-    'rest_auth',
+    'dj_rest_auth',
     'allauth',
     'allauth.account',
     'allauth.socialaccount', # to support user deletion
-    'rest_auth.registration',
+    'dj_rest_auth.registration',
     'simple_history',
 ]
 
@@ -95,6 +97,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
@@ -145,7 +148,8 @@ DATABASES = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'OPTIONS': {'ignore_exc': True},
         'LOCATION': os.environ.get('MEMCACHED_LOCATION', '127.0.0.1:11211'),
         'TIMEOUT': None,
     }
@@ -287,10 +291,10 @@ LOGGING = {
 logging.config.dictConfig(LOGGING)
 
 SITE_ID = 1
-ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_USERNAME_MIN_LENGTH = 3
-ACCOUNT_AUTHENTICATION_METHOD = 'username'
+ACCOUNT_LOGIN_METHODS = {'username'}
+ACCOUNT_SIGNUP_FIELDS = ['username*', 'email*', 'password1*', 'password2*']
 OLD_PASSWORD_FIELD_ENABLED = True
 LOGOUT_ON_PASSWORD_CHANGE = False
 ACCOUNT_PRESERVE_USERNAME_CASING = False
