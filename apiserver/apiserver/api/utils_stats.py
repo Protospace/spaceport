@@ -68,7 +68,7 @@ def calc_next_events():
 
     # TODO, go by tag?
     member_meeting = sessions.filter(is_cancelled=False, course__in=[317, 413, 478], datetime__gte=now()).order_by('datetime').first()
-    monthly_clean = sessions.filter(is_cancelled=False, course=273, datetime__gte=now()).first()
+    monthly_clean = sessions.filter(is_cancelled=False, course=273, datetime__gte=now()).order_by('datetime').first()
     next_class = sessions.exclude(course__in=[317, 413, 273, 478]).exclude(max_students=1).filter(is_cancelled=False, datetime__gte=now()).order_by('datetime').first()
     prev_class = sessions.exclude(course__in=[317, 413, 273, 478]).exclude(max_students=1).filter(is_cancelled=False, datetime__lte=now()).order_by('datetime').last()
 
@@ -254,9 +254,12 @@ def calc_card_scans():
     date = utils.today_local_tz()
     dt = datetime.combine(date, datetime.min.time())
     midnight = utils.DISPLAY_TZ.localize(dt)
+    tomorrow = utils.DISPLAY_TZ.localize(
+        datetime.combine(date + timedelta(days=1), datetime.min.time())
+    )
 
     cards = models.Card.objects
-    count = cards.filter(last_seen__gte=midnight).count()
+    count = cards.filter(last_seen__gte=midnight, last_seen__lt=tomorrow).count()
 
     cache.set('card_scans', count)
 
