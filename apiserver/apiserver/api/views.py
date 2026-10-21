@@ -1479,7 +1479,10 @@ class HistoryViewSet(Base, List, Retrieve):
         if member_id:
             queryset = queryset.filter(owner_id=member_id)
 
-        return queryset.order_by('-history_date')[:50]
+        queryset = queryset.order_by('-history_date')
+        if self.action == 'list':
+            queryset = queryset[:50]
+        return queryset
 
 
 class VettingViewSet(Base, List):
