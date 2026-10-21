@@ -637,7 +637,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
 
             if 'Protospace' not in tags and 'Event' not in tags and 'Outing' not in tags and user == session.instructor:
                 info = 'User: {}, Course: {}, date: {}, tags: {}'.format(user.username, session.course.name, session.datetime, tags)
-                msg = 'Self-register trickery detected:\n' + info + '\n' + str(data.dict())
+                msg = 'Self-register trickery detected:\n' + info + '\n' + str(data)
                 utils.alert_tanner(msg)
                 raise exceptions.ValidationError(dict(non_field_errors='Can\'t register the instructor.'))
 

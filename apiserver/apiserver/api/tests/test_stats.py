@@ -98,6 +98,9 @@ class StatsTests(TestCase):
         clean_course = models.Course.objects.create(id=273, name='Cleanup')
         class_course = models.Course.objects.create(name='Boundary class')
 
+        # Insert later events first so the tests detect queries that rely on
+        # insertion order instead of selecting the earliest scheduled event.
+        self.create_session(meeting_course, instant + timedelta(hours=4))
         meeting = self.create_session(meeting_course, instant + timedelta(hours=2))
         # Create the later cleanup first to ensure the calculation orders by
         # scheduled time rather than relying on insertion order.
