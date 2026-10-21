@@ -637,7 +637,7 @@ class TrainingViewSet(Base, Retrieve, Create, Update):
 
             if 'Protospace' not in tags and 'Event' not in tags and 'Outing' not in tags and user == session.instructor:
                 info = 'User: {}, Course: {}, date: {}, tags: {}'.format(user.username, session.course.name, session.datetime, tags)
-                msg = 'Self-register trickery detected:\n' + info + '\n' + str(data.dict())
+                msg = 'Self-register trickery detected:\n' + info + '\n' + str(data)
                 utils.alert_tanner(msg)
                 raise exceptions.ValidationError(dict(non_field_errors='Can\'t register the instructor.'))
 
@@ -1479,7 +1479,10 @@ class HistoryViewSet(Base, List, Retrieve):
         if member_id:
             queryset = queryset.filter(owner_id=member_id)
 
-        return queryset.order_by('-history_date')[:50]
+        queryset = queryset.order_by('-history_date')
+        if self.action == 'list':
+            queryset = queryset[:50]
+        return queryset
 
 
 class VettingViewSet(Base, List):

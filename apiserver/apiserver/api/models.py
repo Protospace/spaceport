@@ -6,12 +6,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.timezone import now
 import pytz
 from simple_history.models import HistoricalRecords
+from simple_history import register
 from .. import settings
 
 DISPLAY_TZ = pytz.timezone(settings.DISPLAY_TIMEZONE)
 
-# User history isn't consumed by the app; avoiding dynamic registration keeps
-# schema changes in the API app's generated migrations.
+register(User)
 
 IGNORE = '+'
 
