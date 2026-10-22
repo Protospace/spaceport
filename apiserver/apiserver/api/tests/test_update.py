@@ -11,6 +11,7 @@ from django.urls import re_path, resolve, reverse
 from django.utils.functional import Promise
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy
+from PIL import Image
 try:
     from pypdf import PdfReader
 except ImportError:
@@ -150,6 +151,25 @@ class DependencyUpgradeCompatibilityTests(TestCase):
         self.assertIn(b'SUMMARY:Compatibility test course', ical_data)
         self.assertIn(b'DTSTART', ical_data)
         self.assertIn(b'DTEND', ical_data)
+
+    def test_card_photo_generation_uses_supported_text_metrics(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            template_path = os.path.join(temp_dir, 'card-template.jpg')
+            static_dir = os.path.join(temp_dir, 'static')
+            os.mkdir(static_dir)
+            Image.new('RGB', (1000, 1000), 'white').save(template_path)
+            Image.new('RGB', (600, 600), 'blue').save(
+                os.path.join(static_dir, 'portrait.jpg'),
+            )
+
+            self.member.photo_large = 'portrait.jpg'
+            with patch.object(utils, 'CARD_TEMPLATE_FILE', template_path), \
+                 patch.object(utils, 'STATIC_FOLDER', static_dir + os.path.sep):
+                photo = utils.gen_card_photo(self.member)
+
+            with Image.open(photo) as generated:
+                self.assertEqual(generated.format, 'JPEG')
+                self.assertEqual(generated.size, (1000, 1000))
 
     def test_member_form_generation_produces_a_readable_pdf(self):
         # PyPDF2 2.x/3.x renamed PdfFileReader/Writer and their camelCase

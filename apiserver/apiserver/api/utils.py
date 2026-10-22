@@ -321,8 +321,10 @@ def gen_card_photo(member):
     # check font size
     font_sizes = (60, 72)
     font = ImageFont.truetype('DejaVuSans-Bold.ttf', font_sizes[1])
-    size = draw.textsize(str(member.last_name), font=font)
-    if size[0] > CARD_TEXT_SIZE_LIMIT:
+    last_name = str(member.last_name)
+    text_bbox = draw.textbbox((0, 0), last_name, font=font)
+    text_width = text_bbox[2] - text_bbox[0]
+    if text_width > CARD_TEXT_SIZE_LIMIT:
         font_sizes = (36, 48)
 
     font = ImageFont.truetype('DejaVuSans.ttf', font_sizes[0])
