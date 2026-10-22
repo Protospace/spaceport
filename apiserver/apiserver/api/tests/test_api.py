@@ -1991,8 +1991,23 @@ class AdditionalRouteTests(APITestCase):
 
         with override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'), \
              patch('apiserver.api.throttles.LoggingThrottle.allow_request', return_value=True):
-            reset = APIClient().post('/password/reset/', {'email': self.user.email}, format='json')
+            from django.contrib.sites.models import Site
+            from django.core import mail
+
+            Site.objects.update_or_create(
+                pk=1,
+                defaults={'domain': 'my.protospace.ca', 'name': 'my.protospace.ca'},
+            )
+            Site.objects.clear_cache()
+            mail.outbox = []
+            reset = APIClient().post(
+                '/password/reset/', {'email': self.user.email}, format='json', secure=True,
+            )
         self.assertEqual(reset.status_code, status.HTTP_200_OK)
+        reset_link_prefix = 'https://my.protospace.ca/password/reset/confirm/{}/'.format(
+            user_pk_to_url_str(self.user),
+        )
+        self.assertIn(reset_link_prefix, mail.outbox[0].body)
 
         uid = user_pk_to_url_str(self.user)
         reset_token = default_token_generator.make_token(self.user)

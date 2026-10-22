@@ -2,12 +2,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 from django.contrib.auth.models import User, Group
+from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.db.models import Max, F, Count, Q, Sum
 from django.utils.timezone import now
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
+from allauth.account.utils import user_pk_to_url_str
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from dj_rest_auth.serializers import PasswordChangeSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer, LoginSerializer
 from dj_rest_auth.serializers import UserDetailsSerializer
@@ -1123,6 +1126,17 @@ class MyPasswordChangeSerializer(PasswordChangeSerializer):
         super().save()
 
 class MyPasswordResetSerializer(PasswordResetSerializer):
+    def get_email_options(self):
+        return {'url_generator': self.password_reset_url_generator}
+
+    @staticmethod
+    def password_reset_url_generator(request, user, token):
+        uid = user_pk_to_url_str(user)
+        path = reverse('password_reset_confirm', args=[uid, token])
+        protocol = 'https' if request.is_secure() else 'http'
+        site = Site.objects.get_current()
+        return '{}://{}{}'.format(protocol, site.domain, path)
+
     def validate_email(self, email):
         if not User.objects.filter(email__iexact=email).exists():
             logging.info('Email not found: ' + email)
