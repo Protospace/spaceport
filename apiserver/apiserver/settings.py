@@ -194,8 +194,6 @@ DISPLAY_TIMEZONE = os.environ.get('DISPLAY_TIMEZONE', 'America/Edmonton')
 
 USE_I18N = True
 
-USE_L10N = True
-
 USE_TZ = True
 
 
