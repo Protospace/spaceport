@@ -186,7 +186,9 @@ def gen_search_strings():
     start = time.time()
 
     search_strings = {}
-    for m in models.Member.objects.order_by('-expire_date').prefetch_related('user__storage'):
+    members = models.Member.objects.order_by('-expire_date').prefetch_related('user__storage')
+    # Keep prefetch IN clauses below SQLite's default expression depth limit.
+    for m in members.iterator(chunk_size=500):
         string = '{} {} | {} {}'.format(
             m.preferred_name,
             m.last_name,

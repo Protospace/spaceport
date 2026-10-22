@@ -57,6 +57,28 @@ class RegressionFixTests(TestCase):
         member_fields.update(fields)
         return models.Member.objects.create(**member_fields)
 
+    def test_search_string_generation_batches_large_prefetches(self):
+        users = User.objects.bulk_create([
+            User(username='fix.search.{}'.format(i))
+            for i in range(1200)
+        ], batch_size=100)
+        members = models.Member.objects.bulk_create([
+            models.Member(
+                user=user,
+                first_name='Search',
+                last_name=str(i),
+                preferred_name='Search',
+                application_date=None,
+            )
+            for i, user in enumerate(users)
+        ], batch_size=25)
+
+        with patch('apiserver.api.utils.cache.set') as cache_set:
+            utils.gen_search_strings()
+
+        search_strings = cache_set.call_args.args[1]
+        self.assertEqual(len(search_strings), len(members) + 2)
+
     def test_string_methods_handle_null_relations_and_datetimes(self):
         tx = models.Transaction(
             user=None,
