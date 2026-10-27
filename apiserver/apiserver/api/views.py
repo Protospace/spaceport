@@ -1955,7 +1955,7 @@ class ProtocoinViewSet(Base):
                     return Response(200)
 
                 INK_PROTOCOIN_PER_ML = 0.75
-                DEFAULT_PAPER_PROTOCOIN_PER_M = 0.50
+                DEFAULT_PAPER_PROTOCOIN_PER_M = 1.0
                 PROTOCOIN_PER_PRINT = 1.0
 
                 total_cost = PROTOCOIN_PER_PRINT
@@ -1971,6 +1971,7 @@ class ProtocoinViewSet(Base):
                     # Prices: https://forum.protospace.ca/t/issue-with-plotter-printer-protocoin/6928/20
                     'Plain Paper': 1.00,
                     'Photo Gloss Paper': 8.77,
+                    'HP Universal Instant-dry Photo Semi-Gloss': 8.77,
                     # Canvas price: https://forum.protospace.ca/t/motion-canvas-roll-for-44-t1200-large-format-printer/8640/8
                     'Adhesive Polypropylene Matte': 20.54,
                 }
@@ -1978,7 +1979,15 @@ class ProtocoinViewSet(Base):
                 paper_name = request.data['paper_name']
                 squareinches = float(request.data['paper_sqi'])
                 squaremetres = squareinches / 1550.0
-                cost = squaremetres * PAPER_COSTS.get(paper_name, DEFAULT_PAPER_PROTOCOIN_PER_M)
+
+                try:
+                    cost = squaremetres * PAPER_COSTS[paper_name]
+                except KeyError:
+                    cost = squaremetres * DEFAULT_PAPER_PROTOCOIN_PER_M
+                    msg = 'Job {}: unknown paper name: {}'.format(job_uuid, paper_name)
+                    utils.alert_tanner(msg)
+                    logger.info(msg)
+
                 total_cost += cost
                 logging.info('    %s sqi %s cost: %s', str(squareinches), paper_name, str(cost))
 

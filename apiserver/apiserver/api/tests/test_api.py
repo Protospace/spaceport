@@ -1721,6 +1721,28 @@ class AdditionalRouteTests(APITestCase):
         self.assertTrue(models.Transaction.objects.filter(reference_number='cups-OfficePrinter-cups-job-1').exists())
         log_transaction.assert_called_once()
 
+    def test_printer_report_alerts_on_unknown_paper_name(self):
+        job_uuid = 'unknown-paper-job'
+        headers = {'HTTP_AUTHORIZATION': 'Bearer {}'.format(secrets.PRINTER_API_TOKEN)}
+        with patch('apiserver.api.views.utils.alert_tanner') as alert, \
+             patch('apiserver.api.views.utils.log_transaction') as log_transaction:
+            response = self.client.post('/protocoin/printer_report/', {
+                'uuid': job_uuid,
+                'user_name': self.user.username,
+                'job_status': '0',
+                'source': '1',
+                'ink_ul': '10',
+                'paper_name': 'Unknown Paper Type',
+                'paper_sqi': '1550',
+            }, format='json', **headers)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        alert.assert_called_once()
+        self.assertIn(job_uuid, alert.call_args[0][0])
+        self.assertIn('Unknown Paper Type', alert.call_args[0][0])
+        self.assertTrue(models.Transaction.objects.filter(reference_number=job_uuid).exists())
+        log_transaction.assert_called_once()
+
     def test_printer_reports_skip_duplicate_incomplete_and_missing_jobs(self):
         headers = {'HTTP_AUTHORIZATION': 'Bearer {}'.format(secrets.PRINTER_API_TOKEN)}
         report_fields = {
