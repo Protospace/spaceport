@@ -1954,8 +1954,10 @@ class ProtocoinViewSet(Base):
                     logger.error(msg)
                     return Response(200)
 
-                INK_PROTOCOIN_PER_ML = 0.75
-                DEFAULT_PAPER_PROTOCOIN_PER_M = 1.0
+                # https://www.wolframalpha.com/input?i=%28%241%2C399.95+*+1.05%29+%2F+%28775+mL+*+8%29
+                INK_PROTOCOIN_PER_ML = 0.24
+
+                DEFAULT_PAPER_PROTOCOIN_PER_M = 2.68
                 PROTOCOIN_PER_PRINT = 1.0
 
                 total_cost = PROTOCOIN_PER_PRINT
@@ -1968,12 +1970,13 @@ class ProtocoinViewSet(Base):
                 logging.info('    %s ul ink cost: %s', str(microliters), str(cost))
 
                 PAPER_COSTS = {
-                    # Prices: https://forum.protospace.ca/t/issue-with-plotter-printer-protocoin/6928/20
-                    'Plain Paper': 1.00,
-                    'Photo Gloss Paper': 8.77,
-                    'HP Universal Instant-dry Photo Semi-Gloss': 8.77,
-                    # Canvas price: https://forum.protospace.ca/t/motion-canvas-roll-for-44-t1200-large-format-printer/8640/8
-                    'Adhesive Polypropylene Matte': 20.54,
+                    # https://www.wolframalpha.com/input?i=%28%24124.64+*+1.05%29+%2F+%2842+inch+*+150+feet%29+to+CA%24%2Fm%5E2
+                    'Plain Paper': 2.68,
+                    # https://www.wolframalpha.com/input?i=%28%24294.85+*+1.05%29+%2F+%2836+inch+*+100+feet%29+to+CA%24%2Fm%5E2
+                    'Photo Gloss Paper': 11.11,
+                    'HP Universal Instant-dry Photo Semi-Gloss': 11.11,
+                    # https://www.wolframalpha.com/input?i=%28%24266.00+*+1.05%29+%2F+%2844+inch+*+40+feet%29+to+CA%24%2Fm%5E2
+                    'Adhesive Polypropylene Matte': 20.50,
                 }
 
                 paper_name = request.data['paper_name']
