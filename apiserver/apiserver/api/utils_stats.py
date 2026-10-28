@@ -21,10 +21,6 @@ DEFAULTS = {
     'prev_class': None,
     'upcoming_classes': None,
     'member_count': None,
-    'paused_count': None,
-    'green_count': None,
-    'bay_108_temp': None,
-    'bay_110_temp': None,
     'minecraft_players': [],
     'card_scans': 0,
     'track': {},
@@ -36,11 +32,9 @@ DEFAULTS = {
     'last_scan': {},
     'closing': {},
     'printer3d': {},
-    'scanner3d': {},
     'solar': {},
     'shopping_list': [],
     'maintenance_list': [],
-    'protoballoon': {},
 }
 
 if secrets.MUMBLE:

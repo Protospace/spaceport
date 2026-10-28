@@ -244,6 +244,16 @@ class StatsTests(TestCase):
         cache.set('classes_week', [{'class': 'Cached class'}])
         cache.set('alarm', {'data': 'TRIGGERED'})
         cache.set('autoscan', 'secret state')
+        removed_stats_keys = (
+            'paused_count',
+            'green_count',
+            'bay_108_temp',
+            'bay_110_temp',
+            'scanner3d',
+            'protoballoon',
+        )
+        for key in removed_stats_keys:
+            cache.set(key, 'stale cached value')
 
         response = self.client.get(reverse('stats-list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -251,6 +261,8 @@ class StatsTests(TestCase):
         self.assertEqual(response.data['card_scans'], 8)
         self.assertEqual(response.data['alarm'], {'data': 'TRIGGERED'})
         self.assertEqual(response.data['autoscan'], 'secret state')
+        for key in removed_stats_keys:
+            self.assertNotIn(key, response.data)
 
         extras = self.client.get(reverse('stats-extras'))
         self.assertEqual(extras.status_code, status.HTTP_200_OK)
