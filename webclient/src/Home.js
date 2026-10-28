@@ -291,39 +291,6 @@ export function Home(props) {
 	const getScannerAgo = (name) => stats?.scanner3d?.[name] ? moment.unix(stats.scanner3d[name]['time']).tz(DISPLAY_TIMEZONE).fromNow() : '';
 	const getScannerName = (name) => stats?.scanner3d?.[name]?.['first_name'] ? stats.scanner3d[name]['first_name'] : 'Unknown';
 
-	const getBalloonStat = () => {
-		if (!stats?.protoballoon?.last?.time) {
-			return 'Unknown';
-		}
-		const balloonTime = moment.utc(stats.protoballoon.last.time);
-		const duration = moment.duration(moment().diff(balloonTime));
-
-		if (duration.asSeconds() < 0) {
-			return 'Unknown';
-		}
-
-		if (duration.asMinutes() < 1) {
-			return 'seen 0m ago';
-		}
-
-		const days = Math.floor(duration.asDays());
-		const hours = duration.hours();
-		const minutes = duration.minutes();
-
-		let timeParts = [];
-		if (days > 0) {
-			timeParts.push(`${days}d`);
-		}
-		if (hours > 0) {
-			timeParts.push(`${hours}h`);
-		}
-		if (minutes > 0) {
-			timeParts.push(`${minutes}m`);
-		}
-
-		return `seen ${timeParts.join('')} ago`;
-	};
-
 	const alarmStat = (x) => stats && stats.alarm && moment().unix() - stats.alarm.time < 60*60*24 ? stats.alarm.data : 'Unknown';
 	const alarmUpdateLast = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz(DISPLAY_TIMEZONE).format('llll') : 'Unknown';
 	const alarmUpdateAgo = (x) => stats && stats.alarm ? moment.unix(stats.alarm.time).tz(DISPLAY_TIMEZONE).fromNow() : 'Unknown';
@@ -590,8 +557,6 @@ export function Home(props) {
 										</React.Fragment>
 									} trigger={<a>[more]</a>} />
 								</p>}
-
-								<p>Protoballoon: {getBalloonStat()} <Link to='/balloon'>[globe]</Link></p>
 
 								{stats && stats?.solar?.hasOwnProperty('total') && <p>
 									Members' solar power: {stats.solar.total.toLocaleString()} W <Popup content={
