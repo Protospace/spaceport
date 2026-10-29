@@ -146,6 +146,8 @@ function App() {
 							</Link>
 						</div>
 
+						<p className='ui warning message maintenance-notice'>This portal will be down for maintenance Monday Nov 2nd 10:00-13:00. <a href='https://forum.protospace.ca/t/monday-portal-maintenance-upgrade/14615/' target='_blank' style={{ whiteSpace: 'nowrap' }}>See the forum thread.</a></p>
+
 						{window.location.hostname !== 'my.protospace.ca' &&
 							<p style={{ background: 'yellow' }}>~~~~~ Development site ~~~~~</p>
 						}
