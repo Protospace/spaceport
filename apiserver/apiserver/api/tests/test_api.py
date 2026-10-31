@@ -1733,6 +1733,7 @@ class AdditionalRouteTests(APITestCase):
                 'ink_ul': '10',
                 'paper_name': 'Unknown Paper Type',
                 'paper_sqi': '1550',
+                'job_name': 'Unknown paper test job',
             }, format='json', **headers)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
