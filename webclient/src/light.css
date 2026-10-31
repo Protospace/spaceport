@@ -582,3 +582,8 @@ a {
 	color: #000000;
 }
 
+.ui.message.maintenance-notice {
+	padding: 0.5em 0.75em;
+	text-align: center;
+}
+

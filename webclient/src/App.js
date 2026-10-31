@@ -36,7 +36,7 @@ import { Footer } from './Footer.js';
 import { ScannerQuiz, SawstopQuiz } from './Quiz.js';
 import { LCARS1Display, LCARS2Display, LCARS3Display } from './Display.js';
 
-const APP_VERSION = 12;  // TODO: automate this
+const APP_VERSION = 13;  // TODO: automate this
 
 function App() {
 	const [token, setToken] = useState(localStorage.getItem('token', ''));
@@ -145,6 +145,8 @@ function App() {
 								<img src='/logo-long.svg' className='logo-long' />
 							</Link>
 						</div>
+
+						<p className='ui warning message maintenance-notice'>This portal will be down for maintenance Monday Nov 2nd 10:00-13:00. <a href='https://forum.protospace.ca/t/monday-portal-maintenance-upgrade/14615/' target='_blank' style={{ whiteSpace: 'nowrap' }}>See the forum thread.</a></p>
 
 						{window.location.hostname !== 'my.protospace.ca' &&
 							<p style={{ background: 'yellow' }}>~~~~~ Development site ~~~~~</p>
