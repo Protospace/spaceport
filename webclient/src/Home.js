@@ -262,7 +262,7 @@ export function Home(props) {
 
 	const getStat = (x) => stats && stats[x] ? stats[x] : 'Unknown';
 	const getZeroStat = (x) => stats && stats[x] ? stats[x] : '0';
-	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz(DISPLAY_TIMEZONE).format('MMM Do @ LT') : 'Unknown';
+	const getDateStat = (x) => stats && stats[x] ? moment.utc(stats[x]).tz(DISPLAY_TIMEZONE).format('MMM D @ LT') : 'Unknown';
 	const showMeetingLink = () => stats && stats['next_meeting'] && moment().add(30, 'minutes').isAfter(moment.utc(stats['next_meeting']));
 
 	const getNextStat = (x) => {
@@ -271,7 +271,7 @@ export function Home(props) {
 			if (datetime.isSame(moment().tz(DISPLAY_TIMEZONE), 'day') ) {
 				return <>{datetime.format('LT')} | <Link to={'/classes/' + stats[x].id}>{stats[x].name}</Link></>;
 			} else {
-				return <>{datetime.format('MMM Do')} | <Link to={'/classes/' + stats[x].id}>{stats[x].name}</Link></>;
+				return <>{datetime.format('MMM D')} | <Link to={'/classes/' + stats[x].id}>{stats[x].name}</Link></>;
 			}
 		} else {
 			return 'Unknown';

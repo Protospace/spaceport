@@ -155,7 +155,7 @@ export function Charts(props) {
 
 			<Header size='medium'>Member Counts</Header>
 
-			<p>Daily since March 2nd, 2020.</p>
+			<p>Daily since March 2, 2020.</p>
 
 			<Header size='small'>Total Members</Header>
 
@@ -310,7 +310,7 @@ export function Charts(props) {
 			<Header size='medium'>Space Activity</Header>
 
 			{fullActivity ?
-				<p>Daily since March 7th 2020, updates hourly.</p>
+				<p>Daily since March 7, 2020, updates hourly.</p>
 			:
 				<p>
 					Daily for the last four weeks, updates hourly.
