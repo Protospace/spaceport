@@ -278,7 +278,7 @@ export function Home(props) {
 		}
 	};
 
-	const mcPlayers = stats && stats['minecraft_players'] ? stats['minecraft_players'] : [];
+	const mcPlayers = stats && stats['minecraft_players'] ? stats['minecraft_players'].filter(player => !player.toLowerCase().startsWith('mosfet')) : [];
 	const mumbleUsers = stats && stats['mumble_users'] ? stats['mumble_users'] : [];
 
 	const getTrackStat = (x) => stats && stats.track && stats.track[x] ? moment().unix() - stats.track[x]['time'] > 60 ? 'Free' : 'In Use' : 'Unknown';
