@@ -1977,6 +1977,7 @@ class ProtocoinViewSet(Base):
                     'HP Universal Instant-dry Photo Semi-Gloss': 11.11,
                     'HP Universal Instant-dry Photo Gloss': 11.11,
                     'HP Premium Instant-dry Photo Gloss': 11.11,
+                    'HP Premium Instant-dry Photo Satin': 11.11,
                     # https://www.wolframalpha.com/input?i=%28%24266.00+*+1.05%29+%2F+%2844+inch+*+40+feet%29+to+CA%24%2Fm%5E2
                     'Adhesive Polypropylene Matte': 20.50,
                 }
