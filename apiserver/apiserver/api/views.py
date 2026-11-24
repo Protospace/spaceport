@@ -1760,7 +1760,7 @@ class ProtocoinViewSet(Base):
             )
         else:
             user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
-            user_balance = float(user_balance)
+            user_balance = round(float(user_balance), 2)
 
             res = dict(
                 balance=user_balance,
@@ -1793,7 +1793,7 @@ class ProtocoinViewSet(Base):
             return Response(200)
 
         user_balance = source_user.transactions.aggregate(Sum('protocoin'))['protocoin__sum'] or 0
-        user_balance = float(user_balance)
+        user_balance = round(float(user_balance), 2)
 
         res = dict(
             balance=user_balance,
