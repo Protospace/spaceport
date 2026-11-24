@@ -769,6 +769,41 @@ class RoleBasedTests(APITestCase):
                 self.assertIn('Instructor', mock_alert.call_args[0][0])
 
 
+    def test_protocoin_card_vend_allows_sub_cent_balance_tolerance(self):
+        user = next(u['user'] for u in self.users if u['user'].username == 'vet.user')
+        card = models.Card.objects.create(
+            user=user,
+            card_number='VENDCENTCARD',
+            active_status='card_active',
+        )
+        models.Transaction.objects.create(
+            user=user,
+            protocoin=Decimal('1.00'),
+            amount=0,
+            account_type='Protocoin',
+            category='Exchange',
+        )
+
+        with patch('apiserver.api.views.secrets.VEND_API_TOKEN', 'testtoken'):
+            response = self.client.post(
+                f'/protocoin/{card.card_number}/card_vend_request/',
+                {
+                    'machine': 'Snack',
+                    'number': 'A1',
+                    'balance': '1.00',
+                    'amount': '1.0005',
+                },
+                format='json',
+                HTTP_AUTHORIZATION='Bearer testtoken',
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.assertEqual(
+            models.Transaction.objects.filter(user=user, category='Snacks').count(),
+            1,
+        )
+
+
 class AuthTests(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='test.user', email='test@example.com', password='oldpassword')

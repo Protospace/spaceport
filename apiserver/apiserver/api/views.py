@@ -1590,7 +1590,7 @@ class ProtocoinViewSet(Base):
                 if abs(source_user_balance - balance) > 0.01:  # stupid https://docs.djangoproject.com/en/4.2/ref/databases/#decimal-handling
                     raise exceptions.ValidationError(dict(balance='Incorrect current balance. Try refreshing the page.'))
 
-                if source_user_balance < amount:
+                if source_user_balance + 0.001 < amount:
                     raise exceptions.ValidationError(dict(amount='Insufficient funds.'))
 
                 if training:
@@ -1676,7 +1676,7 @@ class ProtocoinViewSet(Base):
                 if abs(source_user_balance - balance) > 0.01:  # stupid https://docs.djangoproject.com/en/4.2/ref/databases/#decimal-handling
                     raise exceptions.ValidationError(dict(balance='Incorrect current balance. Try refreshing the page.'))
 
-                if source_user_balance < amount:
+                if source_user_balance + 0.001 < amount:
                     raise exceptions.ValidationError(dict(amount='Insufficient funds.'))
 
                 source_delta = -amount
@@ -1867,7 +1867,7 @@ class ProtocoinViewSet(Base):
                 if abs(source_user_balance - balance) > 0.01:  # stupid https://docs.djangoproject.com/en/4.2/ref/databases/#decimal-handling
                     raise exceptions.ValidationError(dict(balance='Incorrect current balance. Try refreshing the page.'))
 
-                if source_user_balance < amount:
+                if source_user_balance + 0.001 < amount:
                     raise exceptions.ValidationError(dict(amount='Insufficient funds.'))
 
                 source_delta = -amount
