@@ -269,7 +269,7 @@ function NewClassTableCourse(props) {
 								<Table.Row key={x.id} active={x.datetime < now || x.is_cancelled}>
 									<Table.Cell>
 										<Link to={'/classes/'+x.id}>
-											{moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format(' MMM Do')}
+											{moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format(' MMM D')}
 										</Link>
 										{' - '}{x.is_cancelled ? 'Cancelled' : moment.utc(x.datetime).tz(DISPLAY_TIMEZONE).format('LT')}
 									</Table.Cell>
